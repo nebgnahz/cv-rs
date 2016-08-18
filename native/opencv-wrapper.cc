@@ -8,4 +8,9 @@ extern "C" {
         *image = cv::imread(filename, flags);
         return (CMat*) image;
     }
+
+    void opencv_mat_free(CMat* mat) {
+        delete mat;
+        mat = NULL;
+    }
 }

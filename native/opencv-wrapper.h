@@ -10,6 +10,8 @@ extern "C" {
 // The caller owns the returned data CMat
 CMat* opencv_imread(const char* const filename, int flags);
 
+void opencv_mat_free(CMat* mat);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
