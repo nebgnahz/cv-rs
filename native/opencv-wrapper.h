@@ -44,6 +44,14 @@ bool opencv_videocapture_is_opened(const CVideoCapture* const ccap);
 bool opencv_videocapture_read(CVideoCapture* ccap, CMat* cmat);
 void opencv_videocapture_drop(CVideoCapture* ccap);
 
+// =============================================================================
+//   CascadeClassifier
+// =============================================================================
+typedef void CCascadeClassifier;
+CCascadeClassifier* opencv_cascade_classifier_new();
+CCascadeClassifier* opencv_cascade_classifier_from_path(const char* const path);
+void opencv_cascade_classifier_drop(CCascadeClassifier* cc);
+
 EXTERN_C_END
 
 #endif  // OPENCV_WRAPPER_H_

@@ -1,12 +1,13 @@
 #include "opencv-wrapper.h"
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/objdetect.hpp>
 
 EXTERN_C_BEGIN
 
-// =========================================================================
+// =============================================================================
 //   Core
-// =========================================================================
+// =============================================================================
 CMat* opencv_mat_new() {
     cv::Mat* image = new cv::Mat();
     return static_cast<CMat*>(image);
@@ -29,9 +30,9 @@ void opencv_mat_drop(CMat* cmat) {
     cmat = nullptr;
 }
 
-// =========================================================================
+// =============================================================================
 //   Highgui: high-level GUI
-// =========================================================================
+// =============================================================================
 void opencv_named_window(const char* const winname, int flags) {
     cv::namedWindow(winname, flags);
 }
@@ -47,9 +48,9 @@ int opencv_wait_key(int delay) {
     return cv::waitKey(delay);
 }
 
-// =========================================================================
+// =============================================================================
 //   VideoCapture
-// =========================================================================
+// =============================================================================
 CVideoCapture* opencv_videocapture_new(int index) {
     cv::VideoCapture* cap = new cv::VideoCapture(index);
     return static_cast<CVideoCapture*>(cap);
@@ -73,8 +74,23 @@ void opencv_videocapture_drop(CVideoCapture* ccap) {
     ccap = nullptr;
 }
 
-// =========================================================================
+// =============================================================================
 //   CascadeClassifier
-// =========================================================================
+// =============================================================================
+CCascadeClassifier* opencv_cascade_classifier_new() {
+    cv::CascadeClassifier* cc = new cv::CascadeClassifier();
+    return static_cast<CCascadeClassifier*>(cc);
+}
+
+CCascadeClassifier* opencv_cascade_classifier_from_path(const char* const p) {
+    cv::CascadeClassifier* cc = new cv::CascadeClassifier(p);
+    return static_cast<CCascadeClassifier*>(cc);
+}
+
+void opencv_cascade_classifier_drop(CCascadeClassifier* cc) {
+    cv::CascadeClassifier* cascade = static_cast<cv::CascadeClassifier*>(cc);
+    delete cascade;
+    cc = nullptr;
+}
 
 EXTERN_C_END

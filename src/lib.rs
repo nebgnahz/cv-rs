@@ -4,15 +4,18 @@ use std::ffi::CString;
 use std::os::raw::c_char;
 
 type CMat = c_void;
-
 pub struct Mat {
     c_mat: *mut CMat,
 }
 
 type CVideoCapture = c_void;
-
 pub struct VideoCapture {
     c_videocapture: *mut CVideoCapture,
+}
+
+type CCascadeClassifier = c_void;
+pub struct CascadeClassifier {
+    c_cascade_classifier: *mut CCascadeClassifier,
 }
 
 pub enum WindowFlags {
@@ -43,6 +46,10 @@ extern "C" {
     fn opencv_videocapture_is_opened(ccap: *const CVideoCapture) -> bool;
     fn opencv_videocapture_read(v: *mut CVideoCapture, m: *mut CMat) -> bool;
     fn opencv_videocapture_drop(ccap: *mut CVideoCapture);
+
+    fn opencv_cascade_classifier_new() -> *mut CCascadeClassifier;
+    fn opencv_cascade_classifier_from_path(p: *const c_char) -> *mut CCascadeClassifier;
+    fn opencv_cascade_classifier_drop(p: *mut CCascadeClassifier);
 }
 
 impl Mat {
@@ -111,6 +118,35 @@ impl Drop for VideoCapture {
     fn drop(&mut self) {
         unsafe {
             opencv_videocapture_drop(self.c_videocapture);
+        }
+    }
+}
+
+impl CascadeClassifier {
+    pub fn new() -> Self {
+        let cascade = unsafe {
+            opencv_cascade_classifier_new()
+        };
+        CascadeClassifier {
+            c_cascade_classifier: cascade,
+        }
+    }
+
+    pub fn from_path(path: &str) -> Self {
+        let s = CString::new(path).unwrap();
+        let cascade = unsafe {
+            opencv_cascade_classifier_from_path((&s).as_ptr())
+        };
+        CascadeClassifier {
+            c_cascade_classifier: cascade,
+        }
+    }
+}
+
+impl Drop for CascadeClassifier {
+    fn drop(&mut self) {
+        unsafe {
+            opencv_cascade_classifier_drop(self.c_cascade_classifier);
         }
     }
 }
