@@ -9,8 +9,24 @@ extern "C" {
         return (CMat*) image;
     }
 
-    void opencv_mat_free(CMat* mat) {
+    void opencv_mat_free(CMat* cmat) {
+        cv::Mat* mat = (cv::Mat*) cmat;
         delete mat;
         mat = NULL;
+    }
+
+    void opencv_named_window(const char* const winname, int flags) {
+        cv::namedWindow(winname, flags);
+    }
+
+    void opencv_imshow(const char* const winname, CMat *cmat) {
+        cv::Mat* mat = (cv::Mat*) cmat;
+        if (mat != NULL) {
+            cv::imshow(winname, *mat);
+        }
+    }
+
+    int opencv_wait_key(int delay) {
+        cv::waitKey(delay);
     }
 }
