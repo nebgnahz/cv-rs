@@ -9,6 +9,12 @@ pub struct Mat {
     c_mat: *mut CMat,
 }
 
+type CVideoCapture = c_void;
+
+pub struct VideoCapture {
+    c_videocapture: *mut CVideoCapture,
+}
+
 pub enum WindowFlags {
     WindowNormal       = 0x00000000,
     WindowAutosize     = 0x00000001,
@@ -24,15 +30,30 @@ pub enum WindowFlags {
 }
 
 extern "C" {
+    fn opencv_mat_new() -> *mut CMat;
+    fn opencv_mat_is_valid(mat: *mut CMat) -> bool;
     fn opencv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
-    fn opencv_mat_free(mat: *mut CMat);
+    fn opencv_mat_drop(mat: *mut CMat);
+
     pub fn opencv_named_window(name: *const c_char, flags: c_int);
     fn opencv_imshow(name: *const c_char, cmat: *mut CMat);
     fn opencv_wait_key(delay_ms: c_int) -> c_int;
+
+    fn opencv_videocapture_new(index: c_int) -> *mut CVideoCapture;
+    fn opencv_videocapture_is_opened(ccap: *const CVideoCapture) -> bool;
+    fn opencv_videocapture_read(v: *mut CVideoCapture, m: *mut CMat) -> bool;
+    fn opencv_videocapture_drop(ccap: *mut CVideoCapture);
 }
 
 impl Mat {
-    pub fn new(path: &str, flags: i32) -> Self {
+    pub fn new() -> Self {
+        let m = unsafe { opencv_mat_new() };
+        Mat {
+            c_mat: m,
+        }
+    }
+
+    pub fn from_path(path: &str, flags: i32) -> Self {
         let s = CString::new(path).unwrap();
         let m = unsafe { opencv_imread((&s).as_ptr(), flags) };
         Mat {
@@ -40,19 +61,56 @@ impl Mat {
         }
     }
 
-    pub fn show(self, name: &str, delay: i32) {
+    pub fn is_valid(&self) -> bool {
+        unsafe { opencv_mat_is_valid(self.c_mat) }
+    }
+
+    pub fn show(&self, name: &str, delay: i32) {
         let s = CString::new(name).unwrap();
         unsafe {
             opencv_imshow((&s).as_ptr(), self.c_mat);
             opencv_wait_key(delay);
         }
     }
+
+    fn get_cmat(&self) -> *mut CMat {
+        self.c_mat
+    }
 }
 
 impl Drop for Mat {
     fn drop(&mut self) {
         unsafe {
-            opencv_mat_free(self.c_mat);
+            opencv_mat_drop(self.c_mat);
+        }
+    }
+}
+
+impl VideoCapture {
+    pub fn new(index: i32) -> Self {
+        let cap = unsafe { opencv_videocapture_new(index) };
+        VideoCapture {
+            c_videocapture: cap,
+        }
+    }
+
+    pub fn is_open(&self, ) -> bool {
+        unsafe {
+            opencv_videocapture_is_opened(self.c_videocapture)
+        }
+    }
+
+    pub fn read(&self, mat: &Mat) -> bool {
+        unsafe {
+            opencv_videocapture_read(self.c_videocapture, mat.get_cmat())
+        }
+    }
+}
+
+impl Drop for VideoCapture {
+    fn drop(&mut self) {
+        unsafe {
+            opencv_videocapture_drop(self.c_videocapture);
         }
     }
 }
