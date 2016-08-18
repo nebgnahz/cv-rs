@@ -6,13 +6,13 @@ extern "C" {
     CMat* opencv_imread(const char* const filename, int flags) {
         cv::Mat* image = new cv::Mat();
         *image = cv::imread(filename, flags);
-        return (CMat*) image;
+        return static_cast<CMat*>(image);
     }
 
     void opencv_mat_free(CMat* cmat) {
-        cv::Mat* mat = (cv::Mat*) cmat;
+        cv::Mat* mat = static_cast<cv::Mat*>(cmat);
         delete mat;
-        mat = NULL;
+        cmat = nullptr;
     }
 
     void opencv_named_window(const char* const winname, int flags) {
@@ -20,7 +20,7 @@ extern "C" {
     }
 
     void opencv_imshow(const char* const winname, CMat *cmat) {
-        cv::Mat* mat = (cv::Mat*) cmat;
+        cv::Mat* mat = static_cast<cv::Mat*>(cmat);
         if (mat != NULL) {
             cv::imshow(winname, *mat);
         }
