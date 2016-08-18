@@ -2,8 +2,14 @@
 #define OPENCV_WRAPPER_H_
 
 #ifdef __cplusplus
-extern "C" {
+#define EXTERN_C_BEGIN  extern "C" {
+#define EXTERN_C_END    }
+#else
+#define EXTERN_C_BEGIN
+#define EXTERN_C_END
 #endif
+
+EXTERN_C_BEGIN
 
 // =============================================================================
 //   Core
@@ -38,9 +44,6 @@ bool opencv_videocapture_is_opened(const CVideoCapture* const ccap);
 bool opencv_videocapture_read(CVideoCapture* ccap, CMat* cmat);
 void opencv_videocapture_drop(CVideoCapture* ccap);
 
-#ifdef __cplusplus
-}  // extern "C"
-#endif
-
+EXTERN_C_END
 
 #endif  // OPENCV_WRAPPER_H_
