@@ -1,6 +1,9 @@
 #ifndef OPENCV_WRAPPER_H_
 #define OPENCV_WRAPPER_H_
 
+#include <stddef.h>
+#include <stdint.h>
+
 #ifdef __cplusplus
 #define EXTERN_C_BEGIN  extern "C" {
 #define EXTERN_C_END    }
@@ -27,6 +30,26 @@ CMat* opencv_imread(const char* const filename, int flags);
 // Free a Mat object
 void opencv_mat_drop(CMat* cmat);
 
+typedef struct {
+    int32_t x;
+    int32_t y;
+    int32_t width;
+    int32_t height;
+} CRect;
+
+typedef struct {
+    CRect *array;
+    size_t used;
+    size_t size;
+} CVecOfRect;
+
+void opencv_vec_of_rect_drop(CVecOfRect* v);
+
+// =============================================================================
+//  Imgproc
+// =============================================================================
+void opencv_rectangle(CMat* cmat, CRect crect);
+
 // =============================================================================
 //   Highgui: high-level GUI
 // =============================================================================
@@ -51,6 +74,11 @@ typedef void CCascadeClassifier;
 CCascadeClassifier* opencv_cascade_classifier_new();
 CCascadeClassifier* opencv_cascade_classifier_from_path(const char* const path);
 void opencv_cascade_classifier_drop(CCascadeClassifier* cc);
+
+// vec_of_rect is dynamically allocated, the caller should take ownership of it.
+void opencv_cascade_classifier_detect(CCascadeClassifier* cc,
+                                      CMat* cmat,
+                                      CVecOfRect* vec_of_rect);
 
 EXTERN_C_END
 

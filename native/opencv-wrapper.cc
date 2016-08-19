@@ -1,6 +1,7 @@
 #include "opencv-wrapper.h"
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
 
 EXTERN_C_BEGIN
@@ -28,6 +29,22 @@ void opencv_mat_drop(CMat* cmat) {
     cv::Mat* mat = static_cast<cv::Mat*>(cmat);
     delete mat;
     cmat = nullptr;
+}
+
+void opencv_vec_of_rect_drop(CVecOfRect* v) {
+    free(v);
+    v->array = NULL;
+    v->used = 0;
+    v->size = 0;
+}
+
+// =============================================================================
+//  Imgproc
+// =============================================================================
+void opencv_rectangle(CMat* cmat, CRect crect) {
+    cv::Mat* mat = static_cast<cv::Mat*>(cmat);
+    cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
+    cv::rectangle(*mat, rect, cv::Scalar(255, 0, 0, 255));
 }
 
 // =============================================================================
@@ -91,6 +108,26 @@ void opencv_cascade_classifier_drop(CCascadeClassifier* cc) {
     cv::CascadeClassifier* cascade = static_cast<cv::CascadeClassifier*>(cc);
     delete cascade;
     cc = nullptr;
+}
+
+void opencv_cascade_classifier_detect(CCascadeClassifier* cc,
+                                      CMat* cmat,
+                                      CVecOfRect* vec_of_rect) {
+    cv::CascadeClassifier* cascade = static_cast<cv::CascadeClassifier*>(cc);
+    cv::Mat* image = static_cast<cv::Mat*>(cmat);
+    std::vector<cv::Rect> objects;
+    cascade->detectMultiScale(*image, objects);
+    // Move objects to vec_of_rect
+    size_t num = objects.size();
+    vec_of_rect->array = (CRect*) malloc(num * sizeof(CRect));
+    vec_of_rect->used = num;
+    vec_of_rect->size = num;
+    for (size_t i = 0; i < num; i++) {
+        vec_of_rect->array[i].x = objects[i].x;
+        vec_of_rect->array[i].y = objects[i].y;
+        vec_of_rect->array[i].width = objects[i].width;
+        vec_of_rect->array[i].height = objects[i].height;
+    }
 }
 
 EXTERN_C_END
