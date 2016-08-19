@@ -1,3 +1,5 @@
+//! A Rust wrapper for OpenCV.
+
 extern crate libc;
 use libc::{c_int, c_void};
 use std::ffi::CString;
@@ -39,9 +41,8 @@ impl VecOfRect {
 
     pub fn populate_rects(&mut self) {
         for i in 0..self.c_vec_of_rect.size {
-            let rect = unsafe {
-                *(self.c_vec_of_rect.array.offset(i as isize))
-            };
+            let rect =
+                unsafe { *(self.c_vec_of_rect.array.offset(i as isize)) };
             self.rects.push(rect);
         }
     }
@@ -67,7 +68,9 @@ impl std::fmt::Debug for VecOfRect {
 
 impl Drop for VecOfRect {
     fn drop(&mut self) {
-        extern "C" { fn opencv_vec_of_rect_drop(_: *mut CVecOfRect); }
+        extern "C" {
+            fn opencv_vec_of_rect_drop(_: *mut CVecOfRect);
+        }
         unsafe {
             opencv_vec_of_rect_drop(&mut self.c_vec_of_rect);
         }
@@ -84,17 +87,13 @@ extern "C" {
 impl Mat {
     pub fn new() -> Self {
         let m = unsafe { opencv_mat_new() };
-        Mat {
-            c_mat: m,
-        }
+        Mat { c_mat: m }
     }
 
     pub fn from_path(path: &str, flags: i32) -> Self {
         let s = CString::new(path).unwrap();
         let m = unsafe { opencv_imread((&s).as_ptr(), flags) };
-        Mat {
-            c_mat: m,
-        }
+        Mat { c_mat: m }
     }
 
     pub fn is_valid(&self) -> bool {
@@ -132,7 +131,6 @@ impl Mat {
             opencv_rectangle(self.c_mat, rect);
         }
     }
-
 }
 
 extern "C" {
@@ -142,17 +140,9 @@ extern "C" {
 }
 
 pub enum WindowFlags {
-    WindowNormal       = 0x00000000,
-    WindowAutosize     = 0x00000001,
-    WindowOpengl       = 0x00001000,
-
-    // The following flags are weird: FULLSCREEN is the same as AUTOSIZE
-    // Disabling them for now!
-    // WINDOW_FULLSCREEN   = 1,
-    // WINDOW_FREERATIO    = 0x00000100,
-    // WINDOW_KEEPRATIO    = 0x00000000,
-    // WINDOW_GUI_EXPANDED = 0x00000000,
-    // WINDOW_GUI_NORMAL   = 0x00000010,
+    WindowNormal = 0x00000000,
+    WindowAutosize = 0x00000001,
+    WindowOpengl = 0x00001000,
 }
 
 type CVideoCapture = c_void;
@@ -170,21 +160,15 @@ extern "C" {
 impl VideoCapture {
     pub fn new(index: i32) -> Self {
         let cap = unsafe { opencv_videocapture_new(index) };
-        VideoCapture {
-            c_videocapture: cap,
-        }
+        VideoCapture { c_videocapture: cap }
     }
 
-    pub fn is_open(&self, ) -> bool {
-        unsafe {
-            opencv_videocapture_is_opened(self.c_videocapture)
-        }
+    pub fn is_open(&self) -> bool {
+        unsafe { opencv_videocapture_is_opened(self.c_videocapture) }
     }
 
     pub fn read(&self, mat: &Mat) -> bool {
-        unsafe {
-            opencv_videocapture_read(self.c_videocapture, mat.get_cmat())
-        }
+        unsafe { opencv_videocapture_read(self.c_videocapture, mat.get_cmat()) }
     }
 }
 
@@ -203,7 +187,8 @@ pub struct CascadeClassifier {
 
 extern "C" {
     fn opencv_cascade_classifier_new() -> *mut CCascadeClassifier;
-    fn opencv_cascade_classifier_from_path(p: *const c_char) -> *mut CCascadeClassifier;
+    fn opencv_cascade_classifier_from_path(p: *const c_char)
+                                           -> *mut CCascadeClassifier;
     fn opencv_cascade_classifier_drop(p: *mut CCascadeClassifier);
     fn opencv_cascade_classifier_detect(cc: *mut CCascadeClassifier,
                                         cmat: *mut CMat,
@@ -212,30 +197,22 @@ extern "C" {
 
 impl CascadeClassifier {
     pub fn new() -> Self {
-        let cascade = unsafe {
-            opencv_cascade_classifier_new()
-        };
-        CascadeClassifier {
-            c_cascade_classifier: cascade,
-        }
+        let cascade = unsafe { opencv_cascade_classifier_new() };
+        CascadeClassifier { c_cascade_classifier: cascade }
     }
 
     pub fn from_path(path: &str) -> Self {
         let s = CString::new(path).unwrap();
-        let cascade = unsafe {
-            opencv_cascade_classifier_from_path((&s).as_ptr())
-        };
-        CascadeClassifier {
-            c_cascade_classifier: cascade,
-        }
+        let cascade =
+            unsafe { opencv_cascade_classifier_from_path((&s).as_ptr()) };
+        CascadeClassifier { c_cascade_classifier: cascade }
     }
 
     pub fn detect(&self, mat: &Mat, result: &mut VecOfRect) {
         unsafe {
-            opencv_cascade_classifier_detect(
-                self.c_cascade_classifier,
-                mat.get_cmat(),
-                result.get_mut_c_vec_of_rec());
+            opencv_cascade_classifier_detect(self.c_cascade_classifier,
+                                             mat.get_cmat(),
+                                             result.get_mut_c_vec_of_rec());
         }
 
         result.populate_rects();

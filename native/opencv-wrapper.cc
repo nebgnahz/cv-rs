@@ -55,7 +55,7 @@ void opencv_named_window(const char* const winname, int flags) {
     cv::namedWindow(winname, flags);
 }
 
-void opencv_imshow(const char* const winname, CMat *cmat) {
+void opencv_imshow(const char* const winname, CMat* cmat) {
     cv::Mat* mat = static_cast<cv::Mat*>(cmat);
     if (mat != NULL) {
         cv::imshow(winname, *mat);
@@ -111,8 +111,7 @@ void opencv_cascade_classifier_drop(CCascadeClassifier* cc) {
     cc = nullptr;
 }
 
-void opencv_cascade_classifier_detect(CCascadeClassifier* cc,
-                                      CMat* cmat,
+void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
                                       CVecOfRect* vec_of_rect) {
     cv::CascadeClassifier* cascade = static_cast<cv::CascadeClassifier*>(cc);
     cv::Mat* image = static_cast<cv::Mat*>(cmat);

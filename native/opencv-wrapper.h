@@ -5,8 +5,8 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-#define EXTERN_C_BEGIN  extern "C" {
-#define EXTERN_C_END    }
+#define EXTERN_C_BEGIN extern "C" {
+#define EXTERN_C_END }
 #else
 #define EXTERN_C_BEGIN
 #define EXTERN_C_END
@@ -38,7 +38,7 @@ typedef struct {
 } CRect;
 
 typedef struct {
-    CRect *array;
+    CRect* array;
     size_t size;
 } CVecOfRect;
 
@@ -75,8 +75,7 @@ CCascadeClassifier* opencv_cascade_classifier_from_path(const char* const path);
 void opencv_cascade_classifier_drop(CCascadeClassifier* cc);
 
 // vec_of_rect is dynamically allocated, the caller should take ownership of it.
-void opencv_cascade_classifier_detect(CCascadeClassifier* cc,
-                                      CMat* cmat,
+void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
                                       CVecOfRect* vec_of_rect);
 
 EXTERN_C_END

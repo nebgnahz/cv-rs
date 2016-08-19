@@ -2,7 +2,9 @@ extern crate rust_vision;
 use rust_vision::*;
 use std::ffi::CString;
 
-const CASCADE_PATH: &'static str = "/usr/local/Cellar/opencv3/3.1.0_3/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml";
+const CASCADE_PATH: &'static str =
+    "/usr/local/Cellar/opencv3/3.1.\
+     0_3/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml";
 
 fn main() {
     let cap = VideoCapture::new(0);
