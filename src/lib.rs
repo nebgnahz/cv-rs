@@ -8,8 +8,8 @@ pub struct Mat {
     c_mat: *mut CMat,
 }
 
-#[repr(C)]
 #[derive(Default, Debug, Clone, Copy)]
+#[repr(C)]
 pub struct Rect {
     x: i32,
     y: i32,

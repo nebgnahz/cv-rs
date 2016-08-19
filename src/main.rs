@@ -19,7 +19,6 @@ fn main() {
         let mut result = VecOfRect::default();
         cap.read(&m);
         cascade.detect(&m, &mut result);
-
         result.draw_on_mat(&mut m);
         m.show("window", 30);
     }

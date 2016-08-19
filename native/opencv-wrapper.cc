@@ -43,7 +43,7 @@ void opencv_vec_of_rect_drop(CVecOfRect* v) {
 // =============================================================================
 void opencv_rectangle(CMat* cmat, CRect crect) {
     cv::Mat* mat = static_cast<cv::Mat*>(cmat);
-    cv::Rect rect(rect.x, rect.y, rect.width, rect.height);
+    cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
     cv::rectangle(*mat, rect, cv::Scalar(255, 0, 0, 255));
 }
 
