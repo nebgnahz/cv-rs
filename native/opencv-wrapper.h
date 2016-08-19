@@ -46,6 +46,11 @@ typedef struct {
 void opencv_vec_of_rect_drop(CVecOfRect* v);
 
 // =============================================================================
+//  Imgproc
+// =============================================================================
+void opencv_rectangle(CMat* cmat, CRect crect);
+
+// =============================================================================
 //   Highgui: high-level GUI
 // =============================================================================
 void opencv_named_window(const char* const winname, int flags);

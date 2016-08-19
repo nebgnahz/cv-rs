@@ -50,6 +50,19 @@ impl std::fmt::Debug for VecOfRect {
     }
 }
 
+impl VecOfRect {
+    pub fn draw_on_mat(&self, mat: &mut Mat) {
+        if self.used == 0 {
+            return
+        }
+
+        for i in 0..self.used {
+            let rect = unsafe { *(self.array.offset(i as isize)) };
+            mat.rectangle(rect);
+        }
+    }
+}
+
 type CVideoCapture = c_void;
 pub struct VideoCapture {
     c_videocapture: *mut CVideoCapture,
@@ -106,6 +119,19 @@ impl Drop for Mat {
             opencv_mat_drop(self.c_mat);
         }
     }
+}
+
+extern "C" {
+    fn opencv_rectangle(cmat: *mut CMat, rect: Rect);
+}
+
+impl Mat {
+    pub fn rectangle(&self, rect: Rect) {
+        unsafe {
+            opencv_rectangle(self.c_mat, rect);
+        }
+    }
+
 }
 
 extern "C" {

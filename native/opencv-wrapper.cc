@@ -1,6 +1,7 @@
 #include "opencv-wrapper.h"
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
 
 EXTERN_C_BEGIN
@@ -35,6 +36,15 @@ void opencv_vec_of_rect_drop(CVecOfRect* v) {
     v->array = NULL;
     v->used = 0;
     v->size = 0;
+}
+
+// =============================================================================
+//  Imgproc
+// =============================================================================
+void opencv_rectangle(CMat* cmat, CRect crect) {
+    cv::Mat* mat = static_cast<cv::Mat*>(cmat);
+    cv::Rect rect(rect.x, rect.y, rect.width, rect.height);
+    cv::rectangle(*mat, rect, cv::Scalar(255, 0, 0, 255));
 }
 
 // =============================================================================
