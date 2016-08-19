@@ -30,6 +30,13 @@ void opencv_mat_drop(CMat* cmat) {
     cmat = nullptr;
 }
 
+void opencv_vec_of_rect_drop(CVecOfRect* v) {
+    free(v);
+    v->array = NULL;
+    v->used = 0;
+    v->size = 0;
+}
+
 // =============================================================================
 //   Highgui: high-level GUI
 // =============================================================================
@@ -93,10 +100,24 @@ void opencv_cascade_classifier_drop(CCascadeClassifier* cc) {
     cc = nullptr;
 }
 
-void opencv_cascade_classifier_drop(CCascadeClassifier* cc) {
+void opencv_cascade_classifier_detect(CCascadeClassifier* cc,
+                                      CMat* cmat,
+                                      CVecOfRect* vec_of_rect) {
     cv::CascadeClassifier* cascade = static_cast<cv::CascadeClassifier*>(cc);
-    delete cascade;
-    cc = nullptr;
+    cv::Mat* image = static_cast<cv::Mat*>(cmat);
+    std::vector<cv::Rect> objects;
+    cascade->detectMultiScale(*image, objects);
+    // Move objects to vec_of_rect
+    size_t num = objects.size();
+    vec_of_rect->array = (CRect*) malloc(num * sizeof(CRect));
+    vec_of_rect->used = num;
+    vec_of_rect->size = num;
+    for (size_t i = 0; i < num; i++) {
+        vec_of_rect->array[i].x = objects[i].x;
+        vec_of_rect->array[i].y = objects[i].y;
+        vec_of_rect->array[i].width = objects[i].width;
+        vec_of_rect->array[i].height = objects[i].height;
+    }
 }
 
 EXTERN_C_END

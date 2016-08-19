@@ -9,11 +9,45 @@ pub struct Mat {
 }
 
 #[repr(C)]
+#[derive(Default, Debug, Clone, Copy)]
 pub struct Rect {
     x: i32,
     y: i32,
     width: i32,
     height: i32,
+}
+
+#[repr(C)]
+pub struct VecOfRect {
+    array: *mut Rect,
+    used: usize,
+    size: usize,
+}
+
+impl Default for VecOfRect {
+    fn default() -> Self {
+        VecOfRect {
+            array: std::ptr::null_mut::<Rect>(),
+            used: 0,
+            size: 0,
+        }
+    }
+}
+
+impl std::fmt::Debug for VecOfRect {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        if self.used == 0 {
+            return writeln!(f, "Empty")
+        }
+
+        // Else we print all the rectangles
+        try!(write!(f, "Rects: "));
+        for i in 0..self.used {
+            let rect = unsafe { *(self.array.offset(i as isize)) };
+            try!(write!(f, " {:?} ", rect));
+        }
+        writeln!(f, "")
+    }
 }
 
 type CVideoCapture = c_void;
@@ -134,6 +168,9 @@ extern "C" {
     fn opencv_cascade_classifier_new() -> *mut CCascadeClassifier;
     fn opencv_cascade_classifier_from_path(p: *const c_char) -> *mut CCascadeClassifier;
     fn opencv_cascade_classifier_drop(p: *mut CCascadeClassifier);
+    fn opencv_cascade_classifier_detect(cc: *mut CCascadeClassifier,
+                                        cmat: *mut CMat,
+                                        vec_of_rect: *mut VecOfRect);
 }
 
 impl CascadeClassifier {
@@ -153,6 +190,13 @@ impl CascadeClassifier {
         };
         CascadeClassifier {
             c_cascade_classifier: cascade,
+        }
+    }
+
+    pub fn detect(&self, mat: &Mat, result: &mut VecOfRect) {
+        unsafe {
+            opencv_cascade_classifier_detect(
+                self.c_cascade_classifier, mat.get_cmat(), result);
         }
     }
 }
