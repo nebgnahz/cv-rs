@@ -32,9 +32,11 @@ void opencv_mat_drop(CMat* cmat) {
 }
 
 void opencv_vec_of_rect_drop(CVecOfRect* v) {
-    free(v);
-    v->array = NULL;
-    v->size = 0;
+    if (v->array != nullptr) {
+        free(v->array);
+        v->array = nullptr;
+        v->size = 0;
+    }
 }
 
 // =============================================================================

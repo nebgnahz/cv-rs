@@ -28,6 +28,25 @@ pub struct VecOfRect {
     c_vec_of_rect: CVecOfRect,
 }
 
+impl VecOfRect {
+    pub fn draw_on_mat(&self, mat: &mut Mat) {
+        self.rects.iter().map(|&r| mat.rectangle(r)).count();
+    }
+
+    fn get_mut_c_vec_of_rec(&mut self) -> &mut CVecOfRect {
+        &mut self.c_vec_of_rect
+    }
+
+    pub fn populate_rects(&mut self) {
+        for i in 0..self.c_vec_of_rect.size {
+            let rect = unsafe {
+                *(self.c_vec_of_rect.array.offset(i as isize))
+            };
+            self.rects.push(rect);
+        }
+    }
+}
+
 impl Default for VecOfRect {
     fn default() -> Self {
         VecOfRect {
@@ -46,21 +65,11 @@ impl std::fmt::Debug for VecOfRect {
     }
 }
 
-impl VecOfRect {
-    pub fn draw_on_mat(&self, mat: &mut Mat) {
-        self.rects.iter().map(|&r| mat.rectangle(r)).count();
-    }
-
-    fn get_mut_c_vec_of_rec(&mut self) -> &mut CVecOfRect {
-        &mut self.c_vec_of_rect
-    }
-
-    pub fn populate_rects(&mut self) {
-        for i in 0..self.c_vec_of_rect.size {
-            let rect = unsafe {
-                *(self.c_vec_of_rect.array.offset(i as isize))
-            };
-            self.rects.push(rect);
+impl Drop for VecOfRect {
+    fn drop(&mut self) {
+        extern "C" { fn opencv_vec_of_rect_drop(_: *mut CVecOfRect); }
+        unsafe {
+            opencv_vec_of_rect_drop(&mut self.c_vec_of_rect);
         }
     }
 }
