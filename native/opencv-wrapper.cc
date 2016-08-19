@@ -93,4 +93,10 @@ void opencv_cascade_classifier_drop(CCascadeClassifier* cc) {
     cc = nullptr;
 }
 
+void opencv_cascade_classifier_drop(CCascadeClassifier* cc) {
+    cv::CascadeClassifier* cascade = static_cast<cv::CascadeClassifier*>(cc);
+    delete cascade;
+    cc = nullptr;
+}
+
 EXTERN_C_END

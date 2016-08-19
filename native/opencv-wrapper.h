@@ -1,6 +1,8 @@
 #ifndef OPENCV_WRAPPER_H_
 #define OPENCV_WRAPPER_H_
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 #define EXTERN_C_BEGIN  extern "C" {
 #define EXTERN_C_END    }
@@ -27,6 +29,13 @@ CMat* opencv_imread(const char* const filename, int flags);
 // Free a Mat object
 void opencv_mat_drop(CMat* cmat);
 
+struct CRect {
+    int32_t x;
+    int32_t y;
+    int32_t width;
+    int32_t height;
+};
+
 // =============================================================================
 //   Highgui: high-level GUI
 // =============================================================================
@@ -51,6 +60,8 @@ typedef void CCascadeClassifier;
 CCascadeClassifier* opencv_cascade_classifier_new();
 CCascadeClassifier* opencv_cascade_classifier_from_path(const char* const path);
 void opencv_cascade_classifier_drop(CCascadeClassifier* cc);
+size_t opencv_cascade_classifier_detect(CCascadeClassifier* cc,
+                                        Rect* rect);
 
 EXTERN_C_END
 

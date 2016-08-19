@@ -8,6 +8,14 @@ pub struct Mat {
     c_mat: *mut CMat,
 }
 
+#[repr(C)]
+pub struct Rect {
+    x: i32,
+    y: i32,
+    width: i32,
+    height: i32,
+}
+
 type CVideoCapture = c_void;
 pub struct VideoCapture {
     c_videocapture: *mut CVideoCapture,
@@ -18,38 +26,11 @@ pub struct CascadeClassifier {
     c_cascade_classifier: *mut CCascadeClassifier,
 }
 
-pub enum WindowFlags {
-    WindowNormal       = 0x00000000,
-    WindowAutosize     = 0x00000001,
-    WindowOpengl       = 0x00001000,
-
-    // The following flags are weird: FULLSCREEN is the same as AUTOSIZE
-    // Disabling them for now!
-    // WINDOW_FULLSCREEN   = 1,
-    // WINDOW_FREERATIO    = 0x00000100,
-    // WINDOW_KEEPRATIO    = 0x00000000,
-    // WINDOW_GUI_EXPANDED = 0x00000000,
-    // WINDOW_GUI_NORMAL   = 0x00000010,
-}
-
 extern "C" {
     fn opencv_mat_new() -> *mut CMat;
     fn opencv_mat_is_valid(mat: *mut CMat) -> bool;
     fn opencv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
     fn opencv_mat_drop(mat: *mut CMat);
-
-    pub fn opencv_named_window(name: *const c_char, flags: c_int);
-    fn opencv_imshow(name: *const c_char, cmat: *mut CMat);
-    fn opencv_wait_key(delay_ms: c_int) -> c_int;
-
-    fn opencv_videocapture_new(index: c_int) -> *mut CVideoCapture;
-    fn opencv_videocapture_is_opened(ccap: *const CVideoCapture) -> bool;
-    fn opencv_videocapture_read(v: *mut CVideoCapture, m: *mut CMat) -> bool;
-    fn opencv_videocapture_drop(ccap: *mut CVideoCapture);
-
-    fn opencv_cascade_classifier_new() -> *mut CCascadeClassifier;
-    fn opencv_cascade_classifier_from_path(p: *const c_char) -> *mut CCascadeClassifier;
-    fn opencv_cascade_classifier_drop(p: *mut CCascadeClassifier);
 }
 
 impl Mat {
@@ -93,6 +74,33 @@ impl Drop for Mat {
     }
 }
 
+extern "C" {
+    pub fn opencv_named_window(name: *const c_char, flags: c_int);
+    fn opencv_imshow(name: *const c_char, cmat: *mut CMat);
+    fn opencv_wait_key(delay_ms: c_int) -> c_int;
+}
+
+pub enum WindowFlags {
+    WindowNormal       = 0x00000000,
+    WindowAutosize     = 0x00000001,
+    WindowOpengl       = 0x00001000,
+
+    // The following flags are weird: FULLSCREEN is the same as AUTOSIZE
+    // Disabling them for now!
+    // WINDOW_FULLSCREEN   = 1,
+    // WINDOW_FREERATIO    = 0x00000100,
+    // WINDOW_KEEPRATIO    = 0x00000000,
+    // WINDOW_GUI_EXPANDED = 0x00000000,
+    // WINDOW_GUI_NORMAL   = 0x00000010,
+}
+
+extern "C" {
+    fn opencv_videocapture_new(index: c_int) -> *mut CVideoCapture;
+    fn opencv_videocapture_is_opened(ccap: *const CVideoCapture) -> bool;
+    fn opencv_videocapture_read(v: *mut CVideoCapture, m: *mut CMat) -> bool;
+    fn opencv_videocapture_drop(ccap: *mut CVideoCapture);
+}
+
 impl VideoCapture {
     pub fn new(index: i32) -> Self {
         let cap = unsafe { opencv_videocapture_new(index) };
@@ -120,6 +128,12 @@ impl Drop for VideoCapture {
             opencv_videocapture_drop(self.c_videocapture);
         }
     }
+}
+
+extern "C" {
+    fn opencv_cascade_classifier_new() -> *mut CCascadeClassifier;
+    fn opencv_cascade_classifier_from_path(p: *const c_char) -> *mut CCascadeClassifier;
+    fn opencv_cascade_classifier_drop(p: *mut CCascadeClassifier);
 }
 
 impl CascadeClassifier {
