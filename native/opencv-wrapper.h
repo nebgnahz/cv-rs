@@ -39,7 +39,6 @@ typedef struct {
 
 typedef struct {
     CRect *array;
-    size_t used;
     size_t size;
 } CVecOfRect;
 

@@ -34,7 +34,6 @@ void opencv_mat_drop(CMat* cmat) {
 void opencv_vec_of_rect_drop(CVecOfRect* v) {
     free(v);
     v->array = NULL;
-    v->used = 0;
     v->size = 0;
 }
 
@@ -120,7 +119,6 @@ void opencv_cascade_classifier_detect(CCascadeClassifier* cc,
     // Move objects to vec_of_rect
     size_t num = objects.size();
     vec_of_rect->array = (CRect*) malloc(num * sizeof(CRect));
-    vec_of_rect->used = num;
     vec_of_rect->size = num;
     for (size_t i = 0; i < num; i++) {
         vec_of_rect->array[i].x = objects[i].x;
