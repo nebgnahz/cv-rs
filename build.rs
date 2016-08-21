@@ -5,6 +5,7 @@ fn main() {
         .cpp(true)
         .file("native/opencv-wrapper.cc")
         .include("native")
+        .flag("--std=c++11")
         .compile("libopencv-wrapper.a");
 
     println!("cargo:rustc-link-search=native=-L/usr/local/lib");
