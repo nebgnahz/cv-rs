@@ -167,8 +167,11 @@ extern "C" {
                            ndsts: isize,
                            from_to: *const i32,
                            npairs: isize);
-    fn opencv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double,
-                        beta: c_double, norm_type: c_int);
+    fn opencv_normalize(csrc: *const CMat,
+                        cdst: *mut CMat,
+                        alpha: c_double,
+                        beta: c_double,
+                        norm_type: c_int);
 }
 
 impl Mat {
@@ -199,9 +202,7 @@ impl Mat {
 
     pub fn normalize(&self, alpha: f64, beta: f64, norm_type: i32) -> Mat {
         let m = Mat::new();
-        unsafe {
-            opencv_normalize(self.c_mat, m.c_mat, alpha, beta, norm_type)
-        }
+        unsafe { opencv_normalize(self.c_mat, m.c_mat, alpha, beta, norm_type) }
         m
     }
 }
@@ -212,14 +213,20 @@ impl Mat {
 extern "C" {
     fn opencv_rectangle(cmat: *mut CMat, rect: Rect);
     fn opencv_cvt_color(cmat: *const CMat, output: *mut CMat, code: i32);
-    fn opencv_cal_hist(cimages: *const CMat,
-                       nimages: i32,
-                       channels: *const c_int,
-                       cmask: *const CMat,
-                       chist: *mut CMat,
-                       dims: c_int,
-                       hist_size: *const c_int,
-                       ranges: *mut *mut c_float);
+    fn opencv_calc_hist(cimages: *const CMat,
+                        nimages: i32,
+                        channels: *const c_int,
+                        cmask: *const CMat,
+                        chist: *mut CMat,
+                        dims: c_int,
+                        hist_size: *const c_int,
+                        ranges: *mut *mut c_float);
+    fn opencv_calc_back_project(cimages: *const CMat,
+                                nimages: c_int,
+                                channels: *const c_int,
+                                chist: *const CMat,
+                                cback_project: *mut CMat,
+                                ranges: *const *const c_float);
 }
 
 impl Mat {
@@ -235,25 +242,41 @@ impl Mat {
         m
     }
 
-    pub fn cal_hist(&self,
-                    channels: *const c_int,
-                    mask: Mat,
-                    dims: c_int,
-                    hist_size: *const c_int,
-                    ranges: *mut *mut c_float)
-                    -> Mat {
+    pub fn calc_hist(&self,
+                     channels: *const c_int,
+                     mask: Mat,
+                     dims: c_int,
+                     hist_size: *const c_int,
+                     ranges: *mut *mut c_float)
+                     -> Mat {
         let m = Mat::new();
         unsafe {
-            opencv_cal_hist(self.c_mat,
-                            1,
-                            channels,
-                            mask.c_mat,
-                            m.c_mat,
-                            dims,
-                            hist_size,
-                            ranges);
+            opencv_calc_hist(self.c_mat,
+                             1,
+                             channels,
+                             mask.c_mat,
+                             m.c_mat,
+                             dims,
+                             hist_size,
+                             ranges);
         }
+        m
+    }
 
+    pub fn calc_back_project(&self,
+                             channels: *const i32,
+                             hist: Mat,
+                             ranges: *const *const f32)
+                             -> Mat {
+        let m = Mat::new();
+        unsafe {
+            opencv_calc_back_project(self.c_mat,
+                                     1,
+                                     channels,
+                                     hist.c_mat,
+                                     m.c_mat,
+                                     ranges);
+        }
         m
     }
 }

@@ -98,15 +98,25 @@ void opencv_cvt_color(CMat* cmat, CMat* output, int code) {
     cv::cvtColor(*mat, *out, code);
 }
 
-void opencv_cal_hist(const CMat* cimages, int nimages,
-                     const int* channels, CMat* cmask, CMat* chist, int dims,
-                     const int* hist_size, const float** ranges) {
+void opencv_calc_hist(const CMat* cimages, int nimages,
+                      const int* channels, CMat* cmask, CMat* chist, int dims,
+                      const int* hist_size, const float** ranges) {
     const cv::Mat* images = static_cast<const cv::Mat*>(cimages);
     cv::Mat* mask = static_cast<cv::Mat*>(cmask);
     cv::Mat* hist = static_cast<cv::Mat*>(chist);
-    cv::calcHist(images, nimages, channels, *mask, *hist, dims, hist_size, ranges);
+    cv::calcHist(images, nimages, channels, *mask, *hist, dims, hist_size,
+                 ranges);
 }
 
+void opencv_calc_back_project(const CMat* cimages, int nimages,
+                              const int* channels, CMat* chist,
+                              CMat* cback_project, const float** ranges) {
+    const cv::Mat* images = static_cast<const cv::Mat*>(cimages);
+    cv::Mat* hist = static_cast<cv::Mat*>(chist);
+    cv::Mat* back_project = static_cast<cv::Mat*>(cback_project);
+    cv::calcBackProject(images, nimages, channels, *hist, *back_project,
+                        ranges);
+}
 
 // =============================================================================
 //   Highgui: high-level GUI

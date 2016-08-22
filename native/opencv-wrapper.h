@@ -93,9 +93,12 @@ void opencv_normalize(CMat* csrc, CMat* cdst, double alpha, double beta,
 // =============================================================================
 void opencv_rectangle(CMat* cmat, CRect crect);
 void opencv_cvt_color(CMat* cmat, CMat* output, int code);
-void opencv_cal_hist(const CMat* const cimages, int nimages,
-                     const int* channels, CMat* mask, CMat* hist, int dims,
-                     const int* hist_size, const float** ranges);
+void opencv_calc_hist(const CMat* const cimages, int nimages,
+                      const int* channels, CMat* mask, CMat* hist, int dims,
+                      const int* hist_size, const float** ranges);
+void opencv_calc_back_project(const CMat* images, int nimages,
+                              const int* channels, CMat* hist,
+                              CMat* back_project, const float** ranges);
 
 // =============================================================================
 //   Highgui: high-level GUI
