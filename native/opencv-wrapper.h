@@ -15,20 +15,24 @@
 EXTERN_C_BEGIN
 
 // =============================================================================
-//   Core
+//   Core/Types
 // =============================================================================
 typedef void CMat;
 
-// The caller owns the returned data CMat
-CMat* opencv_mat_new();
+typedef struct {
+    int32_t x;
+    int32_t y;
+} CPoint2i;
 
-bool opencv_mat_valid(CMat* cmat);
+typedef struct {
+    float x;
+    float y;
+} CPoint2f;
 
-// The caller owns the returned data CMat
-CMat* opencv_imread(const char* const filename, int flags);
-
-// Free a Mat object
-void opencv_mat_drop(CMat* cmat);
+typedef struct {
+    float width;
+    float height;
+} CSize2f;
 
 typedef struct {
     int32_t x;
@@ -38,9 +42,29 @@ typedef struct {
 } CRect;
 
 typedef struct {
+    CPoint2f center;
+    CSize2f size;
+    float angle;
+} CRotatedRect;
+
+typedef struct {
     CRect* array;
     size_t size;
 } CVecOfRect;
+
+// The caller owns the returned data CMat
+CMat* opencv_mat_new();
+
+bool opencv_mat_valid(CMat* cmat);
+
+// The caller owns the returned CMat
+CMat* opencv_mat_roi(CMat* cmat, CRect crect);
+
+// The caller owns the returned data CMat
+CMat* opencv_imread(const char* const filename, int flags);
+
+// Free a Mat object
+void opencv_mat_drop(CMat* cmat);
 
 void opencv_vec_of_rect_drop(CVecOfRect* v);
 

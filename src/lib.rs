@@ -81,6 +81,7 @@ extern "C" {
     fn opencv_mat_new() -> *mut CMat;
     fn opencv_mat_is_valid(mat: *mut CMat) -> bool;
     fn opencv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
+    fn opencv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
     fn opencv_mat_drop(mat: *mut CMat);
 }
 
@@ -98,6 +99,15 @@ impl Mat {
 
     pub fn is_valid(&self) -> bool {
         unsafe { opencv_mat_is_valid(self.c_mat) }
+    }
+
+    pub fn roi(&self, rect: Rect) -> Mat {
+        let cmat = unsafe {
+            opencv_mat_roi(self.c_mat, rect)
+        };
+        Mat {
+            c_mat: cmat,
+        }
     }
 
     pub fn show(&self, name: &str, delay: i32) {

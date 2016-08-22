@@ -19,6 +19,13 @@ bool opencv_mat_is_valid(CMat* cmat) {
     return mat->data != NULL;
 }
 
+CMat* opencv_mat_roi(CMat* cmat, CRect crect) {
+    cv::Mat* image = new cv::Mat();
+    cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
+    cv::Mat* roi = new cv::Mat(*image, rect);
+    return static_cast<CMat*>(roi);
+}
+
 CMat* opencv_imread(const char* const filename, int flags) {
     cv::Mat* image = new cv::Mat();
     *image = cv::imread(filename, flags);
@@ -127,6 +134,13 @@ void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
         vec_of_rect->array[i].width = objects[i].width;
         vec_of_rect->array[i].height = objects[i].height;
     }
+}
+
+// =============================================================================
+//  Object Tracking
+// =============================================================================
+CRotatedRect opencv_camshift(CMat* cmat, CRect& window) {
+    cv::Mat* mat = static_cast<cv::Mat*>(cmat);
 }
 
 EXTERN_C_END
