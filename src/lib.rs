@@ -1,7 +1,7 @@
 //! A Rust wrapper for OpenCV.
 
 extern crate libc;
-use libc::{c_float, c_int, c_void};
+use libc::{c_double, c_float, c_int, c_void};
 use std::ffi::CString;
 use std::os::raw::c_char;
 
@@ -154,7 +154,7 @@ impl Drop for Mat {
 }
 
 // =============================================================================
-//  Operations on arrays
+//  core array
 // =============================================================================
 extern "C" {
     fn opencv_in_range(cmat: *const CMat,
@@ -167,6 +167,8 @@ extern "C" {
                            ndsts: isize,
                            from_to: *const i32,
                            npairs: isize);
+    fn opencv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double,
+                        beta: c_double, norm_type: c_int);
 }
 
 impl Mat {
@@ -191,6 +193,14 @@ impl Mat {
                                 ndsts,
                                 from_to,
                                 npairs);
+        }
+        m
+    }
+
+    pub fn normalize(&self, alpha: f64, beta: f64, norm_type: i32) -> Mat {
+        let m = Mat::new();
+        unsafe {
+            opencv_normalize(self.c_mat, m.c_mat, alpha, beta, norm_type)
         }
         m
     }

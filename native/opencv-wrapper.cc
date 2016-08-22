@@ -76,6 +76,13 @@ void opencv_mix_channels(CMat* cmat, size_t nsrcs, CMat* dst, size_t ndsts,
     cv::mixChannels(from, nsrcs, to, ndsts, from_to, npairs);
 }
 
+void opencv_normalize(CMat* csrc, CMat* cdst, double alpha, double beta,
+                      int norm_type) {
+    cv::Mat* src = static_cast<cv::Mat*>(csrc);
+    cv::Mat* dst = static_cast<cv::Mat*>(cdst);
+    cv::normalize(*src, *dst, alpha, beta, norm_type);
+}
+
 // =============================================================================
 //  Imgproc
 // =============================================================================

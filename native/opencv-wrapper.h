@@ -85,6 +85,8 @@ void opencv_vec_of_rect_drop(CVecOfRect* v);
 void opencv_in_range(CMat* cmat, CScalar lowerb, CScalar upperb, CMat* dst);
 void opencv_mix_channels(CMat* cmat, size_t nsrcs, CMat* dst, size_t ndsts,
                          const int* from_to, size_t npairs);
+void opencv_normalize(CMat* csrc, CMat* cdst, double alpha, double beta,
+                      int norm_type);
 
 // =============================================================================
 //  Imgproc
