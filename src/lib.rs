@@ -110,12 +110,8 @@ impl Mat {
     }
 
     pub fn roi(&self, rect: Rect) -> Mat {
-        let cmat = unsafe {
-            opencv_mat_roi(self.c_mat, rect)
-        };
-        Mat {
-            c_mat: cmat,
-        }
+        let cmat = unsafe { opencv_mat_roi(self.c_mat, rect) };
+        Mat { c_mat: cmat }
     }
 
     pub fn show(&self, name: &str, delay: i32) {
@@ -143,7 +139,10 @@ impl Drop for Mat {
 //  Operations on arrays
 // =============================================================================
 extern "C" {
-    fn opencv_in_range(cmat: *const CMat, lowerb: Scalar, upperb: Scalar, dst: *mut CMat);
+    fn opencv_in_range(cmat: *const CMat,
+                       lowerb: Scalar,
+                       upperb: Scalar,
+                       dst: *mut CMat);
 }
 
 impl Mat {
