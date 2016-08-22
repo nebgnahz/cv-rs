@@ -52,6 +52,13 @@ typedef struct {
     size_t size;
 } CVecOfRect;
 
+typedef struct {
+    int32_t v0;
+    int32_t v1;
+    int32_t v2;
+    int32_t v3;
+} CScalar;
+
 // The caller owns the returned data CMat
 CMat* opencv_mat_new();
 
@@ -67,6 +74,11 @@ CMat* opencv_imread(const char* const filename, int flags);
 void opencv_mat_drop(CMat* cmat);
 
 void opencv_vec_of_rect_drop(CVecOfRect* v);
+
+// =============================================================================
+//  Operations on arrays
+// =============================================================================
+void opencv_in_range(CMat* cmat, CScalar lowerb, CScalar upperb, CMat* dst);
 
 // =============================================================================
 //  Imgproc

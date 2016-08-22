@@ -47,6 +47,17 @@ void opencv_vec_of_rect_drop(CVecOfRect* v) {
 }
 
 // =============================================================================
+//  Operations on arrays
+// =============================================================================
+void opencv_in_range(CMat* cmat, CScalar lowerb, CScalar upperb, CMat* cdst) {
+    cv::Mat* mat = static_cast<cv::Mat*>(cmat);
+    cv::Scalar lb(lowerb.v0, lowerb.v1, lowerb.v2);
+    cv::Scalar ub(upperb.v0, upperb.v1, upperb.v2);
+    cv::Mat* dst = static_cast<cv::Mat*>(cdst);
+    cv::inRange(*mat, lb, ub, *dst);
+}
+
+// =============================================================================
 //  Imgproc
 // =============================================================================
 void opencv_rectangle(CMat* cmat, CRect crect) {

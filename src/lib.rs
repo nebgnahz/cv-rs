@@ -10,6 +10,14 @@ pub struct Mat {
     c_mat: *mut CMat,
 }
 
+#[repr(C)]
+pub struct Scalar {
+    v0: i32,
+    v1: i32,
+    v2: i32,
+    v3: i32,
+}
+
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Rect {
@@ -128,6 +136,21 @@ impl Drop for Mat {
         unsafe {
             opencv_mat_drop(self.c_mat);
         }
+    }
+}
+
+// =============================================================================
+//  Operations on arrays
+// =============================================================================
+extern "C" {
+    fn opencv_in_range(cmat: *const CMat, lowerb: Scalar, upperb: Scalar, dst: *mut CMat);
+}
+
+impl Mat {
+    pub fn in_range(&self, lowerb: Scalar, upperb: Scalar) -> Mat {
+        let m = Mat::new();
+        unsafe { opencv_in_range(self.c_mat, lowerb, upperb, m.c_mat) }
+        m
     }
 }
 
