@@ -20,6 +20,31 @@ pub struct Scalar {
     v3: i32,
 }
 
+#[repr(C)]
+pub struct Point2i {
+    x: i32,
+    y: i32,
+}
+
+#[repr(C)]
+pub struct Point2f {
+    x: f32,
+    y: f32,
+}
+
+#[repr(C)]
+pub struct Size2f {
+    width: f32,
+    height: f32,
+}
+
+#[repr(C)]
+pub struct RotatedRect {
+    center: Point2f,
+    size: Size2f,
+    angle: f32,
+}
+
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Rect {
@@ -371,6 +396,22 @@ impl Drop for CascadeClassifier {
     fn drop(&mut self) {
         unsafe {
             opencv_cascade_classifier_drop(self.c_cascade_classifier);
+        }
+    }
+}
+
+// =============================================================================
+//   VideoTrack
+// =============================================================================
+extern "C" {
+    fn opencv_camshift(image: *mut CMat, w: Rect, flag: c_int) -> RotatedRect;
+}
+
+impl Mat {
+    #[allow(dead_code)]
+    fn camshift(&self, wndw: Rect, flag: i32) -> RotatedRect {
+        unsafe {
+            opencv_camshift(self.c_mat, wndw, flag)
         }
     }
 }

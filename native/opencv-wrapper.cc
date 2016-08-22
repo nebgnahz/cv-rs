@@ -3,6 +3,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
+#include <opencv2/video/tracking.hpp>
 
 EXTERN_C_BEGIN
 
@@ -202,8 +203,17 @@ void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
 // =============================================================================
 //  Object Tracking
 // =============================================================================
-CRotatedRect opencv_camshift(CMat* cmat, CRect& window) {
-    cv::Mat* mat = static_cast<cv::Mat*>(cmat);
+CRotatedRect opencv_camshift(CMat *c_bp_image, CRect& crect, int) {
+    cv::Mat* bp_image = static_cast<cv::Mat*>(bp_image);
+    cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
+    cv::RotatedRect rr = cv::CamShift(*bp_image, rect, cv::TermCriteria());
+    CRotatedRect c_rr;
+    c_rr.center.x = rr.center.x;
+    c_rr.center.y = rr.center.y;
+    c_rr.size.width = rr.size.width;
+    c_rr.size.height = rr.size.height;
+    c_rr.angle = rr.angle;
+    return c_rr;
 }
 
 EXTERN_C_END

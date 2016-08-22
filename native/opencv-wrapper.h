@@ -129,6 +129,11 @@ void opencv_cascade_classifier_drop(CCascadeClassifier* cc);
 void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
                                       CVecOfRect* vec_of_rect);
 
+// =============================================================================
+//   VideoTrack
+// =============================================================================
+CRotatedRect opencv_camshift(CMat *back_project_image, CRect& window, int flag);
+
 EXTERN_C_END
 
 #endif  // OPENCV_WRAPPER_H_
