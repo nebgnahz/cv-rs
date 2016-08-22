@@ -61,6 +61,7 @@ typedef struct {
 
 // The caller owns the returned data CMat
 CMat* opencv_mat_new();
+CMat* opencv_mat_new_with_size(int rows, int cols, int type);
 
 bool opencv_mat_valid(CMat* cmat);
 
@@ -70,21 +71,29 @@ CMat* opencv_mat_roi(CMat* cmat, CRect crect);
 // The caller owns the returned data CMat
 CMat* opencv_imread(const char* const filename, int flags);
 
+int opencv_mat_rows(const CMat* const cmat);
+int opencv_mat_cols(const CMat* const cmat);
+
 // Free a Mat object
 void opencv_mat_drop(CMat* cmat);
 
 void opencv_vec_of_rect_drop(CVecOfRect* v);
 
 // =============================================================================
-//  Operations on arrays
+//  core array
 // =============================================================================
 void opencv_in_range(CMat* cmat, CScalar lowerb, CScalar upperb, CMat* dst);
+void opencv_mix_channels(CMat* cmat, size_t nsrcs, CMat* dst, size_t ndsts,
+                         const int* from_to, size_t npairs);
 
 // =============================================================================
 //  Imgproc
 // =============================================================================
 void opencv_rectangle(CMat* cmat, CRect crect);
 void opencv_cvt_color(CMat* cmat, CMat* output, int code);
+void opencv_cal_hist(const CMat* const cimages, int nimages,
+                     const int* channels, CMat* mask, CMat* hist, int dims,
+                     const int* hist_size, const float** ranges);
 
 // =============================================================================
 //   Highgui: high-level GUI

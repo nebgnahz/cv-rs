@@ -1,13 +1,15 @@
 //! A Rust wrapper for OpenCV.
 
 extern crate libc;
-use libc::{c_int, c_void};
+use libc::{c_float, c_int, c_void};
 use std::ffi::CString;
 use std::os::raw::c_char;
 
 type CMat = c_void;
 pub struct Mat {
     c_mat: *mut CMat,
+    cols: i32,
+    rows: i32,
 }
 
 #[repr(C)]
@@ -87,22 +89,38 @@ impl Drop for VecOfRect {
 
 extern "C" {
     fn opencv_mat_new() -> *mut CMat;
+    fn opencv_mat_new_with_size(rows: i32, cols: i32, t: i32) -> *mut CMat;
     fn opencv_mat_is_valid(mat: *mut CMat) -> bool;
+    fn opencv_mat_rows(cmat: *const CMat) -> i32;
+    fn opencv_mat_cols(cmat: *const CMat) -> i32;
     fn opencv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
     fn opencv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
     fn opencv_mat_drop(mat: *mut CMat);
 }
 
 impl Mat {
+    fn new_with_cmat(cmat: *mut CMat) -> Self {
+        Mat {
+            c_mat: cmat,
+            rows: unsafe { opencv_mat_rows(cmat) },
+            cols: unsafe { opencv_mat_cols(cmat) },
+        }
+    }
+
     pub fn new() -> Self {
         let m = unsafe { opencv_mat_new() };
-        Mat { c_mat: m }
+        Mat::new_with_cmat(m)
+    }
+
+    pub fn with_size(rows: i32, cols: i32, t: i32) -> Self {
+        let m = unsafe { opencv_mat_new_with_size(rows, cols, t) };
+        Mat::new_with_cmat(m)
     }
 
     pub fn from_path(path: &str, flags: i32) -> Self {
         let s = CString::new(path).unwrap();
         let m = unsafe { opencv_imread((&s).as_ptr(), flags) };
-        Mat { c_mat: m }
+        Mat::new_with_cmat(m)
     }
 
     pub fn is_valid(&self) -> bool {
@@ -111,7 +129,7 @@ impl Mat {
 
     pub fn roi(&self, rect: Rect) -> Mat {
         let cmat = unsafe { opencv_mat_roi(self.c_mat, rect) };
-        Mat { c_mat: cmat }
+        Mat::new_with_cmat(cmat)
     }
 
     pub fn show(&self, name: &str, delay: i32) {
@@ -143,6 +161,12 @@ extern "C" {
                        lowerb: Scalar,
                        upperb: Scalar,
                        dst: *mut CMat);
+    fn opencv_mix_channels(cmat: *const CMat,
+                           nsrcs: isize,
+                           dst: *mut CMat,
+                           ndsts: isize,
+                           from_to: *const i32,
+                           npairs: isize);
 }
 
 impl Mat {
@@ -151,11 +175,41 @@ impl Mat {
         unsafe { opencv_in_range(self.c_mat, lowerb, upperb, m.c_mat) }
         m
     }
+
+    pub fn mix_channels(&self,
+                        nsrcs: isize,
+                        ndsts: isize,
+                        dst_flag: i32,
+                        from_to: *const i32,
+                        npairs: isize)
+                        -> Mat {
+        let m = Mat::with_size(self.rows, self.cols, dst_flag);
+        unsafe {
+            opencv_mix_channels(self.c_mat,
+                                nsrcs,
+                                m.c_mat,
+                                ndsts,
+                                from_to,
+                                npairs);
+        }
+        m
+    }
 }
 
+// =============================================================================
+//  Imgproc
+// =============================================================================
 extern "C" {
     fn opencv_rectangle(cmat: *mut CMat, rect: Rect);
     fn opencv_cvt_color(cmat: *const CMat, output: *mut CMat, code: i32);
+    fn opencv_cal_hist(cimages: *const CMat,
+                       nimages: i32,
+                       channels: *const c_int,
+                       cmask: *const CMat,
+                       chist: *mut CMat,
+                       dims: c_int,
+                       hist_size: *const c_int,
+                       ranges: *mut *mut c_float);
 }
 
 impl Mat {
@@ -168,6 +222,28 @@ impl Mat {
     pub fn cvt_color(&self, code: i32) -> Mat {
         let m = Mat::new();
         unsafe { opencv_cvt_color(self.c_mat, m.c_mat, code) }
+        m
+    }
+
+    pub fn cal_hist(&self,
+                    channels: *const c_int,
+                    mask: Mat,
+                    dims: c_int,
+                    hist_size: *const c_int,
+                    ranges: *mut *mut c_float)
+                    -> Mat {
+        let m = Mat::new();
+        unsafe {
+            opencv_cal_hist(self.c_mat,
+                            1,
+                            channels,
+                            mask.c_mat,
+                            m.c_mat,
+                            dims,
+                            hist_size,
+                            ranges);
+        }
+
         m
     }
 }

@@ -14,6 +14,10 @@ CMat* opencv_mat_new() {
     return static_cast<CMat*>(image);
 }
 
+CMat* opencv_mat_new_with_size(int rows, int cols, int type) {
+    return static_cast<CMat*>(new cv::Mat(rows, cols, type));
+}
+
 bool opencv_mat_is_valid(CMat* cmat) {
     cv::Mat* mat = static_cast<cv::Mat*>(cmat);
     return mat->data != NULL;
@@ -32,6 +36,14 @@ CMat* opencv_imread(const char* const filename, int flags) {
     return static_cast<CMat*>(image);
 }
 
+int opencv_mat_cols(const CMat* const cmat) {
+    return (static_cast<const cv::Mat* const>(cmat))->cols;
+}
+
+int opencv_mat_rows(const CMat* const cmat) {
+    return (static_cast<const cv::Mat* const>(cmat))->rows;
+}
+
 void opencv_mat_drop(CMat* cmat) {
     cv::Mat* mat = static_cast<cv::Mat*>(cmat);
     delete mat;
@@ -47,7 +59,7 @@ void opencv_vec_of_rect_drop(CVecOfRect* v) {
 }
 
 // =============================================================================
-//  Operations on arrays
+//  core array
 // =============================================================================
 void opencv_in_range(CMat* cmat, CScalar lowerb, CScalar upperb, CMat* cdst) {
     cv::Mat* mat = static_cast<cv::Mat*>(cmat);
@@ -55,6 +67,13 @@ void opencv_in_range(CMat* cmat, CScalar lowerb, CScalar upperb, CMat* cdst) {
     cv::Scalar ub(upperb.v0, upperb.v1, upperb.v2);
     cv::Mat* dst = static_cast<cv::Mat*>(cdst);
     cv::inRange(*mat, lb, ub, *dst);
+}
+
+void opencv_mix_channels(CMat* cmat, size_t nsrcs, CMat* dst, size_t ndsts,
+                         const int* from_to, size_t npairs) {
+    cv::Mat* from = static_cast<cv::Mat*>(cmat);
+    cv::Mat* to = static_cast<cv::Mat*>(dst);
+    cv::mixChannels(from, nsrcs, to, ndsts, from_to, npairs);
 }
 
 // =============================================================================
@@ -71,6 +90,16 @@ void opencv_cvt_color(CMat* cmat, CMat* output, int code) {
     cv::Mat* out = static_cast<cv::Mat*>(output);
     cv::cvtColor(*mat, *out, code);
 }
+
+void opencv_cal_hist(const CMat* cimages, int nimages,
+                     const int* channels, CMat* cmask, CMat* chist, int dims,
+                     const int* hist_size, const float** ranges) {
+    const cv::Mat* images = static_cast<const cv::Mat*>(cimages);
+    cv::Mat* mask = static_cast<cv::Mat*>(cmask);
+    cv::Mat* hist = static_cast<cv::Mat*>(chist);
+    cv::calcHist(images, nimages, channels, *mask, *hist, dims, hist_size, ranges);
+}
+
 
 // =============================================================================
 //   Highgui: high-level GUI
