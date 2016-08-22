@@ -73,6 +73,7 @@ CMat* opencv_imread(const char* const filename, int flags);
 
 int opencv_mat_rows(const CMat* const cmat);
 int opencv_mat_cols(const CMat* const cmat);
+int opencv_mat_depth(const CMat* const cmat);
 
 // Free a Mat object
 void opencv_mat_drop(CMat* cmat);
@@ -106,6 +107,10 @@ void opencv_calc_back_project(const CMat* images, int nimages,
 void opencv_named_window(const char* const winname, int flags);
 void opencv_imshow(const char* const winname, CMat* mat);
 int opencv_wait_key(int delay_in_millis);
+
+typedef void(* MouseCallback)(int e, int x, int y, int flags, void *data);
+void opencv_set_mouse_callback(const char* const winname, MouseCallback onMouse,
+                               void* userdata);
 
 // =============================================================================
 //   VideoCapture

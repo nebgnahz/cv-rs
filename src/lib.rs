@@ -5,11 +5,14 @@ use libc::{c_double, c_float, c_int, c_void};
 use std::ffi::CString;
 use std::os::raw::c_char;
 
+pub type CVoid = c_void;
+
 type CMat = c_void;
 pub struct Mat {
     c_mat: *mut CMat,
     cols: i32,
     rows: i32,
+    depth: i32,
 }
 
 #[repr(C)]
@@ -18,6 +21,17 @@ pub struct Scalar {
     v1: i32,
     v2: i32,
     v3: i32,
+}
+
+impl Scalar {
+    pub fn new(v0: i32, v1: i32, v2: i32, v3: i32) -> Self {
+        Scalar {
+            v0: v0,
+            v1: v1,
+            v2: v2,
+            v3: v3,
+        }
+    }
 }
 
 #[repr(C)]
@@ -48,10 +62,10 @@ pub struct RotatedRect {
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Rect {
-    x: i32,
-    y: i32,
-    width: i32,
-    height: i32,
+    pub x: i32,
+    pub y: i32,
+    pub width: i32,
+    pub height: i32,
 }
 
 #[repr(C)]
@@ -118,6 +132,7 @@ extern "C" {
     fn opencv_mat_is_valid(mat: *mut CMat) -> bool;
     fn opencv_mat_rows(cmat: *const CMat) -> i32;
     fn opencv_mat_cols(cmat: *const CMat) -> i32;
+    fn opencv_mat_depth(cmat: *const CMat) -> i32;
     fn opencv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
     fn opencv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
     fn opencv_mat_drop(mat: *mut CMat);
@@ -129,6 +144,7 @@ impl Mat {
             c_mat: cmat,
             rows: unsafe { opencv_mat_rows(cmat) },
             cols: unsafe { opencv_mat_cols(cmat) },
+            depth: unsafe { opencv_mat_depth(cmat) },
         }
     }
 
@@ -209,11 +225,10 @@ impl Mat {
     pub fn mix_channels(&self,
                         nsrcs: isize,
                         ndsts: isize,
-                        dst_flag: i32,
                         from_to: *const i32,
                         npairs: isize)
                         -> Mat {
-        let m = Mat::with_size(self.rows, self.cols, dst_flag);
+        let m = Mat::with_size(self.rows, self.cols, self.depth);
         unsafe {
             opencv_mix_channels(self.c_mat,
                                 nsrcs,
@@ -254,6 +269,11 @@ extern "C" {
                                 ranges: *const *const c_float);
 }
 
+pub enum ColorConversionCodes {
+    BGR2BGRA = 0,
+    BGR2HSV = 40,
+}
+
 impl Mat {
     pub fn rectangle(&self, rect: Rect) {
         unsafe {
@@ -261,9 +281,9 @@ impl Mat {
         }
     }
 
-    pub fn cvt_color(&self, code: i32) -> Mat {
+    pub fn cvt_color(&self, code: ColorConversionCodes) -> Mat {
         let m = Mat::new();
-        unsafe { opencv_cvt_color(self.c_mat, m.c_mat, code) }
+        unsafe { opencv_cvt_color(self.c_mat, m.c_mat, code as i32) }
         m
     }
 
@@ -306,10 +326,19 @@ impl Mat {
     }
 }
 
+// =============================================================================
+//   Highgui: high-level GUI
+// =============================================================================
 extern "C" {
     pub fn opencv_named_window(name: *const c_char, flags: c_int);
     fn opencv_imshow(name: *const c_char, cmat: *mut CMat);
     fn opencv_wait_key(delay_ms: c_int) -> c_int;
+    pub fn opencv_set_mouse_callback(name: *const c_char,
+                                     on_mouse: extern "C" fn(e: i32,
+                                                             x: i32,
+                                                             y: i32,
+                                                             data: *mut c_void),
+                                     userdata: *mut c_void);
 }
 
 pub enum WindowFlags {
@@ -318,6 +347,37 @@ pub enum WindowFlags {
     WindowOpengl = 0x00001000,
 }
 
+/// Mouse Events
+pub enum MouseEventTypes {
+    /// Indicates that the mouse has moved over the window.
+    MouseMove = 0,
+    /// Indicates that the left mouse button is pressed.
+    LButtonDown = 1,
+    /// Indicates that the right mouse button is pressed.
+    RButtonDown = 2,
+    /// Indicates that the middle mouse button is pressed.
+    MButtonDown = 3,
+    /// Indicates that left mouse button is released.
+    LButtonUp = 4,
+    /// Indicates that right mouse button is released.
+    RButtonUp = 5,
+    /// Indicates that middle mouse button is released.
+    MButtonUp = 6,
+    /// Indicates that left mouse button is double clicked.
+    LButtonClick = 7,
+    /// Indicates that right mouse button is double clicked.
+    RButtonClick = 8,
+    /// Indicates that middle mouse button is double clicked.
+    MButtonClick = 9,
+    /// Positive/negative means forward/backward scrolling.
+    MouseWheel = 10,
+    /// Positive/negative means right and left scrolling.
+    MouseHWheel = 11,
+}
+
+// =============================================================================
+//   VideoCapture
+// =============================================================================
 type CVideoCapture = c_void;
 pub struct VideoCapture {
     c_videocapture: *mut CVideoCapture,
@@ -410,8 +470,6 @@ extern "C" {
 impl Mat {
     #[allow(dead_code)]
     fn camshift(&self, wndw: Rect, flag: i32) -> RotatedRect {
-        unsafe {
-            opencv_camshift(self.c_mat, wndw, flag)
-        }
+        unsafe { opencv_camshift(self.c_mat, wndw, flag) }
     }
 }

@@ -45,6 +45,10 @@ int opencv_mat_rows(const CMat* const cmat) {
     return (static_cast<const cv::Mat* const>(cmat))->rows;
 }
 
+int opencv_mat_depth(const CMat* const cmat) {
+    return (static_cast<const cv::Mat* const>(cmat))->depth();
+}
+
 void opencv_mat_drop(CMat* cmat) {
     cv::Mat* mat = static_cast<cv::Mat*>(cmat);
     delete mat;
@@ -135,6 +139,11 @@ void opencv_imshow(const char* const winname, CMat* cmat) {
 
 int opencv_wait_key(int delay) {
     return cv::waitKey(delay);
+}
+
+void opencv_set_mouse_callback(const char* const winname, MouseCallback onMouse,
+                               void* userdata) {
+    cv::setMouseCallback(winname, onMouse, userdata);
 }
 
 // =============================================================================

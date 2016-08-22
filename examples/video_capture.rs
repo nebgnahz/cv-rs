@@ -39,6 +39,6 @@ fn main() {
 
     loop {
         cap.read(&m);
-        m.show("window", 30);
+        m.show("Window", 30);
     }
 }
