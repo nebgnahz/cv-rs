@@ -72,6 +72,7 @@ void opencv_vec_of_rect_drop(CVecOfRect* v);
 //  Imgproc
 // =============================================================================
 void opencv_rectangle(CMat* cmat, CRect crect);
+void opencv_cvt_color(CMat* cmat, CMat* output, int code);
 
 // =============================================================================
 //   Highgui: high-level GUI

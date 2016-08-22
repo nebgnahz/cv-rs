@@ -133,6 +133,7 @@ impl Drop for Mat {
 
 extern "C" {
     fn opencv_rectangle(cmat: *mut CMat, rect: Rect);
+    fn opencv_cvt_color(cmat: *const CMat, output: *mut CMat, code: i32);
 }
 
 impl Mat {
@@ -140,6 +141,12 @@ impl Mat {
         unsafe {
             opencv_rectangle(self.c_mat, rect);
         }
+    }
+
+    pub fn cvt_color(&self, code: i32) -> Mat {
+        let m = Mat::new();
+        unsafe { opencv_cvt_color(self.c_mat, m.c_mat, code) }
+        m
     }
 }
 

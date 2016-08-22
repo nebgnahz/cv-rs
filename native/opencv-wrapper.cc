@@ -55,6 +55,12 @@ void opencv_rectangle(CMat* cmat, CRect crect) {
     cv::rectangle(*mat, rect, cv::Scalar(255, 0, 0, 255));
 }
 
+void opencv_cvt_color(CMat* cmat, CMat* output, int code) {
+    cv::Mat* mat = static_cast<cv::Mat*>(cmat);
+    cv::Mat* out = static_cast<cv::Mat*>(output);
+    cv::cvtColor(*mat, *out, code);
+}
+
 // =============================================================================
 //   Highgui: high-level GUI
 // =============================================================================
