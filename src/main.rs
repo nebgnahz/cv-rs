@@ -15,7 +15,7 @@ extern "C" fn on_mouse(e: i32, x: i32, y: i32, _: i32, data: *mut CVoid) {
             let mut selection = unsafe { &mut (*ss).selection };
             selection.x = x;
             selection.y = y;
-        },
+        }
         MouseEventTypes::LButtonUp => {
             let ss = data as *mut SelectionStatus;
             let mut selection = unsafe { &mut (*ss).selection };
@@ -26,8 +26,8 @@ extern "C" fn on_mouse(e: i32, x: i32, y: i32, _: i32, data: *mut CVoid) {
             if selection.width > 0 && selection.height > 0 {
                 *status = true;
             }
-        },
-        _ => {},
+        }
+        _ => {}
     }
 
 }
@@ -56,7 +56,7 @@ fn main() {
     let mut hist = Mat::new();
     let hsize = 16;
     let hranges = [0 as f32, 180 as f32];
-    let phranges: [*const f32; 1] = [ &hranges[0] as *const f32 ];
+    let phranges: [*const f32; 1] = [&hranges[0] as *const f32];
     let mut track_window = Rect::default();
 
     loop {
@@ -65,8 +65,9 @@ fn main() {
 
         let ch = [0, 0];
         let hue = hsv.mix_channels(1, 1, &ch[0] as *const i32, 1);
-        let mask = hsv.in_range(Scalar::new(0, 30, 10, 0),
-                                Scalar::new(180, 256, 256, 0));
+        let mask =
+            hsv.in_range(Scalar::new(0, 30, 10, 0),
+                         Scalar::new(180, 256, 256, 0));
 
         if selection_status.status {
             println!("Initialize tracking, setting up CAMShift search");
@@ -74,10 +75,13 @@ fn main() {
             let roi = hue.roi(selection);
             let maskroi = mask.roi(selection);
 
-            let raw_hist = roi.calc_hist(std::ptr::null(), maskroi, 1, &hsize,
+            let raw_hist = roi.calc_hist(std::ptr::null(),
+                                         maskroi,
+                                         1,
+                                         &hsize,
                                          &phranges[0] as *const *const f32);
-            hist = raw_hist.normalize(0 as f64, 255 as f64,
-                                      NormTypes::NormMinMax);
+            hist =
+                raw_hist.normalize(0 as f64, 255 as f64, NormTypes::NormMinMax);
 
             println!("{:?}", selection);
             track_window = selection;
@@ -87,8 +91,9 @@ fn main() {
         }
 
         if is_tracking {
-            let mut back_project = hue.calc_back_project(
-                std::ptr::null(), &hist, &phranges[0] as *const *const f32);
+            let mut back_project = hue.calc_back_project(std::ptr::null(),
+                                   &hist,
+                                   &phranges[0] as *const *const f32);
             back_project.logic_and(mask);
             let criteria = TermCriteria::new(TermType::Count, 10, 1 as f64);
             let track_box = back_project.camshift(track_window, &criteria);

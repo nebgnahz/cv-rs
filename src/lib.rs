@@ -182,7 +182,9 @@ impl Mat {
     // TODO(benzh): Find the right reference in OpenCV for this one. Provide a
     // shortcut for `image &= mask`
     pub fn logic_and(&mut self, mask: Mat) {
-        unsafe { opencv_mat_logic_and(self.c_mat, mask.get_cmat()); }
+        unsafe {
+            opencv_mat_logic_and(self.c_mat, mask.get_cmat());
+        }
     }
 
     pub fn show(&self, name: &str, delay: i32) {
@@ -241,8 +243,7 @@ pub enum NormTypes {
 impl Mat {
     pub fn in_range(&self, lowerb: Scalar, upperb: Scalar) -> Mat {
         let m = unsafe { opencv_mat_new() };
-        unsafe {
-            opencv_in_range(self.c_mat, lowerb, upperb, m) }
+        unsafe { opencv_in_range(self.c_mat, lowerb, upperb, m) }
         Mat::new_with_cmat(m)
     }
 
@@ -495,9 +496,15 @@ pub enum TermType {
 }
 
 extern "C" {
-    fn opencv_term_criteria_new(t: i32, count: i32, epsilon: f64) -> *mut CTermCriteria;
+    fn opencv_term_criteria_new(t: i32,
+                                count: i32,
+                                epsilon: f64)
+                                -> *mut CTermCriteria;
     fn opencv_term_criteria_drop(criteria: *mut CTermCriteria);
-    fn opencv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
+    fn opencv_camshift(image: *mut CMat,
+                       w: Rect,
+                       c_criteria: *const CTermCriteria)
+                       -> RotatedRect;
 }
 
 pub struct TermCriteria {
@@ -506,10 +513,9 @@ pub struct TermCriteria {
 
 impl TermCriteria {
     pub fn new(t: TermType, max_count: i32, epsilon: f64) -> Self {
-        let c_criteria = unsafe { opencv_term_criteria_new(t as i32, max_count, epsilon) };
-        TermCriteria {
-            c_criteria: c_criteria,
-        }
+        let c_criteria =
+            unsafe { opencv_term_criteria_new(t as i32, max_count, epsilon) };
+        TermCriteria { c_criteria: c_criteria }
     }
 }
 
