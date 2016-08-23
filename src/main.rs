@@ -7,24 +7,26 @@ struct SelectionStatus {
     status: bool,
 }
 
-extern "C" fn on_mouse(e: i32, x: i32, y: i32, data: *mut CVoid) {
-    let ss = data as *mut SelectionStatus;
-    let mut selection = unsafe { &mut (*ss).selection };
-    let mut status = unsafe { &mut (*ss).status };
-
+extern "C" fn on_mouse(e: i32, x: i32, y: i32, _: i32, data: *mut CVoid) {
     let event: MouseEventTypes = unsafe { std::mem::transmute(e as u8) };
     match event {
         MouseEventTypes::LButtonDown => {
+            let ss = data as *mut SelectionStatus;
+            let mut selection = unsafe { &mut (*ss).selection };
             selection.x = x;
             selection.y = y;
         },
         MouseEventTypes::LButtonUp => {
+            let ss = data as *mut SelectionStatus;
+            let mut selection = unsafe { &mut (*ss).selection };
+            let mut status = unsafe { &mut (*ss).status };
             selection.width = x - selection.x;
             selection.height = y - selection.y;
             *status = true;
         },
         _ => {},
     }
+
 }
 
 fn main() {
@@ -48,12 +50,14 @@ fn main() {
     let m = Mat::new();
     loop {
         cap.read(&m);
-        let hsv = m.cvt_color(ColorConversionCodes::BGR2HSV);
+        // let hsv = m.cvt_color(ColorConversionCodes::BGR2HSV);
 
         if selection_status.status {
             println!("{:?}", selection_status.selection);
+            m.rectangle(selection_status.selection);
+            selection_status.status = false;
         }
 
-        hsv.show("Window", 30);
+        m.show("Window", 30);
     }
 }

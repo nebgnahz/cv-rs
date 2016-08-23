@@ -337,6 +337,7 @@ extern "C" {
                                      on_mouse: extern "C" fn(e: i32,
                                                              x: i32,
                                                              y: i32,
+                                                             f: i32,
                                                              data: *mut c_void),
                                      userdata: *mut c_void);
 }

@@ -141,9 +141,10 @@ int opencv_wait_key(int delay) {
     return cv::waitKey(delay);
 }
 
-void opencv_set_mouse_callback(const char* const winname, MouseCallback onMouse,
+void opencv_set_mouse_callback(const char* const winname,
+                               MouseCallback on_mouse,
                                void* userdata) {
-    cv::setMouseCallback(winname, onMouse, userdata);
+    cv::setMouseCallback(winname, on_mouse, userdata);
 }
 
 // =============================================================================
