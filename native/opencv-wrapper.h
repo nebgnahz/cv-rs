@@ -142,7 +142,7 @@ void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
 typedef void CTermCriteria;
 CTermCriteria* opencv_term_criteria_new(int type, int count, double epsilon);
 void opencv_term_criteria_drop(CTermCriteria* c_criteria);
-CRotatedRect opencv_camshift(CMat* back_project_image, CRect& window,
+CRotatedRect opencv_camshift(CMat* back_project_image, CRect window,
                              CTermCriteria* term_criteria);
 
 EXTERN_C_END

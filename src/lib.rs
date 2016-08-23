@@ -240,9 +240,10 @@ pub enum NormTypes {
 
 impl Mat {
     pub fn in_range(&self, lowerb: Scalar, upperb: Scalar) -> Mat {
-        let m = Mat::new();
-        unsafe { opencv_in_range(self.c_mat, lowerb, upperb, m.c_mat) }
-        m
+        let m = unsafe { opencv_mat_new() };
+        unsafe {
+            opencv_in_range(self.c_mat, lowerb, upperb, m) }
+        Mat::new_with_cmat(m)
     }
 
     pub fn mix_channels(&self,
@@ -264,9 +265,9 @@ impl Mat {
     }
 
     pub fn normalize(&self, alpha: f64, beta: f64, t: NormTypes) -> Mat {
-        let m = Mat::new();
-        unsafe { opencv_normalize(self.c_mat, m.c_mat, alpha, beta, t as i32) }
-        m
+        let m = unsafe { opencv_mat_new() };
+        unsafe { opencv_normalize(self.c_mat, m, alpha, beta, t as i32) }
+        Mat::new_with_cmat(m)
     }
 }
 
@@ -305,9 +306,9 @@ impl Mat {
     }
 
     pub fn cvt_color(&self, code: ColorConversionCodes) -> Mat {
-        let m = Mat::new();
-        unsafe { opencv_cvt_color(self.c_mat, m.c_mat, code as i32) }
-        m
+        let m = unsafe { opencv_mat_new() };
+        unsafe { opencv_cvt_color(self.c_mat, m, code as i32) }
+        Mat::new_with_cmat(m)
     }
 
     pub fn calc_hist(&self,
@@ -317,35 +318,35 @@ impl Mat {
                      hist_size: *const c_int,
                      ranges: *const *const f32)
                      -> Mat {
-        let m = Mat::new();
+        let m = unsafe { opencv_mat_new() };
         unsafe {
             opencv_calc_hist(self.c_mat,
                              1,
                              channels,
                              mask.c_mat,
-                             m.c_mat,
+                             m,
                              dims,
                              hist_size,
                              ranges);
         }
-        m
+        Mat::new_with_cmat(m)
     }
 
     pub fn calc_back_project(&self,
                              channels: *const i32,
-                             hist: Mat,
+                             hist: &Mat,
                              ranges: *const *const f32)
                              -> Mat {
-        let m = Mat::new();
+        let m = unsafe { opencv_mat_new() };
         unsafe {
             opencv_calc_back_project(self.c_mat,
                                      1,
                                      channels,
-                                     hist.c_mat,
-                                     m.c_mat,
+                                     (*hist).c_mat,
+                                     m,
                                      ranges);
         }
-        m
+        Mat::new_with_cmat(m)
     }
 }
 

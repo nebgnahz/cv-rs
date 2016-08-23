@@ -25,10 +25,10 @@ bool opencv_mat_is_valid(CMat* cmat) {
 }
 
 CMat* opencv_mat_roi(CMat* cmat, CRect crect) {
-    cv::Mat* image = new cv::Mat();
+    cv::Mat* mat = static_cast<cv::Mat*>(cmat);
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
-    cv::Mat* roi = new cv::Mat(*image, rect);
-    return static_cast<CMat*>(roi);
+    cv::Mat* dst = new cv::Mat(*mat, rect);
+    return static_cast<CMat*>(dst);
 }
 
 void opencv_mat_logic_and(CMat* cimage, const CMat* const cmask) {
@@ -230,9 +230,9 @@ void opencv_term_criteria_drop(CTermCriteria* c_criteria) {
     c_criteria = nullptr;
 }
 
-CRotatedRect opencv_camshift(CMat* c_bp_image, CRect& crect,
+CRotatedRect opencv_camshift(CMat* c_bp_image, CRect crect,
                              CTermCriteria* c_criteria) {
-    cv::Mat* bp_image = static_cast<cv::Mat*>(bp_image);
+    cv::Mat* bp_image = static_cast<cv::Mat*>(c_bp_image);
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
     cv::TermCriteria* criteria = static_cast<cv::TermCriteria*>(c_criteria);
     cv::RotatedRect rr = cv::CamShift(*bp_image, rect, *criteria);
