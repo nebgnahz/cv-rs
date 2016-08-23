@@ -73,6 +73,17 @@ pub struct Rect {
     pub height: i32,
 }
 
+impl Rect {
+    pub fn new(x: i32, y: i32, width: i32, height: i32) -> Self {
+        Rect {
+            x: x,
+            y: y,
+            width: width,
+            height: height,
+        }
+    }
+}
+
 #[repr(C)]
 struct CVecOfRect {
     array: *mut Rect,
@@ -530,5 +541,40 @@ impl Drop for TermCriteria {
 impl Mat {
     pub fn camshift(&self, wndw: Rect, criteria: &TermCriteria) -> RotatedRect {
         unsafe { opencv_camshift(self.c_mat, wndw, criteria.c_criteria) }
+    }
+}
+
+impl RotatedRect {
+    pub fn points(&self) -> [Point2f; 4] {
+        let angle = self.angle * std::f32::consts::PI / 180.0;
+
+        let b = angle.cos() * 0.5;
+        let a = angle.sin() * 0.5;
+
+        let mut pts: [Point2f; 4] = [Point2f::default(); 4];
+        pts[0].x = self.center.x - a * self.size.height - b * self.size.width;
+        pts[0].y = self.center.y + b * self.size.height - a * self.size.width;
+        pts[1].x = self.center.x + a * self.size.height - b * self.size.width;
+        pts[1].y = self.center.y - b * self.size.height - a * self.size.width;
+
+        pts[2].x = 2.0 * self.center.x - pts[0].x;
+        pts[2].y = 2.0 * self.center.y - pts[0].y;
+        pts[3].x = 2.0 * self.center.x - pts[1].x;
+        pts[3].y = 2.0 * self.center.y - pts[1].y;
+        pts
+    }
+
+    pub fn bounding_rect(&self) -> Rect {
+        let pt = self.points();
+        let x = pt.iter().map(|p| p.x).fold(0. / 0., f32::min).floor() as i32;
+        let y = pt.iter().map(|p| p.y).fold(0. / 0., f32::min).floor() as i32;
+
+        let width =
+            pt.iter().map(|p| p.x).fold(0. / 0., f32::max).ceil() as i32 - x +
+            1;
+        let height =
+            pt.iter().map(|p| p.y).fold(0. / 0., f32::max).ceil() as i32 - y +
+            1;
+        Rect::new(x, y, width, height)
     }
 }

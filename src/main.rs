@@ -98,6 +98,7 @@ fn main() {
             let criteria = TermCriteria::new(TermType::Count, 10, 1 as f64);
             let track_box = back_project.camshift(track_window, &criteria);
 
+            m.rectangle(track_box.bounding_rect());
             println!("{:?}", track_box);
         }
 
