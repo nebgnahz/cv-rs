@@ -48,14 +48,50 @@ fn main() {
     }
 
     let m = Mat::new();
+    let mut is_tracking = false;
+
     loop {
         cap.read(&m);
-        // let hsv = m.cvt_color(ColorConversionCodes::BGR2HSV);
+        let hsv = m.cvt_color(ColorConversionCodes::BGR2HSV);
+
+        let ch = [0, 0];
+        let hue = hsv.mix_channels(1, 1, &ch[0] as *const i32, 1);
+        let mask = hsv.in_range(Scalar::new(0, 30, 10, 0),
+                                Scalar::new(180, 256, 256, 0));
+
+        let mut hist = Mat::new();
+        let hsize = 16;
+        let hranges = [0 as f32, 180 as f32];
+        let phranges: [*const f32; 1] = [ &hranges[0] as *const f32 ];
+
+        let mut track_window = Rect::default();
 
         if selection_status.status {
-            println!("{:?}", selection_status.selection);
-            m.rectangle(selection_status.selection);
+            // Object has been selected by user, set up CAMShift search
+            // properties once
+            let selection = selection_status.selection;
+            let roi = hue.roi(selection);
+            let maskroi = mask.roi(selection);
+
+            hist = roi.calc_hist(std::ptr::null(), maskroi, 1, &hsize,
+                                 &phranges[0] as *const *const f32);
+            hist = hist.normalize(0 as f64, 255 as f64,
+                                  NormTypes::NormMinMax);
+
+            println!("{:?}", selection);
+            track_window = selection;
+            m.rectangle(selection);
             selection_status.status = false;
+            is_tracking = true;
+        }
+
+        if is_tracking {
+            let mut back_project = hue.calc_back_project(
+                std::ptr::null(), hist, &phranges[0] as *const *const f32);
+            back_project.logic_and(mask);
+            let term_criteria = TermCriteria::new(TermType::Count, 10, 1 as f64);
+            let track_box = back_project.camshift(track_window, &term_criteria);
+            println!("{:?}", track_box);
         }
 
         m.show("Window", 30);

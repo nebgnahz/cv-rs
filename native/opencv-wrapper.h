@@ -68,6 +68,8 @@ bool opencv_mat_valid(CMat* cmat);
 // The caller owns the returned CMat
 CMat* opencv_mat_roi(CMat* cmat, CRect crect);
 
+void opencv_mat_logic_and(CMat* image, const CMat* const mask);
+
 // The caller owns the returned data CMat
 CMat* opencv_imread(const char* const filename, int flags);
 
@@ -137,7 +139,11 @@ void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
 // =============================================================================
 //   VideoTrack
 // =============================================================================
-CRotatedRect opencv_camshift(CMat *back_project_image, CRect& window, int flag);
+typedef void CTermCriteria;
+CTermCriteria* opencv_term_criteria_new(int type, int count, double epsilon);
+void opencv_term_criteria_drop(CTermCriteria* c_criteria);
+CRotatedRect opencv_camshift(CMat* back_project_image, CRect& window,
+                             CTermCriteria* term_criteria);
 
 EXTERN_C_END
 

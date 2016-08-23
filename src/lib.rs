@@ -15,6 +15,7 @@ pub struct Mat {
     depth: i32,
 }
 
+#[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Scalar {
     v0: i32,
@@ -34,24 +35,28 @@ impl Scalar {
     }
 }
 
+#[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Point2i {
     x: i32,
     y: i32,
 }
 
+#[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Point2f {
     x: f32,
     y: f32,
 }
 
+#[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Size2f {
     width: f32,
     height: f32,
 }
 
+#[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct RotatedRect {
     center: Point2f,
@@ -135,6 +140,7 @@ extern "C" {
     fn opencv_mat_depth(cmat: *const CMat) -> i32;
     fn opencv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
     fn opencv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
+    fn opencv_mat_logic_and(cimage: *mut CMat, cmask: *const CMat);
     fn opencv_mat_drop(mat: *mut CMat);
 }
 
@@ -171,6 +177,12 @@ impl Mat {
     pub fn roi(&self, rect: Rect) -> Mat {
         let cmat = unsafe { opencv_mat_roi(self.c_mat, rect) };
         Mat::new_with_cmat(cmat)
+    }
+
+    // TODO(benzh): Find the right reference in OpenCV for this one. Provide a
+    // shortcut for `image &= mask`
+    pub fn logic_and(&mut self, mask: Mat) {
+        unsafe { opencv_mat_logic_and(self.c_mat, mask.get_cmat()); }
     }
 
     pub fn show(&self, name: &str, delay: i32) {
@@ -215,6 +227,17 @@ extern "C" {
                         norm_type: c_int);
 }
 
+pub enum NormTypes {
+    NormInf = 1,
+    NormL1 = 2,
+    NormL2 = 4,
+    NormL2Sqr = 5,
+    NormHamming = 6,
+    NormHamming2 = 7,
+    NormRelative = 8,
+    NormMinMax = 32,
+}
+
 impl Mat {
     pub fn in_range(&self, lowerb: Scalar, upperb: Scalar) -> Mat {
         let m = Mat::new();
@@ -240,9 +263,9 @@ impl Mat {
         m
     }
 
-    pub fn normalize(&self, alpha: f64, beta: f64, norm_type: i32) -> Mat {
+    pub fn normalize(&self, alpha: f64, beta: f64, t: NormTypes) -> Mat {
         let m = Mat::new();
-        unsafe { opencv_normalize(self.c_mat, m.c_mat, alpha, beta, norm_type) }
+        unsafe { opencv_normalize(self.c_mat, m.c_mat, alpha, beta, t as i32) }
         m
     }
 }
@@ -260,7 +283,7 @@ extern "C" {
                         chist: *mut CMat,
                         dims: c_int,
                         hist_size: *const c_int,
-                        ranges: *mut *mut c_float);
+                        ranges: *const *const c_float);
     fn opencv_calc_back_project(cimages: *const CMat,
                                 nimages: c_int,
                                 channels: *const c_int,
@@ -292,7 +315,7 @@ impl Mat {
                      mask: Mat,
                      dims: c_int,
                      hist_size: *const c_int,
-                     ranges: *mut *mut c_float)
+                     ranges: *const *const f32)
                      -> Mat {
         let m = Mat::new();
         unsafe {
@@ -464,13 +487,41 @@ impl Drop for CascadeClassifier {
 // =============================================================================
 //   VideoTrack
 // =============================================================================
+type CTermCriteria = c_void;
+pub enum TermType {
+    Count = 1,
+    EPS = 2,
+}
+
 extern "C" {
-    fn opencv_camshift(image: *mut CMat, w: Rect, flag: c_int) -> RotatedRect;
+    fn opencv_term_criteria_new(t: i32, count: i32, epsilon: f64) -> *mut CTermCriteria;
+    fn opencv_term_criteria_drop(criteria: *mut CTermCriteria);
+    fn opencv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
+}
+
+pub struct TermCriteria {
+    c_criteria: *mut CTermCriteria,
+}
+
+impl TermCriteria {
+    pub fn new(t: TermType, max_count: i32, epsilon: f64) -> Self {
+        let c_criteria = unsafe { opencv_term_criteria_new(t as i32, max_count, epsilon) };
+        TermCriteria {
+            c_criteria: c_criteria,
+        }
+    }
+}
+
+impl Drop for TermCriteria {
+    fn drop(&mut self) {
+        unsafe {
+            opencv_term_criteria_drop(self.c_criteria);
+        }
+    }
 }
 
 impl Mat {
-    #[allow(dead_code)]
-    fn camshift(&self, wndw: Rect, flag: i32) -> RotatedRect {
-        unsafe { opencv_camshift(self.c_mat, wndw, flag) }
+    pub fn camshift(&self, wndw: Rect, criteria: &TermCriteria) -> RotatedRect {
+        unsafe { opencv_camshift(self.c_mat, wndw, criteria.c_criteria) }
     }
 }

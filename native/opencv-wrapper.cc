@@ -31,6 +31,12 @@ CMat* opencv_mat_roi(CMat* cmat, CRect crect) {
     return static_cast<CMat*>(roi);
 }
 
+void opencv_mat_logic_and(CMat* cimage, const CMat* const cmask) {
+    cv::Mat* image = static_cast<cv::Mat*>(cimage);
+    const cv::Mat* mask = static_cast<const cv::Mat*>(cmask);
+    (*image) &= (*mask);
+}
+
 CMat* opencv_imread(const char* const filename, int flags) {
     cv::Mat* image = new cv::Mat();
     *image = cv::imread(filename, flags);
@@ -213,10 +219,23 @@ void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
 // =============================================================================
 //  Object Tracking
 // =============================================================================
-CRotatedRect opencv_camshift(CMat *c_bp_image, CRect& crect, int) {
+CTermCriteria* opencv_term_criteria_new(int type, int count, double epsilon) {
+    cv::TermCriteria* criteria = new cv::TermCriteria(type, count, epsilon);
+    return static_cast<CTermCriteria*>(criteria);
+}
+
+void opencv_term_criteria_drop(CTermCriteria* c_criteria) {
+    cv::TermCriteria* criteria = static_cast<cv::TermCriteria*>(c_criteria);
+    delete criteria;
+    c_criteria = nullptr;
+}
+
+CRotatedRect opencv_camshift(CMat* c_bp_image, CRect& crect,
+                             CTermCriteria* c_criteria) {
     cv::Mat* bp_image = static_cast<cv::Mat*>(bp_image);
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
-    cv::RotatedRect rr = cv::CamShift(*bp_image, rect, cv::TermCriteria());
+    cv::TermCriteria* criteria = static_cast<cv::TermCriteria*>(c_criteria);
+    cv::RotatedRect rr = cv::CamShift(*bp_image, rect, *criteria);
     CRotatedRect c_rr;
     c_rr.center.x = rr.center.x;
     c_rr.center.y = rr.center.y;
@@ -225,5 +244,7 @@ CRotatedRect opencv_camshift(CMat *c_bp_image, CRect& crect, int) {
     c_rr.angle = rr.angle;
     return c_rr;
 }
+
+
 
 EXTERN_C_END

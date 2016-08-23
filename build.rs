@@ -15,4 +15,5 @@ fn main() {
     println!("cargo:rustc-link-lib=opencv_highgui");
     println!("cargo:rustc-link-lib=opencv_videoio");
     println!("cargo:rustc-link-lib=opencv_objdetect");
+    println!("cargo:rustc-link-lib=opencv_video");
 }
