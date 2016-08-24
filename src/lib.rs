@@ -1,13 +1,24 @@
-//! A Rust wrapper for OpenCV.
-
+//! A library that integrates computer vision algorithms, mostly OpenCV.
+//!
+//! This is a work-in-progress port of OpenCV 3.1.0. Modules and functions are
+//! implemented as needed. There is another library
+//! [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
+//! bindings using a Python script.
 extern crate libc;
 use libc::{c_double, c_float, c_int, c_void};
 use std::ffi::CString;
 use std::os::raw::c_char;
 
+/// Rexport `CVoid` so that various callbacks (such as `on_mouse`) can use it
+/// for C void pointers.
 pub type CVoid = c_void;
 
 type CMat = c_void;
+
+/// This wraps OpenCV's `Mat` class which is designed for n-dimensional dense
+/// array. It's the most widely used data structure in image/video processing
+/// since images are often stored as `Mat`.
+// TODO(benzh): move this to core module.
 pub struct Mat {
     c_mat: *mut CMat,
     cols: i32,
@@ -15,13 +26,14 @@ pub struct Mat {
     depth: i32,
 }
 
+/// A 4-element struct that is widely used to pass pixel values.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Scalar {
-    v0: i32,
-    v1: i32,
-    v2: i32,
-    v3: i32,
+    pub v0: i32,
+    pub v1: i32,
+    pub v2: i32,
+    pub v3: i32,
 }
 
 impl Scalar {
@@ -35,33 +47,29 @@ impl Scalar {
     }
 }
 
+/// 2D integer points specified by its coordinates `x` and `y`.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Point2i {
-    x: i32,
-    y: i32,
+    pub x: i32,
+    pub y: i32,
 }
 
+/// 2D floating points specified by its coordinates `x` and `y`.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Point2f {
-    x: f32,
-    y: f32,
+    pub x: f32,
+    pub y: f32,
 }
 
+/// `Size` struct is used for specifying the size of an image or rectangle. It
+/// has two members called `width` and `height`.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Size2f {
-    width: f32,
-    height: f32,
-}
-
-#[derive(Default, Debug, Clone, Copy)]
-#[repr(C)]
-pub struct RotatedRect {
-    center: Point2f,
-    size: Size2f,
-    angle: f32,
+    pub width: f32,
+    pub height: f32,
 }
 
 #[derive(Default, Debug, Clone, Copy)]
@@ -84,18 +92,70 @@ impl Rect {
     }
 }
 
+/// This struct represents a rotated (i.e. not up-right) rectangle. Each
+/// rectangle is specified by the center point (mass center), length of each
+/// side (represented by `Size2f`) and the rotation angle in degrees.
+#[derive(Default, Debug, Clone, Copy)]
+#[repr(C)]
+pub struct RotatedRect {
+    center: Point2f,
+    size: Size2f,
+    angle: f32,
+}
+
+impl RotatedRect {
+    /// Return 4 vertices of the rectangle.
+    pub fn points(&self) -> [Point2f; 4] {
+        let angle = self.angle * std::f32::consts::PI / 180.0;
+
+        let b = angle.cos() * 0.5;
+        let a = angle.sin() * 0.5;
+
+        let mut pts: [Point2f; 4] = [Point2f::default(); 4];
+        pts[0].x = self.center.x - a * self.size.height - b * self.size.width;
+        pts[0].y = self.center.y + b * self.size.height - a * self.size.width;
+        pts[1].x = self.center.x + a * self.size.height - b * self.size.width;
+        pts[1].y = self.center.y - b * self.size.height - a * self.size.width;
+
+        pts[2].x = 2.0 * self.center.x - pts[0].x;
+        pts[2].y = 2.0 * self.center.y - pts[0].y;
+        pts[3].x = 2.0 * self.center.x - pts[1].x;
+        pts[3].y = 2.0 * self.center.y - pts[1].y;
+        pts
+    }
+
+    /// Return the minimal up-right rectangle containing the rotated rectangle
+    pub fn bounding_rect(&self) -> Rect {
+        let pt = self.points();
+        let x = pt.iter().map(|p| p.x).fold(0. / 0., f32::min).floor() as i32;
+        let y = pt.iter().map(|p| p.y).fold(0. / 0., f32::min).floor() as i32;
+
+        let width =
+            pt.iter().map(|p| p.x).fold(0. / 0., f32::max).ceil() as i32 - x +
+            1;
+        let height =
+            pt.iter().map(|p| p.y).fold(0. / 0., f32::max).ceil() as i32 - y +
+            1;
+        Rect::new(x, y, width, height)
+    }
+}
+
 #[repr(C)]
 struct CVecOfRect {
     array: *mut Rect,
     size: usize,
 }
 
+/// This struct represents a vector of rectangles. It can be used as a return
+/// value from object detection algorithms (such as face detection) where each
+/// detection is a rectangle.
 pub struct VecOfRect {
     rects: Vec<Rect>,
     c_vec_of_rect: CVecOfRect,
 }
 
 impl VecOfRect {
+    /// Helper function to draw all rectangles on the `Mat` (image).
     pub fn draw_on_mat(&self, mat: &mut Mat) {
         self.rects.iter().map(|&r| mat.rectangle(r)).count();
     }
@@ -104,6 +164,9 @@ impl VecOfRect {
         &mut self.c_vec_of_rect
     }
 
+    /// Creates internal `Vec<Rect>` from the C structs; this is necessary right
+    /// now to prepare an idiosyncratic Rust API.
+    // TODO(benzh): find ways to simplify this extra function call.
     pub fn populate_rects(&mut self) {
         for i in 0..self.c_vec_of_rect.size {
             let rect =
@@ -156,7 +219,7 @@ extern "C" {
 }
 
 impl Mat {
-    fn new_with_cmat(cmat: *mut CMat) -> Self {
+    fn new_with_cmat(cmat: *mut CMat) -> Mat {
         Mat {
             c_mat: cmat,
             rows: unsafe { opencv_mat_rows(cmat) },
@@ -165,31 +228,37 @@ impl Mat {
         }
     }
 
-    pub fn new() -> Self {
+    /// Create an empty `Mat` struct.
+    pub fn new() -> Mat {
         let m = unsafe { opencv_mat_new() };
         Mat::new_with_cmat(m)
     }
 
+    /// Create an empty `Mat` with specific size (rows, cols and types).
     pub fn with_size(rows: i32, cols: i32, t: i32) -> Self {
         let m = unsafe { opencv_mat_new_with_size(rows, cols, t) };
         Mat::new_with_cmat(m)
     }
 
+    /// Create a `Mat` from reading the image specified by the path.
     pub fn from_path(path: &str, flags: i32) -> Self {
         let s = CString::new(path).unwrap();
         let m = unsafe { opencv_imread((&s).as_ptr(), flags) };
         Mat::new_with_cmat(m)
     }
 
+    /// Check if the `Mat` is valid or not.
     pub fn is_valid(&self) -> bool {
         unsafe { opencv_mat_is_valid(self.c_mat) }
     }
 
+    /// Return a region of interest from a `Mat` specfied by a `Rect`.
     pub fn roi(&self, rect: Rect) -> Mat {
         let cmat = unsafe { opencv_mat_roi(self.c_mat, rect) };
         Mat::new_with_cmat(cmat)
     }
 
+    /// Apply a mask to myself.
     // TODO(benzh): Find the right reference in OpenCV for this one. Provide a
     // shortcut for `image &= mask`
     pub fn logic_and(&mut self, mask: Mat) {
@@ -198,6 +267,8 @@ impl Mat {
         }
     }
 
+    /// Call out to highgui to show the image, the duration is specified by
+    /// `delay`.
     pub fn show(&self, name: &str, delay: i32) {
         let s = CString::new(name).unwrap();
         unsafe {
@@ -252,12 +323,18 @@ pub enum NormTypes {
 }
 
 impl Mat {
+    /// Check if Mat elements lie between the elements of two other arrays
+    /// (lowerb and upperb). The output Mat has the same size as `self` and
+    /// CV_8U type.
     pub fn in_range(&self, lowerb: Scalar, upperb: Scalar) -> Mat {
         let m = unsafe { opencv_mat_new() };
         unsafe { opencv_in_range(self.c_mat, lowerb, upperb, m) }
         Mat::new_with_cmat(m)
     }
 
+    /// Copy specified channels from `self` to the specified channels of output
+    /// `Mat`.
+    // TODO(benzh) Avoid using raw pointers but rather take a vec for `from_to`?
     pub fn mix_channels(&self,
                         nsrcs: isize,
                         ndsts: isize,
@@ -276,6 +353,7 @@ impl Mat {
         m
     }
 
+    /// Normalize the Mat according to the normalization type.
     pub fn normalize(&self, alpha: f64, beta: f64, t: NormTypes) -> Mat {
         let m = unsafe { opencv_mat_new() };
         unsafe { opencv_normalize(self.c_mat, m, alpha, beta, t as i32) }
@@ -541,40 +619,5 @@ impl Drop for TermCriteria {
 impl Mat {
     pub fn camshift(&self, wndw: Rect, criteria: &TermCriteria) -> RotatedRect {
         unsafe { opencv_camshift(self.c_mat, wndw, criteria.c_criteria) }
-    }
-}
-
-impl RotatedRect {
-    pub fn points(&self) -> [Point2f; 4] {
-        let angle = self.angle * std::f32::consts::PI / 180.0;
-
-        let b = angle.cos() * 0.5;
-        let a = angle.sin() * 0.5;
-
-        let mut pts: [Point2f; 4] = [Point2f::default(); 4];
-        pts[0].x = self.center.x - a * self.size.height - b * self.size.width;
-        pts[0].y = self.center.y + b * self.size.height - a * self.size.width;
-        pts[1].x = self.center.x + a * self.size.height - b * self.size.width;
-        pts[1].y = self.center.y - b * self.size.height - a * self.size.width;
-
-        pts[2].x = 2.0 * self.center.x - pts[0].x;
-        pts[2].y = 2.0 * self.center.y - pts[0].y;
-        pts[3].x = 2.0 * self.center.x - pts[1].x;
-        pts[3].y = 2.0 * self.center.y - pts[1].y;
-        pts
-    }
-
-    pub fn bounding_rect(&self) -> Rect {
-        let pt = self.points();
-        let x = pt.iter().map(|p| p.x).fold(0. / 0., f32::min).floor() as i32;
-        let y = pt.iter().map(|p| p.y).fold(0. / 0., f32::min).floor() as i32;
-
-        let width =
-            pt.iter().map(|p| p.x).fold(0. / 0., f32::max).ceil() as i32 - x +
-            1;
-        let height =
-            pt.iter().map(|p| p.y).fold(0. / 0., f32::max).ceil() as i32 - y +
-            1;
-        Rect::new(x, y, width, height)
     }
 }
