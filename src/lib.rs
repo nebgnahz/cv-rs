@@ -9,6 +9,20 @@ use libc::{c_double, c_float, c_int, c_void};
 use std::ffi::CString;
 use std::os::raw::c_char;
 
+mod highgui;
+pub use highgui::highgui_named_window;
+pub use highgui::highgui_set_mouse_callback;
+pub use highgui::MouseEventTypes;
+pub use highgui::WindowFlags;
+
+// =============================================================================
+//   Highgui: high-level GUI
+// =============================================================================
+extern "C" {
+    fn opencv_imshow(name: *const c_char, cmat: *mut CMat);
+    fn opencv_wait_key(delay_ms: c_int) -> c_int;
+}
+
 /// Rexport `CVoid` so that various callbacks (such as `on_mouse`) can use it
 /// for C void pointers.
 pub type CVoid = c_void;
@@ -447,56 +461,6 @@ impl Mat {
         }
         Mat::new_with_cmat(m)
     }
-}
-
-// =============================================================================
-//   Highgui: high-level GUI
-// =============================================================================
-extern "C" {
-    pub fn opencv_named_window(name: *const c_char, flags: c_int);
-    fn opencv_imshow(name: *const c_char, cmat: *mut CMat);
-    fn opencv_wait_key(delay_ms: c_int) -> c_int;
-    pub fn opencv_set_mouse_callback(name: *const c_char,
-                                     on_mouse: extern "C" fn(e: i32,
-                                                             x: i32,
-                                                             y: i32,
-                                                             f: i32,
-                                                             data: *mut c_void),
-                                     userdata: *mut c_void);
-}
-
-pub enum WindowFlags {
-    WindowNormal = 0x00000000,
-    WindowAutosize = 0x00000001,
-    WindowOpengl = 0x00001000,
-}
-
-/// Mouse Events
-pub enum MouseEventTypes {
-    /// Indicates that the mouse has moved over the window.
-    MouseMove = 0,
-    /// Indicates that the left mouse button is pressed.
-    LButtonDown = 1,
-    /// Indicates that the right mouse button is pressed.
-    RButtonDown = 2,
-    /// Indicates that the middle mouse button is pressed.
-    MButtonDown = 3,
-    /// Indicates that left mouse button is released.
-    LButtonUp = 4,
-    /// Indicates that right mouse button is released.
-    RButtonUp = 5,
-    /// Indicates that middle mouse button is released.
-    MButtonUp = 6,
-    /// Indicates that left mouse button is double clicked.
-    LButtonClick = 7,
-    /// Indicates that right mouse button is double clicked.
-    RButtonClick = 8,
-    /// Indicates that middle mouse button is double clicked.
-    MButtonClick = 9,
-    /// Positive/negative means forward/backward scrolling.
-    MouseWheel = 10,
-    /// Positive/negative means right and left scrolling.
-    MouseHWheel = 11,
 }
 
 // =============================================================================

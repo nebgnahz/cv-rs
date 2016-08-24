@@ -1,6 +1,5 @@
 extern crate rust_vision;
 use rust_vision::*;
-use std::ffi::CString;
 
 struct SelectionStatus {
     selection: Rect,
@@ -42,13 +41,8 @@ fn main() {
     let cap = VideoCapture::new(0);
     assert!(cap.is_open());
 
-    let s = CString::new("Window").unwrap();
-    unsafe {
-        opencv_named_window((&s).as_ptr(), WindowFlags::WindowAutosize as i32);
-        opencv_set_mouse_callback((&s).as_ptr(),
-                                  on_mouse,
-                                  ss_ptr as *mut CVoid);
-    }
+    highgui_named_window("Window",  WindowFlags::WindowAutosize);
+    highgui_set_mouse_callback("Window", on_mouse, ss_ptr as *mut CVoid);
 
     let m = Mat::new();
     let mut is_tracking = false;
