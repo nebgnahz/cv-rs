@@ -135,6 +135,8 @@ void opencv_videocapture_drop(CVideoCapture* ccap);
 typedef void CCascadeClassifier;
 CCascadeClassifier* opencv_cascade_classifier_new();
 CCascadeClassifier* opencv_cascade_classifier_from_path(const char* const path);
+bool opencv_cascade_classifier_load(CCascadeClassifier* cc,
+                                    const char* const path);
 void opencv_cascade_classifier_drop(CCascadeClassifier* cc);
 
 // vec_of_rect is dynamically allocated, the caller should take ownership of it.

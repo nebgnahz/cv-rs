@@ -187,6 +187,12 @@ CCascadeClassifier* opencv_cascade_classifier_new() {
     return static_cast<CCascadeClassifier*>(cc);
 }
 
+bool opencv_cascade_classifier_load(CCascadeClassifier* cc,
+                                    const char* const p) {
+    cv::CascadeClassifier* cascade = static_cast<cv::CascadeClassifier*>(cc);
+    return cascade->load(p);
+}
+
 CCascadeClassifier* opencv_cascade_classifier_from_path(const char* const p) {
     cv::CascadeClassifier* cc = new cv::CascadeClassifier(p);
     return static_cast<CCascadeClassifier*>(cc);

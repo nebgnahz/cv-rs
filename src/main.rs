@@ -13,7 +13,8 @@ fn main() {
     assert!(cap.is_open());
     let mut m = Mat::new();
 
-    let cascade = CascadeClassifier::from_path(&args[1]);
+    let cascade = CascadeClassifier::new();
+    assert!(cascade.load(&args[1]));
     let s = CString::new("Window").unwrap();
     unsafe {
         opencv_named_window((&s).as_ptr(), WindowFlags::WindowAutosize as i32);
@@ -22,7 +23,8 @@ fn main() {
     loop {
         let mut result = VecOfRect::default();
         cap.read(&m);
-        cascade.detect_with_params(&m, &mut result, 1.2, 5, Size2i::default());
+        cascade.detect_with_params(&m, &mut result, 1.2, 5, Size2i::default(),
+                                   Size2i::default());
         result.draw_on_mat(&mut m);
         m.show("window", 30);
     }

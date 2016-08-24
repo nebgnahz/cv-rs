@@ -538,12 +538,17 @@ impl Drop for VideoCapture {
 }
 
 type CCascadeClassifier = c_void;
+
+/// Cascade classifier class for object detection.
 pub struct CascadeClassifier {
     c_cascade_classifier: *mut CCascadeClassifier,
 }
 
 extern "C" {
     fn opencv_cascade_classifier_new() -> *mut CCascadeClassifier;
+    fn opencv_cascade_classifier_load(cc: *mut CCascadeClassifier,
+                                      p: *const c_char)
+                                      -> bool;
     fn opencv_cascade_classifier_from_path(p: *const c_char)
                                            -> *mut CCascadeClassifier;
     fn opencv_cascade_classifier_drop(p: *mut CCascadeClassifier);
@@ -558,9 +563,18 @@ extern "C" {
 }
 
 impl CascadeClassifier {
+    /// Create a cascade classifier, uninitialized. Before use, call load.
     pub fn new() -> CascadeClassifier {
         let cascade = unsafe { opencv_cascade_classifier_new() };
         CascadeClassifier { c_cascade_classifier: cascade }
+    }
+
+    pub fn load(&self, path: &str) -> bool {
+        let s = CString::new(path).unwrap();
+        unsafe {
+            opencv_cascade_classifier_load(self.c_cascade_classifier,
+                                           (&s).as_ptr())
+        }
     }
 
     pub fn from_path(path: &str) -> Self {
@@ -598,7 +612,7 @@ impl CascadeClassifier {
                                              result.get_mut_c_vec_of_rec(),
                                              scale_factor,
                                              min_neighbors,
-                                             flags,
+                                             0,
                                              min_size,
                                              max_size);
         }
