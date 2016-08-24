@@ -30,6 +30,11 @@ typedef struct {
 } CPoint2f;
 
 typedef struct {
+    int width;
+    int height;
+} CSize2i;
+
+typedef struct {
     float width;
     float height;
 } CSize2f;
@@ -134,7 +139,10 @@ void opencv_cascade_classifier_drop(CCascadeClassifier* cc);
 
 // vec_of_rect is dynamically allocated, the caller should take ownership of it.
 void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
-                                      CVecOfRect* vec_of_rect);
+                                      CVecOfRect* vec_of_rect,
+                                      double scale_factor, int min_neighbors,
+                                      int flags, CSize2i min_size,
+                                      CSize2i max_size);
 
 // =============================================================================
 //   VideoTrack

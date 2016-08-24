@@ -63,7 +63,16 @@ pub struct Point2f {
     pub y: f32,
 }
 
-/// `Size` struct is used for specifying the size of an image or rectangle. It
+/// `Size2i` struct is used for specifying the size of an image or rectangle. It
+/// has two members called `width` and `height`.
+#[derive(Default, Debug, Clone, Copy)]
+#[repr(C)]
+pub struct Size2i {
+    pub width: i32,
+    pub height: i32,
+}
+
+/// `Size2f` struct is used for specifying the size of an image or rectangle. It
 /// has two members called `width` and `height`.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
@@ -540,11 +549,16 @@ extern "C" {
     fn opencv_cascade_classifier_drop(p: *mut CCascadeClassifier);
     fn opencv_cascade_classifier_detect(cc: *mut CCascadeClassifier,
                                         cmat: *mut CMat,
-                                        vec_of_rect: *mut CVecOfRect);
+                                        vec_of_rect: *mut CVecOfRect,
+                                        scale_factor: c_double,
+                                        min_neighbors: c_int,
+                                        flags: c_int,
+                                        min_size: Size2i,
+                                        max_size: Size2i);
 }
 
 impl CascadeClassifier {
-    pub fn new() -> Self {
+    pub fn new() -> CascadeClassifier {
         let cascade = unsafe { opencv_cascade_classifier_new() };
         CascadeClassifier { c_cascade_classifier: cascade }
     }
@@ -560,7 +574,33 @@ impl CascadeClassifier {
         unsafe {
             opencv_cascade_classifier_detect(self.c_cascade_classifier,
                                              mat.get_cmat(),
-                                             result.get_mut_c_vec_of_rec());
+                                             result.get_mut_c_vec_of_rec(),
+                                             1.1,
+                                             3,
+                                             0,
+                                             Size2i::default(),
+                                             Size2i::default());
+        }
+
+        result.populate_rects();
+    }
+
+    pub fn detect_with_params(&self,
+                              mat: &Mat,
+                              result: &mut VecOfRect,
+                              scale_factor: f64,
+                              min_neighbors: i32,
+                              min_size: Size2i,
+                              max_size: Size2i) {
+        unsafe {
+            opencv_cascade_classifier_detect(self.c_cascade_classifier,
+                                             mat.get_cmat(),
+                                             result.get_mut_c_vec_of_rec(),
+                                             scale_factor,
+                                             min_neighbors,
+                                             flags,
+                                             min_size,
+                                             max_size);
         }
 
         result.populate_rects();

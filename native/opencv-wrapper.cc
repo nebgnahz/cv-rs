@@ -199,11 +199,18 @@ void opencv_cascade_classifier_drop(CCascadeClassifier* cc) {
 }
 
 void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
-                                      CVecOfRect* vec_of_rect) {
+                                      CVecOfRect* vec_of_rect,
+                                      double scale_factor, int min_neighbors,
+                                      int flags, CSize2i min_size,
+                                      CSize2i max_size) {
     cv::CascadeClassifier* cascade = static_cast<cv::CascadeClassifier*>(cc);
     cv::Mat* image = static_cast<cv::Mat*>(cmat);
     std::vector<cv::Rect> objects;
-    cascade->detectMultiScale(*image, objects);
+
+    cv::Size cv_min_size(min_size.width, min_size.height);
+    cv::Size cv_max_size(max_size.width, max_size.height);
+    cascade->detectMultiScale(*image, objects, scale_factor, min_neighbors,
+                              flags, cv_min_size, cv_max_size);
     // Move objects to vec_of_rect
     size_t num = objects.size();
     vec_of_rect->array = (CRect*) malloc(num * sizeof(CRect));
