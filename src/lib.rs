@@ -5,7 +5,7 @@
 //! [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
 //! bindings using a Python script.
 extern crate libc;
-use libc::{c_double, c_float, c_int};
+use libc::{c_double, c_int};
 use std::ffi::CString;
 use std::os::raw::c_char;
 
@@ -150,84 +150,8 @@ impl Mat {
     }
 }
 
-// =============================================================================
-//  Imgproc
-// =============================================================================
-extern "C" {
-    fn opencv_rectangle(cmat: *mut CMat, rect: Rect);
-    fn opencv_cvt_color(cmat: *const CMat, output: *mut CMat, code: i32);
-    fn opencv_calc_hist(cimages: *const CMat,
-                        nimages: i32,
-                        channels: *const c_int,
-                        cmask: *const CMat,
-                        chist: *mut CMat,
-                        dims: c_int,
-                        hist_size: *const c_int,
-                        ranges: *const *const c_float);
-    fn opencv_calc_back_project(cimages: *const CMat,
-                                nimages: c_int,
-                                channels: *const c_int,
-                                chist: *const CMat,
-                                cback_project: *mut CMat,
-                                ranges: *const *const c_float);
-}
-
-pub enum ColorConversionCodes {
-    BGR2BGRA = 0,
-    BGR2HSV = 40,
-}
-
-impl Mat {
-    pub fn rectangle(&self, rect: Rect) {
-        unsafe {
-            opencv_rectangle(self.c_mat, rect);
-        }
-    }
-
-    pub fn cvt_color(&self, code: ColorConversionCodes) -> Mat {
-        let m = unsafe { opencv_mat_new() };
-        unsafe { opencv_cvt_color(self.c_mat, m, code as i32) }
-        Mat::new_with_cmat(m)
-    }
-
-    pub fn calc_hist(&self,
-                     channels: *const c_int,
-                     mask: Mat,
-                     dims: c_int,
-                     hist_size: *const c_int,
-                     ranges: *const *const f32)
-                     -> Mat {
-        let m = unsafe { opencv_mat_new() };
-        unsafe {
-            opencv_calc_hist(self.c_mat,
-                             1,
-                             channels,
-                             mask.c_mat,
-                             m,
-                             dims,
-                             hist_size,
-                             ranges);
-        }
-        Mat::new_with_cmat(m)
-    }
-
-    pub fn calc_back_project(&self,
-                             channels: *const i32,
-                             hist: &Mat,
-                             ranges: *const *const f32)
-                             -> Mat {
-        let m = unsafe { opencv_mat_new() };
-        unsafe {
-            opencv_calc_back_project(self.c_mat,
-                                     1,
-                                     channels,
-                                     (*hist).c_mat,
-                                     m,
-                                     ranges);
-        }
-        Mat::new_with_cmat(m)
-    }
-}
+mod imgproc;
+pub use imgproc::ColorConversionCodes;
 
 // =============================================================================
 //   VideoCapture

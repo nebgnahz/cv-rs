@@ -48,7 +48,7 @@ fn main() {
 
     let mut hist = Mat::new();
     let hsize = 16;
-    let hranges = [0 as f32, 180 as f32];
+    let hranges = [0_f32, 180_f32];
     let phranges: [*const f32; 1] = [&hranges[0] as *const f32];
     let mut track_window = Rect::default();
 

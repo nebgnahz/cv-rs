@@ -41,7 +41,7 @@ pub type MouseCallbackData = *mut c_void;
 /// [highgui_set_mouse_callback](fn.highgui_set_mouse_callback.html)
 pub type MouseCallback = fn(i32, i32, i32, i32, MouseCallbackData);
 
-/// Sets mouse handler for the specified window (identified by name). A callback
+/// Set mouse handler for the specified window (identified by name). A callback
 /// handler should be provided and optional user_data can be passed around.
 pub fn highgui_set_mouse_callback(name: &str,
                                   on_mouse: MouseCallback,
