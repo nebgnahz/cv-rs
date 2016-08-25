@@ -40,7 +40,7 @@ fn main() {
     let cap = VideoCapture::new(0);
     assert!(cap.is_open());
 
-    highgui_named_window("Window",  WindowFlags::WindowAutosize);
+    highgui_named_window("Window", WindowFlags::WindowAutosize);
     highgui_set_mouse_callback("Window", on_mouse, ss_ptr as *mut CVoid);
 
     let m = Mat::new();
@@ -84,8 +84,8 @@ fn main() {
 
         if is_tracking {
             let mut back_project = hue.calc_back_project(std::ptr::null(),
-                                                         &hist,
-                                                         &phranges[0] as *const *const f32);
+                                   &hist,
+                                   &phranges[0] as *const *const f32);
             back_project.logic_and(mask);
             let criteria = TermCriteria::new(TermType::Count, 10, 1 as f64);
             let track_box = back_project.camshift(track_window, &criteria);
