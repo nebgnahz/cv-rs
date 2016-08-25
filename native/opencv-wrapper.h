@@ -17,7 +17,7 @@ EXTERN_C_BEGIN
 // =============================================================================
 //   Core/Types
 // =============================================================================
-typedef void CMat;
+typedef struct CMat CMat;
 
 typedef struct {
     int32_t x;
@@ -122,7 +122,7 @@ void opencv_set_mouse_callback(const char* const winname, MouseCallback onMouse,
 // =============================================================================
 //   VideoCapture
 // =============================================================================
-typedef void CVideoCapture;
+typedef struct CVideoCapture CVideoCapture;
 
 CVideoCapture* opencv_videocapture_new(int index);
 bool opencv_videocapture_is_opened(const CVideoCapture* const ccap);
@@ -132,7 +132,7 @@ void opencv_videocapture_drop(CVideoCapture* ccap);
 // =============================================================================
 //   CascadeClassifier
 // =============================================================================
-typedef void CCascadeClassifier;
+typedef struct CCascadeClassifier CCascadeClassifier;
 CCascadeClassifier* opencv_cascade_classifier_new();
 CCascadeClassifier* opencv_cascade_classifier_from_path(const char* const path);
 bool opencv_cascade_classifier_load(CCascadeClassifier* cc,
@@ -149,7 +149,7 @@ void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
 // =============================================================================
 //   VideoTrack
 // =============================================================================
-typedef void CTermCriteria;
+typedef struct CTermCriteria CTermCriteria;
 CTermCriteria* opencv_term_criteria_new(int type, int count, double epsilon);
 void opencv_term_criteria_drop(CTermCriteria* c_criteria);
 CRotatedRect opencv_camshift(CMat* back_project_image, CRect window,
