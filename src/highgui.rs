@@ -21,17 +21,35 @@ pub fn highgui_named_window(name: &str, flags: WindowFlags) {
     }
 }
 
+type MouseCallback = fn(i32, i32, i32, i32, *mut c_void);
+type _MouseCallback = extern "C" fn(i32, i32, i32, i32, *mut c_void);
+
 pub fn highgui_set_mouse_callback(name: &str,
-                                  on_mouse: extern "C" fn(e: i32,
-                                                          x: i32,
-                                                          y: i32,
-                                                          f: i32,
-                                                          data: *mut c_void),
-                                  userdata: *mut c_void) {
+                                  on_mouse: MouseCallback,
+                                  user_data: *mut c_void) {
+    struct CallbackWrapper {
+        cb: Box<MouseCallback>,
+        data: *mut c_void,
+    }
+
+    extern "C" fn internal_mouse_callback(e: i32, x: i32, y: i32, f: i32, user_data: *mut c_void) {
+        let cb_wrapper_in_box = user_data as *mut Box<CallbackWrapper>;
+        let cb_wrapper: &Box<CallbackWrapper> = unsafe { &*cb_wrapper_in_box };
+        let callback = &cb_wrapper.cb;
+        callback(e, x, y, f, cb_wrapper.data);
+    }
+
+    let cb_wrapper = CallbackWrapper {
+        cb: Box::new(on_mouse),
+        data: user_data,
+    };
+
+    let cb: Box<CallbackWrapper> = Box::new(cb_wrapper);
+    let cb_raw = Box::into_raw(cb) as *mut c_void;
 
     let s = CString::new(name).unwrap();
     unsafe {
-        opencv_set_mouse_callback((&s).as_ptr(), on_mouse, userdata);
+        opencv_set_mouse_callback((&s).as_ptr(), internal_mouse_callback, cb_raw);
     }
 }
 
