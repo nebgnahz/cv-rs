@@ -34,9 +34,12 @@ pub fn highgui_destroy_window(name: &str) {
     }
 }
 
+/// Pointer referring to the data used in MouseCallback
+pub type MouseCallbackData = *mut c_void;
+
 /// Callback function for mouse events, primarily used in
 /// [highgui_set_mouse_callback](fn.highgui_set_mouse_callback.html)
-pub type MouseCallback = fn(i32, i32, i32, i32, *mut c_void);
+pub type MouseCallback = fn(i32, i32, i32, i32, MouseCallbackData);
 
 /// Sets mouse handler for the specified window (identified by name). A callback
 /// handler should be provided and optional user_data can be passed around.

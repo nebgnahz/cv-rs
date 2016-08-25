@@ -5,7 +5,7 @@
 //! [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
 //! bindings using a Python script.
 extern crate libc;
-use libc::{c_double, c_float, c_int, c_void};
+use libc::{c_double, c_float, c_int};
 use std::ffi::CString;
 use std::os::raw::c_char;
 
@@ -14,11 +14,9 @@ pub use highgui::highgui_named_window;
 pub use highgui::highgui_destroy_window;
 pub use highgui::highgui_set_mouse_callback;
 pub use highgui::MouseCallback;
+pub use highgui::MouseCallbackData;
 pub use highgui::MouseEventTypes;
 pub use highgui::WindowFlags;
-
-/// Re-export from `libc` for C void pointer.
-pub type CVoid = c_void;
 
 mod core;
 pub use core::Scalar;

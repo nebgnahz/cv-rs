@@ -6,7 +6,7 @@ struct SelectionStatus {
     status: bool,
 }
 
-fn on_mouse(e: i32, x: i32, y: i32, _: i32, data: *mut CVoid) {
+fn on_mouse(e: i32, x: i32, y: i32, _: i32, data: MouseCallbackData) {
     let event: MouseEventTypes = unsafe { std::mem::transmute(e as u8) };
     match event {
         MouseEventTypes::LButtonDown => {
@@ -41,7 +41,7 @@ fn main() {
     assert!(cap.is_open());
 
     highgui_named_window("Window", WindowFlags::WindowAutosize);
-    highgui_set_mouse_callback("Window", on_mouse, ss_ptr as *mut CVoid);
+    highgui_set_mouse_callback("Window", on_mouse, ss_ptr as MouseCallbackData);
 
     let m = Mat::new();
     let mut is_tracking = false;
