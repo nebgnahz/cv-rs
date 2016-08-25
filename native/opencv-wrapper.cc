@@ -136,6 +136,10 @@ void opencv_named_window(const char* const winname, int flags) {
     cv::namedWindow(winname, flags);
 }
 
+void opencv_destroy_window(const char* const winname) {
+    cv::destroyWindow(winname);
+}
+
 void opencv_imshow(const char* const winname, CMat* cmat) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     if (mat != NULL) {

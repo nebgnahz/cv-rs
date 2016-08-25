@@ -5,6 +5,7 @@ use std::ffi::CString;
 
 extern "C" {
     fn opencv_named_window(name: *const c_char, flags: c_int);
+    fn opencv_destroy_window(name: *const c_char);
     fn opencv_set_mouse_callback(name: *const c_char,
                                  on_mouse: extern "C" fn(e: i32,
                                                          x: i32,
@@ -14,6 +15,10 @@ extern "C" {
                                  userdata: *mut c_void);
 }
 
+
+/// Create a window that can be used as a placeholder for images and
+/// trackbars. All created windows are referred to by their names. If a window
+/// with the same name already exists, the function does nothing.
 pub fn highgui_named_window(name: &str, flags: WindowFlags) {
     let s = CString::new(name).unwrap();
     unsafe {
@@ -21,9 +26,20 @@ pub fn highgui_named_window(name: &str, flags: WindowFlags) {
     }
 }
 
-type MouseCallback = fn(i32, i32, i32, i32, *mut c_void);
-type _MouseCallback = extern "C" fn(i32, i32, i32, i32, *mut c_void);
+/// Destroy the specified window with the given name.
+pub fn highgui_destroy_window(name: &str) {
+    let s = CString::new(name).unwrap();
+    unsafe {
+        opencv_destroy_window((&s).as_ptr());
+    }
+}
 
+/// Callback function for mouse events, primarily used in
+/// [highgui_set_mouse_callback](fn.highgui_set_mouse_callback.html)
+pub type MouseCallback = fn(i32, i32, i32, i32, *mut c_void);
+
+/// Sets mouse handler for the specified window (identified by name). A callback
+/// handler should be provided and optional user_data can be passed around.
 pub fn highgui_set_mouse_callback(name: &str,
                                   on_mouse: MouseCallback,
                                   user_data: *mut c_void) {
@@ -59,10 +75,19 @@ pub fn highgui_set_mouse_callback(name: &str,
     }
 }
 
+
+/// Flags for [highgui_named_window](fn.highgui_named_window.html). This only
+/// supports a subset of all cv::WindowFlags because C/C++ allows enum with the
+/// same value but Rust is stricter.
 pub enum WindowFlags {
+    /// the window can be resized (no constraint) or switched to fullscreen.
     WindowNormal = 0x00000000,
+    /// the window is constrained by the image displayed.
     WindowAutosize = 0x00000001,
+    /// the window is with opengl support.
     WindowOpengl = 0x00001000,
+    /// the window can be resized arbitrarily (no ratio constraint).
+    WindowFreeRatio = 0x00000100,
 }
 
 /// Mouse Events

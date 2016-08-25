@@ -11,22 +11,16 @@ use std::os::raw::c_char;
 
 mod highgui;
 pub use highgui::highgui_named_window;
+pub use highgui::highgui_destroy_window;
 pub use highgui::highgui_set_mouse_callback;
+pub use highgui::MouseCallback;
 pub use highgui::MouseEventTypes;
 pub use highgui::WindowFlags;
 
-// =============================================================================
-//   Highgui: high-level GUI
-// =============================================================================
-extern "C" {
-    fn opencv_imshow(name: *const c_char, cmat: *mut CMat);
-    fn opencv_wait_key(delay_ms: c_int) -> c_int;
-}
-
-/// Rexport `CVoid` so that various callbacks (such as `on_mouse`) can use it
-/// for C void pointers.
+/// Re-export from `libc` for C void pointer.
 pub type CVoid = c_void;
 
+// Opaque data struct for C bindings
 enum CMat {}
 
 /// This wraps OpenCV's `Mat` class which is designed for n-dimensional dense
@@ -293,6 +287,11 @@ impl Mat {
     /// Call out to highgui to show the image, the duration is specified by
     /// `delay`.
     pub fn show(&self, name: &str, delay: i32) {
+        extern "C" {
+            fn opencv_imshow(name: *const c_char, cmat: *mut CMat);
+            fn opencv_wait_key(delay_ms: c_int) -> c_int;
+        }
+
         let s = CString::new(name).unwrap();
         unsafe {
             opencv_imshow((&s).as_ptr(), self.c_mat);

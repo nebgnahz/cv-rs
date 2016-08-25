@@ -112,6 +112,7 @@ void opencv_calc_back_project(const CMat* images, int nimages,
 //   Highgui: high-level GUI
 // =============================================================================
 void opencv_named_window(const char* const winname, int flags);
+void opencv_destroy_window(const char* const winname);
 void opencv_imshow(const char* const winname, CMat* mat);
 int opencv_wait_key(int delay_in_millis);
 
