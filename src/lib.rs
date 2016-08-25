@@ -27,7 +27,7 @@ extern "C" {
 /// for C void pointers.
 pub type CVoid = c_void;
 
-type CMat = c_void;
+enum CMat {}
 
 /// This wraps OpenCV's `Mat` class which is designed for n-dimensional dense
 /// array. It's the most widely used data structure in image/video processing
@@ -466,7 +466,7 @@ impl Mat {
 // =============================================================================
 //   VideoCapture
 // =============================================================================
-type CVideoCapture = c_void;
+enum CVideoCapture {}
 pub struct VideoCapture {
     c_videocapture: *mut CVideoCapture,
 }
@@ -501,7 +501,7 @@ impl Drop for VideoCapture {
     }
 }
 
-type CCascadeClassifier = c_void;
+enum CCascadeClassifier {}
 
 /// Cascade classifier class for object detection.
 pub struct CascadeClassifier {
@@ -596,7 +596,7 @@ impl Drop for CascadeClassifier {
 // =============================================================================
 //   VideoTrack
 // =============================================================================
-type CTermCriteria = c_void;
+enum CTermCriteria {}
 pub enum TermType {
     Count = 1,
     EPS = 2,
