@@ -1,5 +1,5 @@
 [package]
-name = "rust-vision"
+name = "rust_vision"
 version = "0.1.0"
 authors = ["Ben Zhang <benzh@cs.berkeley.edu>"]
 build = "build.rs"
