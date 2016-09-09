@@ -74,6 +74,7 @@ bool opencv_mat_valid(CMat* cmat);
 CMat* opencv_mat_roi(CMat* cmat, CRect crect);
 
 void opencv_mat_logic_and(CMat* image, const CMat* const mask);
+void opencv_mat_flip(CMat* image, int code);
 
 // The caller owns the returned data CMat
 CMat* opencv_imread(const char* const filename, int flags);

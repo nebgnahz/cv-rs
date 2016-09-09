@@ -31,6 +31,8 @@ use core::CMat;
 use core::opencv_mat_new;
 pub use core::Mat;
 
+pub use core::FlipCode;
+
 /// This struct represents a rotated (i.e. not up-right) rectangle. Each
 /// rectangle is specified by the center point (mass center), length of each
 /// side (represented by `Size2f`) and the rotation angle in degrees.

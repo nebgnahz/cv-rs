@@ -4,7 +4,7 @@ fn main() {
     gcc::Config::new()
         .cpp(true)
         .file("native/opencv-wrapper.cc")
-	.include("/usr/local/include")
+        .include("/usr/local/include")
         .include("native")
         .flag("--std=c++11")
         .compile("libopencv-wrapper.a");
