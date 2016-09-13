@@ -2,6 +2,8 @@
 extern crate libc;
 use libc::{c_char, c_int, c_void};
 use std::ffi::CString;
+use std::ptr;
+use std::mem;
 
 extern "C" {
     fn opencv_named_window(name: *const c_char, flags: c_int);
@@ -56,18 +58,17 @@ pub fn highgui_set_mouse_callback(name: &str,
                                   y: i32,
                                   f: i32,
                                   ud: *mut c_void) {
-        let box_wrapper = unsafe { Box::from_raw(ud as *mut CallbackWrapper) };
-        let cb_wrapper: CallbackWrapper = *box_wrapper;
+        let cb_wrapper =
+            unsafe { ptr::read(ud as *mut CallbackWrapper) };
         let true_callback = *(cb_wrapper.cb);
         true_callback(e, x, y, f, cb_wrapper.data);
+        mem::forget(cb_wrapper.cb);
     }
 
-    let cb_wrapper = CallbackWrapper {
+    let box_wrapper: Box<CallbackWrapper> = Box::new(CallbackWrapper {
         cb: Box::new(on_mouse),
         data: user_data,
-    };
-
-    let box_wrapper: Box<CallbackWrapper> = Box::new(cb_wrapper);
+    });
     let box_wrapper_raw = Box::into_raw(box_wrapper) as *mut c_void;
 
     let s = CString::new(name).unwrap();

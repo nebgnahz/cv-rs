@@ -43,7 +43,7 @@ fn main() {
     highgui_named_window("Window", WindowFlags::WindowAutosize);
     highgui_set_mouse_callback("Window", on_mouse, ss_ptr as MouseCallbackData);
 
-    let m = Mat::new();
+    let mut m = Mat::new();
     let mut is_tracking = false;
 
     let mut hist = Mat::new();
@@ -54,6 +54,8 @@ fn main() {
 
     loop {
         cap.read(&m);
+        m.flip(FlipCode::YAxis);
+
         let hsv = m.cvt_color(ColorConversionCodes::BGR2HSV);
 
         let ch = [0, 0];

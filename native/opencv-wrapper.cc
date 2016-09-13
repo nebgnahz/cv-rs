@@ -37,6 +37,11 @@ void opencv_mat_logic_and(CMat* cimage, const CMat* const cmask) {
     (*image) &= (*mask);
 }
 
+void opencv_mat_flip(CMat* cimage, int code) {
+    cv::Mat* image = reinterpret_cast<cv::Mat*>(cimage);
+    cv::flip(*image, *image, code);
+}
+
 CMat* opencv_imread(const char* const filename, int flags) {
     cv::Mat* image = new cv::Mat();
     *image = cv::imread(filename, flags);

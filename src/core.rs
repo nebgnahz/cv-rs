@@ -169,7 +169,14 @@ extern "C" {
     fn opencv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
     fn opencv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
     fn opencv_mat_logic_and(cimage: *mut CMat, cmask: *const CMat);
+    fn opencv_mat_flip(src: *mut CMat, code: i32);
     fn opencv_mat_drop(mat: *mut CMat);
+}
+
+pub enum FlipCode {
+    XAxis,
+    YAxis,
+    XYAxis,
 }
 
 impl Mat {
@@ -219,6 +226,16 @@ impl Mat {
         unsafe {
             opencv_mat_logic_and(self.c_mat, mask.get_cmat());
         }
+    }
+
+    /// Flips an image around vertical, horizontal, or both axes.
+    pub fn flip(&mut self, code: FlipCode) {
+        let code = match code {
+            FlipCode::XAxis => 0,
+            FlipCode::YAxis => 1,
+            FlipCode::XYAxis => -1,
+        };
+        unsafe { opencv_mat_flip(self.c_mat, code); }
     }
 
     /// Call out to highgui to show the image, the duration is specified by
