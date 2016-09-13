@@ -1,6 +1,5 @@
 extern crate rust_vision;
 use rust_vision::*;
-use std::ffi::CString;
 
 fn main() {
     let args: Vec<_> = std::env::args().collect();
@@ -14,10 +13,7 @@ fn main() {
     let mut m = Mat::new();
 
     let cascade = CascadeClassifier::from_path(&args[1]);
-    let s = CString::new("Window").unwrap();
-    unsafe {
-        opencv_named_window((&s).as_ptr(), WindowFlags::WindowAutosize as i32);
-    }
+    highgui_named_window("Window", WindowFlags::WindowAutosize);
 
     loop {
         let mut result = VecOfRect::default();
