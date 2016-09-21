@@ -2,7 +2,6 @@
 // http://docs.opencv.org/3.1.0/db/deb/tutorial_display_image.html
 extern crate rust_vision;
 use rust_vision::*;
-use std::ffi::CString;
 
 fn main() {
     let args: Vec<_> = std::env::args().collect();
@@ -18,10 +17,6 @@ fn main() {
         std::process::exit(-1);
     }
 
-    let s = CString::new("Display window").unwrap();
-    unsafe {
-        opencv_named_window((&s).as_ptr(), WindowFlags::WindowAutosize as i32);
-    }
-
+    highgui_named_window("Display window", WindowFlags::WindowAutosize);
     mat.show("Display window", 0);
 }

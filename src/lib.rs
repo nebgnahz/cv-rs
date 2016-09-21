@@ -152,6 +152,9 @@ impl Mat {
     }
 }
 
+mod imgcodecs;
+pub use imgcodecs::{ImreadModes, ImwriteFlags, ImwritePngFlags};
+
 mod imgproc;
 pub use imgproc::ColorConversionCodes;
 

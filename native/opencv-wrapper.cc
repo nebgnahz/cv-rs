@@ -135,6 +135,30 @@ void opencv_calc_back_project(const CMat* cimages, int nimages,
 }
 
 // =============================================================================
+//  Imgcodecs
+// =============================================================================
+CMat* opencv_imdecode(const uint8_t* const buffer, size_t len, int flag) {
+    cv::Mat* dst = new cv::Mat();
+    std::vector<uchar> input(buffer, buffer + len);
+    cv::imdecode(cv::Mat(input), flag, dst);
+    return reinterpret_cast<CMat*>(dst);
+}
+
+ImencodeResult opencv_imencode(const char* const ext, const CMat* const cmat,
+                               const int* const flag_ptr, size_t flag_size) {
+    const cv::Mat* image = reinterpret_cast<const cv::Mat*>(cmat);
+    std::vector<uchar> buf;
+    std::vector<int> params(flag_ptr, flag_ptr + flag_size);
+    bool r = cv::imencode(ext, *image, buf, params);
+
+    ImencodeResult result;
+    result.status = r;
+    result.buf = &buf[0];
+    result.size = buf.size();
+    return result;
+}
+
+// =============================================================================
 //   Highgui: high-level GUI
 // =============================================================================
 void opencv_named_window(const char* const winname, int flags) {

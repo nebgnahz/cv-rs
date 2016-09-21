@@ -64,6 +64,12 @@ typedef struct {
     int32_t v3;
 } CScalar;
 
+typedef struct {
+    bool status;
+    uint8_t* buf;
+    size_t size;
+} ImencodeResult;
+
 // The caller owns the returned data CMat
 CMat* opencv_mat_new();
 CMat* opencv_mat_new_with_size(int rows, int cols, int type);
@@ -108,6 +114,13 @@ void opencv_calc_hist(const CMat* const cimages, int nimages,
 void opencv_calc_back_project(const CMat* images, int nimages,
                               const int* channels, CMat* hist,
                               CMat* back_project, const float** ranges);
+
+// =============================================================================
+//  Imgcodecs
+// =============================================================================
+CMat* opencv_imdecode(const uint8_t* const buffer, size_t len, int flag);
+ImencodeResult opencv_imencode(const char* const ext, const CMat* const cmat,
+                               const int* const flag_ptr, size_t flag_size);
 
 // =============================================================================
 //   Highgui: high-level GUI

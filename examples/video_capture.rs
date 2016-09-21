@@ -25,18 +25,13 @@
 
 extern crate rust_vision;
 use rust_vision::*;
-use std::ffi::CString;
 
 fn main() {
     let cap = VideoCapture::new(0);
     assert!(cap.is_open());
     let m = Mat::new();
 
-    let s = CString::new("Window").unwrap();
-    unsafe {
-        opencv_named_window((&s).as_ptr(), WindowFlags::WindowAutosize as i32);
-    }
-
+    highgui_named_window("Window", WindowFlags::WindowAutosize);
     loop {
         cap.read(&m);
         m.show("Window", 30);
