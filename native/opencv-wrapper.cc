@@ -144,6 +144,7 @@ CMat* opencv_imdecode(const uint8_t* const buffer, size_t len, int flag) {
     return reinterpret_cast<CMat*>(dst);
 }
 
+// The caller is responsible for the allocated buffer
 ImencodeResult opencv_imencode(const char* const ext, const CMat* const cmat,
                                const int* const flag_ptr, size_t flag_size) {
     const cv::Mat* image = reinterpret_cast<const cv::Mat*>(cmat);
@@ -151,10 +152,14 @@ ImencodeResult opencv_imencode(const char* const ext, const CMat* const cmat,
     std::vector<int> params(flag_ptr, flag_ptr + flag_size);
     bool r = cv::imencode(ext, *image, buf, params);
 
+    int size = buf.size();
+    uint8_t* buffer = new uint8_t[size];
+    std::copy(buf.begin(), buf.begin() + size, buffer);
+
     ImencodeResult result;
     result.status = r;
-    result.buf = &buf[0];
-    result.size = buf.size();
+    result.size = size;
+    result.buf = buffer;
     return result;
 }
 
