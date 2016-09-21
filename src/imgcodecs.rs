@@ -1,5 +1,5 @@
-use super::libc::{c_int, size_t, uint8_t};
 use super::core::{CMat, Mat};
+use super::libc::{c_int, size_t, uint8_t};
 
 // =============================================================================
 //  Imgproc

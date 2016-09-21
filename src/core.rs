@@ -180,6 +180,7 @@ pub enum FlipCode {
 }
 
 impl Mat {
+    #[inline]
     pub fn new_with_cmat(cmat: *mut CMat) -> Mat {
         Mat {
             c_mat: cmat,
