@@ -1,5 +1,6 @@
+use std::ffi::CString;
 use super::core::{CMat, Mat};
-use super::libc::{c_int, size_t, uint8_t};
+use super::libc::{c_char, c_int, size_t, uint8_t};
 
 // =============================================================================
 //  Imgproc
@@ -96,7 +97,7 @@ pub enum ImwritePngFlags {
 
 extern "C" {
     fn opencv_imdecode(buf: *const uint8_t, l: size_t, m: c_int) -> *mut CMat;
-    fn opencv_imencode(ext: *const uint8_t,
+    fn opencv_imencode(ext: *const c_char,
                        c_mat: *const CMat,
                        flag_ptr: *const c_int,
                        flag_size: size_t)
@@ -119,9 +120,10 @@ impl Mat {
     }
 
     pub fn imencode(&self, ext: &str, f: Vec<ImwriteFlags>) -> Option<Vec<u8>> {
+        let ext = CString::new(ext).expect("invalid extension string");
         let flags = f.into_iter().map(|f| f as i32).collect::<Vec<_>>();
         let r = unsafe {
-            opencv_imencode(ext.as_ptr(),
+            opencv_imencode(ext.into_raw(),
                             self.c_mat,
                             flags.as_ptr(),
                             flags.len())

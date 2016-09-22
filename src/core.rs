@@ -12,6 +12,7 @@ pub enum CMat {}
 /// This wraps OpenCV's `Mat` class which is designed for n-dimensional dense
 /// array. It's the most widely used data structure in image/video processing
 /// since images are often stored as `Mat`.
+#[derive(Debug)]
 pub struct Mat {
     pub c_mat: *mut CMat,
     pub cols: i32,
