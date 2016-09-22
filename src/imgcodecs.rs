@@ -112,7 +112,7 @@ struct ImencodeResult {
 }
 
 impl Mat {
-    pub fn imdecode(buf: &Vec<u8>, mode: ImreadModes) -> Mat {
+    pub fn imdecode(buf: &[u8], mode: ImreadModes) -> Mat {
         let c_mat =
             unsafe { opencv_imdecode(buf.as_ptr(), buf.len(), mode as i32) };
         Mat::new_with_cmat(c_mat)
@@ -127,7 +127,9 @@ impl Mat {
                             flags.len())
         };
         if r.status {
-            unsafe { Some(Vec::from_raw_parts(r.buf, r.size, r.size)) }
+            unsafe {
+                Some(::std::slice::from_raw_parts(r.buf, r.size).to_vec())
+            }
         } else {
             None
         }
