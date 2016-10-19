@@ -203,6 +203,8 @@ pub struct CascadeClassifier {
     c_cascade_classifier: *mut CCascadeClassifier,
 }
 
+unsafe impl Send for CascadeClassifier {}
+
 extern "C" {
     fn opencv_cascade_classifier_new() -> *mut CCascadeClassifier;
     fn opencv_cascade_classifier_load(cc: *mut CCascadeClassifier,
@@ -249,9 +251,9 @@ impl CascadeClassifier {
                                              mat.get_cmat(),
                                              result.get_mut_c_vec_of_rec(),
                                              1.1,
-                                             3,
+                                             5,
                                              0,
-                                             Size2i::default(),
+                                             Size2i { width: 100, height: 100 },
                                              Size2i::default());
         }
 
