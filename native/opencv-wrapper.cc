@@ -114,6 +114,12 @@ void opencv_cvt_color(CMat* cmat, CMat* output, int code) {
     cv::cvtColor(*mat, *out, code);
 }
 
+void opencv_pyr_down(CMat* cmat, CMat* output) {
+    cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
+    cv::Mat* out = reinterpret_cast<cv::Mat*>(output);
+    cv::pyrDown(*mat, *out);
+}
+
 void opencv_calc_hist(const CMat* cimages, int nimages,
                       const int* channels, CMat* cmask, CMat* chist, int dims,
                       const int* hist_size, const float** ranges) {

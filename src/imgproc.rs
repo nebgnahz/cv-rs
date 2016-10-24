@@ -1,10 +1,7 @@
 extern crate libc;
 
 use libc::{c_float, c_int};
-use super::core::Rect;
-use super::core::CMat;
-use super::core::Mat;
-use super::core::opencv_mat_new;
+use super::core::*;
 
 // =============================================================================
 //  Imgproc
@@ -12,6 +9,7 @@ use super::core::opencv_mat_new;
 extern "C" {
     fn opencv_rectangle(cmat: *mut CMat, rect: Rect);
     fn opencv_cvt_color(cmat: *const CMat, output: *mut CMat, code: i32);
+    fn opencv_pyr_down(cmat: *const CMat, output: *mut CMat);
     fn opencv_calc_hist(cimages: *const CMat,
                         nimages: i32,
                         channels: *const c_int,
@@ -182,6 +180,12 @@ impl Mat {
         Mat::new_with_cmat(m)
     }
 
+    /// Convert an image from one color space to another.
+    pub fn pyr_down(&self) -> Mat {
+        let m = unsafe { opencv_mat_new() };
+        unsafe { opencv_pyr_down(self.c_mat, m) }
+        Mat::new_with_cmat(m)
+    }
 
     /// Calculate a histogram of an image.
     pub fn calc_hist(&self,
