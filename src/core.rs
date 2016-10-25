@@ -110,6 +110,11 @@ pub struct VecOfRect {
 }
 
 impl VecOfRect {
+    /// Count of detect rectangles
+    pub fn len(&self) -> usize {
+        self.rects.len()
+    }
+
     /// Helper function to draw all rectangles on the `Mat` (image).
     pub fn draw_on_mat(&self, mat: &mut Mat) {
         self.rects.iter().map(|&r| mat.rectangle(r)).count();
