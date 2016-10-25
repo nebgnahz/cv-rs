@@ -10,28 +10,28 @@ use std::ffi::CString;
 use std::os::raw::c_char;
 
 mod highgui;
-pub use highgui::highgui_named_window;
-pub use highgui::highgui_destroy_window;
-pub use highgui::highgui_set_mouse_callback;
 pub use highgui::MouseCallback;
 pub use highgui::MouseCallbackData;
 pub use highgui::MouseEventTypes;
 pub use highgui::WindowFlags;
+pub use highgui::highgui_destroy_window;
+pub use highgui::highgui_named_window;
+pub use highgui::highgui_set_mouse_callback;
 
 mod core;
-pub use core::Scalar;
-pub use core::Point2i;
-pub use core::Point2f;
-pub use core::Size2i;
-pub use core::Size2f;
-pub use core::Rect;
-use core::CVecOfRect;
-pub use core::VecOfRect;
 use core::CMat;
-use core::opencv_mat_new;
-pub use core::Mat;
+use core::CVecOfRect;
 
 pub use core::FlipCode;
+pub use core::Mat;
+pub use core::Point2f;
+pub use core::Point2i;
+pub use core::Rect;
+pub use core::Scalar;
+pub use core::Size2f;
+pub use core::Size2i;
+pub use core::VecOfRect;
+use core::opencv_mat_new;
 
 /// This struct represents a rotated (i.e. not up-right) rectangle. Each
 /// rectangle is specified by the center point (mass center), length of each
@@ -245,16 +245,22 @@ impl CascadeClassifier {
         CascadeClassifier { c_cascade_classifier: cascade }
     }
 
-    pub fn detect(&self, mat: &Mat, result: &mut VecOfRect) {
+    pub fn detect(&self,
+                  mat: &Mat,
+                  result: &mut VecOfRect,
+                  scale_factor: f32,
+                  min_neighbors: i32,
+                  min_size: Size2i,
+                  max_size: Size2i) {
         unsafe {
             opencv_cascade_classifier_detect(self.c_cascade_classifier,
                                              mat.get_cmat(),
                                              result.get_mut_c_vec_of_rec(),
-                                             1.1,
-                                             5,
+                                             scale_factor as c_double,
+                                             min_neighbors as c_int,
                                              0,
-                                             Size2i { width: 100, height: 100 },
-                                             Size2i::default());
+                                             min_size,
+                                             max_size)
         }
 
         result.populate_rects();
