@@ -1,3 +1,5 @@
+#![feature(test)]
+extern crate test;
 extern crate rust_vision;
 
 use rust_vision::*;
@@ -6,7 +8,8 @@ use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 
-fn main() {
+#[test]
+fn detect_lenna() {
     let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     d.push("assets/lenna.png");
 
@@ -18,12 +21,15 @@ fn main() {
     d.push("assets/haarcascade_frontalface_default.xml");
     let cascade = CascadeClassifier::from_path(d);
 
-    highgui_named_window("window", WindowFlags::WindowAutosize);
-
     // result is a vector of rectangles
     let result = cascade.detect(&mat);
-    println!("result: {:?}", result);
-    // we draw each of them on the image
-    result.iter().map(|&r| mat.rectangle(r)).count();
-    mat.show("window", 0);
+
+    assert_eq!(result.len(), 1);
+    assert_eq!(result[0],
+               Rect {
+                   x: 219,
+                   y: 203,
+                   width: 170,
+                   height: 170,
+               });
 }

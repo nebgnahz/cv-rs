@@ -55,7 +55,12 @@ typedef struct {
 typedef struct {
     CRect* array;
     size_t size;
-} CVecOfRect;
+} VecRect;
+
+typedef struct {
+    double* array;
+    size_t size;
+} VecDouble;
 
 typedef struct {
     int32_t v0;
@@ -92,7 +97,7 @@ int opencv_mat_depth(const CMat* const cmat);
 // Free a Mat object
 void opencv_mat_drop(CMat* cmat);
 
-void opencv_vec_of_rect_drop(CVecOfRect* v);
+void opencv_vec_of_rect_drop(VecRect* v);
 
 // =============================================================================
 //  core array
@@ -131,7 +136,7 @@ void opencv_destroy_window(const char* const winname);
 void opencv_imshow(const char* const winname, CMat* mat);
 int opencv_wait_key(int delay_in_millis);
 
-typedef void(* MouseCallback)(int e, int x, int y, int flags, void *data);
+typedef void (*MouseCallback)(int e, int x, int y, int flags, void* data);
 void opencv_set_mouse_callback(const char* const winname, MouseCallback onMouse,
                                void* userdata);
 
@@ -157,10 +162,22 @@ void opencv_cascade_classifier_drop(CCascadeClassifier* cc);
 
 // vec_of_rect is dynamically allocated, the caller should take ownership of it.
 void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
-                                      CVecOfRect* vec_of_rect,
-                                      double scale_factor, int min_neighbors,
-                                      int flags, CSize2i min_size,
-                                      CSize2i max_size);
+                                      VecRect* vec_of_rect, double scale_factor,
+                                      int min_neighbors, int flags,
+                                      CSize2i min_size, CSize2i max_size);
+
+typedef struct _SvmDetector SvmDetector;
+SvmDetector* cv_hog_default_people_detector();
+SvmDetector* cv_hog_daimler_people_detector();
+void cv_hog_detector_drop(SvmDetector*);
+
+typedef struct _HogDescriptor HogDescriptor;
+HogDescriptor* cv_hog_new();
+void cv_hog_drop(HogDescriptor*);
+void cv_hog_set_svm_detector(HogDescriptor*, SvmDetector*);
+void cv_hog_detect(HogDescriptor*, CMat*, VecRect* vec_detected,
+                   VecDouble* vec_weight, CSize2i win_stride, CSize2i padding,
+                   double scale);
 
 // =============================================================================
 //   VideoTrack

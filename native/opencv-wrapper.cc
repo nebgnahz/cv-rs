@@ -8,6 +8,30 @@
 EXTERN_C_BEGIN
 
 // =============================================================================
+//   Utils
+// =============================================================================
+
+void vec_rect_cxx_to_c(const std::vector<cv::Rect>& cxx_vec_rect, VecRect* vr) {
+    size_t num = cxx_vec_rect.size();
+    vr->size = num;
+    vr->array = (CRect*) malloc(num * sizeof(CRect));
+    for (size_t i = 0; i < num; i++) {
+        vr->array[i].x = cxx_vec_rect[i].x;
+        vr->array[i].y = cxx_vec_rect[i].y;
+        vr->array[i].width = cxx_vec_rect[i].width;
+        vr->array[i].height = cxx_vec_rect[i].height;
+    }
+}
+
+void vec_double_cxx_to_c(const std::vector<double>& cxx_vec_double,
+                         VecDouble* vd) {
+    size_t num = cxx_vec_double.size();
+    vd->size = num;
+    vd->array = (double*) malloc(num * sizeof(double));
+    ::memcpy(vd->array, cxx_vec_double.data(), num * sizeof(double));
+}
+
+// =============================================================================
 //   Core
 // =============================================================================
 CMat* opencv_mat_new() {
@@ -66,7 +90,7 @@ void opencv_mat_drop(CMat* cmat) {
     cmat = nullptr;
 }
 
-void opencv_vec_of_rect_drop(CVecOfRect* v) {
+void opencv_vec_of_rect_drop(VecRect* v) {
     if (v->array != nullptr) {
         free(v->array);
         v->array = nullptr;
@@ -120,9 +144,9 @@ void opencv_pyr_down(CMat* cmat, CMat* output) {
     cv::pyrDown(*mat, *out);
 }
 
-void opencv_calc_hist(const CMat* cimages, int nimages,
-                      const int* channels, CMat* cmask, CMat* chist, int dims,
-                      const int* hist_size, const float** ranges) {
+void opencv_calc_hist(const CMat* cimages, int nimages, const int* channels,
+                      CMat* cmask, CMat* chist, int dims, const int* hist_size,
+                      const float** ranges) {
     const cv::Mat* images = reinterpret_cast<const cv::Mat*>(cimages);
     cv::Mat* mask = reinterpret_cast<cv::Mat*>(cmask);
     cv::Mat* hist = reinterpret_cast<cv::Mat*>(chist);
@@ -192,8 +216,7 @@ int opencv_wait_key(int delay) {
 }
 
 void opencv_set_mouse_callback(const char* const winname,
-                               MouseCallback on_mouse,
-                               void* userdata) {
+                               MouseCallback on_mouse, void* userdata) {
     cv::setMouseCallback(winname, on_mouse, userdata);
 }
 
@@ -233,7 +256,8 @@ CCascadeClassifier* opencv_cascade_classifier_new() {
 
 bool opencv_cascade_classifier_load(CCascadeClassifier* cc,
                                     const char* const p) {
-    cv::CascadeClassifier* cascade = reinterpret_cast<cv::CascadeClassifier*>(cc);
+    cv::CascadeClassifier* cascade =
+        reinterpret_cast<cv::CascadeClassifier*>(cc);
     return cascade->load(p);
 }
 
@@ -243,17 +267,18 @@ CCascadeClassifier* opencv_cascade_classifier_from_path(const char* const p) {
 }
 
 void opencv_cascade_classifier_drop(CCascadeClassifier* cc) {
-    cv::CascadeClassifier* cascade = reinterpret_cast<cv::CascadeClassifier*>(cc);
+    cv::CascadeClassifier* cascade =
+        reinterpret_cast<cv::CascadeClassifier*>(cc);
     delete cascade;
     cc = nullptr;
 }
 
 void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
-                                      CVecOfRect* vec_of_rect,
-                                      double scale_factor, int min_neighbors,
-                                      int flags, CSize2i min_size,
-                                      CSize2i max_size) {
-    cv::CascadeClassifier* cascade = reinterpret_cast<cv::CascadeClassifier*>(cc);
+                                      VecRect* vec_of_rect, double scale_factor,
+                                      int min_neighbors, int flags,
+                                      CSize2i min_size, CSize2i max_size) {
+    cv::CascadeClassifier* cascade =
+        reinterpret_cast<cv::CascadeClassifier*>(cc);
     cv::Mat* image = reinterpret_cast<cv::Mat*>(cmat);
     std::vector<cv::Rect> objects;
 
@@ -273,6 +298,62 @@ void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
     }
 }
 
+SvmDetector* cv_hog_default_people_detector() {
+    std::vector<float>* detector =
+        new std::vector<float>(cv::HOGDescriptor::getDefaultPeopleDetector());
+    return reinterpret_cast<SvmDetector*>(detector);
+}
+
+SvmDetector* cv_hog_daimler_people_detector() {
+    std::vector<float>* detector =
+        new std::vector<float>(cv::HOGDescriptor::getDaimlerPeopleDetector());
+    return reinterpret_cast<SvmDetector*>(detector);
+}
+
+void cv_hog_detector_drop(SvmDetector* detector) {
+    std::vector<float>* cv_detector =
+        reinterpret_cast<std::vector<float>*>(detector);
+    delete cv_detector;
+    cv_detector = nullptr;
+}
+
+HogDescriptor* cv_hog_new() {
+    return reinterpret_cast<HogDescriptor*>(new cv::HOGDescriptor());
+}
+
+void cv_hog_drop(HogDescriptor* hog) {
+    cv::HOGDescriptor* cv_hog = reinterpret_cast<cv::HOGDescriptor*>(hog);
+    delete cv_hog;
+    cv_hog = nullptr;
+}
+
+void cv_hog_set_svm_detector(HogDescriptor* hog, SvmDetector* detector) {
+    cv::HOGDescriptor* cv_hog = reinterpret_cast<cv::HOGDescriptor*>(hog);
+    std::vector<float>* cv_detector =
+        reinterpret_cast<std::vector<float>*>(detector);
+    cv_hog->setSVMDetector(*cv_detector);
+}
+
+void cv_hog_detect(HogDescriptor* hog, CMat* cmat, VecRect* vec_rect,
+                   VecDouble* vec_weight, CSize2i win_stride, CSize2i padding,
+                   double scale) {
+    // Convert all types
+    cv::HOGDescriptor* cv_hog = reinterpret_cast<cv::HOGDescriptor*>(hog);
+    cv::Mat* image = reinterpret_cast<cv::Mat*>(cmat);
+    std::vector<cv::Rect> objects;
+    std::vector<double> weights;
+    cv::Size cv_win_stride(win_stride.width, win_stride.height);
+    cv::Size cv_padding(padding.width, padding.height);
+
+    // Call the function
+    cv_hog->detectMultiScale(*image, objects, weights, 0, cv_win_stride,
+                             cv_padding, scale);
+
+    // Prepare the results
+    vec_rect_cxx_to_c(objects, vec_rect);
+    vec_double_cxx_to_c(weights, vec_weight);
+}
+
 // =============================================================================
 //  Object Tracking
 // =============================================================================
@@ -282,7 +363,8 @@ CTermCriteria* opencv_term_criteria_new(int type, int count, double epsilon) {
 }
 
 void opencv_term_criteria_drop(CTermCriteria* c_criteria) {
-    cv::TermCriteria* criteria = reinterpret_cast<cv::TermCriteria*>(c_criteria);
+    cv::TermCriteria* criteria =
+        reinterpret_cast<cv::TermCriteria*>(c_criteria);
     delete criteria;
     c_criteria = nullptr;
 }
@@ -291,7 +373,8 @@ CRotatedRect opencv_camshift(CMat* c_bp_image, CRect crect,
                              CTermCriteria* c_criteria) {
     cv::Mat* bp_image = reinterpret_cast<cv::Mat*>(c_bp_image);
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
-    cv::TermCriteria* criteria = reinterpret_cast<cv::TermCriteria*>(c_criteria);
+    cv::TermCriteria* criteria =
+        reinterpret_cast<cv::TermCriteria*>(c_criteria);
     cv::RotatedRect rr = cv::CamShift(*bp_image, rect, *criteria);
     CRotatedRect c_rr;
     c_rr.center.x = rr.center.x;
@@ -301,7 +384,5 @@ CRotatedRect opencv_camshift(CMat* c_bp_image, CRect crect,
     c_rr.angle = rr.angle;
     return c_rr;
 }
-
-
 
 EXTERN_C_END

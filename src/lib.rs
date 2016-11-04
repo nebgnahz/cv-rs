@@ -1,13 +1,14 @@
-//! A library that integrates computer vision algorithms, mostly OpenCV.
+//! This library primarily provides a binding and API for OpenCV 3.1.0.
 //!
-//! This is a work-in-progress port of OpenCV 3.1.0. Modules and functions are
-//! implemented as needed. There is another library
+//! This is a work-in-progress and modules/functions are implemented as
+//! needed. Attempts to use
+//! [rust-bindgen](https://github.com/servo/rust-bindgen) or
+//! [cpp_to_rust](https://github.com/rust-qt/cpp_to_rust) haven't been very
+//! successful (I probably haven't tried hard enough). There is another port
 //! [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
 //! bindings using a Python script.
 extern crate libc;
 use libc::{c_double, c_int};
-use std::ffi::CString;
-use std::os::raw::c_char;
 
 mod highgui;
 pub use highgui::MouseCallback;
@@ -20,7 +21,6 @@ pub use highgui::highgui_set_mouse_callback;
 
 mod core;
 use core::CMat;
-use core::CVecOfRect;
 
 pub use core::FlipCode;
 pub use core::Mat;
@@ -30,7 +30,6 @@ pub use core::Rect;
 pub use core::Scalar;
 pub use core::Size2f;
 pub use core::Size2i;
-pub use core::VecOfRect;
 use core::opencv_mat_new;
 
 /// This struct represents a rotated (i.e. not up-right) rectangle. Each
@@ -119,7 +118,7 @@ impl Mat {
     /// CV_8U type.
     pub fn in_range(&self, lowerb: Scalar, upperb: Scalar) -> Mat {
         let m = unsafe { opencv_mat_new() };
-        unsafe { opencv_in_range(self.c_mat, lowerb, upperb, m) }
+        unsafe { opencv_in_range(self.inner, lowerb, upperb, m) }
         Mat::new_with_cmat(m)
     }
 
@@ -134,9 +133,9 @@ impl Mat {
                         -> Mat {
         let m = Mat::with_size(self.rows, self.cols, self.depth);
         unsafe {
-            opencv_mix_channels(self.c_mat,
+            opencv_mix_channels(self.inner,
                                 nsrcs,
-                                m.c_mat,
+                                m.inner,
                                 ndsts,
                                 from_to,
                                 npairs);
@@ -147,7 +146,7 @@ impl Mat {
     /// Normalize the Mat according to the normalization type.
     pub fn normalize(&self, alpha: f64, beta: f64, t: NormTypes) -> Mat {
         let m = unsafe { opencv_mat_new() };
-        unsafe { opencv_normalize(self.c_mat, m, alpha, beta, t as i32) }
+        unsafe { opencv_normalize(self.inner, m, alpha, beta, t as i32) }
         Mat::new_with_cmat(m)
     }
 }
@@ -196,105 +195,7 @@ impl Drop for VideoCapture {
     }
 }
 
-enum CCascadeClassifier {}
-
-/// Cascade classifier class for object detection.
-pub struct CascadeClassifier {
-    c_cascade_classifier: *mut CCascadeClassifier,
-}
-
-unsafe impl Send for CascadeClassifier {}
-
-extern "C" {
-    fn opencv_cascade_classifier_new() -> *mut CCascadeClassifier;
-    fn opencv_cascade_classifier_load(cc: *mut CCascadeClassifier,
-                                      p: *const c_char)
-                                      -> bool;
-    fn opencv_cascade_classifier_from_path(p: *const c_char)
-                                           -> *mut CCascadeClassifier;
-    fn opencv_cascade_classifier_drop(p: *mut CCascadeClassifier);
-    fn opencv_cascade_classifier_detect(cc: *mut CCascadeClassifier,
-                                        cmat: *mut CMat,
-                                        vec_of_rect: *mut CVecOfRect,
-                                        scale_factor: c_double,
-                                        min_neighbors: c_int,
-                                        flags: c_int,
-                                        min_size: Size2i,
-                                        max_size: Size2i);
-}
-
-impl CascadeClassifier {
-    /// Create a cascade classifier, uninitialized. Before use, call load.
-    pub fn new() -> CascadeClassifier {
-        let cascade = unsafe { opencv_cascade_classifier_new() };
-        CascadeClassifier { c_cascade_classifier: cascade }
-    }
-
-    pub fn load(&self, path: &str) -> bool {
-        let s = CString::new(path).unwrap();
-        unsafe {
-            opencv_cascade_classifier_load(self.c_cascade_classifier,
-                                           (&s).as_ptr())
-        }
-    }
-
-    pub fn from_path(path: &str) -> Self {
-        let s = CString::new(path).unwrap();
-        let cascade =
-            unsafe { opencv_cascade_classifier_from_path((&s).as_ptr()) };
-        CascadeClassifier { c_cascade_classifier: cascade }
-    }
-
-    pub fn detect(&self,
-                  mat: &Mat,
-                  result: &mut VecOfRect,
-                  scale_factor: f32,
-                  min_neighbors: i32,
-                  min_size: Size2i,
-                  max_size: Size2i) {
-        unsafe {
-            opencv_cascade_classifier_detect(self.c_cascade_classifier,
-                                             mat.get_cmat(),
-                                             result.get_mut_c_vec_of_rec(),
-                                             scale_factor as c_double,
-                                             min_neighbors as c_int,
-                                             0,
-                                             min_size,
-                                             max_size)
-        }
-
-        result.populate_rects();
-    }
-
-    pub fn detect_with_params(&self,
-                              mat: &Mat,
-                              result: &mut VecOfRect,
-                              scale_factor: f64,
-                              min_neighbors: i32,
-                              min_size: Size2i,
-                              max_size: Size2i) {
-        unsafe {
-            opencv_cascade_classifier_detect(self.c_cascade_classifier,
-                                             mat.get_cmat(),
-                                             result.get_mut_c_vec_of_rec(),
-                                             scale_factor,
-                                             min_neighbors,
-                                             0,
-                                             min_size,
-                                             max_size);
-        }
-
-        result.populate_rects();
-    }
-}
-
-impl Drop for CascadeClassifier {
-    fn drop(&mut self) {
-        unsafe {
-            opencv_cascade_classifier_drop(self.c_cascade_classifier);
-        }
-    }
-}
+pub mod objdetect;
 
 // =============================================================================
 //   VideoTrack
@@ -339,6 +240,6 @@ impl Drop for TermCriteria {
 
 impl Mat {
     pub fn camshift(&self, wndw: Rect, criteria: &TermCriteria) -> RotatedRect {
-        unsafe { opencv_camshift(self.c_mat, wndw, criteria.c_criteria) }
+        unsafe { opencv_camshift(self.inner, wndw, criteria.c_criteria) }
     }
 }

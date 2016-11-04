@@ -98,7 +98,7 @@ pub enum ImwritePngFlags {
 extern "C" {
     fn opencv_imdecode(buf: *const uint8_t, l: size_t, m: c_int) -> *mut CMat;
     fn opencv_imencode(ext: *const c_char,
-                       c_mat: *const CMat,
+                       inner: *const CMat,
                        flag_ptr: *const c_int,
                        flag_size: size_t)
                        -> ImencodeResult;
@@ -114,9 +114,9 @@ struct ImencodeResult {
 
 impl Mat {
     pub fn imdecode(buf: &[u8], mode: ImreadModes) -> Mat {
-        let c_mat =
+        let inner =
             unsafe { opencv_imdecode(buf.as_ptr(), buf.len(), mode as i32) };
-        Mat::new_with_cmat(c_mat)
+        Mat::new_with_cmat(inner)
     }
 
     pub fn imencode(&self, ext: &str, f: Vec<ImwriteFlags>) -> Option<Vec<u8>> {
@@ -124,7 +124,7 @@ impl Mat {
         let flags = f.into_iter().map(|f| f as i32).collect::<Vec<_>>();
         let r = unsafe {
             opencv_imencode(ext.into_raw(),
-                            self.c_mat,
+                            self.inner,
                             flags.as_ptr(),
                             flags.len())
         };

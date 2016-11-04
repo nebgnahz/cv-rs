@@ -1,24 +1,36 @@
 extern crate rust_vision;
 
 use rust_vision::*;
+use rust_vision::objdetect::*;
 use std::fs::File;
-use std::io::{Read, Write};
+use std::io::Read;
 use std::path::PathBuf;
 
 fn main() {
     let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    d.push("assets/lenna.png");
+    d.push("assets/AVG-TownCentre-test-000011.jpg");
 
     let mut buf = Vec::new();
     File::open(d).unwrap().read_to_end(&mut buf).unwrap();
     let mat = Mat::imdecode(&buf, ImreadModes::ImreadGrayscale);
 
-    let flags = Vec::new();
-    if let Some(encoded) = mat.imencode(".JPEG", flags) {
-        println!("{}", encoded.len());
+    let mut hog = HogDescriptor::new();
+    let detector = SvmDetector::default_people_detector();
+    hog.set_svm_detector(detector);
 
-        let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        d.push("assets/lenna.jpg");
-        File::create(d).unwrap().write_all(&encoded).unwrap();
-    }
+    let start = ::std::time::Instant::now();
+    let results = hog.detect(&mat, Size2i::new(4, 4), Size2i::new(8, 8), 1.2);
+
+    let elapsed = start.elapsed();
+    println!("{} ms",
+             elapsed.as_secs() as f64 * 1_000.0 +
+             elapsed.subsec_nanos() as f64 / 1_000_000.0);
+
+    highgui_named_window("window", WindowFlags::WindowAutosize);
+
+    // we draw each of them on the image
+    results.iter()
+        .map(|&(r, _w)| mat.rectangle(r))
+        .count();
+    mat.show("window", 0);
 }

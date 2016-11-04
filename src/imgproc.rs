@@ -169,21 +169,21 @@ impl Mat {
     /// Draw a simple, thick, or filled up-right rectangle.
     pub fn rectangle(&self, rect: Rect) {
         unsafe {
-            opencv_rectangle(self.c_mat, rect);
+            opencv_rectangle(self.inner, rect);
         }
     }
 
     /// Convert an image from one color space to another.
     pub fn cvt_color(&self, code: ColorConversionCodes) -> Mat {
         let m = unsafe { opencv_mat_new() };
-        unsafe { opencv_cvt_color(self.c_mat, m, code as i32) }
+        unsafe { opencv_cvt_color(self.inner, m, code as i32) }
         Mat::new_with_cmat(m)
     }
 
     /// Convert an image from one color space to another.
     pub fn pyr_down(&self) -> Mat {
         let m = unsafe { opencv_mat_new() };
-        unsafe { opencv_pyr_down(self.c_mat, m) }
+        unsafe { opencv_pyr_down(self.inner, m) }
         Mat::new_with_cmat(m)
     }
 
@@ -197,10 +197,10 @@ impl Mat {
                      -> Mat {
         let m = unsafe { opencv_mat_new() };
         unsafe {
-            opencv_calc_hist(self.c_mat,
+            opencv_calc_hist(self.inner,
                              1,
                              channels,
-                             mask.c_mat,
+                             mask.inner,
                              m,
                              dims,
                              hist_size,
@@ -218,10 +218,10 @@ impl Mat {
                              -> Mat {
         let m = unsafe { opencv_mat_new() };
         unsafe {
-            opencv_calc_back_project(self.c_mat,
+            opencv_calc_back_project(self.inner,
                                      1,
                                      channels,
-                                     (*hist).c_mat,
+                                     (*hist).inner,
                                      m,
                                      ranges);
         }

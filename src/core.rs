@@ -2,8 +2,8 @@
 extern crate libc;
 extern crate std;
 
+use libc::{c_int, c_double};
 use std::ffi::CString;
-use libc::c_int;
 use std::os::raw::c_char;
 
 // Opaque data struct for C bindings
@@ -14,7 +14,7 @@ pub enum CMat {}
 /// since images are often stored as `Mat`.
 #[derive(Debug)]
 pub struct Mat {
-    pub c_mat: *mut CMat,
+    pub inner: *mut CMat,
     pub cols: i32,
     pub rows: i32,
     pub depth: i32,
@@ -66,6 +66,15 @@ pub struct Size2i {
     pub height: i32,
 }
 
+impl Size2i {
+    pub fn new(width: i32, height: i32) -> Self {
+        Size2i {
+            width: width,
+            height: height,
+        }
+    }
+}
+
 /// `Size2f` struct is used for specifying the size (`width` and `height` as
 /// `f32`) of an image or rectangle.
 #[derive(Default, Debug, Clone, Copy)]
@@ -75,7 +84,7 @@ pub struct Size2f {
     pub height: f32,
 }
 
-#[derive(Default, Debug, Clone, Copy)]
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
 pub struct Rect {
     pub x: i32,
@@ -97,70 +106,58 @@ impl Rect {
 
 #[repr(C)]
 pub struct CVecOfRect {
-    array: *mut Rect,
-    size: usize,
+    pub array: *mut Rect,
+    pub size: usize,
 }
 
-/// This struct represents a vector of rectangles. It can be used as a return
-/// value from object detection algorithms (such as face detection) where each
-/// detection is a rectangle.
-pub struct VecOfRect {
-    rects: Vec<Rect>,
-    c_vec_of_rect: CVecOfRect,
-}
-
-impl VecOfRect {
-    /// Count of detect rectangles
-    pub fn len(&self) -> usize {
-        self.rects.len()
-    }
-
-    /// Helper function to draw all rectangles on the `Mat` (image).
-    pub fn draw_on_mat(&self, mat: &mut Mat) {
-        self.rects.iter().map(|&r| mat.rectangle(r)).count();
-    }
-
-    pub fn get_mut_c_vec_of_rec(&mut self) -> &mut CVecOfRect {
-        &mut self.c_vec_of_rect
-    }
-
-    /// Creates internal `Vec<Rect>` from the C structs; this is necessary right
-    /// now to prepare an idiosyncratic Rust API.
-    // TODO(benzh): find ways to simplify this extra function call.
-    pub fn populate_rects(&mut self) {
-        for i in 0..self.c_vec_of_rect.size {
-            let rect =
-                unsafe { *(self.c_vec_of_rect.array.offset(i as isize)) };
-            self.rects.push(rect);
-        }
-    }
-}
-
-impl Default for VecOfRect {
+impl Default for CVecOfRect {
     fn default() -> Self {
-        VecOfRect {
-            c_vec_of_rect: CVecOfRect {
-                array: std::ptr::null_mut::<Rect>(),
-                size: 0,
-            },
-            rects: Vec::new(),
+        CVecOfRect {
+            array: std::ptr::null_mut::<Rect>(),
+            size: 0,
         }
     }
 }
 
-impl std::fmt::Debug for VecOfRect {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, " {:?} ", self.rects)
-    }
-}
-
-impl Drop for VecOfRect {
+impl Drop for CVecOfRect {
     fn drop(&mut self) {
         extern "C" {
             fn opencv_vec_of_rect_drop(_: *mut CVecOfRect);
         }
         unsafe {
-            opencv_vec_of_rect_drop(&mut self.c_vec_of_rect);
+            opencv_vec_of_rect_drop(self);
+        }
+    }
+}
+
+impl CVecOfRect {
+    pub fn rustify(self) -> Vec<Rect> {
+        (0..self.size)
+            .map(|i| unsafe { *(self.array.offset(i as isize)) as Rect })
+            .collect::<Vec<_>>()
+    }
+}
+
+#[repr(C)]
+pub struct CVecDouble {
+    array: *mut c_double,
+    size: usize,
+}
+
+
+impl CVecDouble {
+    pub fn rustify(self) -> Vec<f64> {
+        (1..self.size)
+            .map(|i| unsafe { *(self.array.offset(i as isize)) as f64 })
+            .collect::<Vec<_>>()
+    }
+}
+
+impl Default for CVecDouble {
+    fn default() -> Self {
+        CVecDouble {
+            array: std::ptr::null_mut::<c_double>(),
+            size: 0,
         }
     }
 }
@@ -189,7 +186,7 @@ impl Mat {
     #[inline]
     pub fn new_with_cmat(cmat: *mut CMat) -> Mat {
         Mat {
-            c_mat: cmat,
+            inner: cmat,
             rows: unsafe { opencv_mat_rows(cmat) },
             cols: unsafe { opencv_mat_cols(cmat) },
             depth: unsafe { opencv_mat_depth(cmat) },
@@ -217,12 +214,12 @@ impl Mat {
 
     /// Check if the `Mat` is valid or not.
     pub fn is_valid(&self) -> bool {
-        unsafe { opencv_mat_is_valid(self.c_mat) }
+        unsafe { opencv_mat_is_valid(self.inner) }
     }
 
     /// Return a region of interest from a `Mat` specfied by a `Rect`.
     pub fn roi(&self, rect: Rect) -> Mat {
-        let cmat = unsafe { opencv_mat_roi(self.c_mat, rect) };
+        let cmat = unsafe { opencv_mat_roi(self.inner, rect) };
         Mat::new_with_cmat(cmat)
     }
 
@@ -231,7 +228,7 @@ impl Mat {
     // shortcut for `image &= mask`
     pub fn logic_and(&mut self, mask: Mat) {
         unsafe {
-            opencv_mat_logic_and(self.c_mat, mask.get_cmat());
+            opencv_mat_logic_and(self.inner, mask.get_cmat());
         }
     }
 
@@ -242,7 +239,9 @@ impl Mat {
             FlipCode::YAxis => 1,
             FlipCode::XYAxis => -1,
         };
-        unsafe { opencv_mat_flip(self.c_mat, code); }
+        unsafe {
+            opencv_mat_flip(self.inner, code);
+        }
     }
 
     /// Call out to highgui to show the image, the duration is specified by
@@ -255,20 +254,20 @@ impl Mat {
 
         let s = CString::new(name).unwrap();
         unsafe {
-            opencv_imshow((&s).as_ptr(), self.c_mat);
+            opencv_imshow((&s).as_ptr(), self.inner);
             opencv_wait_key(delay);
         }
     }
 
     pub fn get_cmat(&self) -> *mut CMat {
-        self.c_mat
+        self.inner
     }
 }
 
 impl Drop for Mat {
     fn drop(&mut self) {
         unsafe {
-            opencv_mat_drop(self.c_mat);
+            opencv_mat_drop(self.inner);
         }
     }
 }
