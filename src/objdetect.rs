@@ -17,9 +17,7 @@ unsafe impl Send for CascadeClassifier {}
 
 extern "C" {
     fn opencv_cascade_classifier_new() -> *mut CCascadeClassifier;
-    fn opencv_cascade_classifier_load(cc: *mut CCascadeClassifier,
-                                      p: *const c_char)
-                                      -> bool;
+    fn opencv_cascade_classifier_load(cc: *mut CCascadeClassifier, p: *const c_char) -> bool;
     fn opencv_cascade_classifier_drop(p: *mut CCascadeClassifier);
     fn opencv_cascade_classifier_detect(cc: *mut CCascadeClassifier,
                                         cmat: *mut CMat,
@@ -52,11 +50,7 @@ impl CascadeClassifier {
     }
 
     pub fn detect(&self, mat: &Mat) -> Vec<Rect> {
-        self.detect_with_params(mat,
-                                1.1,
-                                3,
-                                Size2i::default(),
-                                Size2i::default())
+        self.detect_with_params(mat, 1.1, 3, Size2i::default(), Size2i::default())
     }
 
     pub fn detect_with_params(&self,
@@ -101,6 +95,10 @@ extern "C" {
 }
 
 impl SvmDetector {
+    /// The built-in people detector.
+    ///
+    /// The size of the default people detector is 64x128, that mean that the
+    /// people you would want to detect have to be atleast 64x128.
     pub fn default_people_detector() -> SvmDetector {
         SvmDetector { inner: unsafe { cv_hog_default_people_detector() } }
     }
@@ -119,6 +117,8 @@ impl Drop for SvmDetector {
 }
 
 enum CHogDescriptor {}
+
+/// `HogDescriptor` implements Histogram of Oriented Gradients.
 pub struct HogDescriptor {
     inner: *mut CHogDescriptor,
 }
@@ -128,8 +128,7 @@ unsafe impl Send for HogDescriptor {}
 extern "C" {
     fn cv_hog_new() -> *mut CHogDescriptor;
     fn cv_hog_drop(hog: *mut CHogDescriptor);
-    fn cv_hog_set_svm_detector(hog: *mut CHogDescriptor,
-                               svm: *mut CSvmDetector);
+    fn cv_hog_set_svm_detector(hog: *mut CHogDescriptor, svm: *mut CSvmDetector);
     fn cv_hog_detect(hog: *mut CHogDescriptor,
                      image: *mut CMat,
                      objs: *mut CVecOfRect,
@@ -149,12 +148,9 @@ impl HogDescriptor {
     }
 
     /// Detect the particular object inside this image.
-    pub fn detect(&mut self,
-                  mat: &Mat,
-                  win_stride: Size2i,
-                  padding: Size2i,
-                  scale: f64)
-                  -> Vec<(Rect, f64)> {
+    /// win_stride: the amount of pixels that the between two sliding window
+    /// padding: helps with detecting people on the edge
+    pub fn detect(&mut self, mat: &Mat, win_stride: Size2i, padding: Size2i, scale: f64) -> Vec<(Rect, f64)> {
         let mut detected = CVecOfRect::default();
         let mut weights = CVecDouble::default();
         unsafe {

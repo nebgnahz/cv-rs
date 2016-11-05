@@ -2,18 +2,14 @@
 extern crate libc;
 use libc::{c_char, c_int, c_void};
 use std::ffi::CString;
-use std::ptr;
 use std::mem;
+use std::ptr;
 
 extern "C" {
     fn opencv_named_window(name: *const c_char, flags: c_int);
     fn opencv_destroy_window(name: *const c_char);
     fn opencv_set_mouse_callback(name: *const c_char,
-                                 on_mouse: extern "C" fn(e: i32,
-                                                         x: i32,
-                                                         y: i32,
-                                                         f: i32,
-                                                         data: *mut c_void),
+                                 on_mouse: extern "C" fn(e: i32, x: i32, y: i32, f: i32, data: *mut c_void),
                                  userdata: *mut c_void);
 }
 
@@ -45,21 +41,14 @@ pub type MouseCallback = fn(i32, i32, i32, i32, MouseCallbackData);
 
 /// Set mouse handler for the specified window (identified by name). A callback
 /// handler should be provided and optional user_data can be passed around.
-pub fn highgui_set_mouse_callback(name: &str,
-                                  on_mouse: MouseCallback,
-                                  user_data: *mut c_void) {
+pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data: *mut c_void) {
     struct CallbackWrapper {
         cb: Box<MouseCallback>,
         data: *mut c_void,
     }
 
-    extern "C" fn _mouse_callback(e: i32,
-                                  x: i32,
-                                  y: i32,
-                                  f: i32,
-                                  ud: *mut c_void) {
-        let cb_wrapper =
-            unsafe { ptr::read(ud as *mut CallbackWrapper) };
+    extern "C" fn _mouse_callback(e: i32, x: i32, y: i32, f: i32, ud: *mut c_void) {
+        let cb_wrapper = unsafe { ptr::read(ud as *mut CallbackWrapper) };
         let true_callback = *(cb_wrapper.cb);
         true_callback(e, x, y, f, cb_wrapper.data);
         mem::forget(cb_wrapper.cb);
@@ -73,9 +62,7 @@ pub fn highgui_set_mouse_callback(name: &str,
 
     let s = CString::new(name).unwrap();
     unsafe {
-        opencv_set_mouse_callback((&s).as_ptr(),
-                                  _mouse_callback,
-                                  box_wrapper_raw);
+        opencv_set_mouse_callback((&s).as_ptr(), _mouse_callback, box_wrapper_raw);
     }
 }
 

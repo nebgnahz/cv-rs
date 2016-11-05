@@ -114,24 +114,16 @@ struct ImencodeResult {
 
 impl Mat {
     pub fn imdecode(buf: &[u8], mode: ImreadModes) -> Mat {
-        let inner =
-            unsafe { opencv_imdecode(buf.as_ptr(), buf.len(), mode as i32) };
+        let inner = unsafe { opencv_imdecode(buf.as_ptr(), buf.len(), mode as i32) };
         Mat::new_with_cmat(inner)
     }
 
     pub fn imencode(&self, ext: &str, f: Vec<ImwriteFlags>) -> Option<Vec<u8>> {
         let ext = CString::new(ext).expect("invalid extension string");
         let flags = f.into_iter().map(|f| f as i32).collect::<Vec<_>>();
-        let r = unsafe {
-            opencv_imencode(ext.into_raw(),
-                            self.inner,
-                            flags.as_ptr(),
-                            flags.len())
-        };
+        let r = unsafe { opencv_imencode(ext.into_raw(), self.inner, flags.as_ptr(), flags.len()) };
         if r.status {
-            unsafe {
-                Some(::std::slice::from_raw_parts(r.buf, r.size).to_vec())
-            }
+            unsafe { Some(::std::slice::from_raw_parts(r.buf, r.size).to_vec()) }
         } else {
             None
         }

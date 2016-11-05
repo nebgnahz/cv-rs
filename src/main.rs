@@ -8,7 +8,7 @@ use std::path::PathBuf;
 
 fn main() {
     let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    d.push("assets/AVG-TownCentre-test-000011.jpg");
+    d.push("assets/test.jpg");
 
     let mut buf = Vec::new();
     File::open(d).unwrap().read_to_end(&mut buf).unwrap();
@@ -19,12 +19,11 @@ fn main() {
     hog.set_svm_detector(detector);
 
     let start = ::std::time::Instant::now();
-    let results = hog.detect(&mat, Size2i::new(4, 4), Size2i::new(8, 8), 1.2);
+    let results = hog.detect(&mat, Size2i::new(1, 1), Size2i::new(1, 1), 1.1);
 
     let elapsed = start.elapsed();
     println!("{} ms",
-             elapsed.as_secs() as f64 * 1_000.0 +
-             elapsed.subsec_nanos() as f64 / 1_000_000.0);
+             elapsed.as_secs() as f64 * 1_000.0 + elapsed.subsec_nanos() as f64 / 1_000_000.0);
 
     highgui_named_window("window", WindowFlags::WindowAutosize);
 

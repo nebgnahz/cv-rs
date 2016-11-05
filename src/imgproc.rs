@@ -211,19 +211,10 @@ impl Mat {
 
     /// Calculate the back projection of a histogram. The function calculates
     /// the back project of the histogram.
-    pub fn calc_back_project(&self,
-                             channels: *const i32,
-                             hist: &Mat,
-                             ranges: *const *const f32)
-                             -> Mat {
+    pub fn calc_back_project(&self, channels: *const i32, hist: &Mat, ranges: *const *const f32) -> Mat {
         let m = unsafe { opencv_mat_new() };
         unsafe {
-            opencv_calc_back_project(self.inner,
-                                     1,
-                                     channels,
-                                     (*hist).inner,
-                                     m,
-                                     ranges);
+            opencv_calc_back_project(self.inner, 1, channels, (*hist).inner, m, ranges);
         }
         Mat::new_with_cmat(m)
     }

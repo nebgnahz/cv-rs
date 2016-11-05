@@ -70,12 +70,8 @@ impl RotatedRect {
         let x = pt.iter().map(|p| p.x).fold(0. / 0., f32::min).floor() as i32;
         let y = pt.iter().map(|p| p.y).fold(0. / 0., f32::min).floor() as i32;
 
-        let width =
-            pt.iter().map(|p| p.x).fold(0. / 0., f32::max).ceil() as i32 - x +
-            1;
-        let height =
-            pt.iter().map(|p| p.y).fold(0. / 0., f32::max).ceil() as i32 - y +
-            1;
+        let width = pt.iter().map(|p| p.x).fold(0. / 0., f32::max).ceil() as i32 - x + 1;
+        let height = pt.iter().map(|p| p.y).fold(0. / 0., f32::max).ceil() as i32 - y + 1;
         Rect::new(x, y, width, height)
     }
 }
@@ -84,21 +80,14 @@ impl RotatedRect {
 //  core array
 // =============================================================================
 extern "C" {
-    fn opencv_in_range(cmat: *const CMat,
-                       lowerb: Scalar,
-                       upperb: Scalar,
-                       dst: *mut CMat);
+    fn opencv_in_range(cmat: *const CMat, lowerb: Scalar, upperb: Scalar, dst: *mut CMat);
     fn opencv_mix_channels(cmat: *const CMat,
                            nsrcs: isize,
                            dst: *mut CMat,
                            ndsts: isize,
                            from_to: *const i32,
                            npairs: isize);
-    fn opencv_normalize(csrc: *const CMat,
-                        cdst: *mut CMat,
-                        alpha: c_double,
-                        beta: c_double,
-                        norm_type: c_int);
+    fn opencv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: c_int);
 }
 
 pub enum NormTypes {
@@ -125,20 +114,10 @@ impl Mat {
     /// Copy specified channels from `self` to the specified channels of output
     /// `Mat`.
     // TODO(benzh) Avoid using raw pointers but rather take a vec for `from_to`?
-    pub fn mix_channels(&self,
-                        nsrcs: isize,
-                        ndsts: isize,
-                        from_to: *const i32,
-                        npairs: isize)
-                        -> Mat {
+    pub fn mix_channels(&self, nsrcs: isize, ndsts: isize, from_to: *const i32, npairs: isize) -> Mat {
         let m = Mat::with_size(self.rows, self.cols, self.depth);
         unsafe {
-            opencv_mix_channels(self.inner,
-                                nsrcs,
-                                m.inner,
-                                ndsts,
-                                from_to,
-                                npairs);
+            opencv_mix_channels(self.inner, nsrcs, m.inner, ndsts, from_to, npairs);
         }
         m
     }
@@ -207,15 +186,9 @@ pub enum TermType {
 }
 
 extern "C" {
-    fn opencv_term_criteria_new(t: i32,
-                                count: i32,
-                                epsilon: f64)
-                                -> *mut CTermCriteria;
+    fn opencv_term_criteria_new(t: i32, count: i32, epsilon: f64) -> *mut CTermCriteria;
     fn opencv_term_criteria_drop(criteria: *mut CTermCriteria);
-    fn opencv_camshift(image: *mut CMat,
-                       w: Rect,
-                       c_criteria: *const CTermCriteria)
-                       -> RotatedRect;
+    fn opencv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
 }
 
 pub struct TermCriteria {
@@ -224,8 +197,7 @@ pub struct TermCriteria {
 
 impl TermCriteria {
     pub fn new(t: TermType, max_count: i32, epsilon: f64) -> Self {
-        let c_criteria =
-            unsafe { opencv_term_criteria_new(t as i32, max_count, epsilon) };
+        let c_criteria = unsafe { opencv_term_criteria_new(t as i32, max_count, epsilon) };
         TermCriteria { c_criteria: c_criteria }
     }
 }
