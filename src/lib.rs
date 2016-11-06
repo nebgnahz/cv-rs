@@ -22,6 +22,9 @@ pub use highgui::highgui_set_mouse_callback;
 mod core;
 use core::CMat;
 
+#[cfg(feature = "gpu")]
+pub mod cuda;
+
 pub use core::FlipCode;
 pub use core::Mat;
 pub use core::Point2f;

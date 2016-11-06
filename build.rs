@@ -1,13 +1,18 @@
 extern crate gcc;
 
 fn main() {
-    gcc::Config::new()
-        .cpp(true)
+    let mut opencv_config = gcc::Config::new();
+    opencv_config.cpp(true)
         .file("native/opencv-wrapper.cc")
         .include("/usr/local/include")
         .include("native")
-        .flag("--std=c++11")
-        .compile("libopencv-wrapper.a");
+        .flag("--std=c++11");
+
+    if cfg!(feature = "gpu") {
+        opencv_config.file("native/opencv-gpu.cc");
+    }
+
+    opencv_config.compile("libopencv-wrapper.a");
 
     println!("cargo:rustc-link-search=native=/usr/local/lib");
     println!("cargo:rustc-link-lib=opencv_core");
@@ -17,4 +22,8 @@ fn main() {
     println!("cargo:rustc-link-lib=opencv_videoio");
     println!("cargo:rustc-link-lib=opencv_objdetect");
     println!("cargo:rustc-link-lib=opencv_video");
+
+    if cfg!(feature = "gpu") {
+        println!("cargo:rustc-link-lib=opencv_cudaobjdetect");
+    }
 }
