@@ -71,23 +71,3 @@ fn print_usage(program: &str, opts: getopts::Options) {
     let brief = format!("Usage: {} [options] DIRECTORY", program);
     print!("{}", opts.usage(&brief));
 }
-
-// Read the ground truth data, csv file
-fn mot_ground_truth<P: AsRef<Path>>(path: P) -> Result<()> {
-    let result = HashMap::new();
-
-    let f = try!(File::open(path));
-    let f = BufReader::new(f);
-    for line in f.lines() {
-        println!("{}", line.unwrap());
-
-        // 1,1,1363,569,103,241,1,1,0.86014
-        // <frame>, <id>, <left>, <top>, <width>, <height>, <?>, <?>, conf
-        let v = line.split(',');
-        let id = try!(v[1].parse::<int>());
-        let frame = try!(v[0].parse::<int>());
-
-        player_stats.entry(id).or_insert(1);
-        println!();
-    }
-}
