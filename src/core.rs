@@ -102,6 +102,19 @@ impl Rect {
             height: height,
         }
     }
+
+    pub fn scale(&self, ratio: f32) -> Rect {
+        let new_x = ((1.0 - ratio) * (self.width as f32) / 2.0) as i32 + self.x;
+        let new_y = ((1.0 - ratio) * (self.height as f32) / 2.0) as i32 + self.y;
+        let new_w = ((self.width as f32) * ratio) as i32;
+        let new_h = ((self.height as f32) * ratio) as i32;
+        Rect {
+            x: new_x,
+            y: new_y,
+            width: new_w,
+            height: new_h,
+        }
+    }
 }
 
 #[repr(C)]
