@@ -83,9 +83,9 @@ impl Drop for CascadeClassifier {
     }
 }
 
-enum CSvmDetector {}
+pub enum CSvmDetector {}
 pub struct SvmDetector {
-    inner: *mut CSvmDetector,
+    pub inner: *mut CSvmDetector,
 }
 
 extern "C" {

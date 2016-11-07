@@ -1,6 +1,7 @@
 #include "opencv-wrapper.h"
 #include "opencv-gpu.h"
-#include "opencv2/cudaobjdetect.hpp"
+#include "utils.h"
+#include <opencv2/cudaobjdetect.hpp>
 
 EXTERN_C_BEGIN
 
@@ -31,6 +32,11 @@ CMat* cv_mat_from_gpu_mat(GpuMat* gpu_mat) {
     return reinterpret_cast<CMat*>(new cv::Mat(*gpu_image));
 }
 
+GpuMat* cv_gpu_mat_from_mat(CMat* cmat) {
+    cv::Mat* image = reinterpret_cast<cv::Mat*>(cmat);
+    return reinterpret_cast<GpuMat*>(new cv::cuda::GpuMat(*image));
+}
+
 // =============================================================================
 //   Hog
 // =============================================================================
@@ -53,7 +59,12 @@ void cv_gpu_hog_set_detector(GpuHog* hog, SvmDetector* detector) {
     (*cv_hog)->setSVMDetector(*cv_detector);
 }
 
-void cv_gpu_hog_detect(GpuHog* hog, SvmDetector* detector) {
+void cv_gpu_hog_detect(GpuHog* hog, GpuMat* image, VecRect* found) {
+    CV_GPU_HOG* cv_hog = reinterpret_cast<CV_GPU_HOG*>(hog);
+    cv::cuda::GpuMat* cv_image = reinterpret_cast<cv::cuda::GpuMat*>(image);
+    std::vector<cv::Rect> vec_object;
+    (*cv_hog)->detectMultiScale(*cv_image, vec_object);
+    vec_rect_cxx_to_c(vec_object, found);
 }
 
 EXTERN_C_END

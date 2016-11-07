@@ -22,6 +22,7 @@ GpuMat* cv_gpu_mat_default();
 void cv_gpu_mat_drop(GpuMat*);
 void cv_gpu_mat_upload(GpuMat*, CMat*);
 CMat* cv_mat_from_gpu_mat(GpuMat*);
+GpuMat* cv_gpu_mat_from_mat(CMat*);
 
 // =============================================================================
 //   Hog
@@ -30,6 +31,7 @@ typedef struct _GpuHog GpuHog;
 GpuHog* cv_gpu_hog_default();
 void cv_gpu_hog_drop(GpuHog*);
 void cv_gpu_hog_set_detector(GpuHog*, SvmDetector*);
+void cv_gpu_hog_detect(GpuHog*, GpuMat*, VecRect*);
 
 EXTERN_C_END
 
