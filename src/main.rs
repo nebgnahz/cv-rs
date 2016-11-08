@@ -45,13 +45,18 @@ fn run() -> Result<()> {
         highgui_named_window("window", WindowFlags::WindowAutosize);
     }
 
-    let mut hog = Hog::default();
+    let mut params = HogParams::default();
+    params.scale = 1.01;
+    params.group_threshold = 1;
+    let mut hog = Hog::with_params(params);
+    println!("{:?}", hog.params);
+
     let detector = SvmDetector::default_people_detector();
     hog.set_svm_detector(detector);
 
     for entry in try!(fs::read_dir(Path::new(&dir))) {
         let dir = try!(entry);
-        println!("Processing {:?}", dir.path());
+        // println!("Processing {:?}", dir.path());
         run_detect_for_image(&mut hog, dir.path(), show, measure);
     }
     Ok(())

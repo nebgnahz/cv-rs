@@ -142,13 +142,13 @@ pub struct HogParams {
     pub cell_size: Size2i,
 
     /// Number of bins. Only 9 bins per cell are supported for now.
-    pub nbins: usize,
+    pub nbins: i32,
 
     /// Gaussian smoothing window parameter.
     pub win_sigma: f64,
 
     /// L2-Hys normalization method shrinkage.
-    pub threshold_l2hys: f64,
+    pub l2hys_threshold: f64,
 
     /// Flag to specify whether the gamma correction preprocessing is required or not.
     pub gamma_correction: bool,
@@ -176,7 +176,7 @@ pub struct HogParams {
     /// Coefficient to regulate the similarity threshold. When detected, some
     /// objects can be covered by many rectangles. 0 means not to perform
     /// grouping.
-    pub group_threshold: f64,
+    pub group_threshold: i32,
 }
 
 const DEFAULT_WIN_SIGMA: f64 = -1f64;
@@ -184,22 +184,32 @@ const DEFAULT_NLEVELS: usize = 64;
 
 impl Default for HogParams {
     fn default() -> HogParams {
+
+        let win_sigma = {
+            if cfg!(feature = "gpu") {
+                4.0
+            } else {
+                DEFAULT_WIN_SIGMA
+            }
+        };
+
         HogParams {
             win_size: Size2i::new(64, 128),
             block_size: Size2i::new(16, 16),
             block_stride: Size2i::new(8, 8),
             cell_size: Size2i::new(8, 8),
             nbins: 9,
-            win_sigma: DEFAULT_WIN_SIGMA,
-            threshold_l2hys: 0.2,
+
+            win_sigma: win_sigma,
+            l2hys_threshold: 0.2,
             gamma_correction: true,
             nlevels: DEFAULT_NLEVELS,
 
             hit_threshold: 0f64,
-            win_stride: Size2i::default(),
+            win_stride: Size2i::new(8, 8),
             padding: Size2i::default(),
             scale: 1.05,
-            group_threshold: 2f64,
+            group_threshold: 2,
         }
     }
 }
@@ -251,8 +261,7 @@ impl ObjectDetect for HogDescriptor {
                           self.params.padding,
                           self.params.scale as c_double,
                           2.0, // finalThreshold
-                          false // useMeanshiftGrouping
-            );
+                          false /* useMeanshiftGrouping */);
         }
 
         let results = detected.rustify();
@@ -262,7 +271,7 @@ impl ObjectDetect for HogDescriptor {
 }
 
 impl HogDescriptor {
-    pub fn new(params: HogParams) -> HogDescriptor {
+    pub fn with_params(params: HogParams) -> HogDescriptor {
         HogDescriptor {
             inner: unsafe { cv_hog_new() },
             params: params,
