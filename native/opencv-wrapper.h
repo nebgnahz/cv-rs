@@ -177,7 +177,7 @@ void cv_hog_drop(HogDescriptor*);
 void cv_hog_set_svm_detector(HogDescriptor*, SvmDetector*);
 void cv_hog_detect(HogDescriptor*, CMat*, VecRect* vec_detected,
                    VecDouble* vec_weight, CSize2i win_stride, CSize2i padding,
-                   double scale);
+                   double scale, double final_threshold, bool use_means_shift);
 
 // =============================================================================
 //   VideoTrack

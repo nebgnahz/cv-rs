@@ -1,5 +1,5 @@
 use super::core::*;
-use super::objdetect::{SvmDetector, CSvmDetector};
+use super::objdetect::{SvmDetector, CSvmDetector, ObjectDetect};
 
 // Opaque data struct for C bindings
 pub enum CGpuMat {}
@@ -81,11 +81,24 @@ extern "C" {
     fn cv_gpu_hog_detect(hog: *mut CGpuHog, mat: *mut CGpuMat, found: *mut CVecOfRect);
 }
 
-impl GpuHog {
-    pub fn default() -> GpuHog {
+impl ObjectDetect for GpuHog {
+    fn detect(&self, image: &Mat) -> Vec<(Rect, f64)> {
+        let mut found = CVecOfRect::default();
+        let mut gpu_mat = GpuMat::default();
+        gpu_mat.upload(image);
+        unsafe { cv_gpu_hog_detect(self.inner, gpu_mat.inner, &mut found) }
+
+        found.rustify().into_iter().map(|r| (r, 0f64)).collect::<Vec<_>>()
+    }
+}
+
+impl Default for GpuHog {
+    fn default() -> GpuHog {
         GpuHog { inner: unsafe { cv_gpu_hog_default() } }
     }
+}
 
+impl GpuHog {
     pub fn set_svm_detector(&mut self, detector: SvmDetector) {
         unsafe { cv_gpu_hog_set_detector(self.inner, detector.inner) }
     }

@@ -314,8 +314,8 @@ void cv_hog_set_svm_detector(HogDescriptor* hog, SvmDetector* detector) {
 
 void cv_hog_detect(HogDescriptor* hog, CMat* cmat, VecRect* vec_rect,
                    VecDouble* vec_weight, CSize2i win_stride, CSize2i padding,
-                   double scale) {
-    // Convert all types
+                   double scale, double final_threshold, bool use_means_shift) {
+    // convert all types
     cv::HOGDescriptor* cv_hog = reinterpret_cast<cv::HOGDescriptor*>(hog);
     cv::Mat* image = reinterpret_cast<cv::Mat*>(cmat);
     std::vector<cv::Rect> objects;
@@ -324,8 +324,9 @@ void cv_hog_detect(HogDescriptor* hog, CMat* cmat, VecRect* vec_rect,
     cv::Size cv_padding(padding.width, padding.height);
 
     // Call the function
-    cv_hog->detectMultiScale(*image, objects, weights, 0, cv_win_stride,
-                             cv_padding, scale);
+    cv_hog->detectMultiScale(*image, objects, weights, 0.1, cv_win_stride,
+                             cv_padding, scale, final_threshold,
+                             use_means_shift);
 
     // Prepare the results
     vec_rect_cxx_to_c(objects, vec_rect);
