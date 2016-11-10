@@ -2,6 +2,8 @@ extern crate getopts;
 extern crate rust_vision;
 
 use rust_vision::*;
+use rust_vision::objdetect::HogDescriptor as Hog;
+// use rust_vision::cuda::GpuHog as Hog;
 use rust_vision::objdetect::*;
 use std::fs;
 use std::fs::File;
@@ -16,8 +18,11 @@ fn run() -> Result<()> {
     let args: Vec<String> = ::std::env::args().collect();
     let program = args[0].clone();
     let mut opts = getopts::Options::new();
-    opts.optopt("d", "", "set the directory to look for images", "DIRECTORY");
+    opts.optopt("d", "dir", "the directory to look for images", "DIRECTORY");
+    opts.optflag("m", "measure", "measure the execution time (report in ms)");
+    opts.optflag("s", "show", "display the detection results");
     opts.optflag("h", "help", "print this help menu");
+
     let matches = match opts.parse(&args[1..]) {
         Ok(m) => m,
         Err(_) => {
@@ -31,40 +36,50 @@ fn run() -> Result<()> {
         return Ok(());
     }
 
+    let show = matches.opt_present("s");
+    let measure = matches.opt_present("m");
+
     let dir = matches.opt_str("d").expect("You need to provide the directory");
-    let path = Path::new(&dir);
-    for entry in try!(fs::read_dir(path)) {
+
+    if show {
+        highgui_named_window("window", WindowFlags::WindowAutosize);
+    }
+
+    let mut hog = Hog::default();
+    let detector = SvmDetector::default_people_detector();
+    hog.set_svm_detector(detector);
+
+    for entry in try!(fs::read_dir(Path::new(&dir))) {
         let dir = try!(entry);
-        println!("{:?}", dir.path());
-        run_hog_for_path(dir.path());
+        println!("Processing {:?}", dir.path());
+        run_detect_for_image(&mut hog, dir.path(), show, measure);
     }
     Ok(())
 }
 
-fn run_hog_for_path<P: AsRef<Path>>(path: P) {
+fn run_detect_for_image<P: AsRef<Path>, OD: ObjectDetect>(detector: &mut OD, path: P, show: bool, measure: bool) {
     let mut buf = Vec::new();
+    let filename = path.as_ref().file_stem().unwrap().to_string_lossy().into_owned();
+    let frame_num = filename.parse::<usize>().unwrap();
     File::open(path).unwrap().read_to_end(&mut buf).unwrap();
     let mat = Mat::imdecode(&buf, ImreadModes::ImreadGrayscale);
 
-    let mut hog = HogDescriptor::new();
-    let detector = SvmDetector::default_people_detector();
-    hog.set_svm_detector(detector);
-
     let start = ::std::time::Instant::now();
-    let results = hog.detect(&mat, Size2i::new(2, 2), Size2i::new(4, 4), 1.1);
-
+    let results = detector.detect(&mat);
     let elapsed = start.elapsed();
-    println!("{} ms",
-             elapsed.as_secs() as f64 * 1_000.0 + elapsed.subsec_nanos() as f64 / 1_000_000.0);
-    println!("{:?}", results);
 
-    highgui_named_window("window", WindowFlags::WindowAutosize);
+    print!("{},{},", frame_num, results.len());
+    if measure {
+        println!("{}",
+                 elapsed.as_secs() as f64 * 1_000.0 + elapsed.subsec_nanos() as f64 / 1_000_000.0);
+    }
 
-    // we draw each of them on the image
-    results.iter()
-        .map(|&(r, _w)| mat.rectangle(r.scale(0.6)))
-        .count();
-    mat.show("window", 0);
+    if show {
+        results.iter()
+            .map(|&(r, _w)| mat.rectangle(r.scale(0.6)))
+            .count();
+        mat.show("window", 0);
+    }
 }
 
 fn print_usage(program: &str, opts: getopts::Options) {

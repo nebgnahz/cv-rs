@@ -3,7 +3,7 @@ extern crate test;
 extern crate rust_vision;
 
 use rust_vision::*;
-use rust_vision::objdetect::CascadeClassifier;
+use rust_vision::objdetect::{ObjectDetect, CascadeClassifier};
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
@@ -25,7 +25,7 @@ fn detect_lenna() {
     let result = cascade.detect(&mat);
 
     assert_eq!(result.len(), 1);
-    assert_eq!(result[0],
+    assert_eq!(result[0].0,
                Rect {
                    x: 219,
                    y: 203,

@@ -1,7 +1,7 @@
 extern crate rust_vision;
 
 use rust_vision::*;
-use rust_vision::objdetect::CascadeClassifier;
+use rust_vision::objdetect::{ObjectDetect, CascadeClassifier};
 use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
@@ -24,6 +24,6 @@ fn main() {
     let result = cascade.detect(&mat);
     println!("result: {:?}", result);
     // we draw each of them on the image
-    result.iter().map(|&r| mat.rectangle(r)).count();
+    result.iter().map(|&(r, _conf)| mat.rectangle(r)).count();
     mat.show("window", 0);
 }

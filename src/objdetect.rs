@@ -168,6 +168,7 @@ pub struct HogParams {
     /// Window stride. It must be a multiple of block stride.
     pub win_stride: Size2i,
 
+    /// Padding
     pub padding: Size2i,
 
     /// Coefficient of the detection window increase.
@@ -219,7 +220,7 @@ enum CHogDescriptor {}
 /// `HogDescriptor` implements Histogram of Oriented Gradients.
 pub struct HogDescriptor {
     inner: *mut CHogDescriptor,
-    params: HogParams,
+    pub params: HogParams,
 }
 
 unsafe impl Send for HogDescriptor {}
