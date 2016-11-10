@@ -84,6 +84,7 @@ pub struct Size2f {
     pub height: f32,
 }
 
+/// The `Rect` defines a rectangle in integer.
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
 pub struct Rect {
@@ -94,6 +95,7 @@ pub struct Rect {
 }
 
 impl Rect {
+    /// Creates a new `Rect` with (x, y, width, height) parameters.
     pub fn new(x: i32, y: i32, width: i32, height: i32) -> Self {
         Rect {
             x: x,
@@ -103,6 +105,7 @@ impl Rect {
         }
     }
 
+    /// Scales the rectangle by the specified ratio.
     pub fn scale(&self, ratio: f32) -> Rect {
         let new_x = ((1.0 - ratio) * (self.width as f32) / 2.0) as i32 + self.x;
         let new_y = ((1.0 - ratio) * (self.height as f32) / 2.0) as i32 + self.y;
@@ -113,6 +116,39 @@ impl Rect {
             y: new_y,
             width: new_w,
             height: new_h,
+        }
+    }
+
+    /// Normalize the rectangle according to the image (if the rectangle is
+    /// inside the image, then the result should be all within (0, 1).
+    pub fn normalize_to_mat(&self, mat: &Mat) -> Rect2f {
+        Rect2f {
+            x: (self.x as f32) / (mat.cols as f32),
+            y: (self.y as f32) / (mat.rows as f32),
+            width: (self.width as f32) / (mat.cols as f32),
+            height: (self.height as f32) / (mat.rows as f32),
+        }
+    }
+}
+
+/// The `Rect2f` are rectangles in float.
+#[derive(Default, Debug, Clone, Copy)]
+pub struct Rect2f {
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+    pub height: f32,
+}
+
+impl Rect2f {
+    /// Normalize the rectangle according to the image. This will restore the
+    /// Rect in absolute pixel numbers.
+    pub fn normalize_to_mat(&self, mat: &Mat) -> Rect {
+        Rect {
+            x: (self.x * mat.cols as f32) as i32,
+            y: (self.y * mat.rows as f32) as i32,
+            width: (self.width * mat.cols as f32) as i32,
+            height: (self.height * mat.rows as f32) as i32,
         }
     }
 }
@@ -197,32 +233,32 @@ pub enum FlipCode {
 
 impl Mat {
     #[inline]
-    pub fn new_with_cmat(cmat: *mut CMat) -> Mat {
+    pub fn from_raw(raw: *mut CMat) -> Mat {
         Mat {
-            inner: cmat,
-            rows: unsafe { opencv_mat_rows(cmat) },
-            cols: unsafe { opencv_mat_cols(cmat) },
-            depth: unsafe { opencv_mat_depth(cmat) },
+            inner: raw,
+            rows: unsafe { opencv_mat_rows(raw) },
+            cols: unsafe { opencv_mat_cols(raw) },
+            depth: unsafe { opencv_mat_depth(raw) },
         }
     }
 
     /// Create an empty `Mat` struct.
     pub fn new() -> Mat {
         let m = unsafe { opencv_mat_new() };
-        Mat::new_with_cmat(m)
+        Mat::from_raw(m)
     }
 
     /// Create an empty `Mat` with specific size (rows, cols and types).
     pub fn with_size(rows: i32, cols: i32, t: i32) -> Self {
         let m = unsafe { opencv_mat_new_with_size(rows, cols, t) };
-        Mat::new_with_cmat(m)
+        Mat::from_raw(m)
     }
 
     /// Create a `Mat` from reading the image specified by the path.
     pub fn from_path(path: &str, flags: i32) -> Self {
         let s = CString::new(path).unwrap();
         let m = unsafe { opencv_imread((&s).as_ptr(), flags) };
-        Mat::new_with_cmat(m)
+        Mat::from_raw(m)
     }
 
     /// Check if the `Mat` is valid or not.
@@ -233,7 +269,7 @@ impl Mat {
     /// Return a region of interest from a `Mat` specfied by a `Rect`.
     pub fn roi(&self, rect: Rect) -> Mat {
         let cmat = unsafe { opencv_mat_roi(self.inner, rect) };
-        Mat::new_with_cmat(cmat)
+        Mat::from_raw(cmat)
     }
 
     /// Apply a mask to myself.
@@ -241,7 +277,7 @@ impl Mat {
     // shortcut for `image &= mask`
     pub fn logic_and(&mut self, mask: Mat) {
         unsafe {
-            opencv_mat_logic_and(self.inner, mask.get_cmat());
+            opencv_mat_logic_and(self.inner, mask.inner);
         }
     }
 
@@ -270,10 +306,6 @@ impl Mat {
             opencv_imshow((&s).as_ptr(), self.inner);
             opencv_wait_key(delay);
         }
-    }
-
-    pub fn get_cmat(&self) -> *mut CMat {
-        self.inner
     }
 }
 

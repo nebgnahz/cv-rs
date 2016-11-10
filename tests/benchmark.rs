@@ -21,11 +21,16 @@ fn bench_decode_lenna() {
 }
 
 #[test]
-fn bench_face_detect_lenna() {
-    let mat = load_lenna();
+fn bench_face_detect_physicists() {
+    let mat = load_physicists();
     let cascade = load_frontal_face();
 
-    timed_multiple("face detecting lenna", 5, || {
-        cascade.detect(&mat);
-    });
+    (0..10).map(|i| {
+        let rate = 1.0 - (i as f64) * 0.1;
+        let smaller = mat.resize_by(rate, rate, InterpolationFlag::InterLinear);
+        let bench_name = format!("detect physicists: {}x{}", smaller.rows, smaller.cols);
+        timed_multiple(&bench_name, 1, || {
+            cascade.detect(&smaller);
+        });
+    }).collect::<Vec<_>>();
 }

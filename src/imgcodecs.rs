@@ -115,7 +115,7 @@ struct ImencodeResult {
 impl Mat {
     pub fn imdecode(buf: &[u8], mode: ImreadModes) -> Mat {
         let inner = unsafe { opencv_imdecode(buf.as_ptr(), buf.len(), mode as i32) };
-        Mat::new_with_cmat(inner)
+        Mat::from_raw(inner)
     }
 
     pub fn imencode(&self, ext: &str, f: Vec<ImwriteFlags>) -> Option<Vec<u8>> {

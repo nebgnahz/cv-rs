@@ -1,6 +1,6 @@
 extern crate libc;
 
-use libc::{c_float, c_int};
+use libc::{c_float, c_int, c_double};
 use super::core::*;
 
 // =============================================================================
@@ -10,6 +10,12 @@ extern "C" {
     fn opencv_rectangle(cmat: *mut CMat, rect: Rect);
     fn opencv_cvt_color(cmat: *const CMat, output: *mut CMat, code: i32);
     fn opencv_pyr_down(cmat: *const CMat, output: *mut CMat);
+    fn opencv_resize(from: *const CMat,
+                     to: *mut CMat,
+                     dsize: Size2i,
+                     fx: c_double,
+                     fy: c_double,
+                     interpolation: c_int);
     fn opencv_calc_hist(cimages: *const CMat,
                         nimages: i32,
                         channels: *const c_int,
@@ -165,11 +171,48 @@ pub enum ColorConversionCodes {
     COLORCVT_MAX = 139,
 }
 
+pub enum InterpolationFlag {
+    /// nearest neighbor interpolation
+    InterNearst = 0,
+
+    /// bilinear interpolation
+    InterLinear = 1,
+
+    /// bicubic interpolation
+    InterCubic = 2,
+
+    /// resampling using pixel area relation. It may be a preferred method for
+    /// image decimation, as it gives moire'-free results. But when the image is
+    /// zoomed, it is similar to the INTER_NEAREST method.
+    InterArea = 3,
+
+    /// Lanczos interpolation over 8x8 neighborhood
+    InterLanczos4 = 4,
+
+    /// mask for interpolation codes
+    InterMax = 7,
+
+    /// flag, fills all of the destination image pixels. If some of them
+    /// correspond to outliers in the source image, they are set to zero
+    WarpFillOutliers = 8,
+
+    /// flag, inverse transformation
+    WarpInverseMap = 16,
+}
+
 impl Mat {
-    /// Draw a simple, thick, or filled up-right rectangle.
+    /// Draws a simple, thick, or filled up-right rectangle.
     pub fn rectangle(&self, rect: Rect) {
         unsafe {
             opencv_rectangle(self.inner, rect);
+        }
+    }
+
+    /// Draw a simple, thick, or filled up-right rectangle.
+    pub fn rectangle2f(&self, rect: Rect2f) {
+        let abs_rect = rect.normalize_to_mat(self);
+        unsafe {
+            opencv_rectangle(self.inner, abs_rect);
         }
     }
 
@@ -177,14 +220,42 @@ impl Mat {
     pub fn cvt_color(&self, code: ColorConversionCodes) -> Mat {
         let m = unsafe { opencv_mat_new() };
         unsafe { opencv_cvt_color(self.inner, m, code as i32) }
-        Mat::new_with_cmat(m)
+        Mat::from_raw(m)
     }
 
-    /// Convert an image from one color space to another.
+    /// Blurs an image and downsamples it. This function performs the
+    /// downsampling step of the Gaussian pyramid construction.
     pub fn pyr_down(&self) -> Mat {
         let m = unsafe { opencv_mat_new() };
         unsafe { opencv_pyr_down(self.inner, m) }
-        Mat::new_with_cmat(m)
+        Mat::from_raw(m)
+    }
+
+    /// Resizes an image.
+    ///
+    /// The function resize resizes the image down to or up to the specified
+    /// size.
+    pub fn resize_to(&self, dsize: Size2i, interpolation: InterpolationFlag) -> Mat {
+        let m = unsafe { opencv_mat_new() };
+        unsafe { opencv_resize(self.inner, m, dsize, 0.0, 0.0, interpolation as c_int) }
+        Mat::from_raw(m)
+    }
+
+    /// Resizes an image.
+    ///
+    /// The function resize resizes the image down to or up to the specified
+    /// size.
+    pub fn resize_by(&self, fx: f64, fy: f64, interpolation: InterpolationFlag) -> Mat {
+        let m = unsafe { opencv_mat_new() };
+        unsafe {
+            opencv_resize(self.inner,
+                          m,
+                          Size2i::default(),
+                          fx as c_double,
+                          fy as c_double,
+                          interpolation as c_int)
+        }
+        Mat::from_raw(m)
     }
 
     /// Calculate a histogram of an image.
@@ -206,7 +277,7 @@ impl Mat {
                              hist_size,
                              ranges);
         }
-        Mat::new_with_cmat(m)
+        Mat::from_raw(m)
     }
 
     /// Calculate the back projection of a histogram. The function calculates
@@ -216,6 +287,6 @@ impl Mat {
         unsafe {
             opencv_calc_back_project(self.inner, 1, channels, (*hist).inner, m, ranges);
         }
-        Mat::new_with_cmat(m)
+        Mat::from_raw(m)
     }
 }

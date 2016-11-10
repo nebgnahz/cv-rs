@@ -111,7 +111,7 @@ impl Mat {
     pub fn in_range(&self, lowerb: Scalar, upperb: Scalar) -> Mat {
         let m = unsafe { opencv_mat_new() };
         unsafe { opencv_in_range(self.inner, lowerb, upperb, m) }
-        Mat::new_with_cmat(m)
+        Mat::from_raw(m)
     }
 
     /// Copy specified channels from `self` to the specified channels of output
@@ -129,7 +129,7 @@ impl Mat {
     pub fn normalize(&self, alpha: f64, beta: f64, t: NormTypes) -> Mat {
         let m = unsafe { opencv_mat_new() };
         unsafe { opencv_normalize(self.inner, m, alpha, beta, t as i32) }
-        Mat::new_with_cmat(m)
+        Mat::from_raw(m)
     }
 }
 
@@ -137,7 +137,7 @@ mod imgcodecs;
 pub use imgcodecs::{ImreadModes, ImwriteFlags, ImwritePngFlags};
 
 mod imgproc;
-pub use imgproc::ColorConversionCodes;
+pub use imgproc::{ColorConversionCodes, InterpolationFlag};
 
 // =============================================================================
 //   VideoCapture
@@ -165,7 +165,7 @@ impl VideoCapture {
     }
 
     pub fn read(&self, mat: &Mat) -> bool {
-        unsafe { opencv_videocapture_read(self.c_videocapture, mat.get_cmat()) }
+        unsafe { opencv_videocapture_read(self.c_videocapture, mat.inner) }
     }
 }
 

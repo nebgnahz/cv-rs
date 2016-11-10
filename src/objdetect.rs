@@ -59,6 +59,7 @@ impl CascadeClassifier {
         cc
     }
 
+    /// Default using scale factor 1.1, minNeighbors 3, no min size or max size
     pub fn detect_multiscale(&self, mat: &Mat) -> Vec<Rect> {
         self.detect_with_params(mat, 1.1, 3, Size2i::default(), Size2i::default())
     }
@@ -73,7 +74,7 @@ impl CascadeClassifier {
         let mut c_result = CVecOfRect::default();
         unsafe {
             opencv_cascade_classifier_detect(self.inner,
-                                             mat.get_cmat(),
+                                             mat.inner,
                                              &mut c_result,
                                              scale_factor as c_double,
                                              min_neighbors as c_int,

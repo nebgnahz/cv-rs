@@ -1,3 +1,6 @@
+// TODO(benzh): For some reason, Cargo keeps saying these functions are not
+// used. I guess each individual file in `tests` are compiled, so this file is
+// compiled in its own, making these functions appearing useless.
 #![allow(dead_code)]
 
 extern crate rust_vision;
@@ -6,12 +9,8 @@ use rust_vision::*;
 use rust_vision::objdetect::*;
 use std::fs::File;
 use std::io::Read;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Instant;
-
-// TODO(benzh): For some reason, Cargo keeps saying these functions are not
-// used. I guess each individual file in `tests` are compiled, so this file is
-// compiled in its own, making these functions appearing useless.
 
 pub fn close_rect(a: Rect, b: Rect, epsilon: i32) -> bool {
     ((a.x - b.x) < epsilon) && ((a.y - b.y) < epsilon) && ((a.width - b.width)) < epsilon &&
@@ -38,14 +37,23 @@ pub fn timed_multiple<F>(label: &str, iteration: usize, mut inner: F)
     println!("  {}: {} ms", label, total / (iteration as f64));
 }
 
+pub fn load_physicists() -> Mat {
+    let buf = load_image_as_buf("assets/Solvay_conference_1927.jpg");
+    Mat::imdecode(&buf, ImreadModes::ImreadGrayscale)
+}
+
 pub fn load_lenna() -> Mat {
     let buf = load_lenna_as_buf();
     Mat::imdecode(&buf, ImreadModes::ImreadGrayscale)
 }
 
 pub fn load_lenna_as_buf() -> Vec<u8> {
+    load_image_as_buf("assets/lenna.png")
+}
+
+fn load_image_as_buf<P: AsRef<Path>>(img: P) -> Vec<u8> {
     let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    d.push("assets/lenna.png");
+    d.push(img);
     let mut buf = Vec::new();
     File::open(d).unwrap().read_to_end(&mut buf).unwrap();
     buf

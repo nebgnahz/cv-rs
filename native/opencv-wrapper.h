@@ -114,6 +114,8 @@ void opencv_normalize(CMat* csrc, CMat* cdst, double alpha, double beta,
 void opencv_rectangle(CMat* cmat, CRect crect);
 void opencv_cvt_color(CMat* cmat, CMat* output, int code);
 void opencv_pyr_down(CMat* cmat, CMat* output);
+void opencv_resize(CMat* from, CMat* to, CSize2i dsize, double fx, double fy,
+                   int interpolation);
 void opencv_calc_hist(const CMat* const cimages, int nimages,
                       const int* channels, CMat* mask, CMat* hist, int dims,
                       const int* hist_size, const float** ranges);

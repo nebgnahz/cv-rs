@@ -122,6 +122,14 @@ void opencv_pyr_down(CMat* cmat, CMat* output) {
     cv::pyrDown(*mat, *out);
 }
 
+void opencv_resize(CMat* from, CMat* to, CSize2i dsize, double fx, double fy,
+                   int interpolation) {
+    cv::Mat* cv_from = reinterpret_cast<cv::Mat*>(from);
+    cv::Mat* cv_to = reinterpret_cast<cv::Mat*>(to);
+    cv::Size cv_dsize(dsize.width, dsize.height);
+    cv::resize(*cv_from, *cv_to, cv_dsize, fx, fy, interpolation);
+}
+
 void opencv_calc_hist(const CMat* cimages, int nimages, const int* channels,
                       CMat* cmask, CMat* chist, int dims, const int* hist_size,
                       const float** ranges) {
