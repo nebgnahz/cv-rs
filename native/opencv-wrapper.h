@@ -146,6 +146,7 @@ void opencv_set_mouse_callback(const char* const winname, MouseCallback onMouse,
 typedef struct _CVideoCapture CVideoCapture;
 
 CVideoCapture* opencv_videocapture_new(int index);
+CVideoCapture* opencv_videocapture_from_file(const char* const filename);
 bool opencv_videocapture_is_opened(const CVideoCapture* const ccap);
 bool opencv_videocapture_read(CVideoCapture* ccap, CMat* cmat);
 void opencv_videocapture_drop(CVideoCapture* ccap);
