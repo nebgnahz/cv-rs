@@ -8,7 +8,7 @@
 //! [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
 //! bindings using a Python script.
 extern crate libc;
-use libc::{c_double, c_int};
+use libc::{c_double, c_int, c_char};
 
 mod highgui;
 pub use highgui::MouseCallback;
@@ -149,6 +149,7 @@ pub struct VideoCapture {
 
 extern "C" {
     fn opencv_videocapture_new(index: c_int) -> *mut CVideoCapture;
+    fn opencv_videocapture_from_file(path: *const c_char) -> *mut CVideoCapture;
     fn opencv_videocapture_is_opened(ccap: *const CVideoCapture) -> bool;
     fn opencv_videocapture_read(v: *mut CVideoCapture, m: *mut CMat) -> bool;
     fn opencv_videocapture_drop(ccap: *mut CVideoCapture);
@@ -157,6 +158,12 @@ extern "C" {
 impl VideoCapture {
     pub fn new(index: i32) -> Self {
         let cap = unsafe { opencv_videocapture_new(index) };
+        VideoCapture { c_videocapture: cap }
+    }
+
+    pub fn from_path(path: &str) -> Self {
+        let s = ::std::ffi::CString::new(path).unwrap();
+        let cap = unsafe { opencv_videocapture_from_file((&s).as_ptr()) };
         VideoCapture { c_videocapture: cap }
     }
 

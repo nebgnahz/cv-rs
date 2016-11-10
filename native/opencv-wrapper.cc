@@ -214,6 +214,11 @@ CVideoCapture* opencv_videocapture_new(int index) {
     return reinterpret_cast<CVideoCapture*>(cap);
 }
 
+CVideoCapture* opencv_videocapture_from_file(const char* const filename) {
+    cv::VideoCapture* cap = new cv::VideoCapture(filename);
+    return reinterpret_cast<CVideoCapture*>(cap);
+}
+
 bool opencv_videocapture_is_opened(const CVideoCapture* const ccap) {
     const cv::VideoCapture* const cap =
         reinterpret_cast<const cv::VideoCapture* const>(ccap);
