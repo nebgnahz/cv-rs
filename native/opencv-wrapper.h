@@ -111,7 +111,8 @@ void opencv_normalize(CMat* csrc, CMat* cdst, double alpha, double beta,
 // =============================================================================
 //  Imgproc
 // =============================================================================
-void opencv_rectangle(CMat* cmat, CRect crect);
+void opencv_rectangle(CMat* cmat, CRect crect, CScalar color, int thickness,
+                      int linetype);
 void opencv_cvt_color(CMat* cmat, CMat* output, int code);
 void opencv_pyr_down(CMat* cmat, CMat* output);
 void opencv_resize(CMat* from, CMat* to, CSize2i dsize, double fx, double fy,

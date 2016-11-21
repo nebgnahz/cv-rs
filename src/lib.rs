@@ -137,7 +137,7 @@ mod imgcodecs;
 pub use imgcodecs::{ImreadModes, ImwriteFlags, ImwritePngFlags};
 
 mod imgproc;
-pub use imgproc::{ColorConversionCodes, InterpolationFlag};
+pub use imgproc::{ColorConversionCodes, InterpolationFlag, LineTypes};
 
 // =============================================================================
 //   VideoCapture

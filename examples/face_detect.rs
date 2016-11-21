@@ -8,7 +8,7 @@ use std::path::PathBuf;
 
 fn main() {
     let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    d.push("assets/lenna.png");
+    d.push("assets/Solvay_conference_1927.jpg");
 
     let mut buf = Vec::new();
     File::open(d).unwrap().read_to_end(&mut buf).unwrap();
@@ -21,9 +21,10 @@ fn main() {
     highgui_named_window("window", WindowFlags::WindowAutosize);
 
     // result is a vector of rectangles
-    let result = cascade.detect(&mat);
+    let result = cascade.detect_with_params(&mat, 1.1, 6, Size2i::new(80, 80), Size2i::default());
+
     println!("result: {:?}", result);
     // we draw each of them on the image
-    result.iter().map(|&(r, _conf)| mat.rectangle(r)).count();
+    result.iter().map(|&r| mat.rectangle_custom(r.scale(1.2), Scalar::new(255, 255, 0, 255), 10, LineTypes::Line8)).count();
     mat.show("window", 0);
 }

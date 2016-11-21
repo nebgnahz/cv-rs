@@ -7,7 +7,7 @@ use super::core::*;
 //  Imgproc
 // =============================================================================
 extern "C" {
-    fn opencv_rectangle(cmat: *mut CMat, rect: Rect);
+    fn opencv_rectangle(cmat: *mut CMat, rect: Rect, color: Scalar, thickness: c_int, linetype: c_int);
     fn opencv_cvt_color(cmat: *const CMat, output: *mut CMat, code: i32);
     fn opencv_pyr_down(cmat: *const CMat, output: *mut CMat);
     fn opencv_resize(from: *const CMat,
@@ -200,20 +200,41 @@ pub enum InterpolationFlag {
     WarpInverseMap = 16,
 }
 
+pub enum LineTypes {
+    /// Default type
+    Filled = -1,
+
+    /// 4-connected line
+    Line4 = 4,
+
+    /// 8-connected line
+    Line8 = 8,
+
+    /// antialiased line
+    LineAA = 16,
+}
+
 impl Mat {
     /// Draws a simple, thick, or filled up-right rectangle.
     pub fn rectangle(&self, rect: Rect) {
+        self.rectangle_custom(rect, Scalar::new(255, 255, 0, 255), 1, LineTypes::Line8);
+    }
+
+    /// Draws a simple, thick, or filled up-right rectangle.
+    pub fn rectangle_custom(&self, rect: Rect, color: Scalar, thickness: i32, linetype: LineTypes) {
         unsafe {
-            opencv_rectangle(self.inner, rect);
+            opencv_rectangle(self.inner,
+                             rect,
+                             color,
+                             thickness as c_int,
+                             linetype as c_int);
         }
     }
 
     /// Draw a simple, thick, or filled up-right rectangle.
     pub fn rectangle2f(&self, rect: Rect2f) {
         let abs_rect = rect.normalize_to_mat(self);
-        unsafe {
-            opencv_rectangle(self.inner, abs_rect);
-        }
+        self.rectangle(abs_rect);
     }
 
     /// Convert an image from one color space to another.

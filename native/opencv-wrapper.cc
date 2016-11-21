@@ -104,10 +104,13 @@ void opencv_normalize(CMat* csrc, CMat* cdst, double alpha, double beta,
 // =============================================================================
 //  Imgproc
 // =============================================================================
-void opencv_rectangle(CMat* cmat, CRect crect) {
+void opencv_rectangle(CMat* cmat, CRect crect, CScalar color, int thickness,
+                      int linetype) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
-    cv::rectangle(*mat, rect, cv::Scalar(255, 0, 0, 255));
+    cv::rectangle(*mat, rect,
+                  cv::Scalar(color.v0, color.v1, color.v2, color.v3), thickness,
+                  linetype);
 }
 
 void opencv_cvt_color(CMat* cmat, CMat* output, int code) {
