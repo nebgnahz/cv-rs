@@ -1,13 +1,16 @@
 //! Core data structures in OpenCV
-extern crate libc;
-extern crate std;
-
 use libc::{c_int, c_double};
+use num;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
 // Opaque data struct for C bindings
 pub enum CMat {}
+impl CMat {
+    pub fn new() -> *mut CMat {
+        unsafe { opencv_mat_new() }
+    }
+}
 
 /// This wraps OpenCV's `Mat` class which is designed for n-dimensional dense
 /// array. It's the most widely used data structure in image/video processing
@@ -162,7 +165,7 @@ pub struct CVecOfRect {
 impl Default for CVecOfRect {
     fn default() -> Self {
         CVecOfRect {
-            array: std::ptr::null_mut::<Rect>(),
+            array: ::std::ptr::null_mut::<Rect>(),
             size: 0,
         }
     }
@@ -205,23 +208,24 @@ impl CVecDouble {
 impl Default for CVecDouble {
     fn default() -> Self {
         CVecDouble {
-            array: std::ptr::null_mut::<c_double>(),
+            array: ::std::ptr::null_mut::<c_double>(),
             size: 0,
         }
     }
 }
 
 extern "C" {
-    pub fn opencv_mat_new() -> *mut CMat;
-    fn opencv_mat_new_with_size(rows: i32, cols: i32, t: i32) -> *mut CMat;
+    fn opencv_mat_new() -> *mut CMat;
+    fn opencv_mat_new_with_size(rows: c_int, cols: c_int, t: i32) -> *mut CMat;
     fn opencv_mat_is_valid(mat: *mut CMat) -> bool;
-    fn opencv_mat_rows(cmat: *const CMat) -> i32;
-    fn opencv_mat_cols(cmat: *const CMat) -> i32;
-    fn opencv_mat_depth(cmat: *const CMat) -> i32;
+    fn opencv_mat_rows(cmat: *const CMat) -> c_int;
+    fn opencv_mat_cols(cmat: *const CMat) -> c_int;
+    fn opencv_mat_depth(cmat: *const CMat) -> c_int;
+    fn opencv_mat_type(cmat: *const CMat) -> c_int;
     fn opencv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
     fn opencv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
     fn opencv_mat_logic_and(cimage: *mut CMat, cmask: *const CMat);
-    fn opencv_mat_flip(src: *mut CMat, code: i32);
+    fn opencv_mat_flip(src: *mut CMat, code: c_int);
     fn opencv_mat_drop(mat: *mut CMat);
 }
 
@@ -242,7 +246,7 @@ impl Mat {
         }
     }
 
-    /// Create an empty `Mat` struct.
+    /// Creates an empty `Mat` struct.
     pub fn new() -> Mat {
         let m = unsafe { opencv_mat_new() };
         Mat::from_raw(m)
@@ -259,6 +263,11 @@ impl Mat {
         let s = CString::new(path).unwrap();
         let m = unsafe { opencv_imread((&s).as_ptr(), flags) };
         Mat::from_raw(m)
+    }
+
+    /// Returns the size of this matrix.
+    pub fn size(&self) -> Size2i {
+        Size2i::new(self.cols, self.rows)
     }
 
     /// Check if the `Mat` is valid or not.
@@ -307,6 +316,10 @@ impl Mat {
             opencv_wait_key(delay);
         }
     }
+
+    pub fn cv_type(&self) -> CvType {
+        num::FromPrimitive::from_i32(unsafe { opencv_mat_type(self.inner) }).unwrap()
+    }
 }
 
 impl Drop for Mat {
@@ -315,4 +328,24 @@ impl Drop for Mat {
             opencv_mat_drop(self.inner);
         }
     }
+}
+
+// Here is the `CvType`.
+//
+// +--------+----+----+----+----+------+------+------+------+
+// |        | C1 | C2 | C3 | C4 | C(5) | C(6) | C(7) | C(8) |
+// +--------+----+----+----+----+------+------+------+------+
+// | CV_8U  |  0 |  8 | 16 | 24 |   32 |   40 |   48 |   56 |
+// | CV_8S  |  1 |  9 | 17 | 25 |   33 |   41 |   49 |   57 |
+// | CV_16U |  2 | 10 | 18 | 26 |   34 |   42 |   50 |   58 |
+// | CV_16S |  3 | 11 | 19 | 27 |   35 |   43 |   51 |   59 |
+// | CV_32S |  4 | 12 | 20 | 28 |   36 |   44 |   52 |   60 |
+// | CV_32F |  5 | 13 | 21 | 29 |   37 |   45 |   53 |   61 |
+// | CV_64F |  6 | 14 | 22 | 30 |   38 |   46 |   54 |   62 |
+// +--------+----+----+----+----+------+------+------+------+
+#[derive(Debug, PartialEq, FromPrimitive)]
+pub enum CvType {
+    Cv8UC1 = 0,
+    Cv8UC2 = 8,
+    Cv8UC3 = 16,
 }

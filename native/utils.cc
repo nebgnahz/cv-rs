@@ -3,7 +3,7 @@
 void vec_rect_cxx_to_c(const std::vector<cv::Rect>& cxx_vec_rect, VecRect* vr) {
     size_t num = cxx_vec_rect.size();
     vr->size = num;
-    vr->array = (CRect*) malloc(num * sizeof(CRect));
+    vr->array = (Rect*) malloc(num * sizeof(Rect));
     for (size_t i = 0; i < num; i++) {
         vr->array[i].x = cxx_vec_rect[i].x;
         vr->array[i].y = cxx_vec_rect[i].y;

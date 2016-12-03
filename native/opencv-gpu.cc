@@ -1,5 +1,5 @@
-#include "opencv-wrapper.h"
 #include "opencv-gpu.h"
+#include "opencv-wrapper.h"
 #include "utils.h"
 #include <opencv2/cudaobjdetect.hpp>
 
@@ -19,18 +19,18 @@ void cv_gpu_mat_drop(GpuMat* gpu_mat) {
     gpu_mat = nullptr;
 }
 
-void cv_gpu_mat_upload(GpuMat* gpu_mat, CMat* cpu_mat) {
+void cv_gpu_mat_upload(GpuMat* gpu_mat, CvMat* cpu_mat) {
     cv::cuda::GpuMat* gpu_image = reinterpret_cast<cv::cuda::GpuMat*>(gpu_mat);
     cv::Mat* image = reinterpret_cast<cv::Mat*>(cpu_mat);
     gpu_image->upload(*image);
 }
 
-CMat* cv_mat_from_gpu_mat(GpuMat* gpu_mat) {
+CvMat* cv_mat_from_gpu_mat(GpuMat* gpu_mat) {
     cv::cuda::GpuMat* gpu_image = reinterpret_cast<cv::cuda::GpuMat*>(gpu_mat);
-    return reinterpret_cast<CMat*>(new cv::Mat(*gpu_image));
+    return reinterpret_cast<CvMat*>(new cv::Mat(*gpu_image));
 }
 
-GpuMat* cv_gpu_mat_from_mat(CMat* cmat) {
+GpuMat* cv_gpu_mat_from_mat(CvMat* cmat) {
     cv::Mat* image = reinterpret_cast<cv::Mat*>(cmat);
     return reinterpret_cast<GpuMat*>(new cv::cuda::GpuMat(*image));
 }

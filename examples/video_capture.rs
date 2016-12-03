@@ -25,15 +25,14 @@
 
 extern crate rust_vision;
 use rust_vision::*;
+use rust_vision::videoio::VideoCapture;
 
 fn main() {
     let cap = VideoCapture::new(0);
     assert!(cap.is_open());
-    let m = Mat::new();
 
     highgui_named_window("Window", WindowFlags::WindowAutosize);
     loop {
-        cap.read(&m);
-        m.show("Window", 30);
+        cap.read().unwrap().show("Window", 30);
     }
 }

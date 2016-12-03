@@ -239,7 +239,7 @@ impl Mat {
 
     /// Convert an image from one color space to another.
     pub fn cvt_color(&self, code: ColorConversionCodes) -> Mat {
-        let m = unsafe { opencv_mat_new() };
+        let m = CMat::new();
         unsafe { opencv_cvt_color(self.inner, m, code as i32) }
         Mat::from_raw(m)
     }
@@ -247,7 +247,7 @@ impl Mat {
     /// Blurs an image and downsamples it. This function performs the
     /// downsampling step of the Gaussian pyramid construction.
     pub fn pyr_down(&self) -> Mat {
-        let m = unsafe { opencv_mat_new() };
+        let m = CMat::new();
         unsafe { opencv_pyr_down(self.inner, m) }
         Mat::from_raw(m)
     }
@@ -257,7 +257,7 @@ impl Mat {
     /// The function resize resizes the image down to or up to the specified
     /// size.
     pub fn resize_to(&self, dsize: Size2i, interpolation: InterpolationFlag) -> Mat {
-        let m = unsafe { opencv_mat_new() };
+        let m = CMat::new();
         unsafe { opencv_resize(self.inner, m, dsize, 0.0, 0.0, interpolation as c_int) }
         Mat::from_raw(m)
     }
@@ -267,7 +267,7 @@ impl Mat {
     /// The function resize resizes the image down to or up to the specified
     /// size.
     pub fn resize_by(&self, fx: f64, fy: f64, interpolation: InterpolationFlag) -> Mat {
-        let m = unsafe { opencv_mat_new() };
+        let m = CMat::new();
         unsafe {
             opencv_resize(self.inner,
                           m,
@@ -287,7 +287,7 @@ impl Mat {
                      hist_size: *const c_int,
                      ranges: *const *const f32)
                      -> Mat {
-        let m = unsafe { opencv_mat_new() };
+        let m = CMat::new();
         unsafe {
             opencv_calc_hist(self.inner,
                              1,
@@ -304,7 +304,7 @@ impl Mat {
     /// Calculate the back projection of a histogram. The function calculates
     /// the back project of the histogram.
     pub fn calc_back_project(&self, channels: *const i32, hist: &Mat, ranges: *const *const f32) -> Mat {
-        let m = unsafe { opencv_mat_new() };
+        let m = CMat::new();
         unsafe {
             opencv_calc_back_project(self.inner, 1, channels, (*hist).inner, m, ranges);
         }

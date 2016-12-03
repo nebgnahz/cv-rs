@@ -17,43 +17,43 @@ EXTERN_C_BEGIN
 // =============================================================================
 //   Core/Types
 // =============================================================================
-typedef struct _CMat CMat;
+typedef struct _CvMatrixrix CvMatrix;
 
 typedef struct {
     int32_t x;
     int32_t y;
-} CPoint2i;
+} Point2i;
 
 typedef struct {
     float x;
     float y;
-} CPoint2f;
+} Point2f;
 
 typedef struct {
     int width;
     int height;
-} CSize2i;
+} Size2i;
 
 typedef struct {
     float width;
     float height;
-} CSize2f;
+} Size2f;
 
 typedef struct {
     int32_t x;
     int32_t y;
     int32_t width;
     int32_t height;
-} CRect;
+} Rect;
 
 typedef struct {
-    CPoint2f center;
-    CSize2f size;
+    Point2f center;
+    Size2f size;
     float angle;
-} CRotatedRect;
+} RotatedRect;
 
 typedef struct {
-    CRect* array;
+    Rect* array;
     size_t size;
 } VecRect;
 
@@ -67,7 +67,7 @@ typedef struct {
     int32_t v1;
     int32_t v2;
     int32_t v3;
-} CScalar;
+} Scalar;
 
 typedef struct {
     bool status;
@@ -75,60 +75,63 @@ typedef struct {
     size_t size;
 } ImencodeResult;
 
-// The caller owns the returned data CMat
-CMat* opencv_mat_new();
-CMat* opencv_mat_new_with_size(int rows, int cols, int type);
+// The caller owns the returned data CvMatrix
+CvMatrix* opencv_mat_new();
+CvMatrix* opencv_mat_new_with_size(int rows, int cols, int type);
 
-bool opencv_mat_valid(CMat* cmat);
+bool opencv_mat_valid(CvMatrix* cmat);
 
-// The caller owns the returned CMat
-CMat* opencv_mat_roi(CMat* cmat, CRect crect);
+// The caller owns the returned CvMatrix
+CvMatrix* opencv_mat_roi(CvMatrix* cmat, Rect crect);
 
-void opencv_mat_logic_and(CMat* image, const CMat* const mask);
-void opencv_mat_flip(CMat* image, int code);
+void opencv_mat_logic_and(CvMatrix* image, const CvMatrix* const mask);
+void opencv_mat_flip(CvMatrix* image, int code);
 
-// The caller owns the returned data CMat
-CMat* opencv_imread(const char* const filename, int flags);
+// The caller owns the returned data CvMatrix
+CvMatrix* opencv_imread(const char* const filename, int flags);
 
-int opencv_mat_rows(const CMat* const cmat);
-int opencv_mat_cols(const CMat* const cmat);
-int opencv_mat_depth(const CMat* const cmat);
+int opencv_mat_rows(const CvMatrix* const cmat);
+int opencv_mat_cols(const CvMatrix* const cmat);
+int opencv_mat_depth(const CvMatrix* const cmat);
+int opencv_mat_type(const CvMatrix* const cmat);
 
 // Free a Mat object
-void opencv_mat_drop(CMat* cmat);
+void opencv_mat_drop(CvMatrix* cmat);
 
 void opencv_vec_of_rect_drop(VecRect* v);
 
 // =============================================================================
 //  core array
 // =============================================================================
-void opencv_in_range(CMat* cmat, CScalar lowerb, CScalar upperb, CMat* dst);
-void opencv_mix_channels(CMat* cmat, size_t nsrcs, CMat* dst, size_t ndsts,
-                         const int* from_to, size_t npairs);
-void opencv_normalize(CMat* csrc, CMat* cdst, double alpha, double beta,
+void opencv_in_range(CvMatrix* cmat, Scalar lowerb, Scalar upperb,
+                     CvMatrix* dst);
+void opencv_mix_channels(CvMatrix* cmat, size_t nsrcs, CvMatrix* dst,
+                         size_t ndsts, const int* from_to, size_t npairs);
+void opencv_normalize(CvMatrix* csrc, CvMatrix* cdst, double alpha, double beta,
                       int norm_type);
 
 // =============================================================================
 //  Imgproc
 // =============================================================================
-void opencv_rectangle(CMat* cmat, CRect crect, CScalar color, int thickness,
+void opencv_rectangle(CvMatrix* cmat, Rect crect, Scalar color, int thickness,
                       int linetype);
-void opencv_cvt_color(CMat* cmat, CMat* output, int code);
-void opencv_pyr_down(CMat* cmat, CMat* output);
-void opencv_resize(CMat* from, CMat* to, CSize2i dsize, double fx, double fy,
-                   int interpolation);
-void opencv_calc_hist(const CMat* const cimages, int nimages,
-                      const int* channels, CMat* mask, CMat* hist, int dims,
-                      const int* hist_size, const float** ranges);
-void opencv_calc_back_project(const CMat* images, int nimages,
-                              const int* channels, CMat* hist,
-                              CMat* back_project, const float** ranges);
+void opencv_cvt_color(CvMatrix* cmat, CvMatrix* output, int code);
+void opencv_pyr_down(CvMatrix* cmat, CvMatrix* output);
+void opencv_resize(CvMatrix* from, CvMatrix* to, Size2i dsize, double fx,
+                   double fy, int interpolation);
+void opencv_calc_hist(const CvMatrix* const cimages, int nimages,
+                      const int* channels, CvMatrix* mask, CvMatrix* hist,
+                      int dims, const int* hist_size, const float** ranges);
+void opencv_calc_back_project(const CvMatrix* images, int nimages,
+                              const int* channels, CvMatrix* hist,
+                              CvMatrix* back_project, const float** ranges);
 
 // =============================================================================
 //  Imgcodecs
 // =============================================================================
-CMat* opencv_imdecode(const uint8_t* const buffer, size_t len, int flag);
-ImencodeResult opencv_imencode(const char* const ext, const CMat* const cmat,
+CvMatrix* opencv_imdecode(const uint8_t* const buffer, size_t len, int flag);
+ImencodeResult opencv_imencode(const char* const ext,
+                               const CvMatrix* const cmat,
                                const int* const flag_ptr, size_t flag_size);
 
 // =============================================================================
@@ -136,7 +139,7 @@ ImencodeResult opencv_imencode(const char* const ext, const CMat* const cmat,
 // =============================================================================
 void opencv_named_window(const char* const winname, int flags);
 void opencv_destroy_window(const char* const winname);
-void opencv_imshow(const char* const winname, CMat* mat);
+void opencv_imshow(const char* const winname, CvMatrix* mat);
 int opencv_wait_key(int delay_in_millis);
 
 typedef void (*MouseCallback)(int e, int x, int y, int flags, void* data);
@@ -144,15 +147,33 @@ void opencv_set_mouse_callback(const char* const winname, MouseCallback onMouse,
                                void* userdata);
 
 // =============================================================================
-//   VideoCapture
+//   VideoIO
 // =============================================================================
 typedef struct _CVideoCapture CVideoCapture;
 
-CVideoCapture* opencv_videocapture_new(int index);
-CVideoCapture* opencv_videocapture_from_file(const char* const filename);
-bool opencv_videocapture_is_opened(const CVideoCapture* const ccap);
-bool opencv_videocapture_read(CVideoCapture* ccap, CMat* cmat);
-void opencv_videocapture_drop(CVideoCapture* ccap);
+CVideoCapture* cv_videocapture_new(int index);
+CVideoCapture* cv_videocapture_from_file(const char* const filename);
+bool cv_videocapture_is_opened(const CVideoCapture* const ccap);
+bool cv_videocapture_read(CVideoCapture* ccap, CvMatrix* cmat);
+void cv_videocapture_drop(CVideoCapture* ccap);
+bool cv_videocapture_set(CVideoCapture* ccap, int property, double value);
+double cv_videocapture_get(CVideoCapture* ccap, int property);
+
+typedef struct _CVideoWriter CVideoWriter;
+
+int cv_fourcc(char c1, char c2, char c3, char c4);
+
+CVideoWriter* cv_videowriter_default();
+CVideoWriter* cv_videowriter_new(const char* const path, int fourcc,
+                                  double fps, Size2i frame_size, bool is_color);
+void cv_videowriter_drop(CVideoWriter* writer);
+bool cv_videowriter_open(CVideoWriter* writer, const char* const path,
+                         int fourcc, double fps, Size2i frame_size,
+                         bool is_color);
+bool cv_videowriter_is_opened(CVideoWriter* writer);
+void cv_videowriter_write(CVideoWriter* writer, CvMatrix* cmat);
+bool cv_videowriter_set(CVideoWriter* writer, int property, double value);
+double cv_videowriter_get(CVideoWriter* writer, int property);
 
 // =============================================================================
 //   CascadeClassifier
@@ -165,10 +186,10 @@ bool opencv_cascade_classifier_load(CCascadeClassifier* cc,
 void opencv_cascade_classifier_drop(CCascadeClassifier* cc);
 
 // vec_of_rect is dynamically allocated, the caller should take ownership of it.
-void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CMat* cmat,
+void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CvMatrix* cmat,
                                       VecRect* vec_of_rect, double scale_factor,
                                       int min_neighbors, int flags,
-                                      CSize2i min_size, CSize2i max_size);
+                                      Size2i min_size, Size2i max_size);
 
 typedef struct _SvmDetector SvmDetector;
 SvmDetector* cv_hog_default_people_detector();
@@ -179,8 +200,8 @@ typedef struct _HogDescriptor HogDescriptor;
 HogDescriptor* cv_hog_new();
 void cv_hog_drop(HogDescriptor*);
 void cv_hog_set_svm_detector(HogDescriptor*, SvmDetector*);
-void cv_hog_detect(HogDescriptor*, CMat*, VecRect* vec_detected,
-                   VecDouble* vec_weight, CSize2i win_stride, CSize2i padding,
+void cv_hog_detect(HogDescriptor*, CvMatrix*, VecRect* vec_detected,
+                   VecDouble* vec_weight, Size2i win_stride, Size2i padding,
                    double scale, double final_threshold, bool use_means_shift);
 
 // =============================================================================
@@ -189,8 +210,8 @@ void cv_hog_detect(HogDescriptor*, CMat*, VecRect* vec_detected,
 typedef struct _CTermCriteria CTermCriteria;
 CTermCriteria* opencv_term_criteria_new(int type, int count, double epsilon);
 void opencv_term_criteria_drop(CTermCriteria* c_criteria);
-CRotatedRect opencv_camshift(CMat* back_project_image, CRect window,
-                             CTermCriteria* term_criteria);
+RotatedRect opencv_camshift(CvMatrix* back_project_image, Rect window,
+                            CTermCriteria* term_criteria);
 
 EXTERN_C_END
 

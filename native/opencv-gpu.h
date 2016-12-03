@@ -20,9 +20,9 @@ EXTERN_C_BEGIN
 typedef struct _GpuMat GpuMat;
 GpuMat* cv_gpu_mat_default();
 void cv_gpu_mat_drop(GpuMat*);
-void cv_gpu_mat_upload(GpuMat*, CMat*);
-CMat* cv_mat_from_gpu_mat(GpuMat*);
-GpuMat* cv_gpu_mat_from_mat(CMat*);
+void cv_gpu_mat_upload(GpuMat*, CvMatrix*);
+CvMatrix* cv_mat_from_gpu_mat(GpuMat*);
+GpuMat* cv_gpu_mat_from_mat(CvMatrix*);
 
 // =============================================================================
 //   Hog

@@ -18,10 +18,10 @@ fn main() {
     d.push("assets/haarcascade_frontalface_default.xml");
     let cascade = CascadeClassifier::from_path(d);
 
-    highgui_named_window("window", WindowFlags::WindowAutosize);
+    highgui_named_window("window", WindowFlags::WindowNormal);
 
     // result is a vector of rectangles
-    let result = cascade.detect_with_params(&mat, 1.1, 6, Size2i::new(80, 80), Size2i::default());
+    let result = cascade.detect_with_params(&mat, 1.1, 15, Size2i::new(80, 80), Size2i::default());
 
     println!("result: {:?}", result);
     // we draw each of them on the image
