@@ -33,7 +33,8 @@ extern "C" {
                                 ranges: *const *const c_float);
 }
 
-/// Color conversion code used in [cvt_color](struct.Mat.html#method.cvt_color).
+/// Color conversion code used in
+/// [cvt_color](../struct.Mat.html#method.cvt_color).
 #[allow(non_camel_case_types, missing_docs)]
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ColorConversionCodes {
