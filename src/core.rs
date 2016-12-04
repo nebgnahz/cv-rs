@@ -10,7 +10,7 @@ use std::os::raw::c_char;
 pub enum CMat {}
 impl CMat {
     pub fn new() -> *mut CMat {
-        unsafe { opencv_mat_new() }
+        unsafe { cv_mat_new() }
     }
 }
 
@@ -201,10 +201,10 @@ impl Default for CVecOfRect {
 impl Drop for CVecOfRect {
     fn drop(&mut self) {
         extern "C" {
-            fn opencv_vec_of_rect_drop(_: *mut CVecOfRect);
+            fn cv_vec_of_rect_drop(_: *mut CVecOfRect);
         }
         unsafe {
-            opencv_vec_of_rect_drop(self);
+            cv_vec_of_rect_drop(self);
         }
     }
 }
@@ -258,18 +258,18 @@ pub enum LineTypes {
 }
 
 extern "C" {
-    fn opencv_mat_new() -> *mut CMat;
-    fn opencv_mat_new_with_size(rows: c_int, cols: c_int, t: i32) -> *mut CMat;
-    fn opencv_mat_is_valid(mat: *mut CMat) -> bool;
-    fn opencv_mat_rows(cmat: *const CMat) -> c_int;
-    fn opencv_mat_cols(cmat: *const CMat) -> c_int;
-    fn opencv_mat_depth(cmat: *const CMat) -> c_int;
-    fn opencv_mat_type(cmat: *const CMat) -> c_int;
-    fn opencv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
-    fn opencv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
-    fn opencv_mat_logic_and(cimage: *mut CMat, cmask: *const CMat);
-    fn opencv_mat_flip(src: *mut CMat, code: c_int);
-    fn opencv_mat_drop(mat: *mut CMat);
+    fn cv_mat_new() -> *mut CMat;
+    fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: i32) -> *mut CMat;
+    fn cv_mat_is_valid(mat: *mut CMat) -> bool;
+    fn cv_mat_rows(cmat: *const CMat) -> c_int;
+    fn cv_mat_cols(cmat: *const CMat) -> c_int;
+    fn cv_mat_depth(cmat: *const CMat) -> c_int;
+    fn cv_mat_type(cmat: *const CMat) -> c_int;
+    fn cv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
+    fn cv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
+    fn cv_mat_logic_and(cimage: *mut CMat, cmask: *const CMat);
+    fn cv_mat_flip(src: *mut CMat, code: c_int);
+    fn cv_mat_drop(mat: *mut CMat);
 }
 
 /// A flag to specify how to flip the image. see
@@ -291,28 +291,28 @@ impl Mat {
     pub fn from_raw(raw: *mut CMat) -> Mat {
         Mat {
             inner: raw,
-            rows: unsafe { opencv_mat_rows(raw) },
-            cols: unsafe { opencv_mat_cols(raw) },
-            depth: unsafe { opencv_mat_depth(raw) },
+            rows: unsafe { cv_mat_rows(raw) },
+            cols: unsafe { cv_mat_cols(raw) },
+            depth: unsafe { cv_mat_depth(raw) },
         }
     }
 
     /// Creates an empty `Mat` struct.
     pub fn new() -> Mat {
-        let m = unsafe { opencv_mat_new() };
+        let m = unsafe { cv_mat_new() };
         Mat::from_raw(m)
     }
 
     /// Create an empty `Mat` with specific size (rows, cols and types).
     pub fn with_size(rows: i32, cols: i32, t: i32) -> Self {
-        let m = unsafe { opencv_mat_new_with_size(rows, cols, t) };
+        let m = unsafe { cv_mat_new_with_size(rows, cols, t) };
         Mat::from_raw(m)
     }
 
     /// Create a `Mat` from reading the image specified by the path.
     pub fn from_path(path: &str, flags: i32) -> Self {
         let s = CString::new(path).unwrap();
-        let m = unsafe { opencv_imread((&s).as_ptr(), flags) };
+        let m = unsafe { cv_imread((&s).as_ptr(), flags) };
         Mat::from_raw(m)
     }
 
@@ -323,12 +323,12 @@ impl Mat {
 
     /// Check if the `Mat` is valid or not.
     pub fn is_valid(&self) -> bool {
-        unsafe { opencv_mat_is_valid(self.inner) }
+        unsafe { cv_mat_is_valid(self.inner) }
     }
 
     /// Return a region of interest from a `Mat` specfied by a `Rect`.
     pub fn roi(&self, rect: Rect) -> Mat {
-        let cmat = unsafe { opencv_mat_roi(self.inner, rect) };
+        let cmat = unsafe { cv_mat_roi(self.inner, rect) };
         Mat::from_raw(cmat)
     }
 
@@ -337,7 +337,7 @@ impl Mat {
     // shortcut for `image &= mask`
     pub fn logic_and(&mut self, mask: Mat) {
         unsafe {
-            opencv_mat_logic_and(self.inner, mask.inner);
+            cv_mat_logic_and(self.inner, mask.inner);
         }
     }
 
@@ -349,7 +349,7 @@ impl Mat {
             FlipCode::XYAxis => -1,
         };
         unsafe {
-            opencv_mat_flip(self.inner, code);
+            cv_mat_flip(self.inner, code);
         }
     }
 
@@ -357,28 +357,28 @@ impl Mat {
     /// `delay`.
     pub fn show(&self, name: &str, delay: i32) {
         extern "C" {
-            fn opencv_imshow(name: *const c_char, cmat: *mut CMat);
-            fn opencv_wait_key(delay_ms: c_int) -> c_int;
+            fn cv_imshow(name: *const c_char, cmat: *mut CMat);
+            fn cv_wait_key(delay_ms: c_int) -> c_int;
         }
 
         let s = CString::new(name).unwrap();
         unsafe {
-            opencv_imshow((&s).as_ptr(), self.inner);
-            opencv_wait_key(delay);
+            cv_imshow((&s).as_ptr(), self.inner);
+            cv_wait_key(delay);
         }
     }
 
     /// Returns the images type. For supported types, please see
     /// [CvType](enum.CvType).
     pub fn cv_type(&self) -> CvType {
-        num::FromPrimitive::from_i32(unsafe { opencv_mat_type(self.inner) }).unwrap()
+        num::FromPrimitive::from_i32(unsafe { cv_mat_type(self.inner) }).unwrap()
     }
 }
 
 impl Drop for Mat {
     fn drop(&mut self) {
         unsafe {
-            opencv_mat_drop(self.inner);
+            cv_mat_drop(self.inner);
         }
     }
 }
@@ -456,18 +456,18 @@ impl RotatedRect {
 // core array
 // =============================================================================
 extern "C" {
-    fn opencv_in_range(cmat: *const CMat, lowerb: Scalar, upperb: Scalar, dst: *mut CMat);
-    fn opencv_mix_channels(cmat: *const CMat,
+    fn cv_in_range(cmat: *const CMat, lowerb: Scalar, upperb: Scalar, dst: *mut CMat);
+    fn cv_mix_channels(cmat: *const CMat,
                            nsrcs: isize,
                            dst: *mut CMat,
                            ndsts: isize,
                            from_to: *const i32,
                            npairs: isize);
-    fn opencv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: c_int);
+    fn cv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: c_int);
 }
 
 /// Normalization type. Please refer to [OpenCV's
-/// documentation](http://docs.opencv.org/trunk/d2/de8/group__core__array.html#gad12cefbcb5291cf958a85b4b67b6149f).
+/// documentation](http://docs.cv.org/trunk/d2/de8/group__core__array.html#gad12cefbcb5291cf958a85b4b67b6149f).
 #[derive(Debug, PartialEq, Clone, Copy, FromPrimitive)]
 pub enum NormTypes {
     /// Normalized using `max`
@@ -494,7 +494,7 @@ impl Mat {
     /// CV_8U type.
     pub fn in_range(&self, lowerb: Scalar, upperb: Scalar) -> Mat {
         let m = CMat::new();
-        unsafe { opencv_in_range(self.inner, lowerb, upperb, m) }
+        unsafe { cv_in_range(self.inner, lowerb, upperb, m) }
         Mat::from_raw(m)
     }
 
@@ -504,7 +504,7 @@ impl Mat {
     pub fn mix_channels(&self, nsrcs: isize, ndsts: isize, from_to: *const i32, npairs: isize) -> Mat {
         let m = Mat::with_size(self.rows, self.cols, self.depth);
         unsafe {
-            opencv_mix_channels(self.inner, nsrcs, m.inner, ndsts, from_to, npairs);
+            cv_mix_channels(self.inner, nsrcs, m.inner, ndsts, from_to, npairs);
         }
         m
     }
@@ -512,7 +512,7 @@ impl Mat {
     /// Normalize the Mat according to the normalization type.
     pub fn normalize(&self, alpha: f64, beta: f64, t: NormTypes) -> Mat {
         let m = CMat::new();
-        unsafe { opencv_normalize(self.inner, m, alpha, beta, t as i32) }
+        unsafe { cv_normalize(self.inner, m, alpha, beta, t as i32) }
         Mat::from_raw(m)
     }
 }

@@ -102,8 +102,8 @@ pub enum ImwritePngFlags {
 }
 
 extern "C" {
-    fn opencv_imdecode(buf: *const uint8_t, l: size_t, m: c_int) -> *mut CMat;
-    fn opencv_imencode(ext: *const c_char,
+    fn cv_imdecode(buf: *const uint8_t, l: size_t, m: c_int) -> *mut CMat;
+    fn cv_imencode(ext: *const c_char,
                        inner: *const CMat,
                        flag_ptr: *const c_int,
                        flag_size: size_t)
@@ -121,7 +121,7 @@ struct ImencodeResult {
 impl Mat {
     /// Decodes an image from `buf` according to the specified mode.
     pub fn imdecode(buf: &[u8], mode: ImreadModes) -> Mat {
-        let inner = unsafe { opencv_imdecode(buf.as_ptr(), buf.len(), mode as i32) };
+        let inner = unsafe { cv_imdecode(buf.as_ptr(), buf.len(), mode as i32) };
         Mat::from_raw(inner)
     }
 
@@ -131,7 +131,7 @@ impl Mat {
     pub fn imencode(&self, ext: &str, f: Vec<ImwriteFlags>) -> Option<Vec<u8>> {
         let ext = CString::new(ext).expect("invalid extension string");
         let flags = f.into_iter().map(|f| f as i32).collect::<Vec<_>>();
-        let r = unsafe { opencv_imencode(ext.into_raw(), self.inner, flags.as_ptr(), flags.len()) };
+        let r = unsafe { cv_imencode(ext.into_raw(), self.inner, flags.as_ptr(), flags.len()) };
         if r.status {
             unsafe { Some(::std::slice::from_raw_parts(r.buf, r.size).to_vec()) }
         } else {

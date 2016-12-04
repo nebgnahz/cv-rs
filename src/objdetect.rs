@@ -27,10 +27,10 @@ pub struct CascadeClassifier {
 unsafe impl Send for CascadeClassifier {}
 
 extern "C" {
-    fn opencv_cascade_classifier_new() -> *mut CCascadeClassifier;
-    fn opencv_cascade_classifier_load(cc: *mut CCascadeClassifier, p: *const c_char) -> bool;
-    fn opencv_cascade_classifier_drop(p: *mut CCascadeClassifier);
-    fn opencv_cascade_classifier_detect(cc: *mut CCascadeClassifier,
+    fn cv_cascade_classifier_new() -> *mut CCascadeClassifier;
+    fn cv_cascade_classifier_load(cc: *mut CCascadeClassifier, p: *const c_char) -> bool;
+    fn cv_cascade_classifier_drop(p: *mut CCascadeClassifier);
+    fn cv_cascade_classifier_detect(cc: *mut CCascadeClassifier,
                                         cmat: *mut CMat,
                                         vec_of_rect: *mut CVecOfRect,
                                         scale_factor: c_double,
@@ -49,7 +49,7 @@ impl ObjectDetect for CascadeClassifier {
 impl CascadeClassifier {
     /// Creates a cascade classifier, uninitialized. Before use, call load.
     pub fn new() -> CascadeClassifier {
-        CascadeClassifier { inner: unsafe { opencv_cascade_classifier_new() } }
+        CascadeClassifier { inner: unsafe { cv_cascade_classifier_new() } }
     }
 
     /// Creates a cascade classifier using the model specified.
@@ -64,7 +64,7 @@ impl CascadeClassifier {
                 .to_str()
                 .expect("only UTF-8 path is allowed"))
             .expect("failed to create CString to load cascade");
-        unsafe { opencv_cascade_classifier_load(self.inner, (&s).as_ptr()) }
+        unsafe { cv_cascade_classifier_load(self.inner, (&s).as_ptr()) }
     }
 
     /// The default detection uses scale factor 1.1, minNeighbors 3, no min size
@@ -96,7 +96,7 @@ impl CascadeClassifier {
                               -> Vec<Rect> {
         let mut c_result = CVecOfRect::default();
         unsafe {
-            opencv_cascade_classifier_detect(self.inner,
+            cv_cascade_classifier_detect(self.inner,
                                              mat.inner,
                                              &mut c_result,
                                              scale_factor as c_double,
@@ -112,7 +112,7 @@ impl CascadeClassifier {
 impl Drop for CascadeClassifier {
     fn drop(&mut self) {
         unsafe {
-            opencv_cascade_classifier_drop(self.inner);
+            cv_cascade_classifier_drop(self.inner);
         }
     }
 }

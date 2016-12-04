@@ -6,9 +6,9 @@ use std::mem;
 use std::ptr;
 
 extern "C" {
-    fn opencv_named_window(name: *const c_char, flags: c_int);
-    fn opencv_destroy_window(name: *const c_char);
-    fn opencv_set_mouse_callback(name: *const c_char,
+    fn cv_named_window(name: *const c_char, flags: c_int);
+    fn cv_destroy_window(name: *const c_char);
+    fn cv_set_mouse_callback(name: *const c_char,
                                  on_mouse: extern "C" fn(e: i32, x: i32, y: i32, f: i32, data: *mut c_void),
                                  userdata: *mut c_void);
 }
@@ -20,7 +20,7 @@ extern "C" {
 pub fn highgui_named_window(name: &str, flags: WindowFlags) {
     let s = CString::new(name).unwrap();
     unsafe {
-        opencv_named_window((&s).as_ptr(), flags as i32);
+        cv_named_window((&s).as_ptr(), flags as i32);
     }
 }
 
@@ -28,7 +28,7 @@ pub fn highgui_named_window(name: &str, flags: WindowFlags) {
 pub fn highgui_destroy_window(name: &str) {
     let s = CString::new(name).unwrap();
     unsafe {
-        opencv_destroy_window((&s).as_ptr());
+        cv_destroy_window((&s).as_ptr());
     }
 }
 
@@ -62,7 +62,7 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
 
     let s = CString::new(name).unwrap();
     unsafe {
-        opencv_set_mouse_callback((&s).as_ptr(), _mouse_callback, box_wrapper_raw);
+        cv_set_mouse_callback((&s).as_ptr(), _mouse_callback, box_wrapper_raw);
     }
 }
 

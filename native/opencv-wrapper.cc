@@ -12,67 +12,67 @@ EXTERN_C_BEGIN
 // =============================================================================
 //   Core
 // =============================================================================
-CvMatrix* opencv_mat_new() {
+CvMatrix* cv_mat_new() {
     cv::Mat* image = new cv::Mat();
     return reinterpret_cast<CvMatrix*>(image);
 }
 
-CvMatrix* opencv_mat_new_with_size(int rows, int cols, int type) {
+CvMatrix* cv_mat_new_with_size(int rows, int cols, int type) {
     return reinterpret_cast<CvMatrix*>(new cv::Mat(rows, cols, type));
 }
 
-bool opencv_mat_is_valid(CvMatrix* cmat) {
+bool cv_mat_is_valid(CvMatrix* cmat) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     return mat->data != NULL;
 }
 
-CvMatrix* opencv_mat_roi(CvMatrix* cmat, Rect crect) {
+CvMatrix* cv_mat_roi(CvMatrix* cmat, Rect crect) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
     cv::Mat* dst = new cv::Mat(*mat, rect);
     return reinterpret_cast<CvMatrix*>(dst);
 }
 
-void opencv_mat_logic_and(CvMatrix* cimage, const CvMatrix* const cmask) {
+void cv_mat_logic_and(CvMatrix* cimage, const CvMatrix* const cmask) {
     cv::Mat* image = reinterpret_cast<cv::Mat*>(cimage);
     const cv::Mat* mask = reinterpret_cast<const cv::Mat*>(cmask);
     (*image) &= (*mask);
 }
 
-void opencv_mat_flip(CvMatrix* cimage, int code) {
+void cv_mat_flip(CvMatrix* cimage, int code) {
     cv::Mat* image = reinterpret_cast<cv::Mat*>(cimage);
     cv::flip(*image, *image, code);
 }
 
-CvMatrix* opencv_imread(const char* const filename, int flags) {
+CvMatrix* cv_imread(const char* const filename, int flags) {
     cv::Mat* image = new cv::Mat();
     *image = cv::imread(filename, flags);
     return reinterpret_cast<CvMatrix*>(image);
 }
 
-int opencv_mat_cols(const CvMatrix* const cmat) {
+int cv_mat_cols(const CvMatrix* const cmat) {
     return (reinterpret_cast<const cv::Mat* const>(cmat))->cols;
 }
 
-int opencv_mat_rows(const CvMatrix* const cmat) {
+int cv_mat_rows(const CvMatrix* const cmat) {
     return (reinterpret_cast<const cv::Mat* const>(cmat))->rows;
 }
 
-int opencv_mat_depth(const CvMatrix* const cmat) {
+int cv_mat_depth(const CvMatrix* const cmat) {
     return (reinterpret_cast<const cv::Mat* const>(cmat))->depth();
 }
 
-int opencv_mat_type(const CvMatrix* const cmat) {
+int cv_mat_type(const CvMatrix* const cmat) {
     return (reinterpret_cast<const cv::Mat* const>(cmat))->type();
 }
 
-void opencv_mat_drop(CvMatrix* cmat) {
+void cv_mat_drop(CvMatrix* cmat) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     delete mat;
     cmat = nullptr;
 }
 
-void opencv_vec_of_rect_drop(VecRect* v) {
+void cv_vec_of_rect_drop(VecRect* v) {
     if (v->array != nullptr) {
         free(v->array);
         v->array = nullptr;
@@ -83,7 +83,7 @@ void opencv_vec_of_rect_drop(VecRect* v) {
 // =============================================================================
 //  core array
 // =============================================================================
-void opencv_in_range(CvMatrix* cmat, Scalar lowerb, Scalar upperb,
+void cv_in_range(CvMatrix* cmat, Scalar lowerb, Scalar upperb,
                      CvMatrix* cdst) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     cv::Scalar lb(lowerb.v0, lowerb.v1, lowerb.v2);
@@ -92,14 +92,14 @@ void opencv_in_range(CvMatrix* cmat, Scalar lowerb, Scalar upperb,
     cv::inRange(*mat, lb, ub, *dst);
 }
 
-void opencv_mix_channels(CvMatrix* cmat, size_t nsrcs, CvMatrix* dst,
+void cv_mix_channels(CvMatrix* cmat, size_t nsrcs, CvMatrix* dst,
                          size_t ndsts, const int* from_to, size_t npairs) {
     cv::Mat* from = reinterpret_cast<cv::Mat*>(cmat);
     cv::Mat* to = reinterpret_cast<cv::Mat*>(dst);
     cv::mixChannels(from, nsrcs, to, ndsts, from_to, npairs);
 }
 
-void opencv_normalize(CvMatrix* csrc, CvMatrix* cdst, double alpha, double beta,
+void cv_normalize(CvMatrix* csrc, CvMatrix* cdst, double alpha, double beta,
                       int norm_type) {
     cv::Mat* src = reinterpret_cast<cv::Mat*>(csrc);
     cv::Mat* dst = reinterpret_cast<cv::Mat*>(cdst);
@@ -109,7 +109,7 @@ void opencv_normalize(CvMatrix* csrc, CvMatrix* cdst, double alpha, double beta,
 // =============================================================================
 //  Imgproc
 // =============================================================================
-void opencv_rectangle(CvMatrix* cmat, Rect crect, Scalar color, int thickness,
+void cv_rectangle(CvMatrix* cmat, Rect crect, Scalar color, int thickness,
                       int linetype) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
@@ -118,19 +118,19 @@ void opencv_rectangle(CvMatrix* cmat, Rect crect, Scalar color, int thickness,
                   linetype);
 }
 
-void opencv_cvt_color(CvMatrix* cmat, CvMatrix* output, int code) {
+void cv_cvt_color(CvMatrix* cmat, CvMatrix* output, int code) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     cv::Mat* out = reinterpret_cast<cv::Mat*>(output);
     cv::cvtColor(*mat, *out, code);
 }
 
-void opencv_pyr_down(CvMatrix* cmat, CvMatrix* output) {
+void cv_pyr_down(CvMatrix* cmat, CvMatrix* output) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     cv::Mat* out = reinterpret_cast<cv::Mat*>(output);
     cv::pyrDown(*mat, *out);
 }
 
-void opencv_resize(CvMatrix* from, CvMatrix* to, Size2i dsize, double fx,
+void cv_resize(CvMatrix* from, CvMatrix* to, Size2i dsize, double fx,
                    double fy, int interpolation) {
     cv::Mat* cv_from = reinterpret_cast<cv::Mat*>(from);
     cv::Mat* cv_to = reinterpret_cast<cv::Mat*>(to);
@@ -138,7 +138,7 @@ void opencv_resize(CvMatrix* from, CvMatrix* to, Size2i dsize, double fx,
     cv::resize(*cv_from, *cv_to, cv_dsize, fx, fy, interpolation);
 }
 
-void opencv_calc_hist(const CvMatrix* cimages, int nimages, const int* channels,
+void cv_calc_hist(const CvMatrix* cimages, int nimages, const int* channels,
                       CvMatrix* cmask, CvMatrix* chist, int dims,
                       const int* hist_size, const float** ranges) {
     const cv::Mat* images = reinterpret_cast<const cv::Mat*>(cimages);
@@ -148,7 +148,7 @@ void opencv_calc_hist(const CvMatrix* cimages, int nimages, const int* channels,
                  ranges);
 }
 
-void opencv_calc_back_project(const CvMatrix* cimages, int nimages,
+void cv_calc_back_project(const CvMatrix* cimages, int nimages,
                               const int* channels, CvMatrix* chist,
                               CvMatrix* cback_project, const float** ranges) {
     const cv::Mat* images = reinterpret_cast<const cv::Mat*>(cimages);
@@ -161,7 +161,7 @@ void opencv_calc_back_project(const CvMatrix* cimages, int nimages,
 // =============================================================================
 //  Imgcodecs
 // =============================================================================
-CvMatrix* opencv_imdecode(const uint8_t* const buffer, size_t len, int flag) {
+CvMatrix* cv_imdecode(const uint8_t* const buffer, size_t len, int flag) {
     cv::Mat* dst = new cv::Mat();
     std::vector<uchar> input(buffer, buffer + len);
     cv::imdecode(cv::Mat(input), flag, dst);
@@ -169,7 +169,7 @@ CvMatrix* opencv_imdecode(const uint8_t* const buffer, size_t len, int flag) {
 }
 
 // The caller is responsible for the allocated buffer
-ImencodeResult opencv_imencode(const char* const ext,
+ImencodeResult cv_imencode(const char* const ext,
                                const CvMatrix* const cmat,
                                const int* const flag_ptr, size_t flag_size) {
     const cv::Mat* image = reinterpret_cast<const cv::Mat*>(cmat);
@@ -191,26 +191,26 @@ ImencodeResult opencv_imencode(const char* const ext,
 // =============================================================================
 //   Highgui: high-level GUI
 // =============================================================================
-void opencv_named_window(const char* const winname, int flags) {
+void cv_named_window(const char* const winname, int flags) {
     cv::namedWindow(winname, flags);
 }
 
-void opencv_destroy_window(const char* const winname) {
+void cv_destroy_window(const char* const winname) {
     cv::destroyWindow(winname);
 }
 
-void opencv_imshow(const char* const winname, CvMatrix* cmat) {
+void cv_imshow(const char* const winname, CvMatrix* cmat) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     if (mat != NULL) {
         cv::imshow(winname, *mat);
     }
 }
 
-int opencv_wait_key(int delay) {
+int cv_wait_key(int delay) {
     return cv::waitKey(delay);
 }
 
-void opencv_set_mouse_callback(const char* const winname,
+void cv_set_mouse_callback(const char* const winname,
                                MouseCallback on_mouse, void* userdata) {
     cv::setMouseCallback(winname, on_mouse, userdata);
 }
@@ -315,31 +315,31 @@ double cv_videowriter_get(CVideoWriter* writer, int property) {
 // =============================================================================
 //   CascadeClassifier
 // =============================================================================
-CCascadeClassifier* opencv_cascade_classifier_new() {
+CCascadeClassifier* cv_cascade_classifier_new() {
     cv::CascadeClassifier* cc = new cv::CascadeClassifier();
     return reinterpret_cast<CCascadeClassifier*>(cc);
 }
 
-bool opencv_cascade_classifier_load(CCascadeClassifier* cc,
+bool cv_cascade_classifier_load(CCascadeClassifier* cc,
                                     const char* const p) {
     cv::CascadeClassifier* cascade =
         reinterpret_cast<cv::CascadeClassifier*>(cc);
     return cascade->load(p);
 }
 
-CCascadeClassifier* opencv_cascade_classifier_from_path(const char* const p) {
+CCascadeClassifier* cv_cascade_classifier_from_path(const char* const p) {
     cv::CascadeClassifier* cc = new cv::CascadeClassifier(p);
     return reinterpret_cast<CCascadeClassifier*>(cc);
 }
 
-void opencv_cascade_classifier_drop(CCascadeClassifier* cc) {
+void cv_cascade_classifier_drop(CCascadeClassifier* cc) {
     cv::CascadeClassifier* cascade =
         reinterpret_cast<cv::CascadeClassifier*>(cc);
     delete cascade;
     cc = nullptr;
 }
 
-void opencv_cascade_classifier_detect(CCascadeClassifier* cc, CvMatrix* cmat,
+void cv_cascade_classifier_detect(CCascadeClassifier* cc, CvMatrix* cmat,
                                       VecRect* vec_of_rect, double scale_factor,
                                       int min_neighbors, int flags,
                                       Size2i min_size, Size2i max_size) {
@@ -424,19 +424,19 @@ void cv_hog_detect(HogDescriptor* hog, CvMatrix* cmat, VecRect* vec_rect,
 // =============================================================================
 //  Object Tracking
 // =============================================================================
-CTermCriteria* opencv_term_criteria_new(int type, int count, double epsilon) {
+CTermCriteria* cv_term_criteria_new(int type, int count, double epsilon) {
     cv::TermCriteria* criteria = new cv::TermCriteria(type, count, epsilon);
     return reinterpret_cast<CTermCriteria*>(criteria);
 }
 
-void opencv_term_criteria_drop(CTermCriteria* c_criteria) {
+void cv_term_criteria_drop(CTermCriteria* c_criteria) {
     cv::TermCriteria* criteria =
         reinterpret_cast<cv::TermCriteria*>(c_criteria);
     delete criteria;
     c_criteria = nullptr;
 }
 
-RotatedRect opencv_camshift(CvMatrix* c_bp_image, Rect crect,
+RotatedRect cv_camshift(CvMatrix* c_bp_image, Rect crect,
                              CTermCriteria* c_criteria) {
     cv::Mat* bp_image = reinterpret_cast<cv::Mat*>(c_bp_image);
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);

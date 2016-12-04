@@ -8,16 +8,16 @@ use super::core::*;
 //  Imgproc
 // =============================================================================
 extern "C" {
-    fn opencv_rectangle(cmat: *mut CMat, rect: Rect, color: Scalar, thickness: c_int, linetype: c_int);
-    fn opencv_cvt_color(cmat: *const CMat, output: *mut CMat, code: i32);
-    fn opencv_pyr_down(cmat: *const CMat, output: *mut CMat);
-    fn opencv_resize(from: *const CMat,
+    fn cv_rectangle(cmat: *mut CMat, rect: Rect, color: Scalar, thickness: c_int, linetype: c_int);
+    fn cv_cvt_color(cmat: *const CMat, output: *mut CMat, code: i32);
+    fn cv_pyr_down(cmat: *const CMat, output: *mut CMat);
+    fn cv_resize(from: *const CMat,
                      to: *mut CMat,
                      dsize: Size2i,
                      fx: c_double,
                      fy: c_double,
                      interpolation: c_int);
-    fn opencv_calc_hist(cimages: *const CMat,
+    fn cv_calc_hist(cimages: *const CMat,
                         nimages: i32,
                         channels: *const c_int,
                         cmask: *const CMat,
@@ -25,7 +25,7 @@ extern "C" {
                         dims: c_int,
                         hist_size: *const c_int,
                         ranges: *const *const c_float);
-    fn opencv_calc_back_project(cimages: *const CMat,
+    fn cv_calc_back_project(cimages: *const CMat,
                                 nimages: c_int,
                                 channels: *const c_int,
                                 chist: *const CMat,
@@ -212,7 +212,7 @@ impl Mat {
 
     /// Draws a simple, thick, or filled up-right rectangle.
     pub fn rectangle_custom(&self, rect: Rect, color: Scalar, thickness: i32, linetype: LineTypes) {
-        unsafe { opencv_rectangle(self.inner, rect, color, thickness, linetype as i32) }
+        unsafe { cv_rectangle(self.inner, rect, color, thickness, linetype as i32) }
     }
 
     /// Draw a simple, thick, or filled up-right rectangle.
@@ -224,7 +224,7 @@ impl Mat {
     /// Convert an image from one color space to another.
     pub fn cvt_color(&self, code: ColorConversionCodes) -> Mat {
         let m = CMat::new();
-        unsafe { opencv_cvt_color(self.inner, m, code as i32) }
+        unsafe { cv_cvt_color(self.inner, m, code as i32) }
         Mat::from_raw(m)
     }
 
@@ -232,7 +232,7 @@ impl Mat {
     /// downsampling step of the Gaussian pyramid construction.
     pub fn pyr_down(&self) -> Mat {
         let m = CMat::new();
-        unsafe { opencv_pyr_down(self.inner, m) }
+        unsafe { cv_pyr_down(self.inner, m) }
         Mat::from_raw(m)
     }
 
@@ -242,7 +242,7 @@ impl Mat {
     /// size.
     pub fn resize_to(&self, dsize: Size2i, interpolation: InterpolationFlag) -> Mat {
         let m = CMat::new();
-        unsafe { opencv_resize(self.inner, m, dsize, 0.0, 0.0, interpolation as c_int) }
+        unsafe { cv_resize(self.inner, m, dsize, 0.0, 0.0, interpolation as c_int) }
         Mat::from_raw(m)
     }
 
@@ -253,7 +253,7 @@ impl Mat {
     pub fn resize_by(&self, fx: f64, fy: f64, interpolation: InterpolationFlag) -> Mat {
         let m = CMat::new();
         unsafe {
-            opencv_resize(self.inner,
+            cv_resize(self.inner,
                           m,
                           Size2i::default(),
                           fx,
@@ -273,7 +273,7 @@ impl Mat {
                      -> Mat {
         let m = CMat::new();
         unsafe {
-            opencv_calc_hist(self.inner,
+            cv_calc_hist(self.inner,
                              1,
                              channels,
                              mask.inner,
@@ -290,7 +290,7 @@ impl Mat {
     pub fn calc_back_project(&self, channels: *const i32, hist: &Mat, ranges: *const *const f32) -> Mat {
         let m = CMat::new();
         unsafe {
-            opencv_calc_back_project(self.inner, 1, channels, (*hist).inner, m, ranges);
+            cv_calc_back_project(self.inner, 1, channels, (*hist).inner, m, ranges);
         }
         Mat::from_raw(m)
     }

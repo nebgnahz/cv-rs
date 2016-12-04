@@ -22,9 +22,9 @@ pub mod tracking {
     }
 
     extern "C" {
-        fn opencv_term_criteria_new(t: i32, count: i32, epsilon: f64) -> *mut CTermCriteria;
-        fn opencv_term_criteria_drop(criteria: *mut CTermCriteria);
-        fn opencv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
+        fn cv_term_criteria_new(t: i32, count: i32, epsilon: f64) -> *mut CTermCriteria;
+        fn cv_term_criteria_drop(criteria: *mut CTermCriteria);
+        fn cv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
     }
 
     /// Termination criteria for iterative algorithms.
@@ -36,7 +36,7 @@ pub mod tracking {
     impl TermCriteria {
         /// Creates a new termination criteria.
         pub fn new(t: TermType, max_count: i32, epsilon: f64) -> Self {
-            let c_criteria = unsafe { opencv_term_criteria_new(t as i32, max_count, epsilon) };
+            let c_criteria = unsafe { cv_term_criteria_new(t as i32, max_count, epsilon) };
             TermCriteria { c_criteria: c_criteria }
         }
     }
@@ -44,7 +44,7 @@ pub mod tracking {
     impl Drop for TermCriteria {
         fn drop(&mut self) {
             unsafe {
-                opencv_term_criteria_drop(self.c_criteria);
+                cv_term_criteria_drop(self.c_criteria);
             }
         }
     }
@@ -55,12 +55,12 @@ pub mod tracking {
         /// * `wndw` - initial search window.
         /// * `criteria` - stop criteria for the underlying meanShift.
         pub fn camshift(&self, wndw: Rect, criteria: &TermCriteria) -> RotatedRect {
-            unsafe { opencv_camshift(self.inner, wndw, criteria.c_criteria) }
+            unsafe { cv_camshift(self.inner, wndw, criteria.c_criteria) }
         }
     }
 }
 
 pub mod analysis {
     //! Motion Analysis, see [OpenCV video
-    //! motion](http://docs.opencv.org/3.1.0/de/de1/group__video__motion.html)
+    //! motion](http://docs.cv.org/3.1.0/de/de1/group__video__motion.html)
 }
