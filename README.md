@@ -24,15 +24,31 @@ bindings using a Python script (more automated).
 
 ## Install
 
+First, add this to your `Cargo.toml`:
+
 ```
-TODO(benzh): fill here
+[dependencies]
+cv = "0.1.0"
 ```
+
+Next, add this to your crate:
+
+```
+extern crate cv;
+use cv::*;
+```
+
+And then, enjoy the power of OpenCV.
 
 ## Usage
 
-```
-TODO(benzh): fill here
-```
+See available examples on how this library might be used.
+
+- [Display Image](examples/display_image.rs)
+- [Video Capture](examples/video_capture.rs), optional GPU code
+- [Face Detection](examples/face_detect.rs)
+- [Camshift](examples/camshift.rs)
+- [HOG Detection](examples/hog.rs), optional GPU code
 
 ## API
 
