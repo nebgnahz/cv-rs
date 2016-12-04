@@ -4,13 +4,6 @@
 
 > This library primarily provides bindings and APIs for OpenCV 3.1.0.
 
-This is a work-in-progress and modules/functions are implemented as
-needed. Attempts to use [rust-bindgen](https://github.com/servo/rust-bindgen) or
-[cpp_to_rust](https://github.com/rust-qt/cpp_to_rust) haven't been very
-successful (I probably haven't tried hard enough). There is another port
-[opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
-bindings using a Python script (more automated).
-
 ## Table of Contents
 
 - [Background](#background)
@@ -24,14 +17,20 @@ bindings using a Python script (more automated).
 
 OpenCV (Open Source Computer Vision Library: http://opencv.org) is an
 open-source BSD-licensed library that includes several hundreds of computer
-vision algorithms. The document describes the so-called OpenCV 2.x API, which is
-essentially a C++ API, as opposite to the C-based OpenCV 1.x API. The latter is
-described in opencv1x.pdf.
+vision algorithms. It's mainly developed in C++. This library provides Rust
+bindings to access OpenCV functionalities. First, C bindings are created (in
+[native](native) folder); then [Rust APIs](src/lib.rs) are constructed
+atop. Although this manual process seems an inefficient process, it has served
+me well as a learning experience to both OpenCV and Rust. In terms of OpenCV API
+coverage, modules and functions are implemented as needed. Please check out the
+[documentation](http://rust-vision.s3-website-us-west-2.amazonaws.com/rust_vision/index.html)
+to see what is supported.
 
-This library provides bindings to access OpenCV functionalities using Rust
-FFI. First, C bindings are created (in [native](native) folder); then Rust APIs
-are constructed atop. Although this is an inefficient method, it has served me
-well as a learning experience to both OpenCV and Rust.
+Attempts to use [rust-bindgen](https://github.com/servo/rust-bindgen) or
+[cpp_to_rust](https://github.com/rust-qt/cpp_to_rust) haven't been very
+successful (I probably haven't tried hard enough). There is another port
+[opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
+bindings using a Python script (more automated).
 
 ## Install
 
@@ -66,7 +65,7 @@ See available examples on how this library might be used.
 
 ## API
 
-See [Documentation](http://rust-vision.s3-website-us-west-2.amazonaws.com).
+See [documentation](http://rust-vision.s3-website-us-west-2.amazonaws.com).
 
 ## Contribute
 
