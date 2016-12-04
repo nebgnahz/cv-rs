@@ -33,7 +33,8 @@ extern "C" {
 }
 
 /// Color conversion code used in [cvt_color](struct.Mat.html#method.cvt_color).
-#[allow(non_camel_case_types)]
+#[allow(non_camel_case_types, missing_docs)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ColorConversionCodes {
     BGR2BGRA = 0,
     BGRA2BGR = 1,
@@ -171,6 +172,8 @@ pub enum ColorConversionCodes {
     COLORCVT_MAX = 139,
 }
 
+/// Interpolation algorithm
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum InterpolationFlag {
     /// nearest neighbor interpolation
     InterNearst = 0,
@@ -200,6 +203,8 @@ pub enum InterpolationFlag {
     WarpInverseMap = 16,
 }
 
+/// Line type
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum LineTypes {
     /// Default type
     Filled = -1,
@@ -222,13 +227,7 @@ impl Mat {
 
     /// Draws a simple, thick, or filled up-right rectangle.
     pub fn rectangle_custom(&self, rect: Rect, color: Scalar, thickness: i32, linetype: LineTypes) {
-        unsafe {
-            opencv_rectangle(self.inner,
-                             rect,
-                             color,
-                             thickness as c_int,
-                             linetype as c_int);
-        }
+        unsafe { opencv_rectangle(self.inner, rect, color, thickness, linetype as i32) }
     }
 
     /// Draw a simple, thick, or filled up-right rectangle.
@@ -272,8 +271,8 @@ impl Mat {
             opencv_resize(self.inner,
                           m,
                           Size2i::default(),
-                          fx as c_double,
-                          fy as c_double,
+                          fx,
+                          fy,
                           interpolation as c_int)
         }
         Mat::from_raw(m)

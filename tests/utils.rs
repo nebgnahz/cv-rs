@@ -62,5 +62,5 @@ fn load_image_as_buf<P: AsRef<Path>>(img: P) -> Vec<u8> {
 pub fn load_frontal_face() -> CascadeClassifier {
     let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     d.push("assets/haarcascade_frontalface_default.xml");
-    CascadeClassifier::from_path(d)
+    CascadeClassifier::from_path(d).unwrap()
 }

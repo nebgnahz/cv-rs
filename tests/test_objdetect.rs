@@ -3,7 +3,7 @@ extern crate test;
 extern crate rust_vision;
 
 use rust_vision::*;
-use rust_vision::objdetect::{ObjectDetect};
+use rust_vision::objdetect::ObjectDetect;
 
 mod utils;
 use utils::*;

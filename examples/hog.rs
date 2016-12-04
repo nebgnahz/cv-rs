@@ -2,9 +2,9 @@ extern crate getopts;
 extern crate rust_vision;
 
 use rust_vision::*;
-use rust_vision::objdetect::HogDescriptor as Hog;
 // use rust_vision::cuda::GpuHog as Hog;
 use rust_vision::objdetect::*;
+use rust_vision::objdetect::HogDescriptor as Hog;
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Result};

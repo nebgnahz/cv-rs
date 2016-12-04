@@ -1,10 +1,16 @@
+//! Various object detection algorithms, such as Haar feature-based cascade
+//! classifier for object detection and histogram of oriented gradients (HOG).
+
 use libc::{c_double, c_char, c_int};
 use std::ffi::CString;
 use std::path::Path;
 use std::vec::Vec;
 use super::core::*;
 
+/// An object detect trait.
 pub trait ObjectDetect {
+    /// Detects the object inside this image and returns a list of detections
+    /// with their confidence.
     fn detect(&self, image: &Mat) -> Vec<(Rect, f64)>;
 }
 
@@ -12,6 +18,7 @@ pub trait ObjectDetect {
 enum CCascadeClassifier {}
 
 /// Cascade classifier class for object detection.
+#[derive(Debug)]
 pub struct CascadeClassifier {
     inner: *mut CCascadeClassifier,
 }
@@ -40,11 +47,18 @@ impl ObjectDetect for CascadeClassifier {
 }
 
 impl CascadeClassifier {
-    /// Create a cascade classifier, uninitialized. Before use, call load.
+    /// Creates a cascade classifier, uninitialized. Before use, call load.
     pub fn new() -> CascadeClassifier {
         CascadeClassifier { inner: unsafe { opencv_cascade_classifier_new() } }
     }
 
+    /// Creates a cascade classifier using the model specified.
+    pub fn from_path<P: AsRef<Path>>(path: P) -> Option<Self> {
+        let cc = CascadeClassifier::new();
+        if cc.load(path) { Some(cc) } else { None }
+    }
+
+    /// Loads the classifier model from a path.
     pub fn load<P: AsRef<Path>>(&self, path: P) -> bool {
         let s = CString::new(path.as_ref()
                 .to_str()
@@ -53,17 +67,26 @@ impl CascadeClassifier {
         unsafe { opencv_cascade_classifier_load(self.inner, (&s).as_ptr()) }
     }
 
-    pub fn from_path<P: AsRef<Path>>(path: P) -> Self {
-        let cc = CascadeClassifier::new();
-        cc.load(path);
-        cc
-    }
-
-    /// Default using scale factor 1.1, minNeighbors 3, no min size or max size
+    /// The default detection uses scale factor 1.1, minNeighbors 3, no min size
+    /// or max size.
     pub fn detect_multiscale(&self, mat: &Mat) -> Vec<Rect> {
         self.detect_with_params(mat, 1.1, 3, Size2i::default(), Size2i::default())
     }
 
+    /// Detects the object using parameters specified.
+    ///
+    /// * `mat` - Matrix of the type CV_8U containing an image where objects are
+    ///   detected.
+    /// * `scale_factor` - Parameter specifying how much the image size is
+    ///   reduced at each image scale.
+    /// * `min_neighbors` - Parameter specifying how many neighbors each
+    ///   candidate rectangle should have to retain it.
+    /// * `min_size` - Minimum possible object size. Objects smaller than that
+    ///   are ignored.
+    /// * `max_size` - Maximum possible object size. Objects larger than that
+    ///   are ignored
+    ///
+    /// OpenCV has a parameter (`flags`) that's not used at all.
     pub fn detect_with_params(&self,
                               mat: &Mat,
                               scale_factor: f32,
@@ -77,7 +100,7 @@ impl CascadeClassifier {
                                              mat.inner,
                                              &mut c_result,
                                              scale_factor as c_double,
-                                             min_neighbors as c_int,
+                                             min_neighbors,
                                              0,
                                              min_size,
                                              max_size)
@@ -94,9 +117,13 @@ impl Drop for CascadeClassifier {
     }
 }
 
-pub enum CSvmDetector {}
+#[derive(Clone, Copy)]
+enum CSvmDetector {}
+
+///
+#[derive(Debug)]
 pub struct SvmDetector {
-    pub inner: *mut CSvmDetector,
+    inner: *mut CSvmDetector,
 }
 
 extern "C" {
@@ -114,6 +141,7 @@ impl SvmDetector {
         SvmDetector { inner: unsafe { cv_hog_default_people_detector() } }
     }
 
+    /// Returns the Daimler people detector.
     pub fn daimler_people_detector() -> SvmDetector {
         SvmDetector { inner: unsafe { cv_hog_daimler_people_detector() } }
     }
@@ -128,7 +156,7 @@ impl Drop for SvmDetector {
 }
 
 /// Parameters that controls the behavior of HOG
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct HogParams {
     /// Detection window size. Align to block size and block stride
     pub win_size: Size2i,
@@ -219,8 +247,11 @@ impl Default for HogParams {
 enum CHogDescriptor {}
 
 /// `HogDescriptor` implements Histogram of Oriented Gradients.
+#[derive(Debug)]
 pub struct HogDescriptor {
     inner: *mut CHogDescriptor,
+
+    /// Hog parameters.
     pub params: HogParams,
 }
 
@@ -261,7 +292,7 @@ impl ObjectDetect for HogDescriptor {
                           &mut weights,
                           self.params.win_stride,
                           self.params.padding,
-                          self.params.scale as c_double,
+                          self.params.scale,
                           2.0, // finalThreshold
                           false /* useMeanshiftGrouping */);
         }
@@ -273,6 +304,7 @@ impl ObjectDetect for HogDescriptor {
 }
 
 impl HogDescriptor {
+    /// Creates a HogDescriptor with provided parameters.
     pub fn with_params(params: HogParams) -> HogDescriptor {
         HogDescriptor {
             inner: unsafe { cv_hog_new() },
@@ -280,6 +312,7 @@ impl HogDescriptor {
         }
     }
 
+    /// Sets the SVM detector.
     pub fn set_svm_detector(&mut self, detector: SvmDetector) {
         unsafe { cv_hog_set_svm_detector(self.inner, detector.inner) }
     }

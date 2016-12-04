@@ -70,6 +70,7 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
 /// Flags for [highgui_named_window](fn.highgui_named_window.html). This only
 /// supports a subset of all cv::WindowFlags because C/C++ allows enum with the
 /// same value but Rust is stricter.
+#[derive(Clone, Copy, Debug)]
 pub enum WindowFlags {
     /// the window can be resized (no constraint) or switched to fullscreen.
     WindowNormal = 0x00000000,
@@ -82,6 +83,7 @@ pub enum WindowFlags {
 }
 
 /// Mouse Events
+#[derive(Clone, Copy, Debug)]
 pub enum MouseEventTypes {
     /// Indicates that the mouse has moved over the window.
     MouseMove = 0,

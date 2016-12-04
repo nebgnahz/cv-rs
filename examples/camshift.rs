@@ -1,5 +1,6 @@
 extern crate rust_vision;
 use rust_vision::*;
+use rust_vision::videoio::*;
 
 struct SelectionStatus {
     selection: Rect,
@@ -43,7 +44,6 @@ fn main() {
     highgui_named_window("Window", WindowFlags::WindowAutosize);
     highgui_set_mouse_callback("Window", on_mouse, ss_ptr as MouseCallbackData);
 
-    let mut m = Mat::new();
     let mut is_tracking = false;
 
     let mut hist = Mat::new();
@@ -52,17 +52,14 @@ fn main() {
     let phranges: [*const f32; 1] = [&hranges[0] as *const f32];
     let mut track_window = Rect::default();
 
-    loop {
-        cap.read(&m);
+    while let Some(mut m) = cap.read() {
         m.flip(FlipCode::YAxis);
 
         let hsv = m.cvt_color(ColorConversionCodes::BGR2HSV);
 
         let ch = [0, 0];
         let hue = hsv.mix_channels(1, 1, &ch[0] as *const i32, 1);
-        let mask =
-            hsv.in_range(Scalar::new(0, 30, 10, 0),
-                         Scalar::new(180, 256, 256, 0));
+        let mask = hsv.in_range(Scalar::new(0, 30, 10, 0), Scalar::new(180, 256, 256, 0));
 
         if selection_status.status {
             println!("Initialize tracking, setting up CAMShift search");
@@ -75,8 +72,7 @@ fn main() {
                                          1,
                                          &hsize,
                                          &phranges[0] as *const *const f32);
-            hist =
-                raw_hist.normalize(0 as f64, 255 as f64, NormTypes::NormMinMax);
+            hist = raw_hist.normalize(0.0, 255.0, NormTypes::NormMinMax);
 
             track_window = selection;
             m.rectangle(selection);
@@ -85,11 +81,9 @@ fn main() {
         }
 
         if is_tracking {
-            let mut back_project = hue.calc_back_project(std::ptr::null(),
-                                   &hist,
-                                   &phranges[0] as *const *const f32);
+            let mut back_project = hue.calc_back_project(std::ptr::null(), &hist, &phranges[0] as *const *const f32);
             back_project.logic_and(mask);
-            let criteria = TermCriteria::new(TermType::Count, 10, 1 as f64);
+            let criteria = TermCriteria::new(TermType::Count, 10, 1.0);
             let track_box = back_project.camshift(track_window, &criteria);
 
             m.rectangle(track_box.bounding_rect());

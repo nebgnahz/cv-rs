@@ -3,10 +3,13 @@ use rust_vision::*;
 use rust_vision::videoio::*;
 
 fn main() {
-    let cap = VideoCapture::new(0);
-    println!("{}", cap.set(CapProp::FrameCount, 20.0));
-    println!("{}", cap.set(CapProp::FrameWidth, 640.0));
-    println!("{}", cap.set(CapProp::FrameHeight, 480.0));
+    let cap = VideoCapture::from_path("/Users/benzh/Downloads/video.mp4");
+    println!("{}", cap.get(CapProp::FrameCount).unwrap());
+    println!("{}", cap.get(CapProp::Fps).unwrap());
+    // println!("{}", cap.set(CapProp::FrameWidth, 640.0));
+    // println!("{}", cap.set(CapProp::FrameHeight, 480.0));
+    println!("{}",
+             codec_name(cap.get(CapProp::Fourcc).unwrap() as i32).unwrap());
     assert!(cap.is_open());
     let num = 50;
     let start = ::std::time::Instant::now();
@@ -32,17 +35,16 @@ fn main() {
              size.height,
              is_color);
 
-    let codec = fourcc('M', 'P', '4', 'V');
-    let writer = VideoWriter::new("test.avi", codec, fps, size, is_color);
+    let codec = fourcc('M', 'J', 'P', 'G');
+    let writer = VideoWriter::new("test2.avi", codec, 24.0, size, is_color);
 
     highgui_named_window("Window", WindowFlags::WindowAutosize);
 
-    loop {
-        let image = cap.read().unwrap();
+    while let Some(image) = cap.read() {
         writer.write(&image);
         if let Some(bw) = writer.get(VideoWriterProperty::FrameBytes) {
             println!("frame bytes: {}", bw);
         }
-        image.show("Window", 5);
+        // image.show("Window", 5);
     }
 }

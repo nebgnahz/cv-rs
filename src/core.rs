@@ -1,10 +1,12 @@
 //! Core data structures in OpenCV
+
 use libc::{c_int, c_double};
 use num;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-// Opaque data struct for C bindings
+/// Opaque data struct for C bindings
+#[derive(Clone, Copy, Debug)]
 pub enum CMat {}
 impl CMat {
     pub fn new() -> *mut CMat {
@@ -17,9 +19,16 @@ impl CMat {
 /// since images are often stored as `Mat`.
 #[derive(Debug)]
 pub struct Mat {
+    /// Pointer to the actual C/C++ data structure
     pub inner: *mut CMat,
+
+    /// Number of columns
     pub cols: i32,
+
+    /// Number of rows
     pub rows: i32,
+
+    /// Depth of this mat
     pub depth: i32,
 }
 
@@ -27,13 +36,14 @@ pub struct Mat {
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Scalar {
-    pub v0: i32,
-    pub v1: i32,
-    pub v2: i32,
-    pub v3: i32,
+    v0: i32,
+    v1: i32,
+    v2: i32,
+    v3: i32,
 }
 
 impl Scalar {
+    /// Creates a new scalar object.
     pub fn new(v0: i32, v1: i32, v2: i32, v3: i32) -> Self {
         Scalar {
             v0: v0,
@@ -48,7 +58,10 @@ impl Scalar {
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Point2i {
+    /// x coordinate
     pub x: i32,
+
+    /// y coordinate
     pub y: i32,
 }
 
@@ -56,7 +69,10 @@ pub struct Point2i {
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Point2f {
+    /// x coordinate
     pub x: f32,
+
+    /// y coordinate
     pub y: f32,
 }
 
@@ -65,11 +81,15 @@ pub struct Point2f {
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Size2i {
+    /// width
     pub width: i32,
+
+    /// height
     pub height: i32,
 }
 
 impl Size2i {
+    /// Creates a new `Size2i` object with `width` and `height`
     pub fn new(width: i32, height: i32) -> Self {
         Size2i {
             width: width,
@@ -83,7 +103,10 @@ impl Size2i {
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Size2f {
+    /// width
     pub width: f32,
+
+    /// height
     pub height: f32,
 }
 
@@ -91,9 +114,13 @@ pub struct Size2f {
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(C)]
 pub struct Rect {
+    /// x coordinate of the left-top corner
     pub x: i32,
+    /// y coordinate of the left-top corner
     pub y: i32,
+    /// width of this rectangle
     pub width: i32,
+    /// height of this rectangle
     pub height: i32,
 }
 
@@ -185,7 +212,7 @@ impl Drop for CVecOfRect {
 impl CVecOfRect {
     pub fn rustify(self) -> Vec<Rect> {
         (0..self.size)
-            .map(|i| unsafe { *(self.array.offset(i as isize)) as Rect })
+            .map(|i| unsafe { *(self.array.offset(i as isize)) })
             .collect::<Vec<_>>()
     }
 }
@@ -200,7 +227,7 @@ pub struct CVecDouble {
 impl CVecDouble {
     pub fn rustify(self) -> Vec<f64> {
         (1..self.size)
-            .map(|i| unsafe { *(self.array.offset(i as isize)) as f64 })
+            .map(|i| unsafe { *(self.array.offset(i as isize)) })
             .collect::<Vec<_>>()
     }
 }
@@ -229,14 +256,22 @@ extern "C" {
     fn opencv_mat_drop(mat: *mut CMat);
 }
 
+/// A flag to specify how to flip the image. see
+/// [Mat::flip](struct.Mat.html#method.flip)
+#[derive(Debug, Clone, Copy)]
 pub enum FlipCode {
+    /// Along x-axis: dst[i, j] = src[src.rows - i - 1, j]
     XAxis,
+    /// Along y-axis: dst[i, j] = src[i, src.cols - j - 1]
     YAxis,
+    /// Along both axis: dst[i, j] = src[src.rows - i - 1, src.cols - j - 1]
     XYAxis,
 }
 
 impl Mat {
     #[inline]
+    /// Creates a `Mat` object from raw `CMat` pointer. This will read the rows
+    /// and cols of the image.
     pub fn from_raw(raw: *mut CMat) -> Mat {
         Mat {
             inner: raw,
@@ -302,7 +337,7 @@ impl Mat {
         }
     }
 
-    /// Call out to highgui to show the image, the duration is specified by
+    /// Calls out to highgui to show the image, the duration is specified by
     /// `delay`.
     pub fn show(&self, name: &str, delay: i32) {
         extern "C" {
@@ -317,6 +352,8 @@ impl Mat {
         }
     }
 
+    /// Returns the images type. For supported types, please see
+    /// [CvType](enum.CvType).
     pub fn cv_type(&self) -> CvType {
         num::FromPrimitive::from_i32(unsafe { opencv_mat_type(self.inner) }).unwrap()
     }
@@ -330,22 +367,27 @@ impl Drop for Mat {
     }
 }
 
-// Here is the `CvType`.
-//
-// +--------+----+----+----+----+------+------+------+------+
-// |        | C1 | C2 | C3 | C4 | C(5) | C(6) | C(7) | C(8) |
-// +--------+----+----+----+----+------+------+------+------+
-// | CV_8U  |  0 |  8 | 16 | 24 |   32 |   40 |   48 |   56 |
-// | CV_8S  |  1 |  9 | 17 | 25 |   33 |   41 |   49 |   57 |
-// | CV_16U |  2 | 10 | 18 | 26 |   34 |   42 |   50 |   58 |
-// | CV_16S |  3 | 11 | 19 | 27 |   35 |   43 |   51 |   59 |
-// | CV_32S |  4 | 12 | 20 | 28 |   36 |   44 |   52 |   60 |
-// | CV_32F |  5 | 13 | 21 | 29 |   37 |   45 |   53 |   61 |
-// | CV_64F |  6 | 14 | 22 | 30 |   38 |   46 |   54 |   62 |
-// +--------+----+----+----+----+------+------+------+------+
-#[derive(Debug, PartialEq, FromPrimitive)]
+/// Here is the `CvType`.
+///
+/// +--------+----+----+----+----+------+------+------+------+
+/// |        | C1 | C2 | C3 | C4 | C(5) | C(6) | C(7) | C(8) |
+/// +--------+----+----+----+----+------+------+------+------+
+/// | CV_8U  |  0 |  8 | 16 | 24 |   32 |   40 |   48 |   56 |
+/// | CV_8S  |  1 |  9 | 17 | 25 |   33 |   41 |   49 |   57 |
+/// | CV_16U |  2 | 10 | 18 | 26 |   34 |   42 |   50 |   58 |
+/// | CV_16S |  3 | 11 | 19 | 27 |   35 |   43 |   51 |   59 |
+/// | CV_32S |  4 | 12 | 20 | 28 |   36 |   44 |   52 |   60 |
+/// | CV_32F |  5 | 13 | 21 | 29 |   37 |   45 |   53 |   61 |
+/// | CV_64F |  6 | 14 | 22 | 30 |   38 |   46 |   54 |   62 |
+/// +--------+----+----+----+----+------+------+------+------+
+#[derive(Debug, PartialEq, Clone, Copy, FromPrimitive)]
 pub enum CvType {
+    /// 8 bit, single channel (grey image)
     Cv8UC1 = 0,
+
+    /// 8 bit, two channel (rarelly seen)
     Cv8UC2 = 8,
+
+    /// 8 bit, three channels (RGB image)
     Cv8UC3 = 16,
 }

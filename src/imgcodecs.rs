@@ -6,6 +6,7 @@ use super::libc::{c_char, c_int, size_t, uint8_t};
 //  Imgproc
 // =============================================================================
 /// ImreadModes
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ImreadModes {
     /// If set, return the loaded image as is (with alpha channel, otherwise it
     /// gets cropped
@@ -42,6 +43,7 @@ pub enum ImreadModes {
 }
 
 /// Imwrite flags
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ImwriteFlags {
     /// For JPEG, it can be a quality from 0 to 100 (the higher is the
     /// better). Default value is 95.
@@ -78,6 +80,7 @@ pub enum ImwriteFlags {
 }
 
 /// Imwrite PNG flag
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ImwritePngFlags {
     /// Use this value for normal data.
     ImwritePngStrategyDefault = 0,
@@ -113,11 +116,15 @@ struct ImencodeResult {
 }
 
 impl Mat {
+    /// Decodes an image from `buf` according to the specified mode.
     pub fn imdecode(buf: &[u8], mode: ImreadModes) -> Mat {
         let inner = unsafe { opencv_imdecode(buf.as_ptr(), buf.len(), mode as i32) };
         Mat::from_raw(inner)
     }
 
+    /// Encodes an image; the encoding scheme depends on the extension provided;
+    /// additional write flags can be passed in using a vector. If successful,
+    /// returns an owned vector of the encoded image.
     pub fn imencode(&self, ext: &str, f: Vec<ImwriteFlags>) -> Option<Vec<u8>> {
         let ext = CString::new(ext).expect("invalid extension string");
         let flags = f.into_iter().map(|f| f as i32).collect::<Vec<_>>();

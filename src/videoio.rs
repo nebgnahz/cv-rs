@@ -9,6 +9,7 @@ use libc::{c_int, c_char, c_double};
 enum CvVideoCapture {}
 
 /// Video capturing from video files, image sequences or cameras.
+#[derive(Debug)]
 pub struct VideoCapture {
     inner: *mut CvVideoCapture,
 }
@@ -23,26 +24,68 @@ extern "C" {
     fn cv_videocapture_get(cap: *mut CvVideoCapture, property: c_int) -> c_double;
 }
 
+#[allow(missing_docs)]
+/// Video capture's property identifier.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum CapProp {
+    /// Current position of the video file in milliseconds or video capture
+    /// timestamp.
     PosMsec = 0,
+
+    /// 0-based index of the frame to be decoded/captured next.
     PosFrames = 1,
+
+    /// Relative position of the video file: 0 - start of the film, 1 - end of
+    /// the film.
     PosAviRatio = 2,
+
+    /// Width of the frames in the video stream.
     FrameWidth = 3,
+
+    /// Height of the frames in the video stream.
     FrameHeight = 4,
+
+    /// Frame rate.
     Fps = 5,
+
+    /// 4-character code of codec.
     Fourcc = 6,
+
+    /// Number of frames in the video file.
     FrameCount = 7,
+
+    /// Format of the Mat objects returned by retrieve() .
     Format = 8,
+
+    /// Backend-specific value indicating the current capture mode.
     Mode = 9,
+
+    /// Brightness of the image (only for cameras).
     Brightness = 10,
+
+    /// Contrast of the image (only for cameras).
     Contrast = 11,
+
+    /// Saturation of the image (only for cameras).
     Saturation = 12,
+
+    /// Hue of the image (only for cameras).
     Hue = 13,
+
+    /// Gain of the image (only for cameras).
     Gain = 14,
+
+    /// Exposure (only for cameras).
     Exposure = 15,
+
+    /// Boolean flags indicating whether images should be converted to RGB.
     ConvertRgb = 16,
+
+    /// Currently not supported
     WhiteBalanceBlueU = 17,
+
+    /// Rectification flag for stereo cameras (note: only supported by DC1394 v
+    /// 2.x backend currently)
     Rectification = 18,
     Monochrome = 19,
     Sharpness = 20,
@@ -107,13 +150,13 @@ impl VideoCapture {
 
     /// Sets a property in the `VideoCapture`.
     pub fn set(&self, property: CapProp, value: f64) -> bool {
-        unsafe { cv_videocapture_set(self.inner, property as c_int, value as c_double) }
+        unsafe { cv_videocapture_set(self.inner, property as c_int, value) }
     }
 
     /// Gets a property in the `VideoCapture`.
     pub fn get(&self, property: CapProp) -> Option<f64> {
         let ret = unsafe { cv_videocapture_get(self.inner, property as c_int) };
-        if ret != 0.0 { Some(ret as f64) } else { None }
+        if ret != 0.0 { Some(ret) } else { None }
     }
 }
 
@@ -129,8 +172,14 @@ impl Drop for VideoCapture {
 //   VideoWriter
 // =============================================================================
 
-/// VideoWriter
+/// Opaque VideoWriter type.
 enum CvVideoWriter {}
+
+/// `VideoWriter` provides easy access to write videos to files.
+/// - On Linux FFMPEG is used to write videos;
+/// - On Windows FFMPEG or VFW is used;
+/// - On MacOSX QTKit is used.
+#[derive(Debug)]
 pub struct VideoWriter {
     inner: *mut CvVideoWriter,
 }
@@ -159,28 +208,37 @@ extern "C" {
 }
 
 impl VideoWriter {
+    /// `VideoWriter` constructor.
+    /// * path – Name of the output video file.
+    /// * fourcc – 4-character code of codec used to compress the frames. For
+    ///   example, VideoWriter::fourcc('P','I','M','1') is a MPEG-1 codec,
+    ///   VideoWriter::fourcc('M','J','P','G') is a motion-jpeg codec etc. List
+    ///   of codes can be obtained at Video Codecs by FOURCC page.
+    /// * fps – Framerate of the created video stream.
+    /// * frame_size – Size of the video frames.
+    /// * is_color – If it is not zero, the encoder will expect and encode color
+    ///   frames, otherwise it will work with grayscale frames (the flag is
+    ///   currently supported on Windows only).
     pub fn new(path: &str, fourcc: i32, fps: f64, frame_size: Size2i, is_color: bool) -> VideoWriter {
         let s = ::std::ffi::CString::new(path).unwrap();
-        let writer = unsafe {
-            cv_videowriter_new((&s).as_ptr(),
-                               fourcc as c_int,
-                               fps as c_double,
-                               frame_size,
-                               is_color)
-        };
+        let writer = unsafe { cv_videowriter_new((&s).as_ptr(), fourcc, fps, frame_size, is_color) };
         VideoWriter { inner: writer }
     }
 
+    /// `VideoWriter` constructor.
+    /// * path – Name of the output video file.
+    /// * fourcc – 4-character code of codec used to compress the frames. For
+    ///   example, VideoWriter::fourcc('P','I','M','1') is a MPEG-1 codec,
+    ///   VideoWriter::fourcc('M','J','P','G') is a motion-jpeg codec etc. List
+    ///   of codes can be obtained at Video Codecs by FOURCC page.
+    /// * fps – Framerate of the created video stream.
+    /// * frame_size – Size of the video frames.
+    /// * is_color – If it is not zero, the encoder will expect and encode color
+    ///   frames, otherwise it will work with grayscale frames (the flag is
+    ///   currently supported on Windows only).
     pub fn open(&self, path: &str, fourcc: i32, fps: f64, frame_size: Size2i, is_color: bool) -> bool {
         let s = ::std::ffi::CString::new(path).unwrap();
-        unsafe {
-            cv_videowriter_open(self.inner,
-                                (&s).as_ptr(),
-                                fourcc as c_int,
-                                fps as c_double,
-                                frame_size,
-                                is_color)
-        }
+        unsafe { cv_videowriter_open(self.inner, (&s).as_ptr(), fourcc, fps, frame_size, is_color) }
     }
 
     /// Writes the specified image to video file. It must have the same size as
@@ -197,13 +255,13 @@ impl VideoWriter {
     /// Sets a property in the `VideoWriter`.
     /// Note: `VideoWriterProperty::FrameBytes` is read-only.
     pub fn set(&self, property: VideoWriterProperty, value: f64) -> bool {
-        unsafe { cv_videowriter_set(self.inner, property as c_int, value as c_double) }
+        unsafe { cv_videowriter_set(self.inner, property as c_int, value) }
     }
 
     /// Gets a property in the `VideoWriter`.
     pub fn get(&self, property: VideoWriterProperty) -> Option<f64> {
         let ret = unsafe { cv_videowriter_get(self.inner, property as c_int) };
-        if ret != 0.0 { Some(ret as f64) } else { None }
+        if ret != 0.0 { Some(ret) } else { None }
     }
 }
 
@@ -221,6 +279,7 @@ impl Drop for VideoWriter {
     }
 }
 
+/// `VideoWriter`'s property identifier.
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum VideoWriterProperty {
     /// Current quality of the encoded videostream.
@@ -241,6 +300,19 @@ extern "C" {
     fn cv_fourcc(c1: c_char, c2: c_char, c3: c_char, c4: c_char) -> c_int;
 }
 
+/// Converts from [four character code](https://www.fourcc.org/) to `i32` for
+/// OpenCV.
 pub fn fourcc(c1: char, c2: char, c3: char, c4: char) -> i32 {
     unsafe { cv_fourcc(c1 as c_char, c2 as c_char, c3 as c_char, c4 as c_char) }
+}
+
+/// Converts from OpenCV's int to [four character
+/// code](https://www.fourcc.org/).
+pub fn codec_name(fourcc: i32) -> Option<String> {
+    let ex = fourcc as u32;
+    let vec = vec![(ex & 0xFFu32) as u8,
+                   ((ex & 0xFF00u32) >> 8) as u8,
+                   ((ex & 0xFF0000u32) >> 16) as u8,
+                   ((ex & 0xFF000000u32) >> 24) as u8];
+    String::from_utf8(vec).ok()
 }

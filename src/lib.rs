@@ -8,9 +8,17 @@
 //! [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
 //! bindings using a Python script.
 #![feature(proc_macro)]
+#![deny(missing_docs,
+        missing_debug_implementations,
+        missing_copy_implementations,
+        trivial_casts,
+        trivial_numeric_casts,
+        unused_import_braces,
+        unused_qualifications)]
 
 extern crate num;
-#[macro_use] extern crate num_derive;
+#[macro_use]
+extern crate num_derive;
 
 extern crate libc;
 use libc::{c_double, c_int};
@@ -30,6 +38,7 @@ use core::CMat;
 #[cfg(feature = "gpu")]
 pub mod cuda;
 
+pub use core::CvType;
 pub use core::FlipCode;
 pub use core::Mat;
 pub use core::Point2f;
@@ -38,7 +47,6 @@ pub use core::Rect;
 pub use core::Scalar;
 pub use core::Size2f;
 pub use core::Size2i;
-pub use core::CvType;
 
 /// This struct represents a rotated (i.e. not up-right) rectangle. Each
 /// rectangle is specified by the center point (mass center), length of each
@@ -98,14 +106,25 @@ extern "C" {
     fn opencv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: c_int);
 }
 
+/// Normalization type. Please refer to [OpenCV's
+/// documentation](http://docs.opencv.org/trunk/d2/de8/group__core__array.html#gad12cefbcb5291cf958a85b4b67b6149f).
+#[derive(Debug, PartialEq, Clone, Copy, FromPrimitive)]
 pub enum NormTypes {
+    /// Normalized using `max`
     NormInf = 1,
+    /// Normalized using L1 distance
     NormL1 = 2,
+    /// Normalized using L2 distance
     NormL2 = 4,
+    /// Normalized using L2 sqr distance
     NormL2Sqr = 5,
+    /// Normalized using hamming distance
     NormHamming = 6,
+    /// Normalized using hamming2 distance
     NormHamming2 = 7,
+    /// Normalized using relative distance
     NormRelative = 8,
+    /// Normalized using minmax distance
     NormMinMax = 32,
 }
 
@@ -151,8 +170,15 @@ pub mod objdetect;
 //   VideoTrack
 // =============================================================================
 enum CTermCriteria {}
+
+#[derive(Clone, Copy, Debug)]
+/// Term criteria type, can be one of: Count, Eps or Count + Eps
 pub enum TermType {
+    /// The maximum number of iterations or elements to compute
     Count = 1,
+
+    /// the desired accuracy or change in parameters at which the iterative
+    /// algorithm stops.
     EPS = 2,
 }
 
@@ -162,11 +188,14 @@ extern "C" {
     fn opencv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
 }
 
+/// Termination criteria for iterative algorithms.
+#[derive(Debug)]
 pub struct TermCriteria {
     c_criteria: *mut CTermCriteria,
 }
 
 impl TermCriteria {
+    /// Creates a new termination criteria.
     pub fn new(t: TermType, max_count: i32, epsilon: f64) -> Self {
         let c_criteria = unsafe { opencv_term_criteria_new(t as i32, max_count, epsilon) };
         TermCriteria { c_criteria: c_criteria }
@@ -182,6 +211,10 @@ impl Drop for TermCriteria {
 }
 
 impl Mat {
+    /// Finds an object center, size, and orientation; returns as `RotatedRect`.
+    ///
+    /// * `wndw` - initial search window.
+    /// * `criteria` - stop criteria for the underlying meanShift.
     pub fn camshift(&self, wndw: Rect, criteria: &TermCriteria) -> RotatedRect {
         unsafe { opencv_camshift(self.inner, wndw, criteria.c_criteria) }
     }
