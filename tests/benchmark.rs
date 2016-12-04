@@ -1,6 +1,8 @@
 extern crate rust_vision;
 
 use rust_vision::*;
+use rust_vision::imgcodecs::*;
+use rust_vision::imgproc::*;
 use rust_vision::objdetect::ObjectDetect;
 mod utils;
 use utils::*;

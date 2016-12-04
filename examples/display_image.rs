@@ -2,6 +2,7 @@
 // http://docs.opencv.org/3.1.0/db/deb/tutorial_display_image.html
 extern crate rust_vision;
 use rust_vision::*;
+use rust_vision::highgui::*;
 
 fn main() {
     let args: Vec<_> = std::env::args().collect();

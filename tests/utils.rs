@@ -6,6 +6,7 @@
 extern crate rust_vision;
 
 use rust_vision::*;
+use rust_vision::imgcodecs::*;
 use rust_vision::objdetect::*;
 use std::fs::File;
 use std::io::Read;

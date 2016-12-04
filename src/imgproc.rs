@@ -1,4 +1,5 @@
-extern crate libc;
+//! Image processing, see [OpenCV
+//! imgproc](http://docs.opencv.org/3.1.0/d7/dbd/group__imgproc.html).
 
 use libc::{c_float, c_int, c_double};
 use super::core::*;
@@ -201,22 +202,6 @@ pub enum InterpolationFlag {
 
     /// flag, inverse transformation
     WarpInverseMap = 16,
-}
-
-/// Line type
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub enum LineTypes {
-    /// Default type
-    Filled = -1,
-
-    /// 4-connected line
-    Line4 = 4,
-
-    /// 8-connected line
-    Line8 = 8,
-
-    /// antialiased line
-    LineAA = 16,
 }
 
 impl Mat {

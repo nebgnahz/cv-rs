@@ -241,6 +241,22 @@ impl Default for CVecDouble {
     }
 }
 
+/// Line type
+#[derive(Debug, PartialEq, Clone, Copy)]
+pub enum LineTypes {
+    /// Default type
+    Filled = -1,
+
+    /// 4-connected line
+    Line4 = 4,
+
+    /// 8-connected line
+    Line8 = 8,
+
+    /// antialiased line
+    LineAA = 16,
+}
+
 extern "C" {
     fn opencv_mat_new() -> *mut CMat;
     fn opencv_mat_new_with_size(rows: c_int, cols: c_int, t: i32) -> *mut CMat;
@@ -390,4 +406,48 @@ pub enum CvType {
 
     /// 8 bit, three channels (RGB image)
     Cv8UC3 = 16,
+}
+
+/// This struct represents a rotated (i.e. not up-right) rectangle. Each
+/// rectangle is specified by the center point (mass center), length of each
+/// side (represented by `Size2f`) and the rotation angle in degrees.
+#[derive(Default, Debug, Clone, Copy)]
+#[repr(C)]
+pub struct RotatedRect {
+    center: Point2f,
+    size: Size2f,
+    angle: f32,
+}
+
+impl RotatedRect {
+    /// Return 4 vertices of the rectangle.
+    pub fn points(&self) -> [Point2f; 4] {
+        let angle = self.angle * ::std::f32::consts::PI / 180.0;
+
+        let b = angle.cos() * 0.5;
+        let a = angle.sin() * 0.5;
+
+        let mut pts: [Point2f; 4] = [Point2f::default(); 4];
+        pts[0].x = self.center.x - a * self.size.height - b * self.size.width;
+        pts[0].y = self.center.y + b * self.size.height - a * self.size.width;
+        pts[1].x = self.center.x + a * self.size.height - b * self.size.width;
+        pts[1].y = self.center.y - b * self.size.height - a * self.size.width;
+
+        pts[2].x = 2.0 * self.center.x - pts[0].x;
+        pts[2].y = 2.0 * self.center.y - pts[0].y;
+        pts[3].x = 2.0 * self.center.x - pts[1].x;
+        pts[3].y = 2.0 * self.center.y - pts[1].y;
+        pts
+    }
+
+    /// Return the minimal up-right rectangle containing the rotated rectangle
+    pub fn bounding_rect(&self) -> Rect {
+        let pt = self.points();
+        let x = pt.iter().map(|p| p.x).fold(0. / 0., f32::min).floor() as i32;
+        let y = pt.iter().map(|p| p.y).fold(0. / 0., f32::min).floor() as i32;
+
+        let width = pt.iter().map(|p| p.x).fold(0. / 0., f32::max).ceil() as i32 - x + 1;
+        let height = pt.iter().map(|p| p.y).fold(0. / 0., f32::max).ceil() as i32 - y + 1;
+        Rect::new(x, y, width, height)
+    }
 }

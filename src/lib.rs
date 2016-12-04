@@ -23,14 +23,7 @@ extern crate num_derive;
 extern crate libc;
 use libc::{c_double, c_int};
 
-mod highgui;
-pub use highgui::MouseCallback;
-pub use highgui::MouseCallbackData;
-pub use highgui::MouseEventTypes;
-pub use highgui::WindowFlags;
-pub use highgui::highgui_destroy_window;
-pub use highgui::highgui_named_window;
-pub use highgui::highgui_set_mouse_callback;
+pub mod highgui;
 
 mod core;
 use core::CMat;
@@ -40,6 +33,7 @@ pub mod cuda;
 
 pub use core::CvType;
 pub use core::FlipCode;
+pub use core::LineTypes;
 pub use core::Mat;
 pub use core::Point2f;
 pub use core::Point2i;
@@ -47,50 +41,6 @@ pub use core::Rect;
 pub use core::Scalar;
 pub use core::Size2f;
 pub use core::Size2i;
-
-/// This struct represents a rotated (i.e. not up-right) rectangle. Each
-/// rectangle is specified by the center point (mass center), length of each
-/// side (represented by `Size2f`) and the rotation angle in degrees.
-#[derive(Default, Debug, Clone, Copy)]
-#[repr(C)]
-pub struct RotatedRect {
-    center: Point2f,
-    size: Size2f,
-    angle: f32,
-}
-
-impl RotatedRect {
-    /// Return 4 vertices of the rectangle.
-    pub fn points(&self) -> [Point2f; 4] {
-        let angle = self.angle * std::f32::consts::PI / 180.0;
-
-        let b = angle.cos() * 0.5;
-        let a = angle.sin() * 0.5;
-
-        let mut pts: [Point2f; 4] = [Point2f::default(); 4];
-        pts[0].x = self.center.x - a * self.size.height - b * self.size.width;
-        pts[0].y = self.center.y + b * self.size.height - a * self.size.width;
-        pts[1].x = self.center.x + a * self.size.height - b * self.size.width;
-        pts[1].y = self.center.y - b * self.size.height - a * self.size.width;
-
-        pts[2].x = 2.0 * self.center.x - pts[0].x;
-        pts[2].y = 2.0 * self.center.y - pts[0].y;
-        pts[3].x = 2.0 * self.center.x - pts[1].x;
-        pts[3].y = 2.0 * self.center.y - pts[1].y;
-        pts
-    }
-
-    /// Return the minimal up-right rectangle containing the rotated rectangle
-    pub fn bounding_rect(&self) -> Rect {
-        let pt = self.points();
-        let x = pt.iter().map(|p| p.x).fold(0. / 0., f32::min).floor() as i32;
-        let y = pt.iter().map(|p| p.y).fold(0. / 0., f32::min).floor() as i32;
-
-        let width = pt.iter().map(|p| p.x).fold(0. / 0., f32::max).ceil() as i32 - x + 1;
-        let height = pt.iter().map(|p| p.y).fold(0. / 0., f32::max).ceil() as i32 - y + 1;
-        Rect::new(x, y, width, height)
-    }
-}
 
 // =============================================================================
 //  core array
@@ -157,65 +107,8 @@ impl Mat {
     }
 }
 
-mod imgcodecs;
-pub use imgcodecs::{ImreadModes, ImwriteFlags, ImwritePngFlags};
-
-mod imgproc;
-pub use imgproc::{ColorConversionCodes, InterpolationFlag, LineTypes};
-
+pub mod imgcodecs;
+pub mod imgproc;
 pub mod videoio;
 pub mod objdetect;
-
-// =============================================================================
-//   VideoTrack
-// =============================================================================
-enum CTermCriteria {}
-
-#[derive(Clone, Copy, Debug)]
-/// Term criteria type, can be one of: Count, Eps or Count + Eps
-pub enum TermType {
-    /// The maximum number of iterations or elements to compute
-    Count = 1,
-
-    /// the desired accuracy or change in parameters at which the iterative
-    /// algorithm stops.
-    EPS = 2,
-}
-
-extern "C" {
-    fn opencv_term_criteria_new(t: i32, count: i32, epsilon: f64) -> *mut CTermCriteria;
-    fn opencv_term_criteria_drop(criteria: *mut CTermCriteria);
-    fn opencv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
-}
-
-/// Termination criteria for iterative algorithms.
-#[derive(Debug)]
-pub struct TermCriteria {
-    c_criteria: *mut CTermCriteria,
-}
-
-impl TermCriteria {
-    /// Creates a new termination criteria.
-    pub fn new(t: TermType, max_count: i32, epsilon: f64) -> Self {
-        let c_criteria = unsafe { opencv_term_criteria_new(t as i32, max_count, epsilon) };
-        TermCriteria { c_criteria: c_criteria }
-    }
-}
-
-impl Drop for TermCriteria {
-    fn drop(&mut self) {
-        unsafe {
-            opencv_term_criteria_drop(self.c_criteria);
-        }
-    }
-}
-
-impl Mat {
-    /// Finds an object center, size, and orientation; returns as `RotatedRect`.
-    ///
-    /// * `wndw` - initial search window.
-    /// * `criteria` - stop criteria for the underlying meanShift.
-    pub fn camshift(&self, wndw: Rect, criteria: &TermCriteria) -> RotatedRect {
-        unsafe { opencv_camshift(self.inner, wndw, criteria.c_criteria) }
-    }
-}
+pub mod video;

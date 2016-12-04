@@ -1,5 +1,6 @@
 extern crate rust_vision;
 use rust_vision::*;
+use rust_vision::highgui::*;
 use rust_vision::videoio::*;
 
 fn main() {

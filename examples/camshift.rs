@@ -1,5 +1,8 @@
 extern crate rust_vision;
 use rust_vision::*;
+use rust_vision::imgproc::*;
+use rust_vision::highgui::*;
+use rust_vision::video::tracking::*;
 use rust_vision::videoio::*;
 
 struct SelectionStatus {

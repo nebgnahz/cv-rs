@@ -1,5 +1,5 @@
-//! Mainly `VideoCapture` and `VideoWriter`
-
+//! Media I/O, see [OpenCV
+//! videoio](http://docs.opencv.org/3.1.0/dd/de7/group__videoio.html)
 use core::{Mat, CMat, Size2i};
 use libc::{c_int, c_char, c_double};
 

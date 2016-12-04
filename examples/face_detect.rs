@@ -1,6 +1,8 @@
 extern crate rust_vision;
 
 use rust_vision::*;
+use rust_vision::imgcodecs::*;
+use rust_vision::highgui::*;
 use rust_vision::objdetect::CascadeClassifier;
 use std::fs::File;
 use std::io::Read;

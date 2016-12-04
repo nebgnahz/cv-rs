@@ -1,3 +1,6 @@
+//! Image file reading and writing, see [OpenCV
+//! imgcodecs](http://docs.opencv.org/3.1.0/d4/da8/group__imgcodecs.html).
+
 use std::ffi::CString;
 use super::core::{CMat, Mat};
 use super::libc::{c_char, c_int, size_t, uint8_t};
