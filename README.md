@@ -2,7 +2,7 @@
 
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-> This library primarily provides a binding and API for OpenCV 3.1.0.
+> This library primarily provides bindings and APIs for OpenCV 3.1.0.
 
 This is a work-in-progress and modules/functions are implemented as
 needed. Attempts to use [rust-bindgen](https://github.com/servo/rust-bindgen) or
@@ -24,14 +24,17 @@ bindings using a Python script (more automated).
 
 ## Install
 
-First, add this to your `Cargo.toml`:
+Before anything, make sure you have OpenCV 3 installed. Read this
+[Introduction to OpenCV](http://docs.opencv.org/3.1.0/df/d65/tutorial_table_of_content_introduction.html) to get started.
+
+Then in any Rust project, add this to your `Cargo.toml`:
 
 ```
 [dependencies]
 cv = "0.1.0"
 ```
 
-Next, add this to your crate:
+And add this to your crate:
 
 ```
 extern crate cv;
