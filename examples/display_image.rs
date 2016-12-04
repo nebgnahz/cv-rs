@@ -1,8 +1,8 @@
 // This resembles the OpenCV read image example code:
 // http://docs.opencv.org/3.1.0/db/deb/tutorial_display_image.html
-extern crate rust_vision;
-use rust_vision::*;
-use rust_vision::highgui::*;
+extern crate cv;
+use cv::*;
+use cv::highgui::*;
 
 fn main() {
     let args: Vec<_> = std::env::args().collect();

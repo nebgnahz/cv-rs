@@ -23,16 +23,16 @@
 //     return 0;
 // }
 
-extern crate rust_vision;
-use rust_vision::highgui::*;
-use rust_vision::videoio::VideoCapture;
+extern crate cv;
+use cv::highgui::*;
+use cv::videoio::VideoCapture;
 
 fn main() {
     let cap = VideoCapture::new(0);
     assert!(cap.is_open());
 
     highgui_named_window("Window", WindowFlags::WindowAutosize);
-    loop {
-        cap.read().unwrap().show("Window", 30);
+    while let Some(image) = cap.read() {
+        image.show("Window", 30);
     }
 }

@@ -1,14 +1,20 @@
 [package]
-name = "rust_vision"
+name = "cv"
 version = "0.1.0"
 authors = ["Ben Zhang <benzh@cs.berkeley.edu>"]
 build = "build.rs"
+repository = "https://github.com/nebgnahz/cv-rs.git"
+homepage = "https://github.com/nebgnahz/cv-rs.git"
+license = "MIT"
+readme = "README.md"
+documentation = "rust-vision.s3-website-us-west-2.amazonaws.com"
+description = "This library primarily provides a binding and API for OpenCV 3.1.0."
 
 [dependencies]
 libc = "0.2.0"
 getopts = "0.2"
-num = "*"
-num-derive = "*"
+num = "0.1"
+num-derive = "0.1"
 
 [build-dependencies]
 gcc = "0.3"

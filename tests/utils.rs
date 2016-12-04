@@ -3,11 +3,11 @@
 // compiled in its own, making these functions appearing useless.
 #![allow(dead_code)]
 
-extern crate rust_vision;
+extern crate cv;
 
-use rust_vision::*;
-use rust_vision::imgcodecs::*;
-use rust_vision::objdetect::*;
+use cv::*;
+use cv::imgcodecs::*;
+use cv::objdetect::*;
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};

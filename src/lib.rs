@@ -16,17 +16,17 @@
         unused_import_braces,
         unused_qualifications)]
 
+extern crate libc;
 extern crate num;
 #[macro_use]
 extern crate num_derive;
-extern crate libc;
 
 mod core;
 pub use core::CvType;
 pub use core::FlipCode;
 pub use core::LineTypes;
-pub use core::NormTypes;
 pub use core::Mat;
+pub use core::NormTypes;
 pub use core::Point2f;
 pub use core::Point2i;
 pub use core::Rect;

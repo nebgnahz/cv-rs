@@ -1,9 +1,9 @@
-extern crate rust_vision;
-use rust_vision::*;
-use rust_vision::imgproc::*;
-use rust_vision::highgui::*;
-use rust_vision::video::tracking::*;
-use rust_vision::videoio::*;
+extern crate cv;
+use cv::*;
+use cv::imgproc::*;
+use cv::highgui::*;
+use cv::video::tracking::*;
+use cv::videoio::*;
 
 struct SelectionStatus {
     selection: Rect,

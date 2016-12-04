@@ -1,7 +1,7 @@
-extern crate rust_vision;
-use rust_vision::*;
-use rust_vision::highgui::*;
-use rust_vision::videoio::*;
+extern crate cv;
+use cv::*;
+use cv::highgui::*;
+use cv::videoio::*;
 
 fn main() {
     let cap = VideoCapture::from_path("/Users/benzh/Downloads/video.mp4");

@@ -1,9 +1,9 @@
 #![feature(test)]
 extern crate test;
-extern crate rust_vision;
+extern crate cv;
 
-use rust_vision::*;
-use rust_vision::objdetect::ObjectDetect;
+use cv::*;
+use cv::objdetect::ObjectDetect;
 
 mod utils;
 use utils::*;
