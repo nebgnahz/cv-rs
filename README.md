@@ -22,6 +22,17 @@ bindings using a Python script (more automated).
 
 ## Background
 
+OpenCV (Open Source Computer Vision Library: http://opencv.org) is an
+open-source BSD-licensed library that includes several hundreds of computer
+vision algorithms. The document describes the so-called OpenCV 2.x API, which is
+essentially a C++ API, as opposite to the C-based OpenCV 1.x API. The latter is
+described in opencv1x.pdf.
+
+This library provides bindings to access OpenCV functionalities using Rust
+FFI. First, C bindings are created (in [native](native) folder); then Rust APIs
+are constructed atop. Although this is an inefficient method, it has served me
+well as a learning experience to both OpenCV and Rust.
+
 ## Install
 
 Before anything, make sure you have OpenCV 3 installed. Read this
