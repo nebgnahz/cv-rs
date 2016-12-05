@@ -32,6 +32,10 @@ pub struct Mat {
     pub depth: i32,
 }
 
+// TODO(benzh): Should consider Unique<T>,
+// https://github.com/rust-lang/rust/issues/27730
+unsafe impl Send for Mat {}
+
 /// A 4-element struct that is widely used to pass pixel values.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
