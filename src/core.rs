@@ -1,9 +1,8 @@
 //! Core data structures in OpenCV
 
-use libc::{c_int, c_double};
+use libc::{c_int, c_double, c_char, c_uchar, size_t};
 use num;
 use std::ffi::CString;
-use std::os::raw::c_char;
 
 /// Opaque data struct for C bindings
 #[derive(Clone, Copy, Debug)]
@@ -264,6 +263,9 @@ extern "C" {
     fn cv_mat_rows(cmat: *const CMat) -> c_int;
     fn cv_mat_cols(cmat: *const CMat) -> c_int;
     fn cv_mat_depth(cmat: *const CMat) -> c_int;
+    fn cv_mat_data(cmat: *const CMat) -> *const c_uchar;
+    fn cv_mat_total(cmat: *const CMat) -> size_t;
+    fn cv_mat_elem_size(cmat: *const CMat) -> size_t;
     fn cv_mat_type(cmat: *const CMat) -> c_int;
     fn cv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
     fn cv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
@@ -314,6 +316,26 @@ impl Mat {
         let s = CString::new(path).unwrap();
         let m = unsafe { cv_imread((&s).as_ptr(), flags) };
         Mat::from_raw(m)
+    }
+
+    /// Returns the raw data (as a uchar pointer)
+    pub fn data(&self) -> *const u8 {
+        unsafe { cv_mat_data(self.inner) }
+    }
+
+    /// Returns the total number of array elements. The method returns the
+    /// number of array elements (a number of pixels if the array represents an
+    /// image). For example, images with 1920x1080 resolution will return
+    /// 2073600.
+    pub fn total(&self) -> usize {
+        unsafe { cv_mat_total(self.inner) }
+    }
+
+    /// Returns the matrix element size in bytes. The method returns the matrix
+    /// element size in bytes. For example, if the matrix type is CV_16SC3 , the
+    /// method returns 3*sizeof(short) or 6.
+    pub fn elem_size(&self) -> usize {
+        unsafe { cv_mat_elem_size(self.inner) }
     }
 
     /// Returns the size of this matrix.
@@ -456,11 +478,11 @@ impl RotatedRect {
 extern "C" {
     fn cv_in_range(cmat: *const CMat, lowerb: Scalar, upperb: Scalar, dst: *mut CMat);
     fn cv_mix_channels(cmat: *const CMat,
-                           nsrcs: isize,
-                           dst: *mut CMat,
-                           ndsts: isize,
-                           from_to: *const i32,
-                           npairs: isize);
+                       nsrcs: isize,
+                       dst: *mut CMat,
+                       ndsts: isize,
+                       from_to: *const i32,
+                       npairs: isize);
     fn cv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: c_int);
 }
 

@@ -94,6 +94,9 @@ int cv_mat_rows(const CvMatrix* const cmat);
 int cv_mat_cols(const CvMatrix* const cmat);
 int cv_mat_depth(const CvMatrix* const cmat);
 int cv_mat_type(const CvMatrix* const cmat);
+const uint8_t* cv_mat_data(const CvMatrix* const cmat);
+size_t cv_mat_total(const CvMatrix* const cmat);
+size_t cv_mat_elem_size(const CvMatrix* const cmat);
 
 // Free a Mat object
 void cv_mat_drop(CvMatrix* cmat);

@@ -66,6 +66,18 @@ int cv_mat_type(const CvMatrix* const cmat) {
     return (reinterpret_cast<const cv::Mat* const>(cmat))->type();
 }
 
+const uchar* cv_mat_data(const CvMatrix* const cmat) {
+    return (reinterpret_cast<const cv::Mat* const>(cmat))->data;
+}
+
+size_t cv_mat_total(const CvMatrix* const cmat) {
+    return (reinterpret_cast<const cv::Mat* const>(cmat))->total();
+}
+
+size_t cv_mat_elem_size(const CvMatrix* const cmat) {
+    return (reinterpret_cast<const cv::Mat* const>(cmat))->elemSize();
+}
+
 void cv_mat_drop(CvMatrix* cmat) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     delete mat;
