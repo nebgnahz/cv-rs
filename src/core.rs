@@ -7,6 +7,7 @@ use std::ffi::CString;
 /// Opaque data struct for C bindings
 #[derive(Clone, Copy, Debug)]
 pub enum CMat {}
+unsafe impl Send for CMat {}
 impl CMat {
     pub fn new() -> *mut CMat {
         unsafe { cv_mat_new() }
