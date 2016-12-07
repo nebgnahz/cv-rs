@@ -11,26 +11,21 @@ extern "C" {
     fn cv_rectangle(cmat: *mut CMat, rect: Rect, color: Scalar, thickness: c_int, linetype: c_int);
     fn cv_cvt_color(cmat: *const CMat, output: *mut CMat, code: i32);
     fn cv_pyr_down(cmat: *const CMat, output: *mut CMat);
-    fn cv_resize(from: *const CMat,
-                     to: *mut CMat,
-                     dsize: Size2i,
-                     fx: c_double,
-                     fy: c_double,
-                     interpolation: c_int);
+    fn cv_resize(from: *const CMat, to: *mut CMat, dsize: Size2i, fx: c_double, fy: c_double, interpolation: c_int);
     fn cv_calc_hist(cimages: *const CMat,
-                        nimages: i32,
-                        channels: *const c_int,
-                        cmask: *const CMat,
-                        chist: *mut CMat,
-                        dims: c_int,
-                        hist_size: *const c_int,
-                        ranges: *const *const c_float);
+                    nimages: i32,
+                    channels: *const c_int,
+                    cmask: *const CMat,
+                    chist: *mut CMat,
+                    dims: c_int,
+                    hist_size: *const c_int,
+                    ranges: *const *const c_float);
     fn cv_calc_back_project(cimages: *const CMat,
-                                nimages: c_int,
-                                channels: *const c_int,
-                                chist: *const CMat,
-                                cback_project: *mut CMat,
-                                ranges: *const *const c_float);
+                            nimages: c_int,
+                            channels: *const c_int,
+                            chist: *const CMat,
+                            cback_project: *mut CMat,
+                            ranges: *const *const c_float);
 }
 
 /// Color conversion code used in
@@ -255,11 +250,11 @@ impl Mat {
         let m = CMat::new();
         unsafe {
             cv_resize(self.inner,
-                          m,
-                          Size2i::default(),
-                          fx,
-                          fy,
-                          interpolation as c_int)
+                      m,
+                      Size2i::default(),
+                      fx,
+                      fy,
+                      interpolation as c_int)
         }
         Mat::from_raw(m)
     }
@@ -275,13 +270,13 @@ impl Mat {
         let m = CMat::new();
         unsafe {
             cv_calc_hist(self.inner,
-                             1,
-                             channels,
-                             mask.inner,
-                             m,
-                             dims,
-                             hist_size,
-                             ranges);
+                         1,
+                         channels,
+                         mask.inner,
+                         m,
+                         dims,
+                         hist_size,
+                         ranges);
         }
         Mat::from_raw(m)
     }
