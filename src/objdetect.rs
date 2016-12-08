@@ -31,13 +31,13 @@ extern "C" {
     fn cv_cascade_classifier_load(cc: *mut CCascadeClassifier, p: *const c_char) -> bool;
     fn cv_cascade_classifier_drop(p: *mut CCascadeClassifier);
     fn cv_cascade_classifier_detect(cc: *mut CCascadeClassifier,
-                                        cmat: *mut CMat,
-                                        vec_of_rect: *mut CVecOfRect,
-                                        scale_factor: c_double,
-                                        min_neighbors: c_int,
-                                        flags: c_int,
-                                        min_size: Size2i,
-                                        max_size: Size2i);
+                                    cmat: *mut CMat,
+                                    vec_of_rect: *mut CVecOfRect,
+                                    scale_factor: c_double,
+                                    min_neighbors: c_int,
+                                    flags: c_int,
+                                    min_size: Size2i,
+                                    max_size: Size2i);
 }
 
 impl ObjectDetect for CascadeClassifier {
@@ -97,13 +97,13 @@ impl CascadeClassifier {
         let mut c_result = CVecOfRect::default();
         unsafe {
             cv_cascade_classifier_detect(self.inner,
-                                             mat.inner,
-                                             &mut c_result,
-                                             scale_factor as c_double,
-                                             min_neighbors,
-                                             0,
-                                             min_size,
-                                             max_size)
+                                         mat.inner,
+                                         &mut c_result,
+                                         scale_factor as c_double,
+                                         min_neighbors,
+                                         0,
+                                         min_size,
+                                         max_size)
         }
         c_result.rustify()
     }
@@ -117,13 +117,15 @@ impl Drop for CascadeClassifier {
     }
 }
 
-#[derive(Clone, Copy)]
-enum CSvmDetector {}
+#[derive(Debug, Clone, Copy)]
+/// Opaque type for C/C++ SvmDetector object
+pub enum CSvmDetector {}
 
-///
+/// SvmDetector
 #[derive(Debug)]
 pub struct SvmDetector {
-    inner: *mut CSvmDetector,
+    /// Pointer to the inner data structure
+    pub inner: *mut CSvmDetector,
 }
 
 extern "C" {

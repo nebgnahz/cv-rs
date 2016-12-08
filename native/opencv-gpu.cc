@@ -19,20 +19,20 @@ void cv_gpu_mat_drop(GpuMat* gpu_mat) {
     gpu_mat = nullptr;
 }
 
-void cv_gpu_mat_upload(GpuMat* gpu_mat, CvMat* cpu_mat) {
+void cv_gpu_mat_upload(GpuMat* gpu_mat, CvMatrix* cpu_mat) {
     cv::cuda::GpuMat* gpu_image = reinterpret_cast<cv::cuda::GpuMat*>(gpu_mat);
     cv::Mat* image = reinterpret_cast<cv::Mat*>(cpu_mat);
     gpu_image->upload(*image);
 }
 
-CvMat* cv_mat_from_gpu_mat(GpuMat* gpu_mat) {
+CvMatrix* cv_mat_from_gpu_mat(GpuMat* gpu_mat) {
     cv::cuda::GpuMat* gpu_image = reinterpret_cast<cv::cuda::GpuMat*>(gpu_mat);
-    return reinterpret_cast<CvMat*>(new cv::Mat(*gpu_image));
+    return reinterpret_cast<CvMatrix*>(new cv::Mat(*gpu_image));
 }
 
-GpuMat* cv_gpu_mat_from_mat(CvMat* cmat) {
-    cv::Mat* image = reinterpret_cast<cv::Mat*>(cmat);
-    return reinterpret_cast<GpuMat*>(new cv::cuda::GpuMat(*image));
+GpuMat *cv_gpu_mat_from_mat(CvMatrix *cmat) {
+  cv::Mat *image = reinterpret_cast<cv::Mat *>(cmat);
+  return reinterpret_cast<GpuMat *>(new cv::cuda::GpuMat(*image));
 }
 
 // =============================================================================
@@ -45,8 +45,8 @@ GpuHog* cv_gpu_hog_default() {
     return reinterpret_cast<GpuHog*>(new CV_GPU_HOG(cv::cuda::HOG::create()));
 }
 
-GpuHog* cv_gpu_hog_new(CSize2i win_size, CSize2i block_size,
-                       CSize2i block_stride, CSize2i cell_size, int32_t nbins) {
+GpuHog* cv_gpu_hog_new(Size2i win_size, Size2i block_size,
+                       Size2i block_stride, Size2i cell_size, int32_t nbins) {
     cv::Size cv_win_size(win_size.width, win_size.height);
     cv::Size cv_block_size(block_size.width, block_size.height);
     cv::Size cv_block_stride(block_stride.width, block_stride.height);
@@ -112,7 +112,7 @@ void cv_gpu_hog_set_win_sigma(GpuHog* hog, double win_sigma) {
     (*cv_hog)->setWinSigma(win_sigma);
 }
 
-void cv_gpu_hog_set_win_stride(GpuHog* hog, CSize2i win_stride) {
+void cv_gpu_hog_set_win_stride(GpuHog* hog, Size2i win_stride) {
     CV_GPU_HOG* cv_hog = reinterpret_cast<CV_GPU_HOG*>(hog);
     cv::Size cv_win_stride(win_stride.width, win_stride.height);
     (*cv_hog)->setWinStride(cv_win_stride);
@@ -153,10 +153,10 @@ double cv_gpu_hog_get_win_sigma(GpuHog* hog) {
     return (*cv_hog)->getWinSigma();
 }
 
-CSize2i cv_gpu_hog_get_win_stride(GpuHog* hog) {
+Size2i cv_gpu_hog_get_win_stride(GpuHog* hog) {
     CV_GPU_HOG* cv_hog = reinterpret_cast<CV_GPU_HOG*>(hog);
     cv::Size size = (*cv_hog)->getWinStride();
-    CSize2i c_size;
+    Size2i c_size;
     c_size.width = size.width;
     c_size.height = size.height;
     return c_size;

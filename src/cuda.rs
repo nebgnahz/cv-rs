@@ -1,15 +1,27 @@
+//! Bindings to OpenCV's classes and functions that exploits GPU/Cuda. See
+//! [cv::cuda](http://docs.opencv.org/3.1.0/d1/d1a/namespacecv_1_1cuda.html)
+
 use libc::{size_t, c_int, c_double};
 use super::core::*;
 use super::objdetect::{SvmDetector, CSvmDetector, ObjectDetect, HogParams};
 
-// Opaque data struct for C bindings
+/// Opaque data struct for C/C++ cv::cuda::GpuMat bindings
+#[derive(Clone, Copy, Debug)]
 pub enum CGpuMat {}
 
+/// `GpuMat` data structure in rust, bound to an opaque type in C/C++.
 #[derive(Debug)]
 pub struct GpuMat {
+    /// The pointer to the opaque C/C++ data structure
     pub inner: *mut CGpuMat,
+
+    /// Number of columns
     pub cols: i32,
+
+    /// Number of rows
     pub rows: i32,
+
+    /// Depth of this mat
     pub depth: i32,
 }
 
@@ -22,6 +34,7 @@ extern "C" {
 }
 
 impl GpuMat {
+    /// Creates a default `GpuMat`.
     pub fn default() -> GpuMat {
         GpuMat {
             inner: unsafe { cv_gpu_mat_default() },
@@ -31,6 +44,7 @@ impl GpuMat {
         }
     }
 
+    /// Creates a `GpuMat` from raw pointer.
     pub fn from_raw(inner: *mut CGpuMat) -> GpuMat {
         GpuMat {
             inner: inner,
@@ -40,6 +54,7 @@ impl GpuMat {
         }
     }
 
+    /// Uploads a normal `Mat`
     pub fn upload(&mut self, mat: &Mat) {
         unsafe {
             cv_gpu_mat_upload(self.inner, mat.inner);
@@ -57,7 +72,7 @@ impl Drop for GpuMat {
 
 impl From<GpuMat> for Mat {
     fn from(gpu_mat: GpuMat) -> Mat {
-        unsafe { Mat::new_with_cmat(cv_mat_from_gpu_mat(gpu_mat.inner)) }
+        unsafe { Mat::from_raw(cv_mat_from_gpu_mat(gpu_mat.inner)) }
     }
 }
 
@@ -67,12 +82,15 @@ impl From<Mat> for GpuMat {
     }
 }
 
-// Opaque data struct for C bindings
+/// Opaque data struct for C bindings
+#[derive(Clone, Copy, Debug)]
 pub enum CGpuHog {}
 
 #[derive(Debug)]
+/// Data structure that performs Histogram of Gradient (HOG).
 pub struct GpuHog {
-    pub inner: *mut CGpuHog,
+    inner: *mut CGpuHog,
+    /// Hog parameters.
     pub params: HogParams,
 }
 
@@ -131,7 +149,13 @@ impl Default for GpuHog {
 }
 
 impl GpuHog {
-    pub fn new(win_size: Size2i, block_size: Size2i, block_stride: Size2i, cell_size: Size2i, nbins: i32) -> GpuHog {
+    /// Creates a new GpuHog detector.
+    pub fn new(win_size: Size2i,
+               block_size: Size2i,
+               block_stride: Size2i,
+               cell_size: Size2i,
+               nbins: i32)
+               -> GpuHog {
         let inner = unsafe { cv_gpu_hog_new(win_size, block_size, block_stride, cell_size, nbins) };
         let mut params = HogParams::default();
         GpuHog::update_params(inner, &mut params);
@@ -141,6 +165,7 @@ impl GpuHog {
         }
     }
 
+    /// Creates a new GpuHog detector with parameters specified inside `params`.
     pub fn with_params(params: HogParams) -> GpuHog {
         let inner = unsafe {
             cv_gpu_hog_new(params.win_size,
@@ -166,6 +191,7 @@ impl GpuHog {
         }
     }
 
+    /// Updates the parameter inside this GpuHog detector.
     fn update_params(inner: *mut CGpuHog, params: &mut HogParams) {
         params.gamma_correction = unsafe { cv_gpu_hog_get_gamma_correction(inner) };
         params.group_threshold = unsafe { cv_gpu_hog_get_group_threshold(inner) };
@@ -177,10 +203,12 @@ impl GpuHog {
         params.win_stride = unsafe { cv_gpu_hog_get_win_stride(inner) };
     }
 
+    /// Sets the SVM detector.
     pub fn set_svm_detector(&mut self, detector: SvmDetector) {
         unsafe { cv_gpu_hog_set_detector(self.inner, detector.inner) }
     }
 
+    /// Detects according to the SVM detector specified.
     pub fn detect(&mut self, mat: &GpuMat) -> Vec<Rect> {
         let mut found = CVecOfRect::default();
         unsafe {
