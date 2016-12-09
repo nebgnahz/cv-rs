@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["TermType","Term criteria type, can be one of: Count, Eps or Count + Eps"]],"struct":[["TermCriteria","Termination criteria for iterative algorithms."]]});

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `HogParams` struct in crate `cv`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, HogParams">
+
+    <title>cv::objdetect::HogParams - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>cv</a>::<wbr><a href='index.html'>objdetect</a></p><script>window.sidebarCurrent = {name: 'HogParams', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>cv</a>::<wbr><a href='index.html'>objdetect</a>::<wbr><a class='struct' href=''>HogParams</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a id='src-1898' class='srclink' href='../../src/cv/src/objdetect.rs.html#162-212' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct HogParams {
+    pub win_size: <a class='struct' href='../../cv/struct.Size2i.html' title='cv::Size2i'>Size2i</a>,
+    pub block_size: <a class='struct' href='../../cv/struct.Size2i.html' title='cv::Size2i'>Size2i</a>,
+    pub block_stride: <a class='struct' href='../../cv/struct.Size2i.html' title='cv::Size2i'>Size2i</a>,
+    pub cell_size: <a class='struct' href='../../cv/struct.Size2i.html' title='cv::Size2i'>Size2i</a>,
+    pub nbins: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>,
+    pub win_sigma: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>,
+    pub l2hys_threshold: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>,
+    pub gamma_correction: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>,
+    pub nlevels: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>,
+    pub hit_threshold: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>,
+    pub win_stride: <a class='struct' href='../../cv/struct.Size2i.html' title='cv::Size2i'>Size2i</a>,
+    pub padding: <a class='struct' href='../../cv/struct.Size2i.html' title='cv::Size2i'>Size2i</a>,
+    pub scale: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a>,
+    pub group_threshold: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a>,
+}</pre><div class='docblock'><p>Parameters that controls the behavior of HOG</p>
+</div><h2 class='fields'>Fields</h2><span id='structfield.win_size' class='structfield'>
+                           <span id='win_size.v' class='invisible'>
+                           <code>win_size: <a class='struct' href='../../cv/struct.Size2i.html' title='cv::Size2i'>Size2i</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Detection window size. Align to block size and block stride</p>
+</div><span id='structfield.block_size' class='structfield'>
+                           <span id='block_size.v' class='invisible'>
+                           <code>block_size: <a class='struct' href='../../cv/struct.Size2i.html' title='cv::Size2i'>Size2i</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Block size in pixels. Align to cell size. Only (16,16) is supported for now.</p>
+</div><span id='structfield.block_stride' class='structfield'>
+                           <span id='block_stride.v' class='invisible'>
+                           <code>block_stride: <a class='struct' href='../../cv/struct.Size2i.html' title='cv::Size2i'>Size2i</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Block stride. It must be a multiple of cell size.</p>
+</div><span id='structfield.cell_size' class='structfield'>
+                           <span id='cell_size.v' class='invisible'>
+                           <code>cell_size: <a class='struct' href='../../cv/struct.Size2i.html' title='cv::Size2i'>Size2i</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Cell size. Only (8, 8) is supported for now.</p>
+</div><span id='structfield.nbins' class='structfield'>
+                           <span id='nbins.v' class='invisible'>
+                           <code>nbins: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Number of bins. Only 9 bins per cell are supported for now.</p>
+</div><span id='structfield.win_sigma' class='structfield'>
+                           <span id='win_sigma.v' class='invisible'>
+                           <code>win_sigma: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Gaussian smoothing window parameter.</p>
+</div><span id='structfield.l2hys_threshold' class='structfield'>
+                           <span id='l2hys_threshold.v' class='invisible'>
+                           <code>l2hys_threshold: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>L2-Hys normalization method shrinkage.</p>
+</div><span id='structfield.gamma_correction' class='structfield'>
+                           <span id='gamma_correction.v' class='invisible'>
+                           <code>gamma_correction: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Flag to specify whether the gamma correction preprocessing is required or not.</p>
+</div><span id='structfield.nlevels' class='structfield'>
+                           <span id='nlevels.v' class='invisible'>
+                           <code>nlevels: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Maximum number of detection window increases.</p>
+</div><span id='structfield.hit_threshold' class='structfield'>
+                           <span id='hit_threshold.v' class='invisible'>
+                           <code>hit_threshold: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Threshold for the distance between features and SVM classifying
+plane. Usually it is 0 and should be specfied in the detector
+coefficients (as the last free coefficient). But if the free coefficient
+is omitted (which is allowed), you can specify it manually here.</p>
+</div><span id='structfield.win_stride' class='structfield'>
+                           <span id='win_stride.v' class='invisible'>
+                           <code>win_stride: <a class='struct' href='../../cv/struct.Size2i.html' title='cv::Size2i'>Size2i</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Window stride. It must be a multiple of block stride.</p>
+</div><span id='structfield.padding' class='structfield'>
+                           <span id='padding.v' class='invisible'>
+                           <code>padding: <a class='struct' href='../../cv/struct.Size2i.html' title='cv::Size2i'>Size2i</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Padding</p>
+</div><span id='structfield.scale' class='structfield'>
+                           <span id='scale.v' class='invisible'>
+                           <code>scale: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.f64.html'>f64</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Coefficient of the detection window increase.</p>
+</div><span id='structfield.group_threshold' class='structfield'>
+                           <span id='group_threshold.v' class='invisible'>
+                           <code>group_threshold: <a class='primitive' href='https://doc.rust-lang.org/nightly/std/primitive.i32.html'>i32</a></code>
+                           </span></span><span class='stab '></span><div class='docblock'><p>Coefficient to regulate the similarity threshold. When detected, some
+objects can be covered by many rectangles. 0 means not to perform
+grouping.</p>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../cv/objdetect/struct.HogParams.html' title='cv::objdetect::HogParams'>HogParams</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1913' class='srclink' href='../../src/cv/src/objdetect.rs.html#161' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class='method'><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html' title='core::clone::Clone'>Clone</a> for <a class='struct' href='../../cv/objdetect/struct.HogParams.html' title='cv::objdetect::HogParams'>HogParams</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1932' class='srclink' href='../../src/cv/src/objdetect.rs.html#161' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class='method'><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class='struct' href='../../cv/objdetect/struct.HogParams.html' title='cv::objdetect::HogParams'>HogParams</a></code></span></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class='method'><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html' title='core::marker::Copy'>Copy</a> for <a class='struct' href='../../cv/objdetect/struct.HogParams.html' title='cv::objdetect::HogParams'>HogParams</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-1935' class='srclink' href='../../src/cv/src/objdetect.rs.html#161' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../../cv/objdetect/struct.HogParams.html' title='cv::objdetect::HogParams'>HogParams</a></code></span><span class='out-of-band'><div class='ghost'></div><a id='src-661' class='srclink' href='../../src/cv/src/objdetect.rs.html#217-247' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.default' class='method'><span id='default.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default' class='fnname'>default</a>() -&gt; <a class='struct' href='../../cv/objdetect/struct.HogParams.html' title='cv::objdetect::HogParams'>HogParams</a></code></span></h4>
+<div class='docblock'><p>Returns the &quot;default value&quot; for a type. <a href="https://doc.rust-lang.org/nightly/core/default/trait.Default.html#tymethod.default">Read more</a></p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "cv";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

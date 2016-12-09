@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ColorConversionCodes","Color conversion code used in cvt_color."],["InterpolationFlag","Interpolation algorithm"]]});
