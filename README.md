@@ -2,14 +2,15 @@
 
 [![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
 
-> This library primarily provides bindings and APIs for OpenCV 3.1.0.
+> This library primarily provides bindings (somewhat idiomatic) and APIs for OpenCV 3.1.0.
+
+[Documentation](https://nebgnahz.github.io/cv-rs/cv/)
 
 ## Table of Contents
 
 - [Background](#background)
 - [Install](#install)
 - [Usage](#usage)
-- [API](#api)
 - [Contribute](#contribute)
 - [License](#license)
 
@@ -63,15 +64,11 @@ See available examples on how this library might be used.
 - [Camshift](examples/camshift.rs)
 - [HOG Detection](examples/hog.rs), optional GPU code
 
-## API
-
-See [documentation](http://rust-vision.s3-website-us-west-2.amazonaws.com).
-
 ## Contribute
 
-See [the contribute file](contribute.md)!
+See [the contribute file](contribute.md)! PRs highly welcome.
 
-PRs accepted.
+You may also simply open up an issue for feature/porting request.
 
 Small note: If editing the README, please conform to the
 [standard-readme](https://github.com/RichardLitt/standard-readme) specification.
