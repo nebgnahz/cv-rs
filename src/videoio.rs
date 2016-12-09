@@ -1,5 +1,6 @@
 //! Media I/O, see [OpenCV
 //! videoio](http://docs.opencv.org/3.1.0/dd/de7/group__videoio.html)
+
 use core::{Mat, CMat, Size2i};
 use libc::{c_int, c_char, c_double};
 
@@ -8,11 +9,15 @@ use libc::{c_int, c_char, c_double};
 // =============================================================================
 enum CvVideoCapture {}
 
+unsafe impl Send for CvVideoCapture {}
+
 /// Video capturing from video files, image sequences or cameras.
 #[derive(Debug)]
 pub struct VideoCapture {
     inner: *mut CvVideoCapture,
 }
+
+unsafe impl Send for VideoCapture {}
 
 extern "C" {
     fn cv_videocapture_new(index: c_int) -> *mut CvVideoCapture;
