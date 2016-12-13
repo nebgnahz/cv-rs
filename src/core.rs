@@ -272,7 +272,6 @@ extern "C" {
     fn cv_mat_total(cmat: *const CMat) -> size_t;
     fn cv_mat_elem_size(cmat: *const CMat) -> size_t;
     fn cv_mat_type(cmat: *const CMat) -> c_int;
-    fn cv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
     fn cv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
     fn cv_mat_logic_and(cimage: *mut CMat, cmask: *const CMat);
     fn cv_mat_flip(src: *mut CMat, code: c_int);
@@ -313,13 +312,6 @@ impl Mat {
     /// Create an empty `Mat` with specific size (rows, cols and types).
     pub fn with_size(rows: i32, cols: i32, t: i32) -> Self {
         let m = unsafe { cv_mat_new_with_size(rows, cols, t) };
-        Mat::from_raw(m)
-    }
-
-    /// Create a `Mat` from reading the image specified by the path.
-    pub fn from_path(path: &str, flags: i32) -> Self {
-        let s = CString::new(path).unwrap();
-        let m = unsafe { cv_imread((&s).as_ptr(), flags) };
         Mat::from_raw(m)
     }
 

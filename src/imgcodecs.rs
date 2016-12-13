@@ -2,6 +2,7 @@
 //! imgcodecs](http://docs.opencv.org/3.1.0/d4/da8/group__imgcodecs.html).
 
 use std::ffi::CString;
+use std::path::Path;
 use super::core::{CMat, Mat};
 use super::libc::{c_char, c_int, size_t, uint8_t};
 
@@ -102,12 +103,13 @@ pub enum ImwritePngFlags {
 }
 
 extern "C" {
+    fn cv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
     fn cv_imdecode(buf: *const uint8_t, l: size_t, m: c_int) -> *mut CMat;
     fn cv_imencode(ext: *const c_char,
-                       inner: *const CMat,
-                       flag_ptr: *const c_int,
-                       flag_size: size_t)
-                       -> ImencodeResult;
+                   inner: *const CMat,
+                   flag_ptr: *const c_int,
+                   flag_size: size_t)
+                   -> ImencodeResult;
 
 }
 
@@ -119,6 +121,17 @@ struct ImencodeResult {
 }
 
 impl Mat {
+    /// Creates a `Mat` from reading the image specified by the path.
+    pub fn from_path<P: AsRef<Path>>(path: P, flags: ImreadModes) -> Option<Mat> {
+        if let Some(unicode_path) = path.as_ref().as_os_str().to_str() {
+            let s = CString::new(unicode_path).unwrap();
+            let m = unsafe { cv_imread((&s).as_ptr(), flags as c_int) };
+            Some(Mat::from_raw(m))
+        } else {
+            None
+        }
+    }
+
     /// Decodes an image from `buf` according to the specified mode.
     pub fn imdecode(buf: &[u8], mode: ImreadModes) -> Mat {
         let inner = unsafe { cv_imdecode(buf.as_ptr(), buf.len(), mode as i32) };
