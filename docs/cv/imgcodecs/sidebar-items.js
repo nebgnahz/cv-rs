@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["ImreadModes","ImreadModes"],["ImwriteFlags","Imwrite flags"],["ImwritePngFlags","Imwrite PNG flag"]]});
