@@ -78,6 +78,8 @@ typedef struct {
 // The caller owns the returned data CvMatrix
 CvMatrix* cv_mat_new();
 CvMatrix* cv_mat_new_with_size(int rows, int cols, int type);
+CvMatrix* cv_mat_from_buffer(int rows, int cols, int type,
+                             const uint8_t* buf);
 
 bool cv_mat_valid(CvMatrix* cmat);
 

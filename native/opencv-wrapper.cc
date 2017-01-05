@@ -21,6 +21,13 @@ CvMatrix* cv_mat_new_with_size(int rows, int cols, int type) {
     return reinterpret_cast<CvMatrix*>(new cv::Mat(rows, cols, type));
 }
 
+CvMatrix* cv_mat_from_buffer(int rows, int cols, int type,
+                             const uint8_t* buf) {
+    return reinterpret_cast<CvMatrix*>(
+        new cv::Mat(rows, cols, type,
+                    const_cast<void*>(reinterpret_cast<const void*>(buf))));
+}
+
 bool cv_mat_is_valid(CvMatrix* cmat) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     return mat->data != NULL;
@@ -66,7 +73,7 @@ int cv_mat_type(const CvMatrix* const cmat) {
     return (reinterpret_cast<const cv::Mat* const>(cmat))->type();
 }
 
-const uchar* cv_mat_data(const CvMatrix* const cmat) {
+const uint8_t* cv_mat_data(const CvMatrix* const cmat) {
     return (reinterpret_cast<const cv::Mat* const>(cmat))->data;
 }
 
