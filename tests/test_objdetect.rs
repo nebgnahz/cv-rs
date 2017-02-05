@@ -1,5 +1,3 @@
-#![feature(test)]
-extern crate test;
 extern crate cv;
 
 use cv::*;

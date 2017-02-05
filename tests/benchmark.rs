@@ -1,4 +1,3 @@
-#![feature(step_by)]
 extern crate cv;
 
 use cv::*;
@@ -29,7 +28,7 @@ fn bench_face_detect_physicists() {
     let cascade = load_frontal_face();
 
     (0..10)
-        .step_by(5)
+        .skip(4)
         .map(|i| {
             let rate = 1.0 - (i as f64) * 0.1;
             let smaller = mat.resize_by(rate, rate, InterpolationFlag::InterLinear);

@@ -7,7 +7,6 @@
 //! successful (I probably haven't tried hard enough). There is another port
 //! [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
 //! bindings using a Python script.
-#![feature(proc_macro)]
 #![deny(missing_docs,
         missing_debug_implementations,
         missing_copy_implementations,
