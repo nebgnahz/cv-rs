@@ -43,6 +43,11 @@ pub fn load_physicists() -> Mat {
     Mat::imdecode(&buf, ImreadModes::ImreadGrayscale)
 }
 
+pub fn load_avg_towncentre() -> Mat {
+    let buf = load_image_as_buf("assets/AVG-TownCentre-test-000011.jpg");
+    Mat::imdecode(&buf, ImreadModes::ImreadGrayscale)
+}
+
 pub fn load_lenna() -> Mat {
     let buf = load_lenna_as_buf();
     Mat::imdecode(&buf, ImreadModes::ImreadGrayscale)
