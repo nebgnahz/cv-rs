@@ -69,6 +69,10 @@ int cv_mat_depth(const CvMatrix* const cmat) {
     return (reinterpret_cast<const cv::Mat* const>(cmat))->depth();
 }
 
+int cv_mat_channels(const CvMatrix* const cmat) {
+    return (reinterpret_cast<const cv::Mat* const>(cmat))->channels();
+}
+
 int cv_mat_type(const CvMatrix* const cmat) {
     return (reinterpret_cast<const cv::Mat* const>(cmat))->type();
 }

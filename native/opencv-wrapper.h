@@ -95,6 +95,7 @@ CvMatrix* cv_imread(const char* const filename, int flags);
 int cv_mat_rows(const CvMatrix* const cmat);
 int cv_mat_cols(const CvMatrix* const cmat);
 int cv_mat_depth(const CvMatrix* const cmat);
+int cv_mat_channels(const CvMatrix* const cmat);
 int cv_mat_type(const CvMatrix* const cmat);
 const uint8_t* cv_mat_data(const CvMatrix* const cmat);
 size_t cv_mat_total(const CvMatrix* const cmat);

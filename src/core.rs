@@ -28,8 +28,11 @@ pub struct Mat {
     /// Number of rows
     pub rows: i32,
 
-    /// Depth of this mat
+    /// Depth of this mat (it should be the type).
     pub depth: i32,
+
+    /// Channels of this mat
+    pub channels: i32,
 }
 
 // TODO(benzh): Should consider Unique<T>,
@@ -269,6 +272,7 @@ extern "C" {
     fn cv_mat_rows(cmat: *const CMat) -> c_int;
     fn cv_mat_cols(cmat: *const CMat) -> c_int;
     fn cv_mat_depth(cmat: *const CMat) -> c_int;
+    fn cv_mat_channels(cmat: *const CMat) -> c_int;
     fn cv_mat_data(cmat: *const CMat) -> *const c_uchar;
     fn cv_mat_total(cmat: *const CMat) -> size_t;
     fn cv_mat_elem_size(cmat: *const CMat) -> size_t;
@@ -301,6 +305,7 @@ impl Mat {
             rows: unsafe { cv_mat_rows(raw) },
             cols: unsafe { cv_mat_cols(raw) },
             depth: unsafe { cv_mat_depth(raw) },
+            channels: unsafe { cv_mat_channels(raw) },
         }
     }
 
@@ -549,6 +554,7 @@ impl Mat {
     /// Copy specified channels from `self` to the specified channels of output
     /// `Mat`.
     // TODO(benzh) Avoid using raw pointers but rather take a vec for `from_to`?
+    // The usage (self.depth) here is buggy, it should actually be the type!
     pub fn mix_channels(&self, nsrcs: isize, ndsts: isize, from_to: *const i32, npairs: isize) -> Mat {
         let m = Mat::with_size(self.rows, self.cols, self.depth);
         unsafe {
