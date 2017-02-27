@@ -318,14 +318,14 @@ impl Mat {
     /// The following example shows how to get the data from an image and create
     /// a new image with the data (also forgets it).
     ///
-    /// ```ignore
+    /// ```rust,ignore
     /// let buffer = image.data();
     /// let size = image.size();
     /// let s = (size.width * size.height * 3) as usize;
     ///
     /// let mut vec = Vec::with_capacity(s);
     /// unsafe {
-    ///   vec.set_len(size);
+    ///   vec.set_len(s);
     ///   copy(buffer, vec.as_mut_ptr(), s);
     /// }
     /// let new_image = Mat::from_buffer(

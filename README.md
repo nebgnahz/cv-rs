@@ -44,7 +44,7 @@ Then in any Rust project, add this to your `Cargo.toml`:
 
 ```
 [dependencies]
-cv = "0.1.0"
+cv = { git = "https://github.com/nebgnahz/cv-rs.git" }
 ```
 
 And add this to your crate:
