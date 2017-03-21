@@ -56,6 +56,14 @@ use cv::*;
 
 And then, enjoy the power of OpenCV.
 
+If you'd like to use OpenCV GPU functions, it's inside `cv::cuda`. Enable it with the following code in `Cargo.toml`:
+
+```
+[dependencies.cv]
+git = "https://github.com/nebgnahz/cv-rs"
+features = [ "gpu" ]
+```
+
 ## Usage
 
 See available examples on how this library might be used.
