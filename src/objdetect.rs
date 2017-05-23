@@ -1,11 +1,11 @@
 //! Various object detection algorithms, such as Haar feature-based cascade
 //! classifier for object detection and histogram of oriented gradients (HOG).
 
+use super::core::*;
 use libc::{c_double, c_char, c_int};
 use std::ffi::CString;
 use std::path::Path;
 use std::vec::Vec;
-use super::core::*;
 
 /// An object detect trait.
 pub trait ObjectDetect {
@@ -42,7 +42,10 @@ extern "C" {
 
 impl ObjectDetect for CascadeClassifier {
     fn detect(&self, image: &Mat) -> Vec<(Rect, f64)> {
-        self.detect_multiscale(image).into_iter().map(|r| (r, 0f64)).collect::<Vec<_>>()
+        self.detect_multiscale(image)
+            .into_iter()
+            .map(|r| (r, 0f64))
+            .collect::<Vec<_>>()
     }
 }
 
@@ -157,13 +160,15 @@ impl Drop for SvmDetector {
     }
 }
 
-/// Parameters that controls the behavior of HOG
+/// Parameters that controls the behavior of HOG.
 #[derive(Debug, Clone, Copy)]
 pub struct HogParams {
-    /// Detection window size. Align to block size and block stride
+    /// Detection window size. Align to block size and block stride. The default
+    /// is 64x128, trained the same as original paper.
     pub win_size: Size2i,
 
-    /// Block size in pixels. Align to cell size. Only (16,16) is supported for now.
+    /// Block size in pixels. Align to cell size. Only (16,16) is supported for
+    /// now (at least for GPU).
     pub block_size: Size2i,
 
     /// Block stride. It must be a multiple of cell size.
@@ -175,16 +180,17 @@ pub struct HogParams {
     /// Number of bins. Only 9 bins per cell are supported for now.
     pub nbins: i32,
 
-    /// Gaussian smoothing window parameter.
+    /// Gaussian smoothing window parameter. Default -1 for CPU and 4.0 for GPU.
     pub win_sigma: f64,
 
-    /// L2-Hys normalization method shrinkage.
+    /// L2-Hys normalization method shrinkage. Default 0.2.
     pub l2hys_threshold: f64,
 
-    /// Flag to specify whether the gamma correction preprocessing is required or not.
+    /// Flag to specify whether the gamma correction preprocessing is required
+    /// or not. Default false.
     pub gamma_correction: bool,
 
-    /// Maximum number of detection window increases.
+    /// Maximum number of detection window increases (HOG scales). Default: 64.
     pub nlevels: usize,
 
     // =======================================================================
@@ -209,6 +215,21 @@ pub struct HogParams {
     /// objects can be covered by many rectangles. 0 means not to perform
     /// grouping.
     pub group_threshold: i32,
+
+    /// The useMeanShiftGrouping parameter is a boolean indicating whether or
+    /// not mean-shift grouping should be performed to handle potential
+    /// overlapping bounding boxes. While this value should not be set and users
+    /// should employ non-maxima suppression instead, we support setting it as a
+    /// library function.
+    pub use_meanshift_grouping: bool,
+
+    /// The `finalThreshold` parameter is mainly used to select the clusters
+    /// that have at least `finalThreshold + 1` rectangles. This parameter is
+    /// passed when meanShift is enabled; the function rejects the small
+    /// clusters containing less than or equal to `finalThreshold` rectangles,
+    /// computes the average rectangle size for the rest of the accepted
+    /// clusters and adds those to the output rectangle list.
+    pub final_threshold: f64,
 }
 
 const DEFAULT_WIN_SIGMA: f64 = -1f64;
@@ -234,7 +255,7 @@ impl Default for HogParams {
 
             win_sigma: win_sigma,
             l2hys_threshold: 0.2,
-            gamma_correction: true,
+            gamma_correction: false,
             nlevels: DEFAULT_NLEVELS,
 
             hit_threshold: 0f64,
@@ -242,6 +263,9 @@ impl Default for HogParams {
             padding: Size2i::default(),
             scale: 1.05,
             group_threshold: 2,
+
+            final_threshold: 2.0,
+            use_meanshift_grouping: false,
         }
     }
 }
@@ -295,8 +319,8 @@ impl ObjectDetect for HogDescriptor {
                           self.params.win_stride,
                           self.params.padding,
                           self.params.scale,
-                          2.0, // finalThreshold
-                          false /* useMeanshiftGrouping */);
+                          self.params.final_threshold,
+                          self.params.use_meanshift_grouping)
         }
 
         let results = detected.rustify();
