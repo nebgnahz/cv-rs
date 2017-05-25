@@ -77,6 +77,17 @@ void cv_gpu_hog_detect(GpuHog* hog, GpuMat* image, VecRect* found) {
     vec_rect_cxx_to_c(vec_object, found);
 }
 
+void cv_gpu_hog_detect_with_conf(GpuHog* hog, GpuMat* image, VecRect* found, VecDouble* conf) {
+    CV_GPU_HOG* cv_hog = reinterpret_cast<CV_GPU_HOG*>(hog);
+    cv::cuda::GpuMat* cv_image = reinterpret_cast<cv::cuda::GpuMat*>(image);
+    std::vector<cv::Rect> vec_object;
+    std::vector<double> vec_confidences;
+    (*cv_hog)->setGroupThreshold(0);
+    (*cv_hog)->detectMultiScale(*cv_image, vec_object, &vec_confidences);
+    vec_rect_cxx_to_c(vec_object, found);
+    vec_double_cxx_to_c(vec_confidences, conf);
+}
+
 void cv_gpu_hog_set_gamma_correction(GpuHog* hog, bool gamma) {
     CV_GPU_HOG* cv_hog = reinterpret_cast<CV_GPU_HOG*>(hog);
     (*cv_hog)->setGammaCorrection(gamma);

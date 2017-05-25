@@ -5,8 +5,8 @@ use cv::*;
 use cv::highgui::*;
 use cv::imgcodecs::*;
 use cv::objdetect::*;
-// use cv::cuda::GpuHog as Hog;
-use cv::objdetect::HogDescriptor as Hog;
+use cv::cuda::GpuHog as Hog;
+// use cv::objdetect::HogDescriptor as Hog;
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Result};
@@ -47,7 +47,9 @@ fn run() -> Result<()> {
         highgui_named_window("window", WindowFlags::WindowAutosize);
     }
 
-    let mut hog = Hog::default();
+    let mut param = HogParams::default();
+    param.group_threshold = 0;
+    let mut hog = Hog::with_params(param);
     let detector = SvmDetector::default_people_detector();
     hog.set_svm_detector(detector);
 

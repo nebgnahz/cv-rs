@@ -92,6 +92,9 @@ pub struct GpuHog {
     inner: *mut CGpuHog,
     /// Hog parameters.
     pub params: HogParams,
+
+    /// Should return detection scores
+    pub return_score: bool,
 }
 
 extern "C" {
@@ -105,6 +108,7 @@ extern "C" {
     fn cv_gpu_hog_drop(hog: *mut CGpuHog);
     fn cv_gpu_hog_set_detector(hog: *mut CGpuHog, d: *const CSvmDetector);
     fn cv_gpu_hog_detect(hog: *mut CGpuHog, mat: *mut CGpuMat, found: *mut CVecOfRect);
+    fn cv_gpu_hog_detect_with_conf(hog: *mut CGpuHog, mat: *mut CGpuMat, found: *mut CVecOfRect, conf: *mut CVecDouble);
 
     fn cv_gpu_hog_set_gamma_correction(hog: *mut CGpuHog, gamma: bool);
     fn cv_gpu_hog_set_group_threshold(hog: *mut CGpuHog, group_threshold: c_int);
@@ -127,12 +131,13 @@ extern "C" {
 
 impl ObjectDetect for GpuHog {
     fn detect(&self, image: &Mat) -> Vec<(Rect, f64)> {
-        let mut found = CVecOfRect::default();
         let mut gpu_mat = GpuMat::default();
         gpu_mat.upload(image);
-        unsafe { cv_gpu_hog_detect(self.inner, gpu_mat.inner, &mut found) }
-
-        found.rustify().into_iter().map(|r| (r, 0f64)).collect::<Vec<_>>()
+        if self.return_score {
+            self._detect_with_confidence(&gpu_mat)
+        } else {
+            self._detect(&gpu_mat)
+        }
     }
 }
 
@@ -144,6 +149,7 @@ impl Default for GpuHog {
         GpuHog {
             inner: inner,
             params: params,
+            return_score: false,
         }
     }
 }
@@ -162,7 +168,13 @@ impl GpuHog {
         GpuHog {
             inner: inner,
             params: params,
+            return_score: false,
         }
+    }
+
+    /// Should or not return the detection score
+    pub fn return_score(&mut self, should: bool) {
+        self.return_score = should;
     }
 
     /// Creates a new GpuHog detector with parameters specified inside `params`.
@@ -188,6 +200,7 @@ impl GpuHog {
         GpuHog {
             inner: inner,
             params: params,
+            return_score: false,
         }
     }
 
@@ -209,12 +222,21 @@ impl GpuHog {
     }
 
     /// Detects according to the SVM detector specified.
-    pub fn detect(&mut self, mat: &GpuMat) -> Vec<Rect> {
+    fn _detect(&self, mat: &GpuMat) -> Vec<(Rect, f64)> {
         let mut found = CVecOfRect::default();
         unsafe {
             cv_gpu_hog_detect(self.inner, mat.inner, &mut found);
         }
-        found.rustify()
+        found.rustify().into_iter().map(|r| (r, 0f64)).collect::<Vec<_>>()
+    }
+
+    /// Detects and returns the results with confidence (scores)
+    fn _detect_with_confidence(&self, mat: &GpuMat) -> Vec<(Rect, f64)> {
+        let mut found = CVecOfRect::default();
+        let mut conf = CVecDouble::default();
+        unsafe { cv_gpu_hog_detect_with_conf(self.inner, mat.inner, &mut found, &mut conf) }
+
+        found.rustify().into_iter().zip(conf.rustify().into_iter()).collect::<Vec<_>>()
     }
 }
 

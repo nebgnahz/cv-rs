@@ -36,6 +36,7 @@ GpuHog* cv_gpu_hog_new(Size2i win_size, Size2i block_size,
 void cv_gpu_hog_drop(GpuHog*);
 void cv_gpu_hog_set_detector(GpuHog*, SvmDetector*);
 void cv_gpu_hog_detect(GpuHog*, GpuMat*, VecRect*);
+void cv_gpu_hog_detect_with_conf(GpuHog*, GpuMat*, VecRect*, VecDouble*);
 
 void cv_gpu_hog_set_gamma_correction(GpuHog*, bool gamma);
 void cv_gpu_hog_set_group_threshold(GpuHog*, int32_t group_threshold);
