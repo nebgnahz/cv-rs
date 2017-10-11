@@ -1,0 +1,38 @@
+language: rust
+sudo: false
+git:
+  submodules: false
+os: osx
+
+cache:
+  directories:
+    - $TRAVIS_BUILD_DIR/target
+
+before_cache:
+  - find $TRAVIS_BUILD_DIR/target/debug -maxdepth 1 -type f -delete
+
+rust:
+  - stable
+
+before_script:
+  - if [[ $TRAVIS_OS_NAME == "osx" ]]; then export CC=clang; brew install opencv3; fi
+
+script:
+  - if [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo install -f clippy && cargo clippy; fi
+  - cargo build --no-default-features
+  - cargo build
+  - cargo test
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cargo doc --no-deps; fi
+  - if [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then cargo bench; fi
+
+notifications:
+  email:
+    on_success: never
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: target/doc/
+  on:
+    branch: master
