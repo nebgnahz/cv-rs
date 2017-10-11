@@ -21,5 +21,5 @@ fn main() {
     }
 
     highgui_named_window("Display window", WindowFlags::WindowNormal);
-    mat.show("Display window", 0);
+    mat.show("Display window", 0).unwrap();
 }

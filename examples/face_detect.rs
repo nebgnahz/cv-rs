@@ -1,8 +1,8 @@
 extern crate cv;
 
 use cv::*;
-use cv::imgcodecs::*;
 use cv::highgui::*;
+use cv::imgcodecs::*;
 use cv::objdetect::CascadeClassifier;
 use std::fs::File;
 use std::io::Read;
@@ -27,13 +27,16 @@ fn main() {
 
     println!("Detected {} faces", result.len());
     // we draw each of them on the image
-    result.iter()
+    result
+        .iter()
         .map(|&r| {
-            mat.rectangle_custom(r.scale(1.2),
-                                 Scalar::new(255, 255, 0, 255),
-                                 10,
-                                 LineTypes::Line8)
+            mat.rectangle_custom(
+                r.scale(1.2),
+                Scalar::new(255, 255, 0, 255),
+                10,
+                LineTypes::Line8,
+            )
         })
         .count();
-    mat.show("window", 0);
+    mat.show("window", 0).unwrap();
 }

@@ -33,6 +33,6 @@ fn main() {
 
     highgui_named_window("Window", WindowFlags::WindowAutosize);
     while let Some(image) = cap.read() {
-        image.show("Window", 30);
+        image.show("Window", 30).unwrap();
     }
 }

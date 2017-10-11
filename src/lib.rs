@@ -1,4 +1,4 @@
-//! This library primarily provides a binding and API for OpenCV 3.1.0.
+//! This library primarily provides a binding and API for OpenCV 3.x.
 //!
 //! This is a work-in-progress and modules/functions are implemented as
 //! needed. Attempts to use
@@ -7,18 +7,23 @@
 //! successful (I probably haven't tried hard enough). There is another port
 //! [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
 //! bindings using a Python script.
-#![deny(missing_docs,
-        missing_debug_implementations,
-        missing_copy_implementations,
-        trivial_casts,
-        trivial_numeric_casts,
-        unused_import_braces,
-        unused_qualifications)]
+#![deny(missing_docs)]
+#![deny(missing_debug_implementations)]
+#![deny(missing_copy_implementations)]
+#![deny(trivial_casts)]
+#![deny(trivial_numeric_casts)]
+#![deny(unused_import_braces)]
+#![deny(unused_qualifications)]
+
+// `error_chain!` can recurse deeply
+#![recursion_limit = "1024"]
 
 extern crate libc;
 extern crate num;
 #[macro_use]
 extern crate num_derive;
+#[macro_use]
+extern crate error_chain;
 
 mod core;
 pub use core::CvType;
@@ -33,6 +38,7 @@ pub use core::Scalar;
 pub use core::Size2f;
 pub use core::Size2i;
 
+pub mod errors;
 pub mod imgproc;
 pub mod imgcodecs;
 pub mod videoio;

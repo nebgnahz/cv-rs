@@ -2,7 +2,8 @@
 //! classifier for object detection and histogram of oriented gradients (HOG).
 
 use super::core::*;
-use libc::{c_double, c_char, c_int};
+use super::errors::*;
+use libc::{c_char, c_double, c_int};
 use std::ffi::CString;
 use std::path::Path;
 use std::vec::Vec;
@@ -30,14 +31,16 @@ extern "C" {
     fn cv_cascade_classifier_new() -> *mut CCascadeClassifier;
     fn cv_cascade_classifier_load(cc: *mut CCascadeClassifier, p: *const c_char) -> bool;
     fn cv_cascade_classifier_drop(p: *mut CCascadeClassifier);
-    fn cv_cascade_classifier_detect(cc: *mut CCascadeClassifier,
-                                    cmat: *mut CMat,
-                                    vec_of_rect: *mut CVecOfRect,
-                                    scale_factor: c_double,
-                                    min_neighbors: c_int,
-                                    flags: c_int,
-                                    min_size: Size2i,
-                                    max_size: Size2i);
+    fn cv_cascade_classifier_detect(
+        cc: *mut CCascadeClassifier,
+        cmat: *mut CMat,
+        vec_of_rect: *mut CVecOfRect,
+        scale_factor: c_double,
+        min_neighbors: c_int,
+        flags: c_int,
+        min_size: Size2i,
+        max_size: Size2i,
+    );
 }
 
 impl ObjectDetect for CascadeClassifier {
@@ -56,18 +59,23 @@ impl CascadeClassifier {
     }
 
     /// Creates a cascade classifier using the model specified.
-    pub fn from_path<P: AsRef<Path>>(path: P) -> Option<Self> {
+    pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self> {
         let cc = CascadeClassifier::new();
-        if cc.load(path) { Some(cc) } else { None }
+        cc.load(path)?;
+        Ok(cc)
     }
 
     /// Loads the classifier model from a path.
-    pub fn load<P: AsRef<Path>>(&self, path: P) -> bool {
-        let s = CString::new(path.as_ref()
-                .to_str()
-                .expect("only UTF-8 path is allowed"))
-            .expect("failed to create CString to load cascade");
-        unsafe { cv_cascade_classifier_load(self.inner, (&s).as_ptr()) }
+    pub fn load<P: AsRef<Path>>(&self, path: P) -> Result<()> {
+        let error = ErrorKind::InvalidPath(path.as_ref().to_path_buf());
+        if let Some(p) = path.as_ref().to_str() {
+            let s = CString::new(p)?;
+            if unsafe { cv_cascade_classifier_load(self.inner, (&s).as_ptr()) } {
+                return Ok(());
+            }
+        }
+
+        Err(error.into())
     }
 
     /// The default detection uses scale factor 1.1, minNeighbors 3, no min size
@@ -90,23 +98,26 @@ impl CascadeClassifier {
     ///   are ignored
     ///
     /// OpenCV has a parameter (`flags`) that's not used at all.
-    pub fn detect_with_params(&self,
-                              mat: &Mat,
-                              scale_factor: f32,
-                              min_neighbors: i32,
-                              min_size: Size2i,
-                              max_size: Size2i)
-                              -> Vec<Rect> {
+    pub fn detect_with_params(
+        &self,
+        mat: &Mat,
+        scale_factor: f32,
+        min_neighbors: i32,
+        min_size: Size2i,
+        max_size: Size2i,
+    ) -> Vec<Rect> {
         let mut c_result = CVecOfRect::default();
         unsafe {
-            cv_cascade_classifier_detect(self.inner,
-                                         mat.inner,
-                                         &mut c_result,
-                                         scale_factor as c_double,
-                                         min_neighbors,
-                                         0,
-                                         min_size,
-                                         max_size)
+            cv_cascade_classifier_detect(
+                self.inner,
+                mat.inner,
+                &mut c_result,
+                scale_factor as c_double,
+                min_neighbors,
+                0,
+                min_size,
+                max_size,
+            )
         }
         c_result.rustify()
     }
@@ -287,15 +298,17 @@ extern "C" {
     fn cv_hog_new() -> *mut CHogDescriptor;
     fn cv_hog_drop(hog: *mut CHogDescriptor);
     fn cv_hog_set_svm_detector(hog: *mut CHogDescriptor, svm: *mut CSvmDetector);
-    fn cv_hog_detect(hog: *mut CHogDescriptor,
-                     image: *mut CMat,
-                     objs: *mut CVecOfRect,
-                     weights: *mut CVecDouble,
-                     win_stride: Size2i,
-                     padding: Size2i,
-                     scale: c_double,
-                     final_threshold: c_double,
-                     use_means_shift: bool);
+    fn cv_hog_detect(
+        hog: *mut CHogDescriptor,
+        image: *mut CMat,
+        objs: *mut CVecOfRect,
+        weights: *mut CVecDouble,
+        win_stride: Size2i,
+        padding: Size2i,
+        scale: c_double,
+        final_threshold: c_double,
+        use_means_shift: bool,
+    );
 }
 
 impl Default for HogDescriptor {
@@ -312,15 +325,17 @@ impl ObjectDetect for HogDescriptor {
         let mut detected = CVecOfRect::default();
         let mut weights = CVecDouble::default();
         unsafe {
-            cv_hog_detect(self.inner,
-                          image.inner,
-                          &mut detected,
-                          &mut weights,
-                          self.params.win_stride,
-                          self.params.padding,
-                          self.params.scale,
-                          self.params.final_threshold,
-                          self.params.use_meanshift_grouping)
+            cv_hog_detect(
+                self.inner,
+                image.inner,
+                &mut detected,
+                &mut weights,
+                self.params.win_stride,
+                self.params.padding,
+                self.params.scale,
+                self.params.final_threshold,
+                self.params.use_meanshift_grouping,
+            )
         }
 
         let results = detected.rustify();

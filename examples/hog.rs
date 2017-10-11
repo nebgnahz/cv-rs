@@ -5,8 +5,13 @@ use cv::*;
 use cv::highgui::*;
 use cv::imgcodecs::*;
 use cv::objdetect::*;
+
+#[cfg(feature = "gpu")]
 use cv::cuda::GpuHog as Hog;
-// use cv::objdetect::HogDescriptor as Hog;
+
+#[cfg(not(feature = "gpu"))]
+use cv::objdetect::HogDescriptor as Hog;
+
 use std::fs;
 use std::fs::File;
 use std::io::{Read, Result};
@@ -82,7 +87,7 @@ fn run_detect_for_image<P: AsRef<Path>, OD: ObjectDetect>(detector: &mut OD, pat
         results.iter()
             .map(|&(r, _w)| mat.rectangle(r.scale(0.6)))
             .count();
-        mat.show("window", 0);
+        mat.show("window", 0).unwrap();
     }
 }
 

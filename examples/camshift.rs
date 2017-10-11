@@ -1,7 +1,7 @@
 extern crate cv;
 use cv::*;
-use cv::imgproc::*;
 use cv::highgui::*;
+use cv::imgproc::*;
 use cv::video::tracking::*;
 use cv::videoio::*;
 
@@ -70,11 +70,13 @@ fn main() {
             let roi = hue.roi(selection);
             let maskroi = mask.roi(selection);
 
-            let raw_hist = roi.calc_hist(std::ptr::null(),
-                                         maskroi,
-                                         1,
-                                         &hsize,
-                                         &phranges[0] as *const *const f32);
+            let raw_hist = roi.calc_hist(
+                std::ptr::null(),
+                maskroi,
+                1,
+                &hsize,
+                &phranges[0] as *const *const f32,
+            );
             hist = raw_hist.normalize(0.0, 255.0, NormTypes::NormMinMax);
 
             track_window = selection;
@@ -84,7 +86,8 @@ fn main() {
         }
 
         if is_tracking {
-            let mut back_project = hue.calc_back_project(std::ptr::null(), &hist, &phranges[0] as *const *const f32);
+            let mut back_project =
+                hue.calc_back_project(std::ptr::null(), &hist, &phranges[0] as *const *const f32);
             back_project.logic_and(mask);
             let criteria = TermCriteria::new(TermType::Count, 10, 1.0);
             let track_box = back_project.camshift(track_window, &criteria);
@@ -92,6 +95,6 @@ fn main() {
             m.rectangle(track_box.bounding_rect());
         }
 
-        m.show("Window", 30);
+        m.show("Window", 30).unwrap();
     }
 }
