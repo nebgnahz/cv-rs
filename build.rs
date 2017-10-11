@@ -1,8 +1,9 @@
 extern crate gcc;
 
 fn main() {
-    let mut opencv_config = gcc::Config::new();
-    opencv_config.cpp(true)
+    let mut opencv_config = gcc::Build::new();
+    opencv_config
+        .cpp(true)
         .file("native/opencv-wrapper.cc")
         .file("native/utils.cc")
         .include("/usr/local/include")

@@ -21,7 +21,3 @@ gcc = "0.3"
 
 [features]
 gpu = []
-
-[[bin]]
-name = "main"
-doc = false
