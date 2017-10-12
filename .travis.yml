@@ -14,7 +14,6 @@ sudo: false
 
 before_script:
   - export CC=clang;
-  - export HOMEBREW_NO_AUTO_UPDATE=1;
   - brew tap homebrew/science
   - brew install opencv3
 
