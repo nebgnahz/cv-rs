@@ -21,8 +21,7 @@ CvMatrix* cv_mat_new_with_size(int rows, int cols, int type) {
     return reinterpret_cast<CvMatrix*>(new cv::Mat(rows, cols, type));
 }
 
-CvMatrix* cv_mat_from_buffer(int rows, int cols, int type,
-                             const uint8_t* buf) {
+CvMatrix* cv_mat_from_buffer(int rows, int cols, int type, const uint8_t* buf) {
     return reinterpret_cast<CvMatrix*>(
         new cv::Mat(rows, cols, type,
                     const_cast<void*>(reinterpret_cast<const void*>(buf))));
@@ -106,8 +105,7 @@ void cv_vec_of_rect_drop(VecRect* v) {
 // =============================================================================
 //  core array
 // =============================================================================
-void cv_in_range(CvMatrix* cmat, Scalar lowerb, Scalar upperb,
-                     CvMatrix* cdst) {
+void cv_in_range(CvMatrix* cmat, Scalar lowerb, Scalar upperb, CvMatrix* cdst) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     cv::Scalar lb(lowerb.v0, lowerb.v1, lowerb.v2);
     cv::Scalar ub(upperb.v0, upperb.v1, upperb.v2);
@@ -115,25 +113,56 @@ void cv_in_range(CvMatrix* cmat, Scalar lowerb, Scalar upperb,
     cv::inRange(*mat, lb, ub, *dst);
 }
 
-void cv_mix_channels(CvMatrix* cmat, size_t nsrcs, CvMatrix* dst,
-                         size_t ndsts, const int* from_to, size_t npairs) {
+void cv_mix_channels(CvMatrix* cmat, size_t nsrcs, CvMatrix* dst, size_t ndsts,
+                     const int* from_to, size_t npairs) {
     cv::Mat* from = reinterpret_cast<cv::Mat*>(cmat);
     cv::Mat* to = reinterpret_cast<cv::Mat*>(dst);
     cv::mixChannels(from, nsrcs, to, ndsts, from_to, npairs);
 }
 
 void cv_normalize(CvMatrix* csrc, CvMatrix* cdst, double alpha, double beta,
-                      int norm_type) {
+                  int norm_type) {
     cv::Mat* src = reinterpret_cast<cv::Mat*>(csrc);
     cv::Mat* dst = reinterpret_cast<cv::Mat*>(cdst);
     cv::normalize(*src, *dst, alpha, beta, norm_type);
+}
+
+void cv_bitwise_and(CvMatrix* csrc1, CvMatrix* csrc2, CvMatrix* cdst) {
+    cv::Mat* src1 = reinterpret_cast<cv::Mat*>(csrc1);
+    cv::Mat* src2 = reinterpret_cast<cv::Mat*>(csrc2);
+    cv::Mat* dst = reinterpret_cast<cv::Mat*>(cdst);
+
+    cv::bitwise_and(*src1, *src2, *dst);
+}
+
+void cv_bitwise_not(CvMatrix* csrc, CvMatrix* cdst) {
+    cv::Mat* src = reinterpret_cast<cv::Mat*>(csrc);
+    cv::Mat* dst = reinterpret_cast<cv::Mat*>(cdst);
+
+    cv::bitwise_not(*src, *dst);
+}
+
+void cv_bitwise_or(CvMatrix* csrc1, CvMatrix* csrc2, CvMatrix* cdst) {
+    cv::Mat* src1 = reinterpret_cast<cv::Mat*>(csrc1);
+    cv::Mat* src2 = reinterpret_cast<cv::Mat*>(csrc2);
+    cv::Mat* dst = reinterpret_cast<cv::Mat*>(cdst);
+
+    cv::bitwise_or(*src1, *src2, *dst);
+}
+
+void cv_bitwise_xor(CvMatrix* csrc1, CvMatrix* csrc2, CvMatrix* cdst) {
+    cv::Mat* src1 = reinterpret_cast<cv::Mat*>(csrc1);
+    cv::Mat* src2 = reinterpret_cast<cv::Mat*>(csrc2);
+    cv::Mat* dst = reinterpret_cast<cv::Mat*>(cdst);
+
+    cv::bitwise_xor(*src1, *src2, *dst);
 }
 
 // =============================================================================
 //  Imgproc
 // =============================================================================
 void cv_rectangle(CvMatrix* cmat, Rect crect, Scalar color, int thickness,
-                      int linetype) {
+                  int linetype) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
     cv::rectangle(*mat, rect,
@@ -153,8 +182,8 @@ void cv_pyr_down(CvMatrix* cmat, CvMatrix* output) {
     cv::pyrDown(*mat, *out);
 }
 
-void cv_resize(CvMatrix* from, CvMatrix* to, Size2i dsize, double fx,
-                   double fy, int interpolation) {
+void cv_resize(CvMatrix* from, CvMatrix* to, Size2i dsize, double fx, double fy,
+               int interpolation) {
     cv::Mat* cv_from = reinterpret_cast<cv::Mat*>(from);
     cv::Mat* cv_to = reinterpret_cast<cv::Mat*>(to);
     cv::Size cv_dsize(dsize.width, dsize.height);
@@ -162,8 +191,8 @@ void cv_resize(CvMatrix* from, CvMatrix* to, Size2i dsize, double fx,
 }
 
 void cv_calc_hist(const CvMatrix* cimages, int nimages, const int* channels,
-                      CvMatrix* cmask, CvMatrix* chist, int dims,
-                      const int* hist_size, const float** ranges) {
+                  CvMatrix* cmask, CvMatrix* chist, int dims,
+                  const int* hist_size, const float** ranges) {
     const cv::Mat* images = reinterpret_cast<const cv::Mat*>(cimages);
     cv::Mat* mask = reinterpret_cast<cv::Mat*>(cmask);
     cv::Mat* hist = reinterpret_cast<cv::Mat*>(chist);
@@ -172,8 +201,8 @@ void cv_calc_hist(const CvMatrix* cimages, int nimages, const int* channels,
 }
 
 void cv_calc_back_project(const CvMatrix* cimages, int nimages,
-                              const int* channels, CvMatrix* chist,
-                              CvMatrix* cback_project, const float** ranges) {
+                          const int* channels, CvMatrix* chist,
+                          CvMatrix* cback_project, const float** ranges) {
     const cv::Mat* images = reinterpret_cast<const cv::Mat*>(cimages);
     cv::Mat* hist = reinterpret_cast<cv::Mat*>(chist);
     cv::Mat* back_project = reinterpret_cast<cv::Mat*>(cback_project);
@@ -192,9 +221,8 @@ CvMatrix* cv_imdecode(const uint8_t* const buffer, size_t len, int flag) {
 }
 
 // The caller is responsible for the allocated buffer
-ImencodeResult cv_imencode(const char* const ext,
-                               const CvMatrix* const cmat,
-                               const int* const flag_ptr, size_t flag_size) {
+ImencodeResult cv_imencode(const char* const ext, const CvMatrix* const cmat,
+                           const int* const flag_ptr, size_t flag_size) {
     const cv::Mat* image = reinterpret_cast<const cv::Mat*>(cmat);
     std::vector<uchar> buf;
     std::vector<int> params(flag_ptr, flag_ptr + flag_size);
@@ -233,8 +261,8 @@ int cv_wait_key(int delay) {
     return cv::waitKey(delay);
 }
 
-void cv_set_mouse_callback(const char* const winname,
-                               MouseCallback on_mouse, void* userdata) {
+void cv_set_mouse_callback(const char* const winname, MouseCallback on_mouse,
+                           void* userdata) {
     cv::setMouseCallback(winname, on_mouse, userdata);
 }
 
@@ -296,7 +324,8 @@ CVideoWriter* cv_videowriter_default() {
 CVideoWriter* cv_videowriter_new(const char* const path, int fourcc, double fps,
                                  Size2i frame_size, bool is_color) {
     cv::Size cv_frame_size(frame_size.width, frame_size.height);
-    cv::VideoWriter* writer = new cv::VideoWriter(path, fourcc, fps, cv_frame_size, is_color);
+    cv::VideoWriter* writer =
+        new cv::VideoWriter(path, fourcc, fps, cv_frame_size, is_color);
     return reinterpret_cast<CVideoWriter*>(writer);
 }
 
@@ -343,8 +372,7 @@ CCascadeClassifier* cv_cascade_classifier_new() {
     return reinterpret_cast<CCascadeClassifier*>(cc);
 }
 
-bool cv_cascade_classifier_load(CCascadeClassifier* cc,
-                                    const char* const p) {
+bool cv_cascade_classifier_load(CCascadeClassifier* cc, const char* const p) {
     cv::CascadeClassifier* cascade =
         reinterpret_cast<cv::CascadeClassifier*>(cc);
     return cascade->load(p);
@@ -363,9 +391,9 @@ void cv_cascade_classifier_drop(CCascadeClassifier* cc) {
 }
 
 void cv_cascade_classifier_detect(CCascadeClassifier* cc, CvMatrix* cmat,
-                                      VecRect* vec_of_rect, double scale_factor,
-                                      int min_neighbors, int flags,
-                                      Size2i min_size, Size2i max_size) {
+                                  VecRect* vec_of_rect, double scale_factor,
+                                  int min_neighbors, int flags, Size2i min_size,
+                                  Size2i max_size) {
     cv::CascadeClassifier* cascade =
         reinterpret_cast<cv::CascadeClassifier*>(cc);
     cv::Mat* image = reinterpret_cast<cv::Mat*>(cmat);
@@ -460,7 +488,7 @@ void cv_term_criteria_drop(CTermCriteria* c_criteria) {
 }
 
 RotatedRect cv_camshift(CvMatrix* c_bp_image, Rect crect,
-                             CTermCriteria* c_criteria) {
+                        CTermCriteria* c_criteria) {
     cv::Mat* bp_image = reinterpret_cast<cv::Mat*>(c_bp_image);
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
     cv::TermCriteria* criteria =

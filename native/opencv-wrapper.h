@@ -78,8 +78,7 @@ typedef struct {
 // The caller owns the returned data CvMatrix
 CvMatrix* cv_mat_new();
 CvMatrix* cv_mat_new_with_size(int rows, int cols, int type);
-CvMatrix* cv_mat_from_buffer(int rows, int cols, int type,
-                             const uint8_t* buf);
+CvMatrix* cv_mat_from_buffer(int rows, int cols, int type, const uint8_t* buf);
 
 bool cv_mat_valid(CvMatrix* cmat);
 
@@ -109,36 +108,38 @@ void cv_vec_of_rect_drop(VecRect* v);
 // =============================================================================
 //  core array
 // =============================================================================
-void cv_in_range(CvMatrix* cmat, Scalar lowerb, Scalar upperb,
-                     CvMatrix* dst);
-void cv_mix_channels(CvMatrix* cmat, size_t nsrcs, CvMatrix* dst,
-                         size_t ndsts, const int* from_to, size_t npairs);
+void cv_in_range(CvMatrix* cmat, Scalar lowerb, Scalar upperb, CvMatrix* dst);
+void cv_mix_channels(CvMatrix* cmat, size_t nsrcs, CvMatrix* dst, size_t ndsts,
+                     const int* from_to, size_t npairs);
 void cv_normalize(CvMatrix* csrc, CvMatrix* cdst, double alpha, double beta,
-                      int norm_type);
+                  int norm_type);
+void cv_bitwise_and(CvMatrix* src1, CvMatrix* src2, CvMatrix* dst);
+void cv_bitwise_not(CvMatrix* src, CvMatrix* dst);
+void cv_bitwise_or(CvMatrix* src1, CvMatrix* src2, CvMatrix* dst);
+void cv_bitwise_xor(CvMatrix* src1, CvMatrix* src2, CvMatrix* dst);
 
 // =============================================================================
 //  Imgproc
 // =============================================================================
 void cv_rectangle(CvMatrix* cmat, Rect crect, Scalar color, int thickness,
-                      int linetype);
+                  int linetype);
 void cv_cvt_color(CvMatrix* cmat, CvMatrix* output, int code);
 void cv_pyr_down(CvMatrix* cmat, CvMatrix* output);
-void cv_resize(CvMatrix* from, CvMatrix* to, Size2i dsize, double fx,
-                   double fy, int interpolation);
+void cv_resize(CvMatrix* from, CvMatrix* to, Size2i dsize, double fx, double fy,
+               int interpolation);
 void cv_calc_hist(const CvMatrix* const cimages, int nimages,
-                      const int* channels, CvMatrix* mask, CvMatrix* hist,
-                      int dims, const int* hist_size, const float** ranges);
+                  const int* channels, CvMatrix* mask, CvMatrix* hist, int dims,
+                  const int* hist_size, const float** ranges);
 void cv_calc_back_project(const CvMatrix* images, int nimages,
-                              const int* channels, CvMatrix* hist,
-                              CvMatrix* back_project, const float** ranges);
+                          const int* channels, CvMatrix* hist,
+                          CvMatrix* back_project, const float** ranges);
 
 // =============================================================================
 //  Imgcodecs
 // =============================================================================
 CvMatrix* cv_imdecode(const uint8_t* const buffer, size_t len, int flag);
-ImencodeResult cv_imencode(const char* const ext,
-                               const CvMatrix* const cmat,
-                               const int* const flag_ptr, size_t flag_size);
+ImencodeResult cv_imencode(const char* const ext, const CvMatrix* const cmat,
+                           const int* const flag_ptr, size_t flag_size);
 
 // =============================================================================
 //   Highgui: high-level GUI
@@ -150,7 +151,7 @@ int cv_wait_key(int delay_in_millis);
 
 typedef void (*MouseCallback)(int e, int x, int y, int flags, void* data);
 void cv_set_mouse_callback(const char* const winname, MouseCallback onMouse,
-                               void* userdata);
+                           void* userdata);
 
 // =============================================================================
 //   VideoIO
@@ -170,8 +171,8 @@ typedef struct _CVideoWriter CVideoWriter;
 int cv_fourcc(char c1, char c2, char c3, char c4);
 
 CVideoWriter* cv_videowriter_default();
-CVideoWriter* cv_videowriter_new(const char* const path, int fourcc,
-                                  double fps, Size2i frame_size, bool is_color);
+CVideoWriter* cv_videowriter_new(const char* const path, int fourcc, double fps,
+                                 Size2i frame_size, bool is_color);
 void cv_videowriter_drop(CVideoWriter* writer);
 bool cv_videowriter_open(CVideoWriter* writer, const char* const path,
                          int fourcc, double fps, Size2i frame_size,
@@ -187,15 +188,14 @@ double cv_videowriter_get(CVideoWriter* writer, int property);
 typedef struct _CCascadeClassifier CCascadeClassifier;
 CCascadeClassifier* cv_cascade_classifier_new();
 CCascadeClassifier* cv_cascade_classifier_from_path(const char* const path);
-bool cv_cascade_classifier_load(CCascadeClassifier* cc,
-                                    const char* const path);
+bool cv_cascade_classifier_load(CCascadeClassifier* cc, const char* const path);
 void cv_cascade_classifier_drop(CCascadeClassifier* cc);
 
 // vec_of_rect is dynamically allocated, the caller should take ownership of it.
 void cv_cascade_classifier_detect(CCascadeClassifier* cc, CvMatrix* cmat,
-                                      VecRect* vec_of_rect, double scale_factor,
-                                      int min_neighbors, int flags,
-                                      Size2i min_size, Size2i max_size);
+                                  VecRect* vec_of_rect, double scale_factor,
+                                  int min_neighbors, int flags, Size2i min_size,
+                                  Size2i max_size);
 
 typedef struct _SvmDetector SvmDetector;
 SvmDetector* cv_hog_default_people_detector();
@@ -217,7 +217,7 @@ typedef struct _CTermCriteria CTermCriteria;
 CTermCriteria* cv_term_criteria_new(int type, int count, double epsilon);
 void cv_term_criteria_drop(CTermCriteria* c_criteria);
 RotatedRect cv_camshift(CvMatrix* back_project_image, Rect window,
-                            CTermCriteria* term_criteria);
+                        CTermCriteria* term_criteria);
 
 EXTERN_C_END
 

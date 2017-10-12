@@ -1,7 +1,7 @@
 //! Core data structures in OpenCV
 
 use errors::*;
-use libc::{c_int, c_double, c_char, c_uchar, size_t};
+use libc::{c_char, c_double, c_int, c_uchar, size_t};
 use num;
 use std::ffi::CString;
 
@@ -514,17 +514,30 @@ impl RotatedRect {
 // =============================================================================
 extern "C" {
     fn cv_in_range(cmat: *const CMat, lowerb: Scalar, upperb: Scalar, dst: *mut CMat);
-    fn cv_mix_channels(cmat: *const CMat,
-                       nsrcs: isize,
-                       dst: *mut CMat,
-                       ndsts: isize,
-                       from_to: *const i32,
-                       npairs: isize);
-    fn cv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: c_int);
+    fn cv_mix_channels(
+        cmat: *const CMat,
+        nsrcs: isize,
+        dst: *mut CMat,
+        ndsts: isize,
+        from_to: *const i32,
+        npairs: isize,
+    );
+    fn cv_normalize(
+        csrc: *const CMat,
+        cdst: *mut CMat,
+        alpha: c_double,
+        beta: c_double,
+        norm_type: c_int,
+    );
+
+    fn cv_bitwise_and(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
+    fn cv_bitwise_not(src: *const CMat, dst: *mut CMat);
+    fn cv_bitwise_or(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
+    fn cv_bitwise_xor(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
 }
 
 /// Normalization type. Please refer to [OpenCV's
-/// documentation](http://docs.cv.org/trunk/d2/de8/group__core__array.html#gad12cefbcb5291cf958a85b4b67b6149f).
+/// documentation](http://docs.cv.org/trunk/d2/de8/group__core__array.html).
 #[derive(Debug, PartialEq, Clone, Copy, FromPrimitive)]
 pub enum NormTypes {
     /// Normalized using `max`
@@ -559,7 +572,13 @@ impl Mat {
     /// `Mat`.
     // TODO(benzh) Avoid using raw pointers but rather take a vec for `from_to`?
     // The usage (self.depth) here is buggy, it should actually be the type!
-    pub fn mix_channels(&self, nsrcs: isize, ndsts: isize, from_to: *const i32, npairs: isize) -> Mat {
+    pub fn mix_channels(
+        &self,
+        nsrcs: isize,
+        ndsts: isize,
+        from_to: *const i32,
+        npairs: isize,
+    ) -> Mat {
         let m = Mat::with_size(self.rows, self.cols, self.depth);
         unsafe {
             cv_mix_channels(self.inner, nsrcs, m.inner, ndsts, from_to, npairs);
@@ -571,6 +590,34 @@ impl Mat {
     pub fn normalize(&self, alpha: f64, beta: f64, t: NormTypes) -> Mat {
         let m = CMat::new();
         unsafe { cv_normalize(self.inner, m, alpha, beta, t as i32) }
+        Mat::from_raw(m)
+    }
+
+    /// Computes bitwise conjunction between two Mat
+    pub fn and(&self, another: Mat) -> Mat {
+        let m = CMat::new();
+        unsafe { cv_bitwise_and(self.inner, another.inner, m) }
+        Mat::from_raw(m)
+    }
+
+    /// Computes bitwise disjunction between two Mat
+    pub fn or(&self, another: Mat) -> Mat {
+        let m = CMat::new();
+        unsafe { cv_bitwise_or(self.inner, another.inner, m) }
+        Mat::from_raw(m)
+    }
+
+    /// Computes bitwise "exclusive or" between two Mat
+    pub fn xor(&self, another: Mat) -> Mat {
+        let m = CMat::new();
+        unsafe { cv_bitwise_xor(self.inner, another.inner, m) }
+        Mat::from_raw(m)
+    }
+
+    /// Computes bitwise "exclusive or" between two Mat
+    pub fn not(&self) -> Mat {
+        let m = CMat::new();
+        unsafe { cv_bitwise_not(self.inner, m) }
         Mat::from_raw(m)
     }
 }
