@@ -170,6 +170,18 @@ void cv_rectangle(CvMatrix* cmat, Rect crect, Scalar color, int thickness,
                   linetype);
 }
 
+void cv_ellipse(CvMatrix* cmat, Point2i center, Size2i axes, double angle,
+                double start_angle, double end_angle, Scalar color,
+                int thickness, int linetype, int shift) {
+    cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
+    cv::Point cv_center(center.x, center.y);
+    cv::Size cv_axes(axes.width, axes.height);
+    cv::Scalar cv_color(color.v0, color.v1, color.v2, color.v3);
+
+    cv::ellipse(*mat, cv_center, cv_axes, angle, start_angle, end_angle,
+                cv_color, thickness, linetype, shift);
+}
+
 void cv_cvt_color(CvMatrix* cmat, CvMatrix* output, int code) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     cv::Mat* out = reinterpret_cast<cv::Mat*>(output);

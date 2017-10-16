@@ -123,6 +123,10 @@ void cv_bitwise_xor(CvMatrix* src1, CvMatrix* src2, CvMatrix* dst);
 // =============================================================================
 void cv_rectangle(CvMatrix* cmat, Rect crect, Scalar color, int thickness,
                   int linetype);
+void cv_ellipse(CvMatrix* cmat, Point2i center, Size2i axes, double angle,
+                double start_angle, double end_angle, Scalar color,
+                int thickness, int linetype, int shift);
+
 void cv_cvt_color(CvMatrix* cmat, CvMatrix* output, int code);
 void cv_pyr_down(CvMatrix* cmat, CvMatrix* output);
 void cv_resize(CvMatrix* from, CvMatrix* to, Size2i dsize, double fx, double fy,

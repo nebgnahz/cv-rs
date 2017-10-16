@@ -1,31 +1,56 @@
 //! Image processing, see [OpenCV
 //! imgproc](http://docs.opencv.org/3.1.0/d7/dbd/group__imgproc.html).
 
-use libc::{c_float, c_int, c_double};
 use super::core::*;
+use libc::{c_double, c_float, c_int};
 
 // =============================================================================
 //  Imgproc
 // =============================================================================
 extern "C" {
     fn cv_rectangle(cmat: *mut CMat, rect: Rect, color: Scalar, thickness: c_int, linetype: c_int);
+
+    fn cv_ellipse(
+        cmat: *mut CMat,
+        center: Point2i,
+        axes: Size2i,
+        angle: c_double,
+        start_angle: c_double,
+        end_angle: c_double,
+        color: Scalar,
+        thickness: c_int,
+        linetype: c_int,
+        shift: c_int,
+    );
+
     fn cv_cvt_color(cmat: *const CMat, output: *mut CMat, code: i32);
     fn cv_pyr_down(cmat: *const CMat, output: *mut CMat);
-    fn cv_resize(from: *const CMat, to: *mut CMat, dsize: Size2i, fx: c_double, fy: c_double, interpolation: c_int);
-    fn cv_calc_hist(cimages: *const CMat,
-                    nimages: i32,
-                    channels: *const c_int,
-                    cmask: *const CMat,
-                    chist: *mut CMat,
-                    dims: c_int,
-                    hist_size: *const c_int,
-                    ranges: *const *const c_float);
-    fn cv_calc_back_project(cimages: *const CMat,
-                            nimages: c_int,
-                            channels: *const c_int,
-                            chist: *const CMat,
-                            cback_project: *mut CMat,
-                            ranges: *const *const c_float);
+    fn cv_resize(
+        from: *const CMat,
+        to: *mut CMat,
+        dsize: Size2i,
+        fx: c_double,
+        fy: c_double,
+        interpolation: c_int,
+    );
+    fn cv_calc_hist(
+        cimages: *const CMat,
+        nimages: i32,
+        channels: *const c_int,
+        cmask: *const CMat,
+        chist: *mut CMat,
+        dims: c_int,
+        hist_size: *const c_int,
+        ranges: *const *const c_float,
+    );
+    fn cv_calc_back_project(
+        cimages: *const CMat,
+        nimages: c_int,
+        channels: *const c_int,
+        chist: *const CMat,
+        cback_project: *mut CMat,
+        ranges: *const *const c_float,
+    );
 }
 
 /// Color conversion code used in
@@ -217,6 +242,57 @@ impl Mat {
         self.rectangle(abs_rect);
     }
 
+    /// Draws a simple, thick ellipse
+    pub fn ellipse(
+        &self,
+        center: Point2i,
+        axes: Size2i,
+        angle: f64,
+        start_angle: f64,
+        end_angle: f64,
+    ) {
+        self.ellipse_custom(
+            center,
+            axes,
+            angle,
+            start_angle,
+            end_angle,
+            Scalar::new(255, 255, 0, 255),
+            1,
+            LineTypes::Line8,
+            0,
+        )
+    }
+
+    /// Draws a custom ellipse
+    pub fn ellipse_custom(
+        &self,
+        center: Point2i,
+        axes: Size2i,
+        angle: f64,
+        start_angle: f64,
+        end_angle: f64,
+        color: Scalar,
+        thickness: i32,
+        linetype: LineTypes,
+        shift: i32,
+    ) {
+        unsafe {
+            cv_ellipse(
+                self.inner,
+                center,
+                axes,
+                angle,
+                start_angle,
+                end_angle,
+                color,
+                thickness,
+                linetype as i32,
+                shift,
+            )
+        }
+    }
+
     /// Convert an image from one color space to another.
     pub fn cvt_color(&self, code: ColorConversionCodes) -> Mat {
         let m = CMat::new();
@@ -249,41 +325,51 @@ impl Mat {
     pub fn resize_by(&self, fx: f64, fy: f64, interpolation: InterpolationFlag) -> Mat {
         let m = CMat::new();
         unsafe {
-            cv_resize(self.inner,
-                      m,
-                      Size2i::default(),
-                      fx,
-                      fy,
-                      interpolation as c_int)
+            cv_resize(
+                self.inner,
+                m,
+                Size2i::default(),
+                fx,
+                fy,
+                interpolation as c_int,
+            )
         }
         Mat::from_raw(m)
     }
 
     /// Calculate a histogram of an image.
-    pub fn calc_hist(&self,
-                     channels: *const c_int,
-                     mask: Mat,
-                     dims: c_int,
-                     hist_size: *const c_int,
-                     ranges: *const *const f32)
-                     -> Mat {
+    pub fn calc_hist(
+        &self,
+        channels: *const c_int,
+        mask: Mat,
+        dims: c_int,
+        hist_size: *const c_int,
+        ranges: *const *const f32,
+    ) -> Mat {
         let m = CMat::new();
         unsafe {
-            cv_calc_hist(self.inner,
-                         1,
-                         channels,
-                         mask.inner,
-                         m,
-                         dims,
-                         hist_size,
-                         ranges);
+            cv_calc_hist(
+                self.inner,
+                1,
+                channels,
+                mask.inner,
+                m,
+                dims,
+                hist_size,
+                ranges,
+            );
         }
         Mat::from_raw(m)
     }
 
     /// Calculate the back projection of a histogram. The function calculates
     /// the back project of the histogram.
-    pub fn calc_back_project(&self, channels: *const i32, hist: &Mat, ranges: *const *const f32) -> Mat {
+    pub fn calc_back_project(
+        &self,
+        channels: *const i32,
+        hist: &Mat,
+        ranges: *const *const f32,
+    ) -> Mat {
         let m = CMat::new();
         unsafe {
             cv_calc_back_project(self.inner, 1, channels, (*hist).inner, m, ranges);
