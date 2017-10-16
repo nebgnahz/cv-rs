@@ -158,6 +158,11 @@ void cv_bitwise_xor(CvMatrix* csrc1, CvMatrix* csrc2, CvMatrix* cdst) {
     cv::bitwise_xor(*src1, *src2, *dst);
 }
 
+int cv_count_non_zero(CvMatrix *csrc) {
+    cv::Mat* src = reinterpret_cast<cv::Mat*>(csrc);
+    return countNonZero(*src);
+}
+
 // =============================================================================
 //  Imgproc
 // =============================================================================

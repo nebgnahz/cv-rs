@@ -534,6 +534,7 @@ extern "C" {
     fn cv_bitwise_not(src: *const CMat, dst: *mut CMat);
     fn cv_bitwise_or(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
     fn cv_bitwise_xor(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
+    fn cv_count_non_zero(src: *const CMat) -> i32;
 }
 
 /// Normalization type. Please refer to [OpenCV's
@@ -619,5 +620,10 @@ impl Mat {
         let m = CMat::new();
         unsafe { cv_bitwise_not(self.inner, m) }
         Mat::from_raw(m)
+    }
+
+    /// Counts non-zero array elements.
+    pub fn count_non_zero(&self) -> i32 {
+        unsafe { cv_count_non_zero(self.inner) }
     }
 }

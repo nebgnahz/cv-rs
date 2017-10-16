@@ -117,6 +117,7 @@ void cv_bitwise_and(CvMatrix* src1, CvMatrix* src2, CvMatrix* dst);
 void cv_bitwise_not(CvMatrix* src, CvMatrix* dst);
 void cv_bitwise_or(CvMatrix* src1, CvMatrix* src2, CvMatrix* dst);
 void cv_bitwise_xor(CvMatrix* src1, CvMatrix* src2, CvMatrix* dst);
+int cv_count_non_zero(CvMatrix *src);
 
 // =============================================================================
 //  Imgproc
