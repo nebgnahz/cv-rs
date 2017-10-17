@@ -1,18 +1,29 @@
 extern crate gcc;
 
+#[cfg(windows)]
+fn opencv_include() -> String {
+    if let Ok(dir) = std::env::var("OPENCV_DIR") {
+        format!("{}\\include", dir)
+    } else {
+        eprint!("%OPENCV_DIR% is not set properly.");
+        std::process::exit(0x0100);
+    }
+}
+
+#[cfg(unix)]
+fn opencv_include() -> &'static str {
+    "/usr/local/include"
+}
+
 fn main() {
     let mut opencv_config = gcc::Build::new();
     opencv_config
         .cpp(true)
         .file("native/opencv-wrapper.cc")
         .file("native/utils.cc")
-        .include("/usr/local/include")
         .include("native")
+        .include(opencv_include())
         .flag("--std=c++11");
-
-    if let Ok(dir) = std::env::var("OPENCV_DIR") {
-        opencv_config.include(format!("{}\\include", dir));
-    }
 
     if cfg!(feature = "gpu") {
         opencv_config.file("native/opencv-gpu.cc");
