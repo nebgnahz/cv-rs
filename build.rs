@@ -7,6 +7,7 @@ fn main() {
         .file("native/opencv-wrapper.cc")
         .file("native/utils.cc")
         .include("/usr/local/include")
+        .include("%OPENCV_DIR%/include")
         .include("native")
         .flag("--std=c++11");
 
