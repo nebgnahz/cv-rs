@@ -64,6 +64,12 @@ git = "https://github.com/nebgnahz/cv-rs"
 features = [ "gpu" ]
 ```
 
+### Windows
+
+Depending on your install, you might have to set the `%OPENCV_DIR%`
+environment variable such that `%OPENCV_DIR%\include` points to the OpenCV
+includes diretory.
+
 ## Usage
 
 See available examples on how this library might be used.
