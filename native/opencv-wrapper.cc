@@ -21,6 +21,12 @@ CvMatrix* cv_mat_new_with_size(int rows, int cols, int type) {
     return reinterpret_cast<CvMatrix*>(new cv::Mat(rows, cols, type));
 }
 
+CvMatrix* cv_mat_zeros(int rows, int cols, int type) {
+    cv::Mat* mat = new cv::Mat();
+    *mat = cv::Mat::zeros(rows, cols, type);
+    return reinterpret_cast<CvMatrix*>(mat);
+}
+
 CvMatrix* cv_mat_from_buffer(int rows, int cols, int type, const uint8_t* buf) {
     return reinterpret_cast<CvMatrix*>(
         new cv::Mat(rows, cols, type,

@@ -268,6 +268,7 @@ pub enum LineTypes {
 extern "C" {
     fn cv_mat_new() -> *mut CMat;
     fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: i32) -> *mut CMat;
+    fn cv_mat_zeros(rows: c_int, cols: c_int, t: i32) -> *mut CMat;
     fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: i32, buffer: *const c_uchar) -> *mut CMat;
     fn cv_mat_is_valid(mat: *mut CMat) -> bool;
     fn cv_mat_rows(cmat: *const CMat) -> c_int;
@@ -349,6 +350,12 @@ impl Mat {
     /// Create an empty `Mat` with specific size (rows, cols and types).
     pub fn with_size(rows: i32, cols: i32, t: i32) -> Self {
         let m = unsafe { cv_mat_new_with_size(rows, cols, t) };
+        Mat::from_raw(m)
+    }
+
+    /// Create an empty `Mat` with specific size (rows, cols and types).
+    pub fn zeros(rows: i32, cols: i32, t: i32) -> Self {
+        let m = unsafe { cv_mat_zeros(rows, cols, t) };
         Mat::from_raw(m)
     }
 
