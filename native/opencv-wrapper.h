@@ -113,11 +113,14 @@ void cv_mix_channels(CvMatrix* cmat, size_t nsrcs, CvMatrix* dst, size_t ndsts,
                      const int* from_to, size_t npairs);
 void cv_normalize(CvMatrix* csrc, CvMatrix* cdst, double alpha, double beta,
                   int norm_type);
-void cv_bitwise_and(CvMatrix* src1, CvMatrix* src2, CvMatrix* dst);
-void cv_bitwise_not(CvMatrix* src, CvMatrix* dst);
-void cv_bitwise_or(CvMatrix* src1, CvMatrix* src2, CvMatrix* dst);
-void cv_bitwise_xor(CvMatrix* src1, CvMatrix* src2, CvMatrix* dst);
-int cv_count_non_zero(CvMatrix *src);
+void cv_bitwise_and(const CvMatrix* const src1, const CvMatrix* const src2,
+                    CvMatrix* dst);
+void cv_bitwise_not(const CvMatrix* const src, CvMatrix* const dst);
+void cv_bitwise_or(const CvMatrix* const src1, const CvMatrix* const src2,
+                   CvMatrix* dst);
+void cv_bitwise_xor(const CvMatrix* const src1, const CvMatrix* const src2,
+                    CvMatrix* dst);
+int cv_count_non_zero(const CvMatrix* const src);
 
 // =============================================================================
 //  Imgproc

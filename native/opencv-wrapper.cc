@@ -127,40 +127,43 @@ void cv_normalize(CvMatrix* csrc, CvMatrix* cdst, double alpha, double beta,
     cv::normalize(*src, *dst, alpha, beta, norm_type);
 }
 
-void cv_bitwise_and(CvMatrix* csrc1, CvMatrix* csrc2, CvMatrix* cdst) {
-    cv::Mat* src1 = reinterpret_cast<cv::Mat*>(csrc1);
-    cv::Mat* src2 = reinterpret_cast<cv::Mat*>(csrc2);
+void cv_bitwise_and(const CvMatrix* const csrc1, const CvMatrix* const csrc2,
+		    CvMatrix* cdst) {
+    const cv::Mat* src1 = reinterpret_cast<const cv::Mat*>(csrc1);
+    const cv::Mat* src2 = reinterpret_cast<const cv::Mat*>(csrc2);
     cv::Mat* dst = reinterpret_cast<cv::Mat*>(cdst);
 
     cv::bitwise_and(*src1, *src2, *dst);
 }
 
-void cv_bitwise_not(CvMatrix* csrc, CvMatrix* cdst) {
-    cv::Mat* src = reinterpret_cast<cv::Mat*>(csrc);
+void cv_bitwise_not(const CvMatrix* const csrc, CvMatrix* const cdst) {
+    const cv::Mat* src = reinterpret_cast<const cv::Mat*>(csrc);
     cv::Mat* dst = reinterpret_cast<cv::Mat*>(cdst);
 
     cv::bitwise_not(*src, *dst);
 }
 
-void cv_bitwise_or(CvMatrix* csrc1, CvMatrix* csrc2, CvMatrix* cdst) {
-    cv::Mat* src1 = reinterpret_cast<cv::Mat*>(csrc1);
-    cv::Mat* src2 = reinterpret_cast<cv::Mat*>(csrc2);
+void cv_bitwise_or(const CvMatrix* const csrc1, const CvMatrix* const csrc2,
+                   CvMatrix* cdst) {
+    const cv::Mat* src1 = reinterpret_cast<const cv::Mat*>(csrc1);
+    const cv::Mat* src2 = reinterpret_cast<const cv::Mat*>(csrc2);
     cv::Mat* dst = reinterpret_cast<cv::Mat*>(cdst);
 
     cv::bitwise_or(*src1, *src2, *dst);
 }
 
-void cv_bitwise_xor(CvMatrix* csrc1, CvMatrix* csrc2, CvMatrix* cdst) {
-    cv::Mat* src1 = reinterpret_cast<cv::Mat*>(csrc1);
-    cv::Mat* src2 = reinterpret_cast<cv::Mat*>(csrc2);
+void cv_bitwise_xor(const CvMatrix* const csrc1, const CvMatrix* const csrc2,
+                    CvMatrix* cdst) {
+    const cv::Mat* src1 = reinterpret_cast<const cv::Mat*>(csrc1);
+    const cv::Mat* src2 = reinterpret_cast<const cv::Mat*>(csrc2);
     cv::Mat* dst = reinterpret_cast<cv::Mat*>(cdst);
 
     cv::bitwise_xor(*src1, *src2, *dst);
 }
 
-int cv_count_non_zero(CvMatrix *csrc) {
-    cv::Mat* src = reinterpret_cast<cv::Mat*>(csrc);
-    return countNonZero(*src);
+int cv_count_non_zero(const CvMatrix* const csrc) {
+    const cv::Mat* src = reinterpret_cast<const cv::Mat*>(csrc);
+    return cv::countNonZero(*src);
 }
 
 // =============================================================================
