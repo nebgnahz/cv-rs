@@ -595,21 +595,21 @@ impl Mat {
     }
 
     /// Computes bitwise conjunction between two Mat
-    pub fn and(&self, another: Mat) -> Mat {
+    pub fn and(&self, another: &Mat) -> Mat {
         let m = CMat::new();
         unsafe { cv_bitwise_and(self.inner, another.inner, m) }
         Mat::from_raw(m)
     }
 
     /// Computes bitwise disjunction between two Mat
-    pub fn or(&self, another: Mat) -> Mat {
+    pub fn or(&self, another: &Mat) -> Mat {
         let m = CMat::new();
         unsafe { cv_bitwise_or(self.inner, another.inner, m) }
         Mat::from_raw(m)
     }
 
     /// Computes bitwise "exclusive or" between two Mat
-    pub fn xor(&self, another: Mat) -> Mat {
+    pub fn xor(&self, another: &Mat) -> Mat {
         let m = CMat::new();
         unsafe { cv_bitwise_xor(self.inner, another.inner, m) }
         Mat::from_raw(m)
