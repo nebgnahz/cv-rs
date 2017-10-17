@@ -7,9 +7,12 @@ fn main() {
         .file("native/opencv-wrapper.cc")
         .file("native/utils.cc")
         .include("/usr/local/include")
-        .include("%OPENCV_DIR%/include")
         .include("native")
         .flag("--std=c++11");
+
+    if let Ok(dir) = std::env::var("OPENCV_DIR") {
+        opencv_config.include(format!("{}\\include", dir));
+    }
 
     if cfg!(feature = "gpu") {
         opencv_config.file("native/opencv-gpu.cc");
