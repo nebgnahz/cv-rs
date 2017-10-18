@@ -29,5 +29,5 @@ if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
     touch $HOME/fresh-cache
 fi
 
-cp $HOME/usr/include/* /usr/local/include
-cp $HOME/usr/lib/* /usr/local/lib
+cp -r $HOME/usr/include/* /usr/local/include
+cp -r $HOME/usr/lib/* /usr/local/lib
