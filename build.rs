@@ -10,9 +10,24 @@ fn opencv_include() -> String {
     }
 }
 
+#[cfg(windows)]
+fn opencv_lib() -> &'static str {
+    if let Ok(dir) = std::env::var("OPENCV_DIR") {
+        format!("{}\\lib", dir)
+    } else {
+        eprint!("%OPENCV_DIR% is not set properly.");
+        std::process::exit(0x0100);
+    }
+}
+
 #[cfg(unix)]
 fn opencv_include() -> &'static str {
     "/usr/local/include"
+}
+
+#[cfg(unix)]
+fn opencv_lib() -> &'static str {
+    "/usr/local/lib"
 }
 
 fn main() {
@@ -30,7 +45,7 @@ fn main() {
 
     opencv_config.compile("libopencv-wrapper.a");
 
-    println!("cargo:rustc-link-search=native=/usr/local/lib");
+    println!("cargo:rustc-link-search=native={}", opencv_lib());
     println!("cargo:rustc-link-lib=opencv_core");
     println!("cargo:rustc-link-lib=opencv_imgcodecs");
     println!("cargo:rustc-link-lib=opencv_imgproc");
