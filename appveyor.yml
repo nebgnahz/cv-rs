@@ -2,6 +2,9 @@ environment:
   RUSTUP_USE_HYPER: 1
   CARGO_HTTP_CHECK_REVOKE: false
 
+  matrix:
+    - TARGET: x86_64-pc-windows-msvc
+
 platform:
   - x64
 
@@ -25,6 +28,7 @@ install:
   - echo "SET OPENCV_DIR"
   - set OPENCV_DIR=%CD%\build
   - cd %APP_PATH%
+  - dir %OPENCV_DIR%
   - set OPENCV_LIB=%OPENCV_DIR%\%ARCH%\vc14\lib
 
 build: false
