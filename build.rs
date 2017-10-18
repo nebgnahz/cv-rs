@@ -49,7 +49,8 @@ fn main() {
         .file("native/opencv-wrapper.cc")
         .file("native/utils.cc")
         .include("native")
-        .include(opencv_include());
+        .include(opencv_include())
+        .flag("--std=c++11");
 
     if cfg!(feature = "gpu") {
         opencv_config.file("native/opencv-gpu.cc");

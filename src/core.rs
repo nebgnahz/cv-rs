@@ -338,7 +338,7 @@ impl Mat {
     /// let new_image = Mat::from_buffer(
     ///   size.height, size.width, CvType::Cv8UC3 as i32, &vec);
     ///
-    ///  . . . use `new_image` here, such as new_image.show(..) . . .
+    ///  // . . . use new_image here, such as new_image.show(..) . . .
     ///
     /// ::std::mem::forget(new_image);
     /// ```

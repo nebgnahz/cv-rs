@@ -1,5 +1,6 @@
 # cv-rs
 
+[![Build Status][travis-image]][travis-url]
 [![Build status][appveyor-image]][appveyor-url]
 [![standard-readme compliant][standard-readme-image]][standard-readme-url]
 
@@ -98,7 +99,9 @@ Small note: If editing the README, please conform to the
 MIT © Ben Zhang
 
 <!-- links -->
-[appveyor-image]: https://ci.appveyor.com/api/projects/status/dutogjshst3oyra2/branch/master?svg=true
+[travis-image]: https://travis-ci.org/nebgnahz/cv-rs.svg?branch=master
+[travis-url]: https://travis-ci.org/nebgnahz/cv-rs
+[appveyor-image]: https://ci.appveyor.com/api/projects/status/dutogjshst3oyra2?svg=true
 [appveyor-url]: https://ci.appveyor.com/project/nebgnahz/cv-rs
 [standard-readme-image]: https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square
 [standard-readme-url]: https://github.com/RichardLitt/standard-readme
