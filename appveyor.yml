@@ -14,10 +14,9 @@ install:
   - cargo -V
   - echo "INSTALL OPENCV:"
   - choco install OpenCV
-
-before_build:
   - set APP_PATH=%CD%
   - IF EXIST c:\tools\opencv* CD c:\tools\opencv*
+  - echo "SET OPENCV_DIR"
   - set OPENCV_DIR=%CD%\build
   - cd %APP_PATH%
 
