@@ -35,7 +35,7 @@ build: false
 
 test_script:
   - cargo build
-  - cargo test --verbose
+  - cargo test
 
 init:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
