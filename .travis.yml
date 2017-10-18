@@ -15,6 +15,7 @@ sudo: false
 before_script:
   - brew update
   - brew tap homebrew/science
+  - brew link --overwrite numpy
   - brew install --force opencv3
 
 script:
