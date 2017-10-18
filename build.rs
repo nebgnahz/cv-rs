@@ -11,7 +11,7 @@ fn opencv_include() -> String {
 }
 
 #[cfg(windows)]
-fn opencv_lib() -> &'static str {
+fn opencv_lib() -> String {
     if let Ok(dir) = std::env::var("OPENCV_DIR") {
         format!("{}\\lib", dir)
     } else {
