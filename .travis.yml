@@ -13,10 +13,9 @@ rust:
 sudo: false
 
 before_script:
-  - export CC=clang;
   - brew update
   - brew tap homebrew/science
-  - brew install opencv3
+  - brew install --force opencv3
 
 script:
   - cargo build
