@@ -20,7 +20,7 @@ install:
   - cargo -V
 
   # Install OpenCV
-  - echo "INSTALL OPENCV:"
+  - echo "INSTALL OPENCV"
   - choco install OpenCV
 
   # Configure OpenCV
