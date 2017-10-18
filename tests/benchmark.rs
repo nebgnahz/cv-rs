@@ -1,5 +1,3 @@
-#![feature(step_by)]
-
 extern crate cv;
 
 use cv::*;
@@ -11,9 +9,7 @@ use utils::*;
 
 #[test]
 fn bench_mat_new() {
-    timed("create new mat", || {
-        Mat::new();
-    });
+    timed("create new mat", || { Mat::new(); });
 }
 
 #[test]
@@ -29,14 +25,12 @@ fn bench_face_detect_physicists() {
     let mat = load_physicists();
     let cascade = load_frontal_face();
 
-    (0..10).step_by(2)
+    (0..10)
         .map(|i| {
             let rate = 1.0 - (i as f64) * 0.1;
             let smaller = mat.resize_by(rate, rate, InterpolationFlag::InterLinear);
             let bench_name = format!("detect physicists: {}x{}", smaller.rows, smaller.cols);
-            timed_multiple(&bench_name, 1, || {
-                cascade.detect(&smaller);
-            });
+            timed_multiple(&bench_name, 1, || { cascade.detect(&smaller); });
         })
         .collect::<Vec<_>>();
 }

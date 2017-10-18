@@ -12,8 +12,8 @@ fn opencv_include() -> String {
 
 #[cfg(windows)]
 fn opencv_lib() -> String {
-    if let Ok(dir) = std::env::var("OPENCV_DIR") {
-        format!("{}\\lib", dir)
+    if let Ok(dir) = std::env::var("OPENCV_LIB") {
+        dir
     } else {
         eprint!("%OPENCV_DIR% is not set properly.");
         std::process::exit(0x0100);

@@ -2,23 +2,30 @@ environment:
   RUSTUP_USE_HYPER: 1
   CARGO_HTTP_CHECK_REVOKE: false
 
-  matrix:
-  - TARGET: x86_64-pc-windows-msvc
+platform:
+  - x64
 
 install:
+  - set ARCH=x64
+
+  # Install Rust
   - set PATH=C:\Program Files\Git\mingw64\bin;%PATH%
   - curl -sSf -o rustup-init.exe https://win.rustup.rs/
   - rustup-init.exe -y --default-host %TARGET%
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
   - rustc -V
   - cargo -V
+  # Install OpenCV
   - echo "INSTALL OPENCV:"
   - choco install OpenCV
+
+  # Configure OpenCV
   - set APP_PATH=%CD%
   - IF EXIST c:\tools\opencv* CD c:\tools\opencv*
   - echo "SET OPENCV_DIR"
   - set OPENCV_DIR=%CD%\build
   - cd %APP_PATH%
+  - set OPENCV_LIB=%OPENCV_DIR%\%ARCH%\vc14\lib
 
 build: false
 
