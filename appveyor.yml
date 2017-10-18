@@ -28,12 +28,10 @@ install:
   - echo "SET OPENCV_DIR"
   - set OPENCV_DIR=%CD%\build
   - cd %APP_PATH%
-  - dir /s %OPENCV_DIR%
   - set OPENCV_LIB=%OPENCV_DIR%\%ARCH%\vc14\lib
-  - dir /s %OPENCV_LIB%
 
 build: false
 
 test_script:
   - cargo build
-  - cargo test
+  - cargo test --verbose
