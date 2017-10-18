@@ -1,8 +1,10 @@
 # cv-rs
 
-[![standard-readme compliant](https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square)](https://github.com/RichardLitt/standard-readme)
+[![Build status][appveyor-image]][appveyor-url]
+[![standard-readme compliant][standard-readme-image]][standard-readme-url]
 
-> This library primarily provides bindings (somewhat idiomatic) and APIs for OpenCV 3.1.0.
+> This library primarily provides bindings (somewhat idiomatic) and APIs for
+> OpenCV 3.1.0.
 
 [Documentation](https://nebgnahz.github.io/cv-rs/cv/)
 
@@ -38,7 +40,7 @@ bindings using a Python script (more automated).
 ## Install
 
 Before anything, make sure you have OpenCV 3 installed. Read this
-[Introduction to OpenCV](http://docs.opencv.org/3.1.0/df/d65/tutorial_table_of_content_introduction.html) to get started.
+[Introduction to OpenCV][opencv-intro] to get started.
 
 Then in any Rust project, add this to your `Cargo.toml`:
 
@@ -56,7 +58,8 @@ use cv::*;
 
 And then, enjoy the power of OpenCV.
 
-If you'd like to use OpenCV GPU functions, it's inside `cv::cuda`. Enable it with the following code in `Cargo.toml`:
+If you'd like to use OpenCV GPU functions, it's inside `cv::cuda`. Enable it
+with the following code in `Cargo.toml`:
 
 ```
 [dependencies.cv]
@@ -66,9 +69,10 @@ features = [ "gpu" ]
 
 ### Windows
 
-Depending on your install, you might have to set the `%OPENCV_DIR%`
-environment variable such that `%OPENCV_DIR%\include` points to the OpenCV
-includes diretory.
+Depending on your install, you might have to set `%OPENCV_DIR%` and
+`%OPENCV_LIB%` environment variables such that `%OPENCV_DIR%\include` points to
+the OpenCV includes diretory and `%OPENCV_LIB%` has `opencv_world320.lib`. You
+will also need to update `%PATH%` for `opencv_world320.dll`.
 
 ## Usage
 
@@ -92,3 +96,10 @@ Small note: If editing the README, please conform to the
 ## License
 
 MIT © Ben Zhang
+
+<!-- links -->
+[appveyor-image]: https://ci.appveyor.com/api/projects/status/dutogjshst3oyra2?svg=true
+[appveyor-url]: https://ci.appveyor.com/project/nebgnahz/cv-rs
+[standard-readme-image]: https://img.shields.io/badge/standard--readme-OK-green.svg?style=flat-square
+[standard-readme-url]: https://github.com/RichardLitt/standard-readme
+[opencv-intro]: http://docs.opencv.org/3.1.0/df/d65/tutorial_table_of_content_introduction.html

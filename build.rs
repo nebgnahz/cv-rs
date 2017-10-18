@@ -1,25 +1,33 @@
 extern crate gcc;
 
-fn main() {
-    let mut opencv_config = gcc::Build::new();
-    opencv_config
-        .cpp(true)
-        .file("native/opencv-wrapper.cc")
-        .file("native/utils.cc")
-        .include("/usr/local/include")
-        .include("native")
-        .flag("--std=c++11");
-
+#[cfg(windows)]
+fn opencv_include() -> String {
     if let Ok(dir) = std::env::var("OPENCV_DIR") {
-        opencv_config.include(format!("{}\\include", dir));
+        format!("{}\\include", dir)
+    } else {
+        eprint!("%OPENCV_DIR% is not set properly.");
+        std::process::exit(0x0100);
     }
+}
 
-    if cfg!(feature = "gpu") {
-        opencv_config.file("native/opencv-gpu.cc");
+#[cfg(windows)]
+fn opencv_link() {
+    if let Ok(dir) = std::env::var("OPENCV_LIB") {
+        println!("cargo:rustc-link-search=native={}", dir);
+        println!("cargo:rustc-link-lib=opencv_world320");
+    } else {
+        eprint!("%OPENCV_DIR% is not set properly.");
+        std::process::exit(0x0100);
     }
+}
 
-    opencv_config.compile("libopencv-wrapper.a");
+#[cfg(unix)]
+fn opencv_include() -> &'static str {
+    "/usr/local/include"
+}
 
+#[cfg(unix)]
+fn opencv_link() {
     println!("cargo:rustc-link-search=native=/usr/local/lib");
     println!("cargo:rustc-link-lib=opencv_core");
     println!("cargo:rustc-link-lib=opencv_imgcodecs");
@@ -32,4 +40,21 @@ fn main() {
     if cfg!(feature = "gpu") {
         println!("cargo:rustc-link-lib=opencv_cudaobjdetect");
     }
+}
+
+fn main() {
+    let mut opencv_config = gcc::Build::new();
+    opencv_config
+        .cpp(true)
+        .file("native/opencv-wrapper.cc")
+        .file("native/utils.cc")
+        .include("native")
+        .include(opencv_include());
+
+    if cfg!(feature = "gpu") {
+        opencv_config.file("native/opencv-gpu.cc");
+    }
+
+    opencv_config.compile("libopencv-wrapper.a");
+    opencv_link();
 }
