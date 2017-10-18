@@ -28,6 +28,7 @@ addons:
 
 before_install:
   - ./travis_build_opencv.sh
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 script:
   - cargo build
