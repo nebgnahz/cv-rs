@@ -1,22 +1,33 @@
+sudo: required
+dist: trusty
+
 language: rust
-cache: cargo
-
-git:
-  submodules: false
-
-os:
-  - osx
-
 rust:
   - stable
 
-sudo: false
+addons:
+  apt:
+    packages:
+    - libgmp-dev
+    - build-essential
+    - cmake
+    - git
+    - libgtk2.0-dev
+    - pkg-config
+    - libavcodec-dev
+    - libavformat-dev
+    - libswscale-dev
+    - libtbb2
+    - libtbb-dev
+    - libjpeg-dev
+    - libpng-dev
+    - libtiff-dev
+    - libjasper-dev
+    - libdc1394-22-dev
+    - xvfb
 
-before_script:
-  - brew update
-  - brew tap homebrew/science
-  - brew install --force numpy
-  - brew install --force opencv3
+before_install:
+  - ./travis_build_opencv.sh
 
 script:
   - cargo build
@@ -27,6 +38,12 @@ script:
 notifications:
   email:
     on_success: never
+
+cache:
+  timeout: 1000
+  directories:
+    - $HOME/usr
+    - $HOME/.cargo
 
 deploy:
   provider: pages
