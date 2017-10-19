@@ -31,5 +31,3 @@ fi
 
 sudo cp -r $HOME/usr/include/* /usr/local/include/
 sudo cp -r $HOME/usr/lib/* /usr/local/lib/
-
-ls -lR /usr/local/lib/
