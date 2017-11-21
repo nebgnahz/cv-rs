@@ -301,12 +301,6 @@ pub enum FlipCode {
     XYAxis,
 }
 
-trait At {}
-
-impl At for isize {}
-
-impl At for (isize, isize) {}
-
 impl Mat {
     #[inline]
     /// Creates a `Mat` object from raw `CMat` pointer. This will read the rows
