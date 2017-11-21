@@ -1,9 +1,12 @@
 //! Core data structures in OpenCV
 
+use bytes::{self, ByteOrder};
 use errors::*;
 use libc::{c_char, c_double, c_int, c_uchar, size_t};
 use num;
 use std::ffi::CString;
+use std::mem;
+use std::slice;
 
 /// Opaque data struct for C bindings
 #[derive(Clone, Copy, Debug)]
@@ -231,7 +234,6 @@ pub struct CVecDouble {
     size: usize,
 }
 
-
 impl CVecDouble {
     pub fn rustify(self) -> Vec<f64> {
         (1..self.size)
@@ -277,7 +279,9 @@ extern "C" {
     fn cv_mat_channels(cmat: *const CMat) -> c_int;
     fn cv_mat_data(cmat: *const CMat) -> *const c_uchar;
     fn cv_mat_total(cmat: *const CMat) -> size_t;
+    fn cv_mat_step1(cmat: *const CMat, i: c_int) -> size_t;
     fn cv_mat_elem_size(cmat: *const CMat) -> size_t;
+    fn cv_mat_elem_size1(cmat: *const CMat) -> size_t;
     fn cv_mat_type(cmat: *const CMat) -> c_int;
     fn cv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
     fn cv_mat_logic_and(cimage: *mut CMat, cmask: *const CMat);
@@ -296,6 +300,12 @@ pub enum FlipCode {
     /// Along both axis: dst[i, j] = src[src.rows - i - 1, src.cols - j - 1]
     XYAxis,
 }
+
+trait At {}
+
+impl At for isize {}
+
+impl At for (isize, isize) {}
 
 impl Mat {
     #[inline]
@@ -372,11 +382,29 @@ impl Mat {
         unsafe { cv_mat_total(self.inner) }
     }
 
-    /// Returns the matrix element size in bytes. The method returns the matrix
-    /// element size in bytes. For example, if the matrix type is CV_16SC3 , the
-    /// method returns 3*sizeof(short) or 6.
+    /// Returns the matrix element size in bytes.
+    ///
+    /// The method returns the matrix element size in bytes. For example, if the
+    /// matrix type is CV_16SC3 , the method returns 3*sizeof(short) or 6.
     pub fn elem_size(&self) -> usize {
         unsafe { cv_mat_elem_size(self.inner) }
+    }
+
+    /// Returns the size of each matrix element channel in bytes.
+    ///
+    /// The method returns the matrix element channel size in bytes, that
+    /// is, it ignores the number of channels. For example, if the matrix
+    /// type is CV_16SC3 , the method returns sizeof(short) or 2.
+    pub fn elem_size1(&self) -> usize {
+        unsafe { cv_mat_elem_size1(self.inner) }
+    }
+
+    /// Returns a normalized step.
+    ///
+    /// The method returns a matrix step divided by Mat::elemSize1() . It can be
+    /// useful to quickly access an arbitrary matrix element
+    pub fn step1(&self, i: c_int) -> usize {
+        unsafe { cv_mat_step1(self.inner, i) }
     }
 
     /// Returns the size of this matrix.
@@ -441,6 +469,127 @@ impl Mat {
     }
 }
 
+pub trait FromBytes {
+    fn from_bytes(bytes: &[u8]) -> Self;
+}
+
+impl<T: FromBytes> FromBytes for (T, T, T) {
+    fn from_bytes(bytes: &[u8]) -> (T, T, T) {
+        let size = mem::size_of::<T>();
+        (
+            T::from_bytes(&bytes[(0 * size)..(1 * size)]),
+            T::from_bytes(&bytes[(1 * size)..(2 * size)]),
+            T::from_bytes(&bytes[(2 * size)..(3 * size)]),
+        )
+    }
+}
+
+impl FromBytes for u8 {
+    fn from_bytes(bytes: &[u8]) -> u8 {
+        bytes[0]
+    }
+}
+
+impl FromBytes for i8 {
+    fn from_bytes(bytes: &[u8]) -> i8 {
+        bytes[0] as i8
+    }
+}
+
+impl FromBytes for u16 {
+    #[cfg(target_endian = "big")]
+    fn from_bytes(bytes: &[u8]) -> u16 {
+        bytes::BigEndian::read_u16(bytes)
+    }
+
+    #[cfg(target_endian = "little")]
+    fn from_bytes(bytes: &[u8]) -> u16 {
+        bytes::LittleEndian::read_u16(bytes)
+    }
+}
+
+impl FromBytes for i16 {
+    #[cfg(target_endian = "big")]
+    fn from_bytes(bytes: &[u8]) -> i16 {
+        bytes::BigEndian::read_i16(bytes)
+    }
+
+    #[cfg(target_endian = "little")]
+    fn from_bytes(bytes: &[u8]) -> i16 {
+        bytes::LittleEndian::read_i16(bytes)
+    }
+}
+
+impl FromBytes for f32 {
+    #[cfg(target_endian = "big")]
+    fn from_bytes(bytes: &[u8]) -> f32 {
+        bytes::BigEndian::read_f32(bytes)
+    }
+
+    #[cfg(target_endian = "little")]
+    fn from_bytes(bytes: &[u8]) -> f32 {
+        bytes::LittleEndian::read_f32(bytes)
+    }
+}
+
+impl FromBytes for i32 {
+    #[cfg(target_endian = "big")]
+    fn from_bytes(bytes: &[u8]) -> i32 {
+        bytes::BigEndian::read_i32(bytes)
+    }
+
+    #[cfg(target_endian = "little")]
+    fn from_bytes(bytes: &[u8]) -> i32 {
+        bytes::LittleEndian::read_i32(bytes)
+    }
+}
+
+impl FromBytes for f64 {
+    #[cfg(target_endian = "big")]
+    fn from_bytes(bytes: &[u8]) -> f64 {
+        bytes::BigEndian::read_f64(bytes)
+    }
+
+    #[cfg(target_endian = "little")]
+    fn from_bytes(bytes: &[u8]) -> f64 {
+        bytes::LittleEndian::read_f64(bytes)
+    }
+}
+
+impl Mat {
+    /// Returns individual pixel (element) information within the Mat. This
+    /// function may need type annotation to assist `FromBytes` trait.
+    ///
+    /// - If matrix is of type `CV_8U` then use `Mat.at<u8>(y,x)`.
+    /// - If matrix is of type `CV_8S` then use `Mat.at<i8>(y,x)`.
+    /// - If matrix is of type `CV_16U` then use `Mat.at<u16>(y,x)`.
+    /// - If matrix is of type `CV_16S` then use `Mat.at<i16>(y,x)`.
+    /// - If matrix is of type `CV_32S`  then use `Mat.at<i32>(y,x)`.
+    /// - If matrix is of type `CV_32F`  then use `Mat.at<f32>(y,x)`.
+    /// - If matrix is of type `CV_64F` then use `Mat.at<f64>(y,x)`.
+    pub fn at2<T: FromBytes>(&self, i0: isize, i1: isize) -> T {
+        let data: *const u8 = self.data();
+        let pos = i0 * (self.step1(0) as isize) + i1 * (self.step1(1) as isize);
+        unsafe {
+            let ptr: *const u8 = data.offset(pos);
+            let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
+            T::from_bytes(slice)
+        }
+    }
+
+    /// See [Mat::at2](struct.Mat.html#method.at2).
+    pub fn at3<T: FromBytes>(&self, i0: isize, i1: isize, i2: isize) -> T {
+        let data: *const u8 = self.data();
+        println!("{} {} {}", self.step1(0), self.step1(1), self.step1(2));
+        let pos = i0 * (self.step1(0) as isize) + i1 * (self.step1(1) as isize) + i2;
+        unsafe {
+            let ptr: *const u8 = data.offset(pos);
+            let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
+            T::from_bytes(slice)
+        }
+    }
+}
+
 impl Drop for Mat {
     fn drop(&mut self) {
         unsafe {
@@ -462,14 +611,50 @@ impl Drop for Mat {
 /// | CV_64F |  6 | 14 | 22 | 30 |   38 |   46 |   54 |   62 |
 #[derive(Debug, PartialEq, Clone, Copy, FromPrimitive)]
 pub enum CvType {
-    /// 8 bit, single channel (grey image)
+    /// 8 bit unsigned (like `uchar`), single channel (grey image)
     Cv8UC1 = 0,
+
+    /// 8 bit signed (like `schar`), single channel (grey image)
+    Cv8SC1 = 1,
+
+    /// 16 bit unsigned (like `ushort`), single channel (grey image)
+    Cv16UC1 = 2,
+
+    /// 16 bit signed (like `short`), single channel (grey image)
+    Cv16SC1 = 3,
+
+    /// 32 bit signed (like `int`), single channel (grey image)
+    Cv32SC1 = 4,
+
+    /// 32 bit float (like `float`), single channel (grey image)
+    Cv32FC1 = 5,
+
+    /// 32 bit float (like `double`), single channel (grey image)
+    Cv64FC1 = 6,
 
     /// 8 bit, two channel (rarelly seen)
     Cv8UC2 = 8,
 
-    /// 8 bit, three channels (RGB image)
+    /// 8 bit unsigned (like `uchar`), three channels (RGB image)
     Cv8UC3 = 16,
+
+    /// 8 bit signed (like `schar`), three channels (RGB image)
+    Cv8SC3 = 17,
+
+    /// 16 bit unsigned (like `ushort`), three channels (RGB image)
+    Cv16UC3 = 18,
+
+    /// 16 bit signed (like `short`), three channels (RGB image)
+    Cv16SC3 = 19,
+
+    /// 32 bit signed (like `int`), three channels (RGB image)
+    Cv32SC3 = 20,
+
+    /// 32 bit float (like `float`), three channels (RGB image)
+    Cv32FC3 = 21,
+
+    /// 32 bit float (like `double`), three channels (RGB image)
+    Cv64FC3 = 22,
 }
 
 /// This struct represents a rotated (i.e. not up-right) rectangle. Each

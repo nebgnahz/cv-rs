@@ -24,6 +24,7 @@ extern crate num;
 extern crate num_derive;
 #[macro_use]
 extern crate error_chain;
+extern crate bytes;
 
 mod core;
 pub use core::CvType;
