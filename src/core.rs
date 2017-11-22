@@ -561,9 +561,10 @@ impl Mat {
     /// - If matrix is of type `CV_32S`  then use `Mat.at<i32>(y,x)`.
     /// - If matrix is of type `CV_32F`  then use `Mat.at<f32>(y,x)`.
     /// - If matrix is of type `CV_64F` then use `Mat.at<f64>(y,x)`.
-    pub fn at2<T: FromBytes>(&self, i0: isize, i1: isize) -> T {
+    pub fn at2<T: FromBytes>(&self, i0: i32, i1: i32) -> T {
         let data: *const u8 = self.data();
-        let pos = i0 * (self.step1(0) as isize) + i1 * (self.step1(1) as isize);
+        let pos = (i0 as isize) * (self.step1(0) as isize) +
+            (i1 as isize) * (self.step1(1) as isize);
         unsafe {
             let ptr: *const u8 = data.offset(pos);
             let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
@@ -572,10 +573,10 @@ impl Mat {
     }
 
     /// See [Mat::at2](struct.Mat.html#method.at2).
-    pub fn at3<T: FromBytes>(&self, i0: isize, i1: isize, i2: isize) -> T {
+    pub fn at3<T: FromBytes>(&self, i0: i32, i1: i32, i2: i32) -> T {
         let data: *const u8 = self.data();
-        println!("{} {} {}", self.step1(0), self.step1(1), self.step1(2));
-        let pos = i0 * (self.step1(0) as isize) + i1 * (self.step1(1) as isize) + i2;
+        let pos = (i0 as isize) * (self.step1(0) as isize) +
+            (i1 as isize) * (self.step1(1) as isize) + i2 as isize;
         unsafe {
             let ptr: *const u8 = data.offset(pos);
             let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
