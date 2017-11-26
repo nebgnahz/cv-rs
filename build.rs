@@ -14,7 +14,7 @@ fn opencv_include() -> String {
 fn opencv_link() {
     if let Ok(dir) = std::env::var("OPENCV_LIB") {
         println!("cargo:rustc-link-search=native={}", dir);
-        println!("cargo:rustc-link-lib=opencv_world320");
+        println!("cargo:rustc-link-lib=opencv_world330");
     } else {
         eprint!("%OPENCV_DIR% is not set properly.");
         std::process::exit(0x0100);
