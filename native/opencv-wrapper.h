@@ -100,6 +100,8 @@ int cv_mat_type(const CvMatrix* const cmat);
 const uint8_t* cv_mat_data(const CvMatrix* const cmat);
 size_t cv_mat_total(const CvMatrix* const cmat);
 size_t cv_mat_elem_size(const CvMatrix* const cmat);
+size_t cv_mat_elem_size1(const CvMatrix* const cmat);
+size_t cv_mat_step1(const CvMatrix* const cmat, int i);
 
 // Free a Mat object
 void cv_mat_drop(CvMatrix* cmat);

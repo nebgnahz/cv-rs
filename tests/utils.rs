@@ -15,17 +15,19 @@ use std::time::Instant;
 
 pub fn close_rect(a: Rect, b: Rect, epsilon: i32) -> bool {
     ((a.x - b.x) < epsilon) && ((a.y - b.y) < epsilon) && ((a.width - b.width)) < epsilon &&
-    ((a.height - b.height)) < epsilon
+        ((a.height - b.height)) < epsilon
 }
 
 pub fn timed<F>(label: &str, inner: F)
-    where F: FnMut()
+where
+    F: FnMut(),
 {
     timed_multiple(label, 1, inner);
 }
 
 pub fn timed_multiple<F>(label: &str, iteration: usize, mut inner: F)
-    where F: FnMut()
+where
+    F: FnMut(),
 {
     let total: f64 = (0..iteration)
         .map(|_| {
@@ -51,6 +53,11 @@ pub fn load_avg_towncentre() -> Mat {
 pub fn load_lenna() -> Mat {
     let buf = load_lenna_as_buf();
     Mat::imdecode(&buf, ImreadModes::ImreadGrayscale)
+}
+
+pub fn load_messi_color() -> Mat {
+    let buf = load_image_as_buf("assets/messi5.jpg");
+    Mat::imdecode(&buf, ImreadModes::ImreadColor)
 }
 
 pub fn load_lenna_as_buf() -> Vec<u8> {

@@ -94,6 +94,14 @@ size_t cv_mat_elem_size(const CvMatrix* const cmat) {
     return (reinterpret_cast<const cv::Mat* const>(cmat))->elemSize();
 }
 
+size_t cv_mat_elem_size1(const CvMatrix* const cmat) {
+    return (reinterpret_cast<const cv::Mat* const>(cmat))->elemSize1();
+}
+
+size_t cv_mat_step1(const CvMatrix* const cmat, int i) {
+    return (reinterpret_cast<const cv::Mat* const>(cmat))->step1(i);
+}
+
 void cv_mat_drop(CvMatrix* cmat) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     delete mat;
@@ -134,7 +142,7 @@ void cv_normalize(CvMatrix* csrc, CvMatrix* cdst, double alpha, double beta,
 }
 
 void cv_bitwise_and(const CvMatrix* const csrc1, const CvMatrix* const csrc2,
-		    CvMatrix* cdst) {
+                    CvMatrix* cdst) {
     const cv::Mat* src1 = reinterpret_cast<const cv::Mat*>(csrc1);
     const cv::Mat* src2 = reinterpret_cast<const cv::Mat*>(csrc2);
     cv::Mat* dst = reinterpret_cast<cv::Mat*>(cdst);
