@@ -183,13 +183,21 @@ int cv_count_non_zero(const CvMatrix* const csrc) {
 // =============================================================================
 //  Imgproc
 // =============================================================================
+void cv_line(CvMatrix* cmat, Point2i pt1, Point2i pt2, Scalar color,
+             int thickness, int linetype, int shift) {
+    cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
+    cv::Point point1(pt1.x, pt1.y);
+    cv::Point point2(pt2.x, pt2.y);
+    cv::Scalar colour(color.v0, color.v1, color.v2, color.v3);
+    cv::line(*mat, point1, point2, colour, thickness, linetype, shift);
+}
+
 void cv_rectangle(CvMatrix* cmat, Rect crect, Scalar color, int thickness,
                   int linetype) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(cmat);
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
-    cv::rectangle(*mat, rect,
-                  cv::Scalar(color.v0, color.v1, color.v2, color.v3), thickness,
-                  linetype);
+    cv::Scalar colour(color.v0, color.v1, color.v2, color.v3);
+    cv::rectangle(*mat, rect, colour, thickness, linetype);
 }
 
 void cv_ellipse(CvMatrix* cmat, Point2i center, Size2i axes, double angle,

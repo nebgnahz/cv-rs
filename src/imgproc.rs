@@ -8,6 +8,16 @@ use libc::{c_double, c_float, c_int};
 //  Imgproc
 // =============================================================================
 extern "C" {
+    fn cv_line(
+        cmat: *mut CMat,
+        pt1: Point2i,
+        pt2: Point2i,
+        color: Scalar,
+        thickness: c_int,
+        linetype: c_int,
+        shift: c_int,
+    );
+
     fn cv_rectangle(cmat: *mut CMat, rect: Rect, color: Scalar, thickness: c_int, linetype: c_int);
 
     fn cv_ellipse(
@@ -226,12 +236,41 @@ pub enum InterpolationFlag {
 }
 
 impl Mat {
+    /// Draws a simple line.
+    pub fn line(&self, pt1: Point2i, pt2: Point2i) {
+        let color = Scalar::new(255, 255, 0, 255);
+        self.line_custom(pt1, pt2, color, 1, LineTypes::Line8, 0);
+    }
+
+    /// Draws a line with custom color, thickness and linetype.
+    pub fn line_custom(
+        &self,
+        pt1: Point2i,
+        pt2: Point2i,
+        color: Scalar,
+        thickness: i32,
+        linetype: LineTypes,
+        shift: i32,
+    ) {
+        unsafe {
+            cv_line(
+                self.inner,
+                pt1,
+                pt2,
+                color,
+                thickness,
+                linetype as i32,
+                shift,
+            );
+        }
+    }
+
     /// Draws a simple, thick, or filled up-right rectangle.
     pub fn rectangle(&self, rect: Rect) {
         self.rectangle_custom(rect, Scalar::new(255, 255, 0, 255), 1, LineTypes::Line8);
     }
 
-    /// Draws a simple, thick, or filled up-right rectangle.
+    /// Draws a rectangle with custom color, thickness and linetype.
     pub fn rectangle_custom(&self, rect: Rect, color: Scalar, thickness: i32, linetype: LineTypes) {
         unsafe { cv_rectangle(self.inner, rect, color, thickness, linetype as i32) }
     }

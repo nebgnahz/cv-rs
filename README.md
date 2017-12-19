@@ -5,7 +5,7 @@
 [![standard-readme compliant][standard-readme-image]][standard-readme-url]
 
 > This library primarily provides bindings (somewhat idiomatic) and APIs for
-> OpenCV 3.1.0.
+> OpenCV 3.x.
 
 [Documentation](https://nebgnahz.github.io/cv-rs/cv/)
 

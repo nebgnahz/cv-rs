@@ -76,6 +76,13 @@ pub struct Point2i {
     pub y: i32,
 }
 
+impl Point2i {
+    /// Creats a new `Point2i`.
+    pub fn new(x: i32, y: i32) -> Self {
+        Point2i { x: x, y: y }
+    }
+}
+
 /// 2D floating points specified by its coordinates `x` and `y`.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
@@ -85,6 +92,13 @@ pub struct Point2f {
 
     /// y coordinate
     pub y: f32,
+}
+
+impl Point2f {
+    /// Creats a new `Point2f`.
+    pub fn new(x: f32, y: f32) -> Self {
+        Point2f { x: x, y: y }
+    }
 }
 
 /// `Size2i` struct is used for specifying the size (`width` and `height` as
@@ -561,6 +575,30 @@ impl Mat {
     /// - If matrix is of type `CV_32S`  then use `Mat.at<i32>(y,x)`.
     /// - If matrix is of type `CV_32F`  then use `Mat.at<f32>(y,x)`.
     /// - If matrix is of type `CV_64F` then use `Mat.at<f64>(y,x)`.
+    pub fn at<T: FromBytes>(&self, i0: i32) -> T {
+        let data: *const u8 = self.data();
+        let size = self.size();
+        let pos = {
+            if size.height == 1 {
+                i0
+            } else if size.width == 1 {
+                i0 * (self.step1(1) * self.elem_size1()) as i32
+            } else {
+                unimplemented!{};
+            }
+        } as isize;
+        unsafe {
+            let ptr: *const u8 = data.offset(pos);
+            let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
+            T::from_bytes(slice)
+        }
+    }
+
+    /// Returns individual pixel (element) information within the Mat. This
+    /// function may need type annotation to assist `FromBytes` trait.
+    ///
+    /// See [Mat::at](struct.Mat.html#method.at) and
+    /// [Mat::at3](struct.Mat.html#method.at3).
     pub fn at2<T: FromBytes>(&self, i0: i32, i1: i32) -> T {
         let data: *const u8 = self.data();
         let pos = (i0 as isize) * (self.step1(0) as isize) +
@@ -572,7 +610,11 @@ impl Mat {
         }
     }
 
-    /// See [Mat::at2](struct.Mat.html#method.at2).
+    /// Returns individual pixel (element) information within the Mat. This
+    /// function may need type annotation to assist `FromBytes` trait.
+    ///
+    /// See [Mat::at](struct.Mat.html#method.at) and
+    /// [Mat::at2](struct.Mat.html#method.at2).
     pub fn at3<T: FromBytes>(&self, i0: i32, i1: i32, i2: i32) -> T {
         let data: *const u8 = self.data();
         let pos = (i0 as isize) * (self.step1(0) as isize) +

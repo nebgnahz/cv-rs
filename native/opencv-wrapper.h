@@ -128,6 +128,8 @@ int cv_count_non_zero(const CvMatrix* const src);
 // =============================================================================
 //  Imgproc
 // =============================================================================
+void cv_line(CvMatrix* cmat, Point2i pt1, Point2i pt2, Scalar color,
+             int thickness, int linetype, int shift);
 void cv_rectangle(CvMatrix* cmat, Rect crect, Scalar color, int thickness,
                   int linetype);
 void cv_ellipse(CvMatrix* cmat, Point2i center, Size2i axes, double angle,
