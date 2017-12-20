@@ -112,6 +112,9 @@ void cv_vec_of_rect_drop(VecRect* v);
 //  core array
 // =============================================================================
 void cv_in_range(CvMatrix* cmat, Scalar lowerb, Scalar upperb, CvMatrix* dst);
+void cv_min_max_loc(const CvMatrix* const cmat, double* min, double* max,
+                    Point2i* minLoc, Point2i* maxLoc,
+                    const CvMatrix* const cmask);
 void cv_mix_channels(CvMatrix* cmat, size_t nsrcs, CvMatrix* dst, size_t ndsts,
                      const int* from_to, size_t npairs);
 void cv_normalize(CvMatrix* csrc, CvMatrix* cdst, double alpha, double beta,

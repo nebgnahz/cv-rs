@@ -127,6 +127,35 @@ void cv_in_range(CvMatrix* cmat, Scalar lowerb, Scalar upperb, CvMatrix* cdst) {
     cv::inRange(*mat, lb, ub, *dst);
 }
 
+void cv_min_max_loc(const CvMatrix* const cmat, double* min, double* max,
+                    Point2i* minLoc, Point2i* maxLoc,
+                    const CvMatrix* const cmask) {
+    const cv::Mat* mat = reinterpret_cast<const cv::Mat*>(cmat);
+    const cv::Mat* mask = reinterpret_cast<const cv::Mat*>(cmask);
+
+    if (minLoc == NULL && maxLoc == NULL) {
+        cv::minMaxLoc(*mat, min, max, NULL, NULL, *mask);
+    } else if (minLoc == NULL && maxLoc != NULL) {
+        cv::Point maxPoint = cv::Point();
+        cv::minMaxLoc(*mat, min, max, NULL, &maxPoint, *mask);
+        maxLoc->x = maxPoint.x;
+        maxLoc->y = maxPoint.y;
+    } else if (minLoc != NULL && maxLoc == NULL) {
+        cv::Point minPoint = cv::Point();
+        cv::minMaxLoc(*mat, min, max, &minPoint, NULL, *mask);
+        minLoc->x = minPoint.x;
+        minLoc->y = minPoint.y;
+    } else {
+        cv::Point minPoint = cv::Point();
+        cv::Point maxPoint = cv::Point();
+        cv::minMaxLoc(*mat, min, max, &minPoint, &maxPoint, *mask);
+        minLoc->x = minPoint.x;
+        minLoc->y = minPoint.y;
+        maxLoc->x = maxPoint.x;
+        maxLoc->y = maxPoint.y;
+    }
+}
+
 void cv_mix_channels(CvMatrix* cmat, size_t nsrcs, CvMatrix* dst, size_t ndsts,
                      const int* from_to, size_t npairs) {
     cv::Mat* from = reinterpret_cast<cv::Mat*>(cmat);

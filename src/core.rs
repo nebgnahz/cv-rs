@@ -63,6 +63,16 @@ impl Scalar {
             v3: v3,
         }
     }
+
+    /// Creates a new scalar object with all value being the same.
+    pub fn all(v: i32) -> Self {
+        Scalar {
+            v0: v,
+            v1: v,
+            v2: v,
+            v3: v,
+        }
+    }
 }
 
 /// 2D integer points specified by its coordinates `x` and `y`.
@@ -601,8 +611,8 @@ impl Mat {
     /// [Mat::at3](struct.Mat.html#method.at3).
     pub fn at2<T: FromBytes>(&self, i0: i32, i1: i32) -> T {
         let data: *const u8 = self.data();
-        let pos = (i0 as isize) * (self.step1(0) as isize) +
-            (i1 as isize) * (self.step1(1) as isize);
+        let pos = (i0 as isize) * ((self.step1(0) * self.elem_size1()) as isize) +
+            (i1 as isize) * ((self.step1(1) * self.elem_size1()) as isize);
         unsafe {
             let ptr: *const u8 = data.offset(pos);
             let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
@@ -617,8 +627,9 @@ impl Mat {
     /// [Mat::at2](struct.Mat.html#method.at2).
     pub fn at3<T: FromBytes>(&self, i0: i32, i1: i32, i2: i32) -> T {
         let data: *const u8 = self.data();
-        let pos = (i0 as isize) * (self.step1(0) as isize) +
-            (i1 as isize) * (self.step1(1) as isize) + i2 as isize;
+        let pos = (i0 as isize) * ((self.step1(0) * self.elem_size1()) as isize) +
+            (i1 as isize) * ((self.step1(1) * self.elem_size1()) as isize) +
+            i2 as isize;
         unsafe {
             let ptr: *const u8 = data.offset(pos);
             let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
@@ -743,6 +754,14 @@ impl RotatedRect {
 // =============================================================================
 extern "C" {
     fn cv_in_range(cmat: *const CMat, lowerb: Scalar, upperb: Scalar, dst: *mut CMat);
+    fn cv_min_max_loc(
+        cmat: *const CMat,
+        min: *mut f64,
+        max: *mut f64,
+        min_loc: *mut Point2i,
+        max_loc: *mut Point2i,
+        cmask: *const CMat,
+    );
     fn cv_mix_channels(
         cmat: *const CMat,
         nsrcs: isize,
@@ -789,13 +808,42 @@ pub enum NormTypes {
 }
 
 impl Mat {
-    /// Check if Mat elements lie between the elements of two other arrays
+    /// Checks if Mat elements lie between the elements of two other arrays
     /// (lowerb and upperb). The output Mat has the same size as `self` and
     /// CV_8U type.
     pub fn in_range(&self, lowerb: Scalar, upperb: Scalar) -> Mat {
         let m = CMat::new();
         unsafe { cv_in_range(self.inner, lowerb, upperb, m) }
         Mat::from_raw(m)
+    }
+
+    /// Finds the global minimum and maximum in an array.
+    ///
+    /// This function finds the minimum and maximum element values and their
+    /// positions. The extremums are searched across the whole array or, if mask
+    /// is not an empty array, in the specified array region.
+    ///
+    /// N.B. Only work with single-channel Mat. For multi-channel arrays. If you
+    /// need to find minimum or maximum elements across all the channels, use
+    /// Mat::reshape first to reinterpret the array as single-channel. Or you
+    /// may extract the particular channel using either extractImageCOI , or
+    /// mixChannels, or split.
+    pub fn min_max_loc(&self, mask: Mat) -> (f64, f64, Point2i, Point2i) {
+        let mut min = 0.0;
+        let mut max = 0.0;
+        let mut min_loc = Point2i::new(0, 0);
+        let mut max_loc = Point2i::new(0, 0);
+        unsafe {
+            cv_min_max_loc(
+                self.inner,
+                &mut min,
+                &mut max,
+                &mut min_loc,
+                &mut max_loc,
+                mask.inner,
+            )
+        }
+        (min, max, min_loc, max_loc)
     }
 
     /// Copy specified channels from `self` to the specified channels of output
