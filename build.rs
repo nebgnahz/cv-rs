@@ -21,8 +21,7 @@ fn opencv_link() {
                     file_name.starts_with("opencv_world") && !file_name.ends_with("d.lib")
                 });
             if let Some(opencv_world) = opencv_world_entry {
-                let opencv_world = opencv_world.file_name();
-                let opencv_world = std::path::Path::new(&opencv_world);
+                let opencv_world = opencv_world.path();
                 println!("cargo:rustc-link-search=native={}", dir);
                 println!("cargo:rustc-link-lib={}", opencv_world.file_stem().unwrap().to_string_lossy());
                 return;
