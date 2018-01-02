@@ -70,10 +70,10 @@ features = [ "gpu" ]
 
 ### Windows
 
-Depending on your install, you might have to set `%OPENCV_DIR%` and
+Depending on your install, you have to set `%OPENCV_DIR%` and
 `%OPENCV_LIB%` environment variables such that `%OPENCV_DIR%\include` points to
-the OpenCV includes diretory and `%OPENCV_LIB%` has `opencv_world320.lib`. You
-will also need to update `%PATH%` for `opencv_world320.dll`.
+the OpenCV includes diretory and `%OPENCV_LIB%` points to `%OPENCV_DIR%\build\x64\<vc14 or vc15>\lib`, which has `opencv_world<version_number>.lib`. You
+will also need to add `%OPENCV_DIR%\build\bin` to the `%PATH%`.
 
 ## Usage
 
