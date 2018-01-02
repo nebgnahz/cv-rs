@@ -21,7 +21,7 @@ install:
 
   # Install OpenCV
   - echo "INSTALL OPENCV"
-  - choco install OpenCV --version 3.3.0
+  - choco install OpenCV
 
   # Configure OpenCV
   - set APP_PATH=%CD%
