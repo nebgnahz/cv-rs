@@ -13,8 +13,23 @@ fn opencv_include() -> String {
 #[cfg(windows)]
 fn opencv_link() {
     if let Ok(dir) = std::env::var("OPENCV_LIB") {
-        println!("cargo:rustc-link-search=native={}", dir);
-        println!("cargo:rustc-link-lib=opencv_world330");
+        if let Ok(mut files) = std::fs::read_dir(&dir) {
+            let opencv_world_entry = files
+                .filter_map(|entry| entry.ok())
+                .find(|entry| {
+                    let file_name = entry.file_name().to_string_lossy().into_owned();
+                    file_name.starts_with("opencv_world") && !file_name.ends_with("d.lib")
+                });
+            if let Some(opencv_world) = opencv_world_entry {
+                let opencv_world = opencv_world.file_name();
+                let opencv_world = std::path::Path::new(&opencv_world);
+                println!("cargo:rustc-link-search=native={}", dir);
+                println!("cargo:rustc-link-lib={}", opencv_world.file_stem().unwrap().to_string_lossy());
+                return;
+            }
+        }
+        eprint!("Cannot find opencv_world file in provided %OPENCV_DIR%");
+        std::process::exit(0x0100);
     } else {
         eprint!("%OPENCV_DIR% is not set properly.");
         std::process::exit(0x0100);
