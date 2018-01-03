@@ -22,6 +22,7 @@ fn opencv_link() {
                 });
             if let Some(opencv_world) = opencv_world_entry {
                 let opencv_world = opencv_world.path();
+                eprint!("{:?}\n", opencv_world);
                 println!("cargo:rustc-link-search=native={}", dir);
                 println!("cargo:rustc-link-lib={}", opencv_world.file_stem().unwrap().to_string_lossy());
                 return;
