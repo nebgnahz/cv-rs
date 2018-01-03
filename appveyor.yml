@@ -30,6 +30,7 @@ install:
   - set OPENCV_DIR=%CD%\build
   - cd %APP_PATH%
   - set OPENCV_LIB=%OPENCV_DIR%\%ARCH%\vc14\lib
+  - dir %OPENCV_LIB%
   - set PATH=%OPENCV_DIR%\%ARCH%\vc14\bin;%PATH%
 
 build: false
