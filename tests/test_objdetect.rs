@@ -15,11 +15,11 @@ fn detect_lenna() {
     assert!(close_rect(
         result[0].0,
         Rect {
-            x: 219,
-            y: 203,
-            width: 170,
-            height: 170,
+            x: 220,
+            y: 204,
+            width: 168,
+            height: 168,
         },
-        2,
+        3,
     ));
 }
