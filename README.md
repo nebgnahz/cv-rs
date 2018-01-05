@@ -70,10 +70,26 @@ features = [ "gpu" ]
 
 ### Windows
 
-Depending on your install, you have to set `%OPENCV_DIR%` and
-`%OPENCV_LIB%` environment variables such that `%OPENCV_DIR%\include` points to
-the OpenCV includes diretory and `%OPENCV_LIB%` points to `%OPENCV_DIR%\build\x64\<vc14 or vc15>\lib`, which has `opencv_world<version_number>.lib`. You
-will also need to add `%OPENCV_DIR%\build\bin` to the `%PATH%`.
+
+Depending on your install, you have to set `%OPENCV_DIR%` environment variable `%OPENCV_DIR%\include` points to the OpenCV includes diretory (for example, it could be `C:\opencv\build`). You will also need to add `%OPENCV_DIR%\bin` to the `%PATH%`. 
+
+##### If you are using MSVC toolchain:
+- Set  environment variable `%OPENCV_LIB%` to `%OPENCV_DIR%\x64\<vc14 or vc15>\lib`, which has `opencv_world<version_number>.lib`
+
+##### If you are using GNU toolchain:
+
+In this case, configuration process is a bit more complicated, because you have to build OpenCV from sources. Follow these steps:
+- Add `MinGW` to the `PATH`. This path could look like `C:\Program Files\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin`. If you haven't installed it yet, download it from [here](https://sourceforge.net/projects/mingw-w64/files/latest/download). Choose architecture `x86_64` during installation.
+- Download and install [CMake](https://cmake.org/download/). Caution, don't download the source code, you need the binary.
+- Run ‘cmake-gui’ in `<cmake-binary>\bin`. For example, `C:\Program Files\CMake\bin\cmake-gui.exe`
+- Enter `%OPENCV_DIR%\..\sources` path in the Windows Explorer and copy result in ‘Where is the source code:’ text box (_CMake doesn't understand path traversal syntax while explorer does_). For example, it could be `C:\opencv\sources`.
+- Do the same thing with `%OPENCV_DIR%\x64\mingw` and paste it in ‘Where to build the binaries:’ text box. For example, it could be `C:\opencv\build\x64\mingw`.
+- Click ‘Configure’. In the popping window, select MinGW option under ‘Specify the generator for this project’ and click ‘Finish’.
+- Search for `WITH_IPP` and **disable** it (otherwise ‘cannot find -lRunTmChk’ error is expected when building OpenCV).
+- Search for `BUILD_opencv_world` and **enable** it (otherwise `cv-rs` won't work).
+- Click ‘Generate’. Now you have properly configured OpenCV.
+- Set environment variable `%OPENCV_LIB%` to `%OPENCV_DIR%\x64\mingw64\lib`, which has `opencv_world<version_number>.dll.a`.
+
 
 ## Usage
 
