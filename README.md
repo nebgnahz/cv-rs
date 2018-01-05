@@ -72,8 +72,8 @@ features = [ "gpu" ]
 
 Depending on your install, you have to set `%OPENCV_DIR%` and
 `%OPENCV_LIB%` environment variables such that `%OPENCV_DIR%\include` points to
-the OpenCV includes diretory and `%OPENCV_LIB%` points to `%OPENCV_DIR%\build\x64\<vc14 or vc15>\lib`, which has `opencv_world<version_number>.lib`. You
-will also need to add `%OPENCV_DIR%\build\bin` to the `%PATH%`.
+the OpenCV includes diretory (for example, it could be `C:\opencv\build`) and `%OPENCV_LIB%` points to `%OPENCV_DIR%\x64\<vc14 or vc15>\lib`, which has `opencv_world<version_number>.lib`. You
+will also need to add `%OPENCV_DIR%\bin` to the `%PATH%`. If you are using `gnu` toolchain you will also need to add `MinGW` to the `PATH`. This path could look like `C:\Program Files\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin`.
 
 ## Usage
 
