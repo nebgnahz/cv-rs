@@ -18,12 +18,14 @@ fn opencv_link() {
                 .filter_map(|entry| entry.ok())
                 .find(|entry| {
                     let file_name = entry.file_name().to_string_lossy().into_owned();
-                    file_name.starts_with("opencv_world") && !file_name.ends_with("d.lib")
+                    (file_name.starts_with("opencv_world") || file_name.starts_with("libopencv_world")) && !file_name.ends_with("d.lib")
                 });
             if let Some(opencv_world) = opencv_world_entry {
-                let opencv_world = opencv_world.path();
+                let opencv_world = opencv_world.file_name();
+                let opencv_world = opencv_world.into_string().unwrap();
+                let opencv_world_without_extension = opencv_world.trim_right_matches(|c: char| !c.is_numeric());
                 println!("cargo:rustc-link-search=native={}", dir);
-                println!("cargo:rustc-link-lib={}", opencv_world.file_stem().unwrap().to_string_lossy());
+                println!("cargo:rustc-link-lib={}", opencv_world_without_extension);
                 return;
             }
         }
