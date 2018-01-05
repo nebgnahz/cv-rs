@@ -23,7 +23,7 @@ fn opencv_link() {
             if let Some(opencv_world) = opencv_world_entry {
                 let opencv_world = opencv_world.file_name();
                 let opencv_world = opencv_world.into_string().unwrap();
-                let opencv_world_without_extension = opencv_world.trim_right_matches(|c: char| !c.is_numeric());
+                let opencv_world_without_extension = opencv_world.trim_right_matches(|c: char| !c.is_numeric()); // we expect filename to be something like 'open_world340.lib' or 'open_world.340.dll.a', so we just consider everything after the version number is an extension
                 println!("cargo:rustc-link-search=native={}", dir);
                 println!("cargo:rustc-link-lib={}", opencv_world_without_extension);
                 return;
