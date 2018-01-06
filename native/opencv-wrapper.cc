@@ -127,6 +127,9 @@ void cv_vec_of_point_drop(VecPoint* pv) {
 
 void cv_vec_of_points_drop(VecPoints* pvs) {
     if (pvs->array != nullptr) {
+        for (size_t i = 0; i < pvs->size; ++i) {
+            cv_vec_of_point_drop(&pvs->array[i]);
+        }
         free(pvs->array);
         pvs->array = nullptr;
         pvs->size = 0;
