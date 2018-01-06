@@ -42,7 +42,7 @@ using CV_GPU_HOG = cv::Ptr<cv::cuda::HOG>;
 
 GpuHog* cv_gpu_hog_default() {
     auto hog = cv::cuda::HOG::create();
-    return reinterpret_cast<GpuHog*>(new CV_GPU_HOG(cv::cuda::HOG::create()));
+    return reinterpret_cast<GpuHog*>(new CV_GPU_HOG(hog));
 }
 
 GpuHog* cv_gpu_hog_new(Size2i win_size, Size2i block_size,

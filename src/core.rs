@@ -253,6 +253,77 @@ impl CVecOfRect {
 }
 
 #[repr(C)]
+pub struct CVecOfPoint {
+    pub array: *mut Point2i,
+    pub size: usize,
+}
+
+impl Default for CVecOfPoint {
+    fn default() -> Self {
+        CVecOfPoint {
+            array: ::std::ptr::null_mut::<Point2i>(),
+            size: 0,
+        }
+    }
+}
+
+impl Drop for CVecOfPoint {
+    fn drop(&mut self) {
+        extern "C" {
+            fn cv_vec_of_point_drop(_: *mut CVecOfPoint);
+        }
+        unsafe {
+            cv_vec_of_point_drop(self);
+        }
+    }
+}
+
+impl CVecOfPoint {
+    pub fn rustify(&self) -> Vec<Point2i> {
+        (0..self.size)
+            .map(|i| unsafe { *(self.array.offset(i as isize)) })
+            .collect::<Vec<_>>()
+    }
+}
+
+#[repr(C)]
+pub struct CVecOfPoints {
+    pub array: *mut CVecOfPoint,
+    pub size: usize,
+}
+
+impl Default for CVecOfPoints {
+    fn default() -> Self {
+        CVecOfPoints {
+            array: ::std::ptr::null_mut::<CVecOfPoint>(),
+            size: 0,
+        }
+    }
+}
+
+impl Drop for CVecOfPoints {
+    fn drop(&mut self) {
+        extern "C" {
+            fn cv_vec_of_points_drop(_: *mut CVecOfPoints);
+        }
+        unsafe {
+            cv_vec_of_points_drop(self);
+        }
+    }
+}
+
+impl CVecOfPoints {
+    pub fn rustify(&self) -> Vec<Vec<Point2i>> {
+        (0..self.size)
+            .map(|i| unsafe {
+                let vec = &*self.array.offset(i as isize);
+                vec.rustify()
+            })
+            .collect::<Vec<_>>()
+    }
+}
+
+#[repr(C)]
 pub struct CVecDouble {
     array: *mut c_double,
     size: usize,

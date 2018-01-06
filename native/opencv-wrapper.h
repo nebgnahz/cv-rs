@@ -63,6 +63,16 @@ typedef struct {
 } VecDouble;
 
 typedef struct {
+    Point2i* array;
+    size_t size;
+} VecPoint;
+
+typedef struct {
+    VecPoint* array;
+    size_t size;
+} VecPoints;
+
+typedef struct {
     int32_t v0;
     int32_t v1;
     int32_t v2;
@@ -107,6 +117,8 @@ size_t cv_mat_step1(const CvMatrix* const cmat, int i);
 void cv_mat_drop(CvMatrix* cmat);
 
 void cv_vec_of_rect_drop(VecRect* v);
+void cv_vec_of_point_drop(VecPoint* pv);
+void cv_vec_of_points_drop(VecPoints* pvs);
 
 // =============================================================================
 //  core array
@@ -234,6 +246,22 @@ CTermCriteria* cv_term_criteria_new(int type, int count, double epsilon);
 void cv_term_criteria_drop(CTermCriteria* c_criteria);
 RotatedRect cv_camshift(CvMatrix* back_project_image, Rect window,
                         CTermCriteria* term_criteria);
+
+// =============================================================================
+//   MSER
+// =============================================================================
+typedef struct _CMSER CMSER;
+CMSER* cv_mser_new(int delta,
+                   int min_area,
+                   int max_area,
+                   double max_variation,
+                   double min_diversity,
+                   int max_evolution,
+                   double area_threshold,
+                   double min_margin,
+                   int edge_blur_size);
+void cv_mser_drop(CMSER* cmser);
+void cv_mser_detectRegions(CMSER* cmser, CvMatrix* image, VecPoints* msers, VecRect* bboxes);
 
 EXTERN_C_END
 
