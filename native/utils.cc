@@ -19,3 +19,24 @@ void vec_double_cxx_to_c(const std::vector<double>& cxx_vec_double,
     vd->array = (double*) malloc(num * sizeof(double));
     ::memcpy(vd->array, cxx_vec_double.data(), num * sizeof(double));
 }
+
+void vec_point_cxx_to_c(const std::vector<cv::Point>& cxx_vec_point,
+                        VecPoint* vp) {
+    size_t num = cxx_vec_point.size();
+    vp->size = num;
+    vp->array = (Point2i*) malloc(num * sizeof(Point2i));
+    for (size_t i = 0; i < num; i++) {
+        vp->array[i].x = cxx_vec_point[i].x;
+        vp->array[i].y = cxx_vec_point[i].y;
+    }
+}
+
+void vec_points_cxx_to_c(const std::vector<std::vector<cv::Point>> &cxx_vec_points,
+                         VecPoints* vps) {
+    size_t num = cxx_vec_points.size();
+    vps->size = num;
+    vps->array = (VecPoint*) malloc(num * sizeof(VecPoint));
+    for (size_t i = 0; i < num; i++) {
+        vec_point_cxx_to_c(cxx_vec_points[i], &vps->array[i]);
+    }
+}

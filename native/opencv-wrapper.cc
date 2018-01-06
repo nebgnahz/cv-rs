@@ -6,6 +6,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
 #include <opencv2/video/tracking.hpp>
+#include <opencv2/features2d.hpp>
 
 EXTERN_C_BEGIN
 
@@ -113,6 +114,25 @@ void cv_vec_of_rect_drop(VecRect* v) {
         free(v->array);
         v->array = nullptr;
         v->size = 0;
+    }
+}
+
+void cv_vec_of_point_drop(VecPoint* pv) {
+    if (pv->array != nullptr) {
+        free(pv->array);
+        pv->array = nullptr;
+        pv->size = 0;
+    }
+}
+
+void cv_vec_of_points_drop(VecPoints* pvs) {
+    if (pvs->array != nullptr) {
+        for (size_t i = 0; i < pvs->size; ++i) {
+            cv_vec_of_point_drop(&pvs->array[i]);
+        }
+        free(pvs->array);
+        pvs->array = nullptr;
+        pvs->size = 0;
     }
 }
 
@@ -572,6 +592,49 @@ RotatedRect cv_camshift(CvMatrix* c_bp_image, Rect crect,
     c_rr.size.height = rr.size.height;
     c_rr.angle = rr.angle;
     return c_rr;
+}
+
+// =============================================================================
+//   MSER
+// =============================================================================
+
+CMSER* cv_mser_new(int delta,
+                   int min_area,
+                   int max_area,
+                   double max_variation,
+                   double min_diversity,
+                   int max_evolution,
+                   double area_threshold,
+                   double min_margin,
+                   int edge_blur_size) {
+    cv::Ptr<cv::MSER> result = cv::MSER::create(delta,
+                                                min_area,
+                                                max_area,
+                                                max_variation,
+                                                min_diversity,
+                                                max_evolution,
+                                                area_threshold,
+                                                min_margin,
+                                                edge_blur_size);
+    return reinterpret_cast<CMSER*>(new cv::Ptr<cv::MSER>(result));
+}
+
+void cv_mser_drop(CMSER* cmser) {
+    cv::Ptr<cv::MSER>* mser = reinterpret_cast<cv::Ptr<cv::MSER>*>(cmser);
+    delete mser;
+    mser = nullptr;
+}
+
+void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, VecRect* bboxes) {
+    cv::Ptr<cv::MSER>* mser = reinterpret_cast<cv::Ptr<cv::MSER>*>(cmser);
+    cv::Mat* mat = reinterpret_cast<cv::Mat*>(image);
+    std::vector<std::vector<cv::Point>> msers_vector;
+    std::vector<cv::Rect> bboxes_vector;
+
+    mser->get()->detectRegions(*mat, msers_vector, bboxes_vector);
+
+    vec_points_cxx_to_c(msers_vector, msers);
+    vec_rect_cxx_to_c(bboxes_vector, bboxes);
 }
 
 EXTERN_C_END
