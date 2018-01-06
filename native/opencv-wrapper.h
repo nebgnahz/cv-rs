@@ -261,7 +261,7 @@ CMSER* cv_mser_new(int delta,
                    double min_margin,
                    int edge_blur_size);
 void cv_mser_drop(CMSER* cmser);
-void cv_mser_detectRegions(CMSER* cmser, CvMatrix* image, VecPoints* msers, VecRect* bboxes);
+void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, VecRect* bboxes);
 
 EXTERN_C_END
 

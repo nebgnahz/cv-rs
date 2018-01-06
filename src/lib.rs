@@ -46,7 +46,7 @@ pub mod videoio;
 pub mod highgui;
 pub mod video;
 pub mod objdetect;
-pub mod mser;
+pub mod features2d;
 
 #[cfg(feature = "gpu")]
 pub mod cuda;

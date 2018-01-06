@@ -21,7 +21,7 @@ void vec_double_cxx_to_c(const std::vector<double>& cxx_vec_double,
 }
 
 void vec_point_cxx_to_c(const std::vector<cv::Point>& cxx_vec_point,
-                         VecPoint* vp) {
+                        VecPoint* vp) {
     size_t num = cxx_vec_point.size();
     vp->size = num;
     vp->array = (Point2i*) malloc(num * sizeof(Point2i));

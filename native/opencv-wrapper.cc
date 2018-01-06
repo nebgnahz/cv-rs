@@ -605,14 +605,14 @@ CMSER* cv_mser_new(int delta,
                    double min_margin,
                    int edge_blur_size) {
     cv::Ptr<cv::MSER> result = cv::MSER::create(delta,
-                                                 min_area,
-                                                 max_area,
-                                                 max_variation,
-                                                 min_diversity,
-                                                 max_evolution,
-                                                 area_threshold,
-                                                 min_margin,
-                                                 edge_blur_size);
+                                                min_area,
+                                                max_area,
+                                                max_variation,
+                                                min_diversity,
+                                                max_evolution,
+                                                area_threshold,
+                                                min_margin,
+                                                edge_blur_size);
     return reinterpret_cast<CMSER*>(new cv::Ptr<cv::MSER>(result));
 }
 
@@ -622,7 +622,7 @@ void cv_mser_drop(CMSER* cmser) {
     mser = nullptr;
 }
 
-void cv_mser_detectRegions(CMSER* cmser, CvMatrix* image, VecPoints* msers, VecRect* bboxes) {
+void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, VecRect* bboxes) {
     cv::Ptr<cv::MSER>* mser = reinterpret_cast<cv::Ptr<cv::MSER>*>(cmser);
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(image);
     std::vector<std::vector<cv::Point>> msers_vector;

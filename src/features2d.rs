@@ -15,7 +15,7 @@ extern "C" {
                    edge_blur_size: i32
     ) -> *mut CMSER;
     fn cv_mser_drop(cmser: *mut CMSER);
-    fn cv_mser_detectRegions(cmser: *mut CMSER, image: *mut CMat, msers: *mut CVecOfPoints, bboxes: *mut CVecOfRect);
+    fn cv_mser_detect_regions(cmser: *const CMSER, image: *const CMat, msers: *mut CVecOfPoints, bboxes: *mut CVecOfRect);
 }
 
 /// Maximally stable extremal region extractor.
@@ -53,7 +53,7 @@ impl MSER {
         let mut msers = CVecOfPoints::default();
         let mut bboxes = CVecOfRect::default();
         unsafe {
-            cv_mser_detectRegions(self.value, image.inner, &mut msers, &mut bboxes);
+            cv_mser_detect_regions(self.value, image.inner, &mut msers, &mut bboxes);
         }
         let msers = msers.rustify();
         let boxes =  bboxes.rustify();
@@ -70,7 +70,7 @@ impl Drop for MSER {
 }
 
 /// Builder that provides defaults for MSER
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Default)]
 pub struct MSERBuilder {
     delta: Option<i32>,
     min_area: Option<i32>,
@@ -84,71 +84,56 @@ pub struct MSERBuilder {
 }
 
 impl MSERBuilder {
-    /// Creates new MSER builder
-    pub fn new() -> Self {
-        MSERBuilder {
-            delta: None,
-            min_area: None,
-            max_area: None,
-            max_variation: None,
-            min_diversity: None,
-            max_evolution: None,
-            area_threshold: None,
-            min_margin: None,
-            edge_blur_size: None,
-        }
-    }
-
     /// Replace current delta with specified value
-    pub fn delta(mut self, value: i32) -> Self{
+    pub fn delta(mut self, value: i32) -> Self {
         self.delta = Some(value);
         self
     }
 
     /// Replace current min_area with specified value
-    pub fn min_area(mut self, value: i32) -> Self{
+    pub fn min_area(mut self, value: i32) -> Self {
         self.min_area = Some(value);
         self
     }
 
     /// Replace current max_area with specified value
-    pub fn max_area(mut self, value: i32) -> Self{
+    pub fn max_area(mut self, value: i32) -> Self {
         self.max_area = Some(value);
         self
     }
 
     /// Replace current max_variation with specified value
-    pub fn max_variation(mut self, value: f64) -> Self{
+    pub fn max_variation(mut self, value: f64) -> Self {
         self.max_variation = Some(value);
         self
     }
 
     /// Replace current min_diversity with specified value
-    pub fn min_diversity(mut self, value: f64) -> Self{
+    pub fn min_diversity(mut self, value: f64) -> Self {
         self.min_diversity = Some(value);
         self
     }
 
     /// Replace current max_evolution with specified value
-    pub fn max_evolution(mut self, value: i32) -> Self{
+    pub fn max_evolution(mut self, value: i32) -> Self {
         self.max_evolution = Some(value);
         self
     }
 
     /// Replace current area_threshold with specified value
-    pub fn area_threshold(mut self, value: f64) -> Self{
+    pub fn area_threshold(mut self, value: f64) -> Self {
         self.area_threshold = Some(value);
         self
     }
 
     /// Replace current min_margin with specified value
-    pub fn min_margin(mut self, value: f64) -> Self{
+    pub fn min_margin(mut self, value: f64) -> Self {
         self.min_margin = Some(value);
         self
     }
 
     /// Replace current edge_blur_size with specified value
-    pub fn edge_blur_size(mut self, value: i32) -> Self{
+    pub fn edge_blur_size(mut self, value: i32) -> Self {
         self.edge_blur_size = Some(value);
         self
     }
