@@ -71,10 +71,11 @@ features = [ "gpu" ]
 ### Windows
 
 
-Depending on your install, you have to set `%OPENCV_DIR%` environment variable `%OPENCV_DIR%\include` points to the OpenCV includes diretory (for example, it could be `C:\opencv\build`). You will also need to add `%OPENCV_DIR%\bin` to the `%PATH%`. 
+Depending on your install, you have to set `%OPENCV_DIR%` environment variable in such a way that `%OPENCV_DIR%\include` points to the OpenCV includes diretory (for example, it could be `C:\opencv\build`).
 
 ##### If you are using MSVC toolchain:
-- Set  environment variable `%OPENCV_LIB%` to `%OPENCV_DIR%\x64\<vc14 or vc15>\lib`, which has `opencv_world<version_number>.lib`
+- Set  environment variable `%OPENCV_LIB%` to `%OPENCV_DIR%\x64\<vc14 or vc15>\lib`. Check that this directory has `opencv_world<version_number>.lib`
+- Add `%OPENCV_DIR%\x64\<vc14 or vc15>\bin` to the `%PATH%`. Check that this directory has `opencv_world<version_number>.dll`
 
 ##### If you are using GNU toolchain:
 
@@ -86,9 +87,12 @@ In this case, configuration process is a bit more complicated, because you have 
 - Do the same thing with `%OPENCV_DIR%\x64\mingw` and paste it in ‘Where to build the binaries:’ text box. For example, it could be `C:\opencv\build\x64\mingw`.
 - Click ‘Configure’. In the popping window, select MinGW option under ‘Specify the generator for this project’ and click ‘Finish’.
 - Search for `WITH_IPP` and **disable** it (otherwise ‘cannot find -lRunTmChk’ error is expected when building OpenCV).
-- Search for `BUILD_opencv_world` and **enable** it (otherwise `cv-rs` won't work).
-- Click ‘Generate’. Now you have properly configured OpenCV.
-- Set environment variable `%OPENCV_LIB%` to `%OPENCV_DIR%\x64\mingw64\lib`, which has `opencv_world<version_number>.dll.a`.
+- Search for `BUILD_opencv_world` and **enable** it (otherwise `cv-rs` won't compile).
+- Click ‘Generate’. Select 'MinGW makefiles' from the dropdown and click ok. Now you have properly configured OpenCV.
+- Open bash shell in `OPENCV_DIR%\x64\mingw` directory and run `mingw32-make`. You should get following result:
+![MinGW make](https://preview.ibb.co/fuTz1b/2018_01_07.png)
+- Set environment variable `%OPENCV_LIB%` to `%OPENCV_DIR%\x64\mingw\lib`. Check that this directory has `libopencv_world<version_number>.dll.a`.
+- Add `%OPENCV_DIR%\x64\mingw\bin` to the `%PATH%`. Check that this directory has  `libopencv_world<version_number>.dll`
 
 
 ## Usage
