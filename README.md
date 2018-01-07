@@ -90,7 +90,7 @@ In this case, configuration process is a bit more complicated, because you have 
 - Search for `BUILD_opencv_world` and **enable** it (otherwise `cv-rs` won't compile).
 - Click ‘Generate’. Select 'MinGW makefiles' from the dropdown and click ok. Now you have properly configured OpenCV.
 - Open bash shell in `OPENCV_DIR%\x64\mingw` directory and run `mingw32-make`. You should get following result:
-![MinGW make](https://preview.ibb.co/fuTz1b/2018_01_07.png)
+![MinGW make](https://user-images.githubusercontent.com/941519/34654809-836fe56c-f3b5-11e7-87b3-46bb7667bf34.png)
 - Set environment variable `%OPENCV_LIB%` to `%OPENCV_DIR%\x64\mingw\lib`. Check that this directory has `libopencv_world<version_number>.dll.a`.
 - Add `%OPENCV_DIR%\x64\mingw\bin` to the `%PATH%`. Check that this directory has  `libopencv_world<version_number>.dll`
 
