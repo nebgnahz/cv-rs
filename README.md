@@ -90,7 +90,7 @@ In this case, configuration process is a bit more complicated, because you have 
 - Click ‘Generate’. Select 'MinGW makefiles' from the dropdown and click ok. Now you have properly configured OpenCV.
 - Open bash shell in `OPENCV_DIR%\x64\mingw64` directory and run `mingw32-make`. You should get following result:
 ![MinGW make](https://preview.ibb.co/fuTz1b/2018_01_07.png)
-- Set environment variable `%OPENCV_LIB%` to `%OPENCV_DIR%\x64\mingw64\lib`, which has `opencv_world<version_number>.dll.a`.
+- Set environment variable `%OPENCV_LIB%` to `%OPENCV_DIR%\x64\mingw64\lib`, which has `libopencv_world<version_number>.dll.a`.
 
 
 ## Usage
