@@ -86,7 +86,7 @@ In this case, configuration process is a bit more complicated, because you have 
 - Do the same thing with `%OPENCV_DIR%\x64\mingw` and paste it in ‘Where to build the binaries:’ text box. For example, it could be `C:\opencv\build\x64\mingw`.
 - Click ‘Configure’. In the popping window, select MinGW option under ‘Specify the generator for this project’ and click ‘Finish’.
 - Search for `WITH_IPP` and **disable** it (otherwise ‘cannot find -lRunTmChk’ error is expected when building OpenCV).
-- Search for `BUILD_opencv_world` and **enable** it (otherwise `cv-rs` won't work).
+- Search for `BUILD_opencv_world` and **enable** it (otherwise `cv-rs` won't compile).
 - Click ‘Generate’. Select 'MinGW makefiles' from the dropdown and click ok. Now you have properly configured OpenCV.
 - Open bash shell in `OPENCV_DIR%\x64\mingw64` directory and run `mingw32-make`. You should get following result:
 ![MinGW make](https://preview.ibb.co/fuTz1b/2018_01_07.png)
