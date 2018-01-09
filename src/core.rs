@@ -2,7 +2,7 @@
 
 use bytes::{self, ByteOrder};
 use errors::*;
-use libc::{c_char, c_double, c_int, c_uchar, size_t};
+use libc::{c_char, c_double, c_int, c_uchar, c_void, size_t};
 use num;
 use std::ffi::CString;
 use std::mem;
@@ -219,129 +219,74 @@ impl Rect2f {
 }
 
 #[repr(C)]
-pub struct CVecOfRect {
-    pub array: *mut Rect,
-    pub size: usize,
-}
-
-impl Default for CVecOfRect {
-    fn default() -> Self {
-        CVecOfRect {
-            array: ::std::ptr::null_mut::<Rect>(),
-            size: 0,
-        }
-    }
-}
-
-impl Drop for CVecOfRect {
-    fn drop(&mut self) {
-        extern "C" {
-            fn cv_vec_of_rect_drop(_: *mut CVecOfRect);
-        }
-        unsafe {
-            cv_vec_of_rect_drop(self);
-        }
-    }
-}
-
-impl CVecOfRect {
-    pub fn rustify(self) -> Vec<Rect> {
-        (0..self.size)
-            .map(|i| unsafe { *(self.array.offset(i as isize)) })
-            .collect::<Vec<_>>()
-    }
-}
-
-#[repr(C)]
-pub struct CVecOfPoint {
-    pub array: *mut Point2i,
-    pub size: usize,
-}
-
-impl Default for CVecOfPoint {
-    fn default() -> Self {
-        CVecOfPoint {
-            array: ::std::ptr::null_mut::<Point2i>(),
-            size: 0,
-        }
-    }
-}
-
-impl Drop for CVecOfPoint {
-    fn drop(&mut self) {
-        extern "C" {
-            fn cv_vec_of_point_drop(_: *mut CVecOfPoint);
-        }
-        unsafe {
-            cv_vec_of_point_drop(self);
-        }
-    }
-}
-
-impl CVecOfPoint {
-    pub fn rustify(&self) -> Vec<Point2i> {
-        (0..self.size)
-            .map(|i| unsafe { *(self.array.offset(i as isize)) })
-            .collect::<Vec<_>>()
-    }
-}
-
-#[repr(C)]
-pub struct CVecOfPoints {
-    pub array: *mut CVecOfPoint,
-    pub size: usize,
-}
-
-impl Default for CVecOfPoints {
-    fn default() -> Self {
-        CVecOfPoints {
-            array: ::std::ptr::null_mut::<CVecOfPoint>(),
-            size: 0,
-        }
-    }
-}
-
-impl Drop for CVecOfPoints {
-    fn drop(&mut self) {
-        extern "C" {
-            fn cv_vec_of_points_drop(_: *mut CVecOfPoints);
-        }
-        unsafe {
-            cv_vec_of_points_drop(self);
-        }
-    }
-}
-
-impl CVecOfPoints {
-    pub fn rustify(&self) -> Vec<Vec<Point2i>> {
-        (0..self.size)
-            .map(|i| unsafe {
-                let vec = &*self.array.offset(i as isize);
-                vec.rustify()
-            })
-            .collect::<Vec<_>>()
-    }
-}
-
-#[repr(C)]
-pub struct CVecDouble {
-    array: *mut c_double,
+#[derive(Debug, Clone)]
+pub struct CVec<T: Sized + NestedVec> {
+    array: *mut T,
     size: usize,
 }
 
-impl CVecDouble {
-    pub fn rustify(self) -> Vec<f64> {
-        (1..self.size)
-            .map(|i| unsafe { *(self.array.offset(i as isize)) })
-            .collect::<Vec<_>>()
+// Unsafe because CVec is not guaranteed to contain valid pointer and size
+unsafe fn unpack<T: NestedVec, U, F>(v: &CVec<T>, mut f: F) -> Vec<U>
+    where
+        F: FnMut(&T) -> U,
+{
+    (0..v.size)
+        .map(|i| f(&*v.array.offset(i as isize)))
+        .collect()
+}
+
+pub trait Unpack {
+    type Out;
+    fn unpack(&self) -> Self::Out;
+}
+
+impl<T: Unpack + NestedVec> Unpack for CVec<T> {
+    type Out = Vec<T::Out>;
+    fn unpack(&self) -> Self::Out {
+        unsafe {
+            unpack(self, |e| e.unpack())
+        }
     }
 }
 
-impl Default for CVecDouble {
+impl<T: Copy> Unpack for T {
+    type Out = T;
+    fn unpack(&self) -> Self::Out {
+        *self
+    }
+}
+
+pub trait NestedVec {
+    const LEVEL: u32;
+}
+
+impl<T: NestedVec> NestedVec for CVec<T> {
+    const LEVEL: u32 = T::LEVEL + 1;
+}
+
+impl<T: Copy> NestedVec for T {
+    const LEVEL: u32 = 0;
+}
+
+impl<T: NestedVec> Default for CVec<T> {
     fn default() -> Self {
-        CVecDouble {
-            array: ::std::ptr::null_mut::<c_double>(),
+        CVec {
+            array: ::std::ptr::null_mut::<T>(),
             size: 0,
+        }
+    }
+}
+
+impl<T: NestedVec> Drop for CVec<T> {
+    fn drop(&mut self) {
+        extern "C" {
+            fn cv_vec_drop(vec: *mut c_void, depth: u32);
+        }
+        unsafe {
+            let depth = CVec::<T>::LEVEL;
+            let self_ptr: *mut _ = self;
+            let self_ptr: *mut c_void =  self_ptr as *mut _;
+            cv_vec_drop(self_ptr, depth);
         }
     }
 }

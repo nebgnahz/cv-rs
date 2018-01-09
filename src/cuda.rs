@@ -107,8 +107,8 @@ extern "C" {
                       -> *mut CGpuHog;
     fn cv_gpu_hog_drop(hog: *mut CGpuHog);
     fn cv_gpu_hog_set_detector(hog: *mut CGpuHog, d: *const CSvmDetector);
-    fn cv_gpu_hog_detect(hog: *mut CGpuHog, mat: *mut CGpuMat, found: *mut CVecOfRect);
-    fn cv_gpu_hog_detect_with_conf(hog: *mut CGpuHog, mat: *mut CGpuMat, found: *mut CVecOfRect, conf: *mut CVecDouble);
+    fn cv_gpu_hog_detect(hog: *mut CGpuHog, mat: *mut CGpuMat, found: *mut CVec<Rect>);
+    fn cv_gpu_hog_detect_with_conf(hog: *mut CGpuHog, mat: *mut CGpuMat, found: *mut CVec<Rect>, conf: *mut CVec<c_double>);
 
     fn cv_gpu_hog_set_gamma_correction(hog: *mut CGpuHog, gamma: bool);
     fn cv_gpu_hog_set_group_threshold(hog: *mut CGpuHog, group_threshold: c_int);
@@ -223,20 +223,20 @@ impl GpuHog {
 
     /// Detects according to the SVM detector specified.
     fn _detect(&self, mat: &GpuMat) -> Vec<(Rect, f64)> {
-        let mut found = CVecOfRect::default();
+        let mut found = CVec<Rect>::default();
         unsafe {
             cv_gpu_hog_detect(self.inner, mat.inner, &mut found);
         }
-        found.rustify().into_iter().map(|r| (r, 0f64)).collect::<Vec<_>>()
+        found.unpack().into_iter().map(|r| (r, 0f64)).collect::<Vec<_>>()
     }
 
     /// Detects and returns the results with confidence (scores)
     fn _detect_with_confidence(&self, mat: &GpuMat) -> Vec<(Rect, f64)> {
-        let mut found = CVecOfRect::default();
-        let mut conf = CVecDouble::default();
+        let mut found = CVec<Rect>::default();
+        let mut conf = CVec<c_double>::default();
         unsafe { cv_gpu_hog_detect_with_conf(self.inner, mat.inner, &mut found, &mut conf) }
 
-        found.rustify().into_iter().zip(conf.rustify().into_iter()).collect::<Vec<_>>()
+        found.unpack().into_iter().zip(conf.unpack().into_iter()).collect::<Vec<_>>()
     }
 }
 

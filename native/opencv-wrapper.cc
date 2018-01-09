@@ -109,30 +109,17 @@ void cv_mat_drop(CvMatrix* cmat) {
     cmat = nullptr;
 }
 
-void cv_vec_of_rect_drop(VecRect* v) {
-    if (v->array != nullptr) {
-        free(v->array);
-        v->array = nullptr;
-        v->size = 0;
-    }
-}
-
-void cv_vec_of_point_drop(VecPoint* pv) {
-    if (pv->array != nullptr) {
-        free(pv->array);
-        pv->array = nullptr;
-        pv->size = 0;
-    }
-}
-
-void cv_vec_of_points_drop(VecPoints* pvs) {
-    if (pvs->array != nullptr) {
-        for (size_t i = 0; i < pvs->size; ++i) {
-            cv_vec_of_point_drop(&pvs->array[i]);
+void cv_vec_drop(Vec* vec, unsigned int depth) {
+    if (vec->array != nullptr) {
+        if (depth > 1) {
+            Vec* nestedVec = (Vec*) vec->array;
+            for (size_t i = 0; i < vec->size; ++i) {
+                cv_vec_drop(&nestedVec[i], depth - 1);
+            }
         }
-        free(pvs->array);
-        pvs->array = nullptr;
-        pvs->size = 0;
+        free(vec->array);
+        vec->array = nullptr;
+        vec->size = 0;
     }
 }
 

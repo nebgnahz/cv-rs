@@ -34,7 +34,7 @@ extern "C" {
     fn cv_cascade_classifier_detect(
         cc: *mut CCascadeClassifier,
         cmat: *mut CMat,
-        vec_of_rect: *mut CVecOfRect,
+        vec_of_rect: *mut CVec<Rect>,
         scale_factor: c_double,
         min_neighbors: c_int,
         flags: c_int,
@@ -106,7 +106,7 @@ impl CascadeClassifier {
         min_size: Size2i,
         max_size: Size2i,
     ) -> Vec<Rect> {
-        let mut c_result = CVecOfRect::default();
+        let mut c_result = CVec::<Rect>::default();
         unsafe {
             cv_cascade_classifier_detect(
                 self.inner,
@@ -119,7 +119,7 @@ impl CascadeClassifier {
                 max_size,
             )
         }
-        c_result.rustify()
+        c_result.unpack()
     }
 }
 
@@ -301,8 +301,8 @@ extern "C" {
     fn cv_hog_detect(
         hog: *mut CHogDescriptor,
         image: *mut CMat,
-        objs: *mut CVecOfRect,
-        weights: *mut CVecDouble,
+        objs: *mut CVec<Rect>,
+        weights: *mut CVec<c_double>,
         win_stride: Size2i,
         padding: Size2i,
         scale: c_double,
@@ -322,8 +322,8 @@ impl Default for HogDescriptor {
 
 impl ObjectDetect for HogDescriptor {
     fn detect(&self, image: &Mat) -> Vec<(Rect, f64)> {
-        let mut detected = CVecOfRect::default();
-        let mut weights = CVecDouble::default();
+        let mut detected = CVec::<Rect>::default();
+        let mut weights = CVec::<c_double>::default();
         unsafe {
             cv_hog_detect(
                 self.inner,
@@ -338,8 +338,8 @@ impl ObjectDetect for HogDescriptor {
             )
         }
 
-        let results = detected.rustify();
-        let weights = weights.rustify();
+        let results = detected.unpack();
+        let weights = weights.unpack();
         results.into_iter().zip(weights).collect::<Vec<_>>()
     }
 }

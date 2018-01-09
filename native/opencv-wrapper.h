@@ -12,6 +12,8 @@
 #define EXTERN_C_END
 #endif
 
+#define VecType(type,name) typedef struct { type* array; size_t size; } name
+
 EXTERN_C_BEGIN
 
 // =============================================================================
@@ -52,25 +54,11 @@ typedef struct {
     float angle;
 } RotatedRect;
 
-typedef struct {
-    Rect* array;
-    size_t size;
-} VecRect;
-
-typedef struct {
-    double* array;
-    size_t size;
-} VecDouble;
-
-typedef struct {
-    Point2i* array;
-    size_t size;
-} VecPoint;
-
-typedef struct {
-    VecPoint* array;
-    size_t size;
-} VecPoints;
+VecType(void, Vec);
+VecType(Rect, VecRect);
+VecType(double, VecDouble);
+VecType(Point2i, VecPoint);
+VecType(VecPoint, VecPoints);
 
 typedef struct {
     int32_t v0;
@@ -116,9 +104,7 @@ size_t cv_mat_step1(const CvMatrix* const cmat, int i);
 // Free a Mat object
 void cv_mat_drop(CvMatrix* cmat);
 
-void cv_vec_of_rect_drop(VecRect* v);
-void cv_vec_of_point_drop(VecPoint* pv);
-void cv_vec_of_points_drop(VecPoints* pvs);
+void cv_vec_drop(Vec* vec, unsigned int depth);
 
 // =============================================================================
 //  core array

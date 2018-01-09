@@ -15,7 +15,7 @@ extern "C" {
                    edge_blur_size: i32
     ) -> *mut CMSER;
     fn cv_mser_drop(cmser: *mut CMSER);
-    fn cv_mser_detect_regions(cmser: *const CMSER, image: *const CMat, msers: *mut CVecOfPoints, bboxes: *mut CVecOfRect);
+    fn cv_mser_detect_regions(cmser: *const CMSER, image: *const CMat, msers: *mut CVec<CVec<Point2i>>, bboxes: *mut CVec<Rect>);
 }
 
 /// Maximally stable extremal region extractor.
@@ -50,13 +50,13 @@ impl MSER {
 
     /// Detect MSER regions.
     pub fn detect_regions(&self, image: &Mat) -> (Vec<Vec<Point2i>>, Vec<Rect>) {
-        let mut msers = CVecOfPoints::default();
-        let mut bboxes = CVecOfRect::default();
+        let mut msers = CVec::<CVec<Point2i>>::default();
+        let mut bboxes = CVec::<Rect>::default();
         unsafe {
             cv_mser_detect_regions(self.value, image.inner, &mut msers, &mut bboxes);
         }
-        let msers = msers.rustify();
-        let boxes =  bboxes.rustify();
+        let msers = msers.unpack();
+        let boxes =  bboxes.unpack();
         (msers, boxes)
     }
 }
