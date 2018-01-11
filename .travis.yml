@@ -8,32 +8,36 @@ rust:
 addons:
   apt:
     packages:
-    - libgmp-dev
     - build-essential
     - cmake
     - git
-    - libgtk2.0-dev
-    - pkg-config
     - libavcodec-dev
     - libavformat-dev
-    - libswscale-dev
-    - libtbb2
-    - libtbb-dev
+    - libdc1394-22-dev
+    - libgmp-dev
+    - libgtk2.0-dev
+    - libjasper-dev
     - libjpeg-dev
     - libpng-dev
+    - libswscale-dev
+    - libtbb-dev
+    - libtbb2
     - libtiff-dev
-    - libjasper-dev
-    - libdc1394-22-dev
+    - pkg-config
     - xvfb
 
 before_install:
-  - ./travis_build_opencv.sh
+  - sudo -E ./.ci/install_cuda.sh
+  - sudo -E ./.ci/travis_build_opencv.sh
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 script:
   - cargo build
-  - cargo test
-  - cargo doc --no-deps
+  - cargo build --no-default-features
+  - cargo test --no-default-features
+  - cargo build --features gpu
+  ## - cargo test --features gpu
+  - cargo doc --features gpu --no-deps
   - if [ "$TRAVIS_RUST_VERSION" == "nightly" ]; then cargo bench ; fi
 
 notifications:
