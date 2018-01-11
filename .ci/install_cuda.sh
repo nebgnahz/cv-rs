@@ -12,13 +12,7 @@ rm ${CUDA_REPO_PKG}
 
 ## update and install package
 apt-get -y update
-apt-get install -y --no-install-recommends \
-        cuda-cufft-$CUDA_PKG_VERSION \
-        cuda-core-$CUDA_PKG_VERSION \
-        cuda-npp-$CUDA_PKG_VERSION \
-        cuda-cudart-dev-$CUDA_PKG_VERSION \
-        cuda-cublas-dev-$CUDA_PKG_VERSION \
-        cuda-curand-dev-$CUDA_PKG_VERSION
+apt-get install -y cuda-$CUDA_PKG_VERSION
 
 ## manually create CUDA symlink
 ln -s /usr/local/cuda-${CUDA_VERSION} /usr/local/cuda
