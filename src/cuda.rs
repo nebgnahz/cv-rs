@@ -223,7 +223,7 @@ impl GpuHog {
 
     /// Detects according to the SVM detector specified.
     fn _detect(&self, mat: &GpuMat) -> Vec<(Rect, f64)> {
-        let mut found = CVec<Rect>::default();
+        let mut found = CVec::<Rect>::default();
         unsafe {
             cv_gpu_hog_detect(self.inner, mat.inner, &mut found);
         }
@@ -232,8 +232,8 @@ impl GpuHog {
 
     /// Detects and returns the results with confidence (scores)
     fn _detect_with_confidence(&self, mat: &GpuMat) -> Vec<(Rect, f64)> {
-        let mut found = CVec<Rect>::default();
-        let mut conf = CVec<c_double>::default();
+        let mut found = CVec::<Rect>::default();
+        let mut conf = CVec::<c_double>::default();
         unsafe { cv_gpu_hog_detect_with_conf(self.inner, mat.inner, &mut found, &mut conf) }
 
         found.unpack().into_iter().zip(conf.unpack().into_iter()).collect::<Vec<_>>()

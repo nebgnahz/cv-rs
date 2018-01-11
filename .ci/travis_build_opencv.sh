@@ -14,15 +14,19 @@ if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
     fi
 
     cd opencv-${OPENCV_VERSION}/build
-    cmake -D BUILD_EXAMPLES=OFF \
-          -D BUILD_TESTS=OFF \
-          -D BUILD_PERF_TESTS=OFF  \
-          -D BUILD_opencv_java=OFF \
-          -D BUILD_opencv_python=OFF \
-          -D BUILD_opencv_python2=OFF \
-          -D BUILD_opencv_python3=OFF \
-          -D CMAKE_INSTALL_PREFIX=$HOME/usr \
-          ..
+    cmake \
+        -D WITH_CUDA=ON \
+        -D BUILD_EXAMPLES=OFF \
+        -D BUILD_TESTS=OFF \
+        -D BUILD_PERF_TESTS=OFF  \
+        -D BUILD_opencv_java=OFF \
+        -D BUILD_opencv_python=OFF \
+        -D BUILD_opencv_python2=OFF \
+        -D BUILD_opencv_python3=OFF \
+        -D CMAKE_INSTALL_PREFIX=$HOME/usr \
+        -D CUDA_ARCH_BIN=5.2 \
+        -D CUDA_ARCH_PTX="" \
+        ..
     make -j4
     make install && touch $HOME/usr/installed-${OPENCV_VERSION}
     cd ../..
