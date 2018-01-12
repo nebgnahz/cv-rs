@@ -271,13 +271,13 @@ extern "C" {
     fn cv_gpu_cascade_set_min_object_size(cascade: *mut CGpuCascade, min: Size2i);
     fn cv_gpu_cascade_set_scale_factor(cascade: *mut CGpuCascade, factor: c_double);
 
-    // fn cv_gpu_cascade_get_classifier_size(cascade: *const CGpuCascade) -> Size2i;
-    // fn cv_gpu_cascade_get_find_largest_object(cascade: *const CGpuCascade) -> bool;
-    // fn cv_gpu_cascade_get_max_num_objects(cascade: *const CGpuCascade) -> c_int;
-    // fn cv_gpu_cascade_get_min_neighbors(cascade: *const CGpuCascade) -> c_int;
-    // fn cv_gpu_cascade_get_max_object_size(cascade: *const CGpuCascade) -> Size2i;
-    // fn cv_gpu_cascade_get_min_object_size(cascade: *const CGpuCascade) -> Size2i;
-    // fn cv_gpu_cascade_get_scale_factor(cascade: *const CGpuCascade) -> c_double;
+    fn cv_gpu_cascade_get_classifier_size(cascade: *const CGpuCascade) -> Size2i;
+    fn cv_gpu_cascade_get_find_largest_object(cascade: *const CGpuCascade) -> bool;
+    fn cv_gpu_cascade_get_max_num_objects(cascade: *const CGpuCascade) -> c_int;
+    fn cv_gpu_cascade_get_min_neighbors(cascade: *const CGpuCascade) -> c_int;
+    fn cv_gpu_cascade_get_max_object_size(cascade: *const CGpuCascade) -> Size2i;
+    fn cv_gpu_cascade_get_min_object_size(cascade: *const CGpuCascade) -> Size2i;
+    fn cv_gpu_cascade_get_scale_factor(cascade: *const CGpuCascade) -> c_double;
 }
 
 impl GpuCascade {
@@ -348,6 +348,56 @@ impl GpuCascade {
     pub fn set_scale_factor(&mut self, factor: f64) {
         unsafe {
             cv_gpu_cascade_set_scale_factor(self.inner, factor);
+        }
+    }
+
+    /// Returns the classifier size.
+    pub fn get_classifier_size(&self) -> Size2i {
+        unsafe {
+            cv_gpu_cascade_get_classifier_size(self.inner)
+        }
+    }
+
+    /// Returns if the CascadeClassifier will only return the largest object.
+    pub fn get_find_largest_object_flag(&self) -> bool {
+        unsafe {
+            cv_gpu_cascade_get_find_largest_object(self.inner)
+        }
+    }
+
+    /// Returns the allowed maximal number of detected objects.
+    pub fn get_max_num_objects(&self) -> i32 {
+        unsafe {
+            cv_gpu_cascade_get_max_num_objects(self.inner)
+        }
+    }
+
+    /// Returns the number of minimal neighbors required for a detection to be
+    /// valid.
+    pub fn get_min_neighbors(&self) -> i32 {
+        unsafe {
+            cv_gpu_cascade_get_min_neighbors(self.inner)
+        }
+    }
+
+    /// Returns the maximum object size.
+    pub fn get_max_object_size(&self) -> Size2i {
+        unsafe {
+            cv_gpu_cascade_get_max_object_size(self.inner)
+        }
+    }
+
+    /// Returns the minimal object size.
+    pub fn get_min_object_size(&self) -> Size2i {
+        unsafe {
+            cv_gpu_cascade_get_min_object_size(self.inner)
+        }
+    }
+
+    /// Returns the scale factor.
+    pub fn get_scale_factor(&self) -> f64 {
+        unsafe {
+            cv_gpu_cascade_get_scale_factor(self.inner)
         }
     }
 }
