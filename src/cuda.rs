@@ -93,12 +93,16 @@ pub enum CGpuHog {}
 /// Data structure that performs Histogram of Gradient (HOG).
 pub struct GpuHog {
     inner: *mut CGpuHog,
+
     /// Hog parameters.
     pub params: HogParams,
 
     /// Should return detection scores
     pub return_score: bool,
 }
+
+/// We can safely send a mutable pointer to a different thread
+unsafe impl Send for GpuHog {}
 
 extern "C" {
     fn cv_gpu_hog_default() -> *mut CGpuHog;
@@ -258,6 +262,9 @@ pub enum CGpuCascade {}
 pub struct GpuCascade {
     inner: *mut CGpuCascade,
 }
+
+/// We can safely send a mutable pointer to a different thread
+unsafe impl Send for GpuCascade {}
 
 extern "C" {
     fn cv_gpu_cascade_new(filename: *const c_char) -> *mut CGpuCascade;
