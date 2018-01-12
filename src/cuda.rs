@@ -1,9 +1,12 @@
 //! Bindings to OpenCV's classes and functions that exploits GPU/Cuda. See
 //! [cv::cuda](http://docs.opencv.org/3.1.0/d1/d1a/namespacecv_1_1cuda.html)
 
-use libc::{size_t, c_int, c_double};
+use libc::{size_t, c_int, c_double, c_char};
 use super::core::*;
+use super::errors::*;
 use super::objdetect::{SvmDetector, CSvmDetector, ObjectDetect, HogParams};
+use std::ffi::CString;
+use std::path::Path;
 
 /// Opaque data struct for C/C++ cv::cuda::GpuMat bindings
 #[derive(Clone, Copy, Debug)]
@@ -243,5 +246,122 @@ impl GpuHog {
 impl Drop for GpuHog {
     fn drop(&mut self) {
         unsafe { cv_gpu_hog_drop(self.inner) }
+    }
+}
+
+/// Opaque data struct for C bindings
+#[derive(Clone, Copy, Debug)]
+pub enum CGpuCascade {}
+
+#[derive(Debug)]
+/// Data structure that performs object detection with a cascade classifier.
+pub struct GpuCascade {
+    inner: *mut CGpuCascade,
+}
+
+extern "C" {
+    fn cv_gpu_cascade_new(filename: *const c_char) -> *mut CGpuCascade;
+    fn cv_gpu_cascade_drop(cascade: *mut CGpuCascade);
+    fn cv_gpu_cascade_detect(cascade: *mut CGpuCascade, image: *const CGpuMat, objects: *mut CVec<Rect>);
+
+    fn cv_gpu_cascade_set_find_largest_object(cascade: *mut CGpuCascade, value: bool);
+    fn cv_gpu_cascade_set_max_num_objects(cascade: *mut CGpuCascade, max: c_int);
+    fn cv_gpu_cascade_set_min_neighbors(cascade: *mut CGpuCascade, min: c_int);
+    fn cv_gpu_cascade_set_max_object_size(cascade: *mut CGpuCascade, max: Size2i);
+    fn cv_gpu_cascade_set_min_object_size(cascade: *mut CGpuCascade, min: Size2i);
+    fn cv_gpu_cascade_set_scale_factor(cascade: *mut CGpuCascade, factor: c_double);
+
+    // fn cv_gpu_cascade_get_classifier_size(cascade: *const CGpuCascade) -> Size2i;
+    // fn cv_gpu_cascade_get_find_largest_object(cascade: *const CGpuCascade) -> bool;
+    // fn cv_gpu_cascade_get_max_num_objects(cascade: *const CGpuCascade) -> c_int;
+    // fn cv_gpu_cascade_get_min_neighbors(cascade: *const CGpuCascade) -> c_int;
+    // fn cv_gpu_cascade_get_max_object_size(cascade: *const CGpuCascade) -> Size2i;
+    // fn cv_gpu_cascade_get_min_object_size(cascade: *const CGpuCascade) -> Size2i;
+    // fn cv_gpu_cascade_get_scale_factor(cascade: *const CGpuCascade) -> c_double;
+}
+
+impl GpuCascade {
+    /// Loads the classifier from a file.
+    ///
+    /// Name of the file from which the classifier is loaded. Only the old
+    /// haar classifier (trained by the haar training application) and NVIDIA's
+    /// nvbin are supported for HAAR and only new type of OpenCV XML cascade
+    /// supported for LBP. The working haar models can be found at
+    /// opencv_folder/data/haarcascades_cuda/.
+    pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self> {
+        if let Some(p) = path.as_ref().to_str() {
+            let s = CString::new(p)?;
+            let inner = unsafe { cv_gpu_cascade_new((&s).as_ptr()) };
+            return Ok(GpuCascade {
+                inner: inner
+            });
+        }
+        let error = ErrorKind::InvalidPath(path.as_ref().to_path_buf());
+        Err(error.into())
+    }
+
+    /// Detects objects of different sizes in the input image.
+    pub fn detect_multiscale(&self, mat: &GpuMat) -> Vec<Rect> {
+        let mut found = CVec::<Rect>::default();
+        unsafe {
+            cv_gpu_cascade_detect(self.inner, mat.inner, &mut found);
+        }
+        found.unpack()
+    }
+
+    /// Sets whether or not to find the only largest object.
+    pub fn set_find_largest_object(&mut self, value: bool) {
+        unsafe {
+            cv_gpu_cascade_set_find_largest_object(self.inner, value);
+        }
+    }
+
+    /// Sets the maximum number of objects.
+    pub fn set_max_num_objects(&mut self, max: i32) {
+        unsafe {
+            cv_gpu_cascade_set_max_num_objects(self.inner, max);
+        }
+    }
+
+    /// Sets minimal neighbors required for a detection to be valid.
+    pub fn set_min_neighbors(&mut self, min: i32) {
+        unsafe {
+            cv_gpu_cascade_set_min_neighbors(self.inner, min);
+        }
+    }
+
+    /// Sets the maximun object size.
+    pub fn set_max_object_size(&mut self, max: Size2i) {
+        unsafe {
+            cv_gpu_cascade_set_max_object_size(self.inner, max);
+        }
+    }
+
+    /// Sets the minimal object size.
+    pub fn set_min_object_size(&mut self, min: Size2i) {
+        unsafe {
+            cv_gpu_cascade_set_min_object_size(self.inner, min);
+        }
+    }
+
+    /// Sets the scale factor used in multiscale detection.
+    pub fn set_scale_factor(&mut self, factor: f64) {
+        unsafe {
+            cv_gpu_cascade_set_scale_factor(self.inner, factor);
+        }
+    }
+}
+
+impl ObjectDetect for GpuCascade {
+    fn detect(&self, image: &Mat) -> Vec<(Rect, f64)> {
+        let mut gpu_mat = GpuMat::default();
+        gpu_mat.upload(image);
+        self.detect_multiscale(&gpu_mat).into_iter().map(|r| (r, 0.0)).collect()
+    }
+}
+
+impl Drop for GpuCascade {
+    fn drop(&mut self) {
+        unsafe { cv_gpu_cascade_drop(self.inner) }
     }
 }

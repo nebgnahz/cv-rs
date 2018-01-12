@@ -56,6 +56,29 @@ double cv_gpu_hog_get_scale_factor(GpuHog*);
 double cv_gpu_hog_get_win_sigma(GpuHog*);
 Size2i cv_gpu_hog_get_win_stride(GpuHog *);
 
+// =============================================================================
+//   CascadeClassifier
+// =============================================================================
+typedef struct _GpuCascade GpuCascade;
+GpuCascade* cv_gpu_cascade_new(const char* const filename);
+void cv_gpu_cascade_drop(GpuCascade*);
+void cv_gpu_cascade_detect(GpuCascade*, GpuMat*, VecRect*);
+
+void cv_gpu_cascade_set_find_largest_object(GpuCascade*, bool);
+void cv_gpu_cascade_set_max_num_objects(GpuCascade*, int32_t);
+void cv_gpu_cascade_set_min_neighbors(GpuCascade*, int32_t);
+void cv_gpu_cascade_set_max_object_size(GpuCascade*, Size2i);
+void cv_gpu_cascade_set_min_object_size(GpuCascade*, Size2i);
+void cv_gpu_cascade_set_scale_factor(GpuCascade*, double);
+
+Size2i cv_gpu_cascade_get_classifier_size(GpuCascade*);
+bool cv_gpu_cascade_get_find_largest_object(GpuCascade*);
+int32_t cv_gpu_cascade_get_max_num_objects(GpuCascade*);
+int32_t cv_gpu_cascade_get_min_neighbors(GpuCascade*);
+Size2i cv_gpu_cascade_get_max_object_size(GpuCascade*);
+Size2i cv_gpu_cascade_get_min_object_size(GpuCascade*);
+double cv_gpu_cascade_get_scale_factor(GpuCascade*);
+
 EXTERN_C_END
 
 #endif  // OPENCV_GPU_H_
