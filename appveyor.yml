@@ -15,7 +15,7 @@ install:
   
   # Install CUDA
   - ps: appveyor DownloadFile https://developer.nvidia.com/compute/cuda/8.0/prod/local_installers/cuda_8.0.44_windows-exe -FileName cuda_8.0.44_windows.exe
-  - ps: appveyor Start-Process -FilePath "cuda_8.0.44_windows.exe" -ArgumentList "-s compiler_8.0" -Wait
+  - ps: Start-Process -FilePath "cuda_8.0.44_windows.exe" -ArgumentList "-s compiler_8.0" -Wait
   - ps: .ci\appveyor_install_CUDA.ps1
   - cmd: set PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v8.0\bin;%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v8.0\libnvvp;%PATH%
   - cmd: nvcc -V
