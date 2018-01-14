@@ -1,2 +1,0 @@
-appveyor DownloadFile https://developer.nvidia.com/compute/cuda/8.0/prod/local_installers/cuda_8.0.44_windows-exe -FileName cuda_8.0.44_windows.exe
-appveyor Start-Process -FilePath "cuda_8.0.44_windows.exe" -ArgumentList "-s compiler_8.0" -Wait -NoNewWindow
