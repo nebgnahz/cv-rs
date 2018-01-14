@@ -1,3 +1,4 @@
+image: Visual Studio 2017
 environment:
   RUSTUP_USE_REQWEST: 1
   CARGO_HTTP_CHECK_REVOKE: false
