@@ -14,7 +14,7 @@ install:
   
   # Install CUDA
   - appveyor DownloadFile https://developer.nvidia.com/compute/cuda/9.1/Prod/local_installers/cuda_9.1.85_win10 -FileName cuda.exe
-  - cuda.exe -s compiler_9.1 cublas_9.1 cublas_dev_9.1 cudart_9.1 curand_9.1 curand_dev_9.1
+  - cuda.exe compiler_9.1 cublas_9.1 cublas_dev_9.1 cudart_9.1 curand_9.1 curand_dev_9.1
   - set PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.1\bin;%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.1\libnvvp;%PATH%
 
 build: false
