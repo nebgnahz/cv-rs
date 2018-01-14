@@ -28,7 +28,7 @@ install:
   - set APP_PATH=%CD%
   - CD Install\opencv
   - echo "SET OPENCV_DIR"
-  - set OPENCV_DIR=%CD%\build
+  - set OPENCV_DIR=%CD%
   - cd %APP_PATH%
   - set OPENCV_LIB=%OPENCV_DIR%\%ARCH%\vc15\lib
   - set PATH=%OPENCV_DIR%\%ARCH%\vc15\bin;%PATH%
