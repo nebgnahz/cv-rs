@@ -14,7 +14,7 @@ install:
   - set ARCH=x64
   
   # Install CUDA
-  - cmd: .ci\appveyor_install_CUDA.cmd
+  - ps: .ci\appveyor_install_CUDA.ps1
 
 build: false
 
