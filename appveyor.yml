@@ -21,9 +21,9 @@ install:
 
   # Install OpenCV
   - echo "INSTALL OPENCV"
-  - mkdir -p build\opencv
-  - mkdir -p build\opencv_contrib
-  - mkdir -p install\opencv
+  - mkdir build\opencv
+  - mkdir build\opencv_contrib
+  - mkdir install\opencv
   - cmd: .ci\appveyor_install_OCV.sh
 
   # Configure OpenCV
