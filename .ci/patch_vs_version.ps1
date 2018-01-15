@@ -1,0 +1,2 @@
+$File = Get-Content "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1\include\crt\host_config.h"
+($File -replace "1911", "1999") > "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.1\include\crt\host_config.h"
