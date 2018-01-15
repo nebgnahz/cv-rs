@@ -1,5 +1,4 @@
 image: Visual Studio 2017
-max_jobs: 4
 environment:
   RUSTUP_USE_REQWEST: 1
   CARGO_HTTP_CHECK_REVOKE: false
@@ -15,7 +14,7 @@ install:
   
   # Install CUDA
   - ps: appveyor DownloadFile https://developer.nvidia.com/compute/cuda/9.1/Prod/local_installers/cuda_9.1.85_win10 -FileName cuda_9.1.exe
-  - ps: Start-Process -FilePath "cuda_9.1.exe" -ArgumentList "-s nvcc_9.1 cublas_9.1 cublas_dev_9.1 cufft_9.1 cufft_dev_9.1 npp_9.1 npp_dev_9.1 Display.Driver" -Wait
+  - ps: Start-Process -FilePath "cuda_9.1.exe" -ArgumentList "-s nvcc_9.1 cublas_9.1 cublas_dev_9.1 cufft_9.1 cufft_dev_9.1 npp_9.1 npp_dev_9.1" -Wait
   - cmd: set PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.1\bin;%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.1\libnvvp;%PATH%
   - cmd: nvcc -V
 
