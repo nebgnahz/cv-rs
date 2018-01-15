@@ -33,9 +33,10 @@ install:
   - mkdir build\opencv_contrib
   - mkdir install\opencv
   - cmd: .ci\appveyor_install_OCV.sh
+  - ps: if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }
 
   # Configure OpenCV
-  - echo "CONFIGURE OPENCV"
+  - cmd: echo "CONFIGURE OPENCV"
   - set APP_PATH=%CD%
   - CD Install\opencv
   - echo "SET OPENCV_DIR"
