@@ -4,7 +4,11 @@ $argumentList = "-s nvcc_$VERSION cublas_$VERSION cublas_dev_$VERSION cufft_$VER
 $envPath = "$env:ProgramFiles\NVIDIA GPU Computing Toolkit\CUDA\v$VERSION\bin;$env:ProgramFiles\NVIDIA GPU Computing Toolkit\CUDA\v$VERSION\libnvvp";
 Write-Host "Install CUDA from $FileName with argumentList $argumentList"
 Start-Process -FilePath $FileName -ArgumentList $argumentList -Wait
-[Environment]::SetEnvironmentVariable("Path", $env:Path + $envPath, [EnvironmentVariableTarget]::Machine)
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
+if ($env:Path.IndexOf($envPath) -eq (-1)) {
+	$env:Path = [Environment]::SetEnvironmentVariable("Path", "${env:Path};${envPath}", [EnvironmentVariableTarget]::Machine)
+}
+[Environment]::SetEnvironmentVariable("Path", $env:Path, [EnvironmentVariableTarget]::Machine)
+$oldErrorAction = $ErrorActionPreference
+$ErrorActionPreference = "SilentlyContinue"
 nvcc.exe -V
-if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }
+$ErrorActionPreference = $oldErrorAction
