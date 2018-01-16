@@ -22,13 +22,15 @@ $REPO_LOCATION = "$pwd\opencv"
 
 #SCRIPT BODY
 Write-Host "CONFIGURE OPENCV PATHS"
-[Environment]::SetEnvironmentVariable("OPENCV_DIR", $OPENCV_DIR, [EnvironmentVariableTarget]::Machine)
-[Environment]::SetEnvironmentVariable("OPENCV_LIB", "%OPENCV_DIR%\x64\vc15\lib", [EnvironmentVariableTarget]::Machine)
-[Environment]::SetEnvironmentVariable("Path", $env:Path + ";%OPENCV_DIR%\x64\vc15\bin", [EnvironmentVariableTarget]::Machine)
 
-$env:OPENCV_DIR = [System.Environment]::GetEnvironmentVariable("OPENCV_DIR","Machine")
-$env:OPENCV_LIB = [System.Environment]::GetEnvironmentVariable("OPENCV_LIB","Machine")
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
+$env:OPENCV_DIR = $OPENCV_DIR
+$env:OPENCV_LIB = "$OPENCV_DIR\x64\vc15\lib"
+if ($env:Path.IndexOf(";$OPENCV_DIR\x64\vc15\bin") -eq (-1)) {
+	$env:Path += ";$OPENCV_DIR\x64\vc15\bin"
+}
+[Environment]::SetEnvironmentVariable("OPENCV_DIR", $env:OPENCV_DIR, [EnvironmentVariableTarget]::Machine)
+[Environment]::SetEnvironmentVariable("OPENCV_LIB", $env:OPENCV_LIB, [EnvironmentVariableTarget]::Machine)
+[Environment]::SetEnvironmentVariable("Path", $env:Path, [EnvironmentVariableTarget]::Machine)
 
 if (Test-Path "$OPENCV_DIR\x64\vc15\bin") {
 	Write-Host "Compiled OpenCV found. Skip installation"
