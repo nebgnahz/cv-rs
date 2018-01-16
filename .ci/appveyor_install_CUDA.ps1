@@ -5,4 +5,5 @@ $envPath = ";%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v$VERSION\bin;%Pro
 Write-Host "Install CUDA from $FileName with argumentList $argumentList"
 Start-Process -FilePath $FileName -ArgumentList $argumentList -Wait
 [Environment]::SetEnvironmentVariable("Path", $env:Path + $envPath, [EnvironmentVariableTarget]::Machine)
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine")
 nvcc -V
