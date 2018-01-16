@@ -3,7 +3,8 @@ $pwd = Get-Location
 $REPO_LOCATION = "$pwd\opencv"
 $OPENCV_DIR = "$pwd\install\opencv";
 $OPENCV_VERSION_TAG = "3.4.0"
-$CMAKE_CONFIG_GENERATOR = "Visual Studio 15 2017 Win64"
+$VS_VERSION = "vc14"
+$CMAKE_CONFIG_GENERATOR = "Visual Studio 14 2015 Win64"
 $CMAKE_OPTIONS = @(
   "-DWITH_CUDA:BOOL=ON",
   "-DCUDA_ARCH_BIN=5.2",
@@ -23,15 +24,15 @@ $CMAKE_OPTIONS = @(
 Write-Host "CONFIGURE OPENCV PATHS"
 
 $env:OPENCV_DIR = $OPENCV_DIR
-$env:OPENCV_LIB = "$OPENCV_DIR\x64\vc15\lib"
-if ($env:Path.IndexOf(";$OPENCV_DIR\x64\vc15\bin") -eq (-1)) {
-	$env:Path = "$env:Path;$OPENCV_DIR\x64\vc15\bin"
+$env:OPENCV_LIB = "$OPENCV_DIR\x64\$VS_VERSION\lib"
+if ($env:Path.IndexOf(";$OPENCV_DIR\x64\$VS_VERSION\bin") -eq (-1)) {
+	$env:Path = "$env:Path;$OPENCV_DIR\x64\$VS_VERSION\bin"
 }
 [Environment]::SetEnvironmentVariable("OPENCV_DIR", $env:OPENCV_DIR, [EnvironmentVariableTarget]::Machine)
 [Environment]::SetEnvironmentVariable("OPENCV_LIB", $env:OPENCV_LIB, [EnvironmentVariableTarget]::Machine)
 [Environment]::SetEnvironmentVariable("Path", $env:Path, [EnvironmentVariableTarget]::Machine)
 
-if (Test-Path "$OPENCV_DIR\x64\vc15\bin") {
+if (Test-Path "$OPENCV_DIR\x64\$VS_VERSION\bin") {
 	Write-Host "Compiled OpenCV found. Skip installation"
 	return;
 }

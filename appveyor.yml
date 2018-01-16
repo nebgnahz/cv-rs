@@ -1,4 +1,4 @@
-image: Previous Visual Studio 2017
+image: Visual Studio 2015
 environment:
   RUSTUP_USE_REQWEST: 1
   CARGO_HTTP_CHECK_REVOKE: false
@@ -11,7 +11,7 @@ platform:
 
 install:  
   # Install CUDA
-  - ps: appveyor DownloadFile https://developer.nvidia.com/compute/cuda/9.1/Prod/local_installers/cuda_9.1.85_win10 -FileName cuda.exe
+  - ps: appveyor DownloadFile https://developer.nvidia.com/compute/cuda/9.1/Prod/local_installers/cuda_9.1.85_windows -FileName cuda.exe
   - ps: .\.ci\appveyor_install_CUDA.ps1 -FileName cuda.exe
   
   # Install OpenCV
