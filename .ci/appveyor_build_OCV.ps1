@@ -25,7 +25,7 @@ Write-Host "CONFIGURE OPENCV PATHS"
 $env:OPENCV_DIR = $OPENCV_DIR
 $env:OPENCV_LIB = "$OPENCV_DIR\x64\vc15\lib"
 if ($env:Path.IndexOf(";$OPENCV_DIR\x64\vc15\bin") -eq (-1)) {
-	$env:Path += ";$OPENCV_DIR\x64\vc15\bin"
+	$env:Path = "$env:Path;$OPENCV_DIR\x64\vc15\bin"
 }
 [Environment]::SetEnvironmentVariable("OPENCV_DIR", $env:OPENCV_DIR, [EnvironmentVariableTarget]::Machine)
 [Environment]::SetEnvironmentVariable("OPENCV_LIB", $env:OPENCV_LIB, [EnvironmentVariableTarget]::Machine)
@@ -35,6 +35,15 @@ if (Test-Path "$OPENCV_DIR\x64\vc15\bin") {
 	Write-Host "Compiled OpenCV found. Skip installation"
 	return;
 }
+
+#CHECK EXISTENCE OF GIT AND CMAKE
+$oldErrorAction = $ErrorActionPreference
+$ErrorActionPreference = "SilentlyContinue"
+git --version
+cmake --version
+$ErrorActionPreference = $oldErrorAction
+
+
 Write-Host "INSTALL OPENCV AT $OPENCV_DIR"
 
 mkdir build\opencv -ErrorAction SilentlyContinue

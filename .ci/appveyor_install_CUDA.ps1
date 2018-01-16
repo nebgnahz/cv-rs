@@ -5,9 +5,10 @@ $envPath = "$env:ProgramFiles\NVIDIA GPU Computing Toolkit\CUDA\v$VERSION\bin;$e
 Write-Host "Install CUDA from $FileName with argumentList $argumentList"
 Start-Process -FilePath $FileName -ArgumentList $argumentList -Wait
 if ($env:Path.IndexOf($envPath) -eq (-1)) {
-	$env:Path = [Environment]::SetEnvironmentVariable("Path", "${env:Path};${envPath}", [EnvironmentVariableTarget]::Machine)
+	Write-Host "Setting PATH for CUDA"
+	$env:Path = "${env:Path};${envPath}"
+    [Environment]::SetEnvironmentVariable("Path", $env:Path, [EnvironmentVariableTarget]::Machine)
 }
-[Environment]::SetEnvironmentVariable("Path", $env:Path, [EnvironmentVariableTarget]::Machine)
 $oldErrorAction = $ErrorActionPreference
 $ErrorActionPreference = "SilentlyContinue"
 nvcc.exe -V
