@@ -9,42 +9,25 @@ environment:
 platform:
   - x64
 
-install:
-  - set ARCH=x64
-  
+install:  
   # Install CUDA
-  - ps: appveyor DownloadFile https://developer.nvidia.com/compute/cuda/9.1/Prod/local_installers/cuda_9.1.85_win10 -FileName cuda_9.1.exe
-  - ps: Start-Process -FilePath "cuda_9.1.exe" -ArgumentList "-s nvcc_9.1 cublas_9.1 cublas_dev_9.1 cufft_9.1 cufft_dev_9.1 npp_9.1 npp_dev_9.1" -Wait
-  - cmd: set PATH=%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.1\bin;%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v9.1\libnvvp;%PATH%
-  - cmd: nvcc -V
+  - ps: appveyor DownloadFile https://developer.nvidia.com/compute/cuda/9.1/Prod/local_installers/cuda_9.1.85_win10 -FileName cuda.exe
+  - ps: .ci\appveyor_build_CUDA.ps1 -FileName cuda.exe
+  
+  # Install OpenCV
+  - ps: .ci\appveyor_build_OCV.ps1
 
   # Install Rust
-  - set PATH=C:\Program Files\Git\mingw64\bin;%PATH%
+  - cmd: set PATH=C:\Program Files\Git\mingw64\bin;%PATH%
   - curl -sSf -o rustup-init.exe https://win.rustup.rs/
   - rustup-init.exe -y --default-host %TARGET%
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
   - rustc -V
   - cargo -V
-
-  # Install OpenCV
-  - echo "INSTALL OPENCV"
-  - mkdir build\opencv
-  - mkdir build\opencv_contrib
-  - mkdir install\opencv
-  - cmd: .ci\appveyor_install_OCV.sh
-  - ps: if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }
-
-  # Configure OpenCV
-  - cmd: echo "CONFIGURE OPENCV"
-  - set APP_PATH=%CD%
-  - CD Install\opencv
-  - echo "SET OPENCV_DIR"
-  - set OPENCV_DIR=%CD%
-  - cd %APP_PATH%
-  - set OPENCV_LIB=%OPENCV_DIR%\%ARCH%\vc15\lib
-  - set PATH=%OPENCV_DIR%\%ARCH%\vc15\bin;%PATH%
+  
 build: false
-
+cache:
+  - install -> .ci\appveyor_build_OCV.ps1, .ci\appveyor_build_CUDA.ps1
 test_script:
   - cargo build --no-default-features
   - cargo test --no-default-features
