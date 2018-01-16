@@ -57,7 +57,7 @@ $ErrorActionPreference = $oldErrorAction
 
 Push-Location -Path "build\opencv"
 Write-Host "cmake -G $CMAKE_CONFIG_GENERATOR -DCMAKE_INSTALL_PREFIX=$OPENCV_DIR $REPO_LOCATION $CMAKE_OPTIONS"
-cmake -G $CMAKE_CONFIG_GENERATOR "-DCMAKE_INSTALL_PREFIX=$OPENCV_DIR" $REPO_LOCATION @CMAKE_OPTIONS
+cmake -G $CMAKE_CONFIG_GENERATOR "-DCMAKE_INSTALL_PREFIX=$OPENCV_DIR -DCMAKE_BUILD_TYPE=Release" $REPO_LOCATION @CMAKE_OPTIONS
 if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }
 cmake --build .  --target install --config release
 if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }
