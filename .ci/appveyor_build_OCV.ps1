@@ -39,7 +39,7 @@ if (Test-Path "$OPENCV_DIR\x64\$VS_VERSION\bin") {
 
 #CHECK EXISTENCE OF GIT AND CMAKE
 $oldErrorAction = $ErrorActionPreference
-$ErrorActionPreference = "SilentlyContinue"
+$ErrorActionPreference = "Stop"
 git --version
 cmake --version
 $ErrorActionPreference = $oldErrorAction
