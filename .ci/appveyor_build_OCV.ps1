@@ -39,8 +39,10 @@ Write-Host "INSTALL OPENCV AT $INSTALL_LOCATION"
 mkdir build\opencv -ErrorAction SilentlyContinue
 mkdir install\opencv -ErrorAction SilentlyContinue
 
-Write-Host "CLONING OPENCV REPOSITORY"
-& { git clone -b $OPENCV_VERSION_TAG --depth 1 https://github.com/opencv/opencv.git } -ErrorAction SilentlyContinue
+$oldErrorAction = $ErrorActionPreference
+$ErrorActionPreference = "SilentlyContinue"
+git clone -b $OPENCV_VERSION_TAG --depth 1 https://github.com/opencv/opencv.git
+$ErrorActionPreference = $oldErrorAction
 
 Push-Location -Path "build\opencv"
 Write-Host "cmake -G $CMAKE_CONFIG_GENERATOR -DCMAKE_INSTALL_PREFIX=$INSTALL_LOCATION $REPO_LOCATION $CMAKE_OPTIONS"
