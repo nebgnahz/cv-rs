@@ -35,8 +35,7 @@ cache:
   - install -> .ci/appveyor_build_OCV.ps1, .ci/appveyor_build_CUDA.ps1
 test_script:
   - cargo build --no-default-features
+  - $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - cargo test --no-default-features
   # - cargo build --features gpu
   # - cargo test --features gpu
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
