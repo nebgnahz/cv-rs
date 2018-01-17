@@ -35,6 +35,7 @@ build: false
 cache:
   - install -> .ci/appveyor_build_OCV.ps1, .ci/appveyor_build_CUDA.ps1
 test_script:
+  - $blockRdp = $true; 
   - cargo build --no-default-features
   - cargo test --no-default-features
   # - cargo build --features gpu
