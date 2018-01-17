@@ -5,7 +5,12 @@ environment:
 
   matrix:
     - TARGET: x86_64-pc-windows-msvc
-
+skip_commits:
+  files:
+    - .travis.yml
+    - .ci/*.sh
+    - LICENSE
+    - '*.md'
 platform:
   - x64
 
@@ -27,9 +32,11 @@ install:
   
 build: false
 cache:
-  - install -> .ci\appveyor_build_OCV.ps1, .ci\appveyor_build_CUDA.ps1
+  - install -> .ci/appveyor_build_OCV.ps1, .ci/appveyor_build_CUDA.ps1
 test_script:
   - cargo build --no-default-features
   - cargo test --no-default-features
   # - cargo build --features gpu
   # - cargo test --features gpu
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
