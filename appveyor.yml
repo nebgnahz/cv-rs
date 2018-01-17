@@ -15,6 +15,7 @@ platform:
   - x64
 
 install:  
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   # Install CUDA
   - ps: appveyor DownloadFile https://developer.nvidia.com/compute/cuda/9.1/Prod/local_installers/cuda_9.1.85_windows -FileName cuda.exe
   - ps: .\.ci\appveyor_install_CUDA.ps1 -FileName cuda.exe
@@ -35,7 +36,6 @@ cache:
   - install -> .ci/appveyor_build_OCV.ps1, .ci/appveyor_build_CUDA.ps1
 test_script:
   - cargo build --no-default-features
-  - $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - cargo test --no-default-features
   # - cargo build --features gpu
   # - cargo test --features gpu
