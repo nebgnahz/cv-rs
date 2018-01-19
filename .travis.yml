@@ -1,11 +1,6 @@
 sudo: required
 dist: trusty
 
-branches:
-  except:
-  - patch-1
-  - /^(?i:win)-.*$/
-
 language: rust
 rust:
   - stable
