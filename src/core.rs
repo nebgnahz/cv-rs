@@ -2,7 +2,7 @@
 
 use bytes::{self, ByteOrder};
 use errors::*;
-use libc::{c_char, c_double, c_int, c_uchar, c_void, size_t};
+use std::os::raw::{c_char, c_double, c_int, c_uchar, c_void};
 use num;
 use std::ffi::CString;
 use std::mem;
@@ -316,10 +316,10 @@ extern "C" {
     fn cv_mat_depth(cmat: *const CMat) -> c_int;
     fn cv_mat_channels(cmat: *const CMat) -> c_int;
     fn cv_mat_data(cmat: *const CMat) -> *const c_uchar;
-    fn cv_mat_total(cmat: *const CMat) -> size_t;
-    fn cv_mat_step1(cmat: *const CMat, i: c_int) -> size_t;
-    fn cv_mat_elem_size(cmat: *const CMat) -> size_t;
-    fn cv_mat_elem_size1(cmat: *const CMat) -> size_t;
+    fn cv_mat_total(cmat: *const CMat) -> usize;
+    fn cv_mat_step1(cmat: *const CMat, i: c_int) -> usize;
+    fn cv_mat_elem_size(cmat: *const CMat) -> usize;
+    fn cv_mat_elem_size1(cmat: *const CMat) -> usize;
     fn cv_mat_type(cmat: *const CMat) -> c_int;
     fn cv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
     fn cv_mat_logic_and(cimage: *mut CMat, cmask: *const CMat);

@@ -20,7 +20,6 @@
 extern crate bytes;
 #[macro_use]
 extern crate error_chain;
-extern crate libc;
 extern crate num;
 #[macro_use]
 extern crate num_derive;

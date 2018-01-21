@@ -2,7 +2,7 @@
 //! imgproc](http://docs.opencv.org/3.1.0/d7/dbd/group__imgproc.html).
 
 use super::core::*;
-use libc::{c_double, c_float, c_int};
+use std::os::raw::{c_double, c_float, c_int};
 
 // =============================================================================
 //  Imgproc

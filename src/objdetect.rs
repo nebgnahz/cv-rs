@@ -3,7 +3,7 @@
 
 use super::core::*;
 use super::errors::*;
-use libc::{c_char, c_double, c_int};
+use std::os::raw::{c_char, c_double, c_int};
 use std::ffi::CString;
 use std::path::Path;
 use std::vec::Vec;

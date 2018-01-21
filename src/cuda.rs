@@ -1,7 +1,7 @@
 //! Bindings to OpenCV's classes and functions that exploits GPU/Cuda. See
 //! [cv::cuda](http://docs.opencv.org/3.1.0/d1/d1a/namespacecv_1_1cuda.html)
 
-use libc::{c_char, c_double, c_int, size_t};
+use std::os::raw::{c_char, c_double, c_int, usize};
 use super::core::*;
 use super::errors::*;
 use super::objdetect::{CSvmDetector, HogParams, ObjectDetect, SvmDetector};
@@ -127,7 +127,7 @@ extern "C" {
     fn cv_gpu_hog_set_group_threshold(hog: *mut CGpuHog, group_threshold: c_int);
     fn cv_gpu_hog_set_hit_threshold(hog: *mut CGpuHog, hit_threshold: c_double);
     fn cv_gpu_hog_set_l2hys_threshold(hog: *mut CGpuHog, l2hys_threshold: c_double);
-    fn cv_gpu_hog_set_num_levels(hog: *mut CGpuHog, num_levels: size_t);
+    fn cv_gpu_hog_set_num_levels(hog: *mut CGpuHog, num_levels: usize);
     fn cv_gpu_hog_set_scale_factor(hog: *mut CGpuHog, scale_factor: c_double);
     fn cv_gpu_hog_set_win_sigma(hog: *mut CGpuHog, win_sigma: c_double);
     fn cv_gpu_hog_set_win_stride(hog: *mut CGpuHog, win_stride: Size2i);
@@ -136,7 +136,7 @@ extern "C" {
     fn cv_gpu_hog_get_group_threshold(hog: *mut CGpuHog) -> c_int;
     fn cv_gpu_hog_get_hit_threshold(hog: *mut CGpuHog) -> c_double;
     fn cv_gpu_hog_get_l2hys_threshold(hog: *mut CGpuHog) -> c_double;
-    fn cv_gpu_hog_get_num_levels(hog: *mut CGpuHog) -> size_t;
+    fn cv_gpu_hog_get_num_levels(hog: *mut CGpuHog) -> usize;
     fn cv_gpu_hog_get_scale_factor(hog: *mut CGpuHog) -> c_double;
     fn cv_gpu_hog_get_win_sigma(hog: *mut CGpuHog) -> c_double;
     fn cv_gpu_hog_get_win_stride(hog: *mut CGpuHog) -> Size2i;
