@@ -70,8 +70,11 @@ fn main() {
         .file("native/opencv-wrapper.cc")
         .file("native/utils.cc")
         .include("native")
-        .include(opencv_include())
-        .flag("--std=c++11");
+        .include(opencv_include());
+		
+    if cfg!(not(target_env = "msvc")) {
+        opencv_config.flag("--std=c++11");
+    }
 
     if cfg!(feature = "gpu") {
         opencv_config.file("native/opencv-gpu.cc");
