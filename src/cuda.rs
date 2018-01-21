@@ -1,7 +1,7 @@
 //! Bindings to OpenCV's classes and functions that exploits GPU/Cuda. See
 //! [cv::cuda](http://docs.opencv.org/3.1.0/d1/d1a/namespacecv_1_1cuda.html)
 
-use std::os::raw::{c_char, c_double, c_int, usize};
+use std::os::raw::{c_char, c_double, c_int};
 use super::core::*;
 use super::errors::*;
 use super::objdetect::{CSvmDetector, HogParams, ObjectDetect, SvmDetector};
