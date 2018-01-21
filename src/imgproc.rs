@@ -35,14 +35,7 @@ extern "C" {
 
     fn cv_cvt_color(cmat: *const CMat, output: *mut CMat, code: i32);
     fn cv_pyr_down(cmat: *const CMat, output: *mut CMat);
-    fn cv_resize(
-        from: *const CMat,
-        to: *mut CMat,
-        dsize: Size2i,
-        fx: c_double,
-        fy: c_double,
-        interpolation: c_int,
-    );
+    fn cv_resize(from: *const CMat, to: *mut CMat, dsize: Size2i, fx: c_double, fy: c_double, interpolation: c_int);
     fn cv_calc_hist(
         cimages: *const CMat,
         nimages: i32,
@@ -282,14 +275,7 @@ impl Mat {
     }
 
     /// Draws a simple, thick ellipse
-    pub fn ellipse(
-        &self,
-        center: Point2i,
-        axes: Size2i,
-        angle: f64,
-        start_angle: f64,
-        end_angle: f64,
-    ) {
+    pub fn ellipse(&self, center: Point2i, axes: Size2i, angle: f64, start_angle: f64, end_angle: f64) {
         self.ellipse_custom(
             center,
             axes,
@@ -403,12 +389,7 @@ impl Mat {
 
     /// Calculate the back projection of a histogram. The function calculates
     /// the back project of the histogram.
-    pub fn calc_back_project(
-        &self,
-        channels: *const i32,
-        hist: &Mat,
-        ranges: *const *const f32,
-    ) -> Mat {
+    pub fn calc_back_project(&self, channels: *const i32, hist: &Mat, ranges: *const *const f32) -> Mat {
         let m = CMat::new();
         unsafe {
             cv_calc_back_project(self.inner, 1, channels, (*hist).inner, m, ranges);

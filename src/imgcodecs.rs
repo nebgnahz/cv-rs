@@ -105,11 +105,8 @@ pub enum ImwritePngFlags {
 extern "C" {
     fn cv_imread(input: *const c_char, flags: c_int) -> *mut CMat;
     fn cv_imdecode(buf: *const uint8_t, l: size_t, m: c_int) -> *mut CMat;
-    fn cv_imencode(ext: *const c_char,
-                   inner: *const CMat,
-                   flag_ptr: *const c_int,
-                   flag_size: size_t)
-                   -> ImencodeResult;
+    fn cv_imencode(ext: *const c_char, inner: *const CMat, flag_ptr: *const c_int, flag_size: size_t)
+        -> ImencodeResult;
 
 }
 

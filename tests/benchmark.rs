@@ -9,7 +9,9 @@ use utils::*;
 
 #[test]
 fn bench_mat_new() {
-    timed("create new mat", || { Mat::new(); });
+    timed("create new mat", || {
+        Mat::new();
+    });
 }
 
 #[test]
@@ -29,6 +31,8 @@ fn bench_face_detect_physicists() {
         let rate = 1.0 - (i as f64) * 0.1;
         let m = mat.resize_by(rate, rate, InterpolationFlag::InterLinear);
         let name = format!("detect physicists: {}x{}", m.rows, m.cols);
-        timed_multiple(&name, 1, || { cascade.detect(&m); });
+        timed_multiple(&name, 1, || {
+            cascade.detect(&m);
+        });
     }
 }

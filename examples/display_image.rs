@@ -12,8 +12,7 @@ fn main() {
         std::process::exit(-1);
     }
 
-    let mat = Mat::from_path(&args[1], ImreadModes::ImreadColor)
-        .expect("Failed to read from path");
+    let mat = Mat::from_path(&args[1], ImreadModes::ImreadColor).expect("Failed to read from path");
 
     if !mat.is_valid() {
         println!("Could not open or find the image");

@@ -86,8 +86,7 @@ fn main() {
         }
 
         if is_tracking {
-            let mut back_project =
-                hue.calc_back_project(std::ptr::null(), &hist, &phranges[0] as *const *const f32);
+            let mut back_project = hue.calc_back_project(std::ptr::null(), &hist, &phranges[0] as *const *const f32);
             back_project.logic_and(mask);
             let criteria = TermCriteria::new(TermType::Count, 10, 1.0);
             let track_box = back_project.camshift(track_window, &criteria);
