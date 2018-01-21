@@ -14,8 +14,8 @@ use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 pub fn close_rect(a: Rect, b: Rect, epsilon: i32) -> bool {
-    ((a.x - b.x) < epsilon) && ((a.y - b.y) < epsilon) && ((a.width - b.width)) < epsilon &&
-        ((a.height - b.height)) < epsilon
+    ((a.x - b.x) < epsilon) && ((a.y - b.y) < epsilon) && ((a.width - b.width)) < epsilon
+        && ((a.height - b.height)) < epsilon
 }
 
 pub fn timed<F>(label: &str, inner: F)

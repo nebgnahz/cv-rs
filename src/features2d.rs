@@ -4,18 +4,24 @@ use super::core::*;
 enum CMSER {}
 
 extern "C" {
-    fn cv_mser_new(delta: i32,
-                   min_area: i32,
-                   max_area: i32,
-                   max_variation: f64,
-                   min_diversity: f64,
-                   max_evolution: i32,
-                   area_threshold: f64,
-                   min_margin: f64,
-                   edge_blur_size: i32
+    fn cv_mser_new(
+        delta: i32,
+        min_area: i32,
+        max_area: i32,
+        max_variation: f64,
+        min_diversity: f64,
+        max_evolution: i32,
+        area_threshold: f64,
+        min_margin: f64,
+        edge_blur_size: i32,
     ) -> *mut CMSER;
     fn cv_mser_drop(cmser: *mut CMSER);
-    fn cv_mser_detect_regions(cmser: *const CMSER, image: *const CMat, msers: *mut CVec<CVec<Point2i>>, bboxes: *mut CVec<Rect>);
+    fn cv_mser_detect_regions(
+        cmser: *const CMSER,
+        image: *const CMat,
+        msers: *mut CVec<CVec<Point2i>>,
+        bboxes: *mut CVec<Rect>,
+    );
 }
 
 /// Maximally stable extremal region extractor.
@@ -26,25 +32,30 @@ pub struct MSER {
 
 impl MSER {
     /// Creates a new maximally stable extremal region extractor criteria.
-    pub fn new(delta: i32,
-               min_area: i32,
-               max_area: i32,
-               max_variation: f64,
-               min_diversity: f64,
-               max_evolution: i32,
-               area_threshold: f64,
-               min_margin: f64,
-               edge_blur_size: i32
+    pub fn new(
+        delta: i32,
+        min_area: i32,
+        max_area: i32,
+        max_variation: f64,
+        min_diversity: f64,
+        max_evolution: i32,
+        area_threshold: f64,
+        min_margin: f64,
+        edge_blur_size: i32,
     ) -> Self {
-        let mser = unsafe { cv_mser_new(delta,
-                                           min_area,
-                                           max_area,
-                                           max_variation,
-                                           min_diversity,
-                                           max_evolution,
-                                           area_threshold,
-                                           min_margin,
-                                           edge_blur_size) };
+        let mser = unsafe {
+            cv_mser_new(
+                delta,
+                min_area,
+                max_area,
+                max_variation,
+                min_diversity,
+                max_evolution,
+                area_threshold,
+                min_margin,
+                edge_blur_size,
+            )
+        };
         MSER { value: mser }
     }
 
@@ -56,7 +67,7 @@ impl MSER {
             cv_mser_detect_regions(self.value, image.inner, &mut msers, &mut bboxes);
         }
         let msers = msers.unpack();
-        let boxes =  bboxes.unpack();
+        let boxes = bboxes.unpack();
         (msers, boxes)
     }
 }
@@ -80,7 +91,7 @@ pub struct MSERBuilder {
     max_evolution: Option<i32>,
     area_threshold: Option<f64>,
     min_margin: Option<f64>,
-    edge_blur_size: Option<i32>
+    edge_blur_size: Option<i32>,
 }
 
 impl MSERBuilder {

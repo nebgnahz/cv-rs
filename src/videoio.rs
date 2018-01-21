@@ -1,8 +1,8 @@
 //! Media I/O, see [OpenCV
 //! videoio](http://docs.opencv.org/3.1.0/dd/de7/group__videoio.html)
 
-use core::{Mat, CMat, Size2i};
-use libc::{c_int, c_char, c_double};
+use core::{CMat, Mat, Size2i};
+use libc::{c_char, c_double, c_int};
 
 // =============================================================================
 //   VideoCapture
@@ -161,7 +161,11 @@ impl VideoCapture {
     /// Gets a property in the `VideoCapture`.
     pub fn get(&self, property: CapProp) -> Option<f64> {
         let ret = unsafe { cv_videocapture_get(self.inner, property as c_int) };
-        if ret != 0.0 { Some(ret) } else { None }
+        if ret != 0.0 {
+            Some(ret)
+        } else {
+            None
+        }
     }
 }
 
@@ -191,21 +195,23 @@ pub struct VideoWriter {
 
 extern "C" {
     fn cv_videowriter_default() -> *mut CvVideoWriter;
-    fn cv_videowriter_new(path: *const c_char,
-                          fourcc: c_int,
-                          fps: c_double,
-                          frame_size: Size2i,
-                          is_color: bool)
-                          -> *mut CvVideoWriter;
+    fn cv_videowriter_new(
+        path: *const c_char,
+        fourcc: c_int,
+        fps: c_double,
+        frame_size: Size2i,
+        is_color: bool,
+    ) -> *mut CvVideoWriter;
     fn cv_videowriter_drop(w: *mut CvVideoWriter);
 
-    fn cv_videowriter_open(w: *mut CvVideoWriter,
-                           path: *const c_char,
-                           fourcc: c_int,
-                           fps: c_double,
-                           frame_size: Size2i,
-                           is_color: bool)
-                           -> bool;
+    fn cv_videowriter_open(
+        w: *mut CvVideoWriter,
+        path: *const c_char,
+        fourcc: c_int,
+        fps: c_double,
+        frame_size: Size2i,
+        is_color: bool,
+    ) -> bool;
     fn cv_videowriter_is_opened(w: *mut CvVideoWriter) -> bool;
     fn cv_videowriter_write(w: *mut CvVideoWriter, m: *mut CMat);
     fn cv_videowriter_set(w: *mut CvVideoWriter, property: c_int, value: c_double) -> bool;
@@ -266,13 +272,19 @@ impl VideoWriter {
     /// Gets a property in the `VideoWriter`.
     pub fn get(&self, property: VideoWriterProperty) -> Option<f64> {
         let ret = unsafe { cv_videowriter_get(self.inner, property as c_int) };
-        if ret != 0.0 { Some(ret) } else { None }
+        if ret != 0.0 {
+            Some(ret)
+        } else {
+            None
+        }
     }
 }
 
 impl Default for VideoWriter {
     fn default() -> VideoWriter {
-        VideoWriter { inner: unsafe { cv_videowriter_default() } }
+        VideoWriter {
+            inner: unsafe { cv_videowriter_default() },
+        }
     }
 }
 
@@ -315,9 +327,11 @@ pub fn fourcc(c1: char, c2: char, c3: char, c4: char) -> i32 {
 /// code](https://www.fourcc.org/).
 pub fn codec_name(fourcc: i32) -> Option<String> {
     let ex = fourcc as u32;
-    let vec = vec![(ex & 0xFFu32) as u8,
-                   ((ex & 0xFF00u32) >> 8) as u8,
-                   ((ex & 0xFF0000u32) >> 16) as u8,
-                   ((ex & 0xFF000000u32) >> 24) as u8];
+    let vec = vec![
+        (ex & 0xFFu32) as u8,
+        ((ex & 0xFF00u32) >> 8) as u8,
+        ((ex & 0xFF0000u32) >> 16) as u8,
+        ((ex & 0xFF000000u32) >> 24) as u8,
+    ];
     String::from_utf8(vec).ok()
 }

@@ -1,10 +1,10 @@
 //! Bindings to OpenCV's classes and functions that exploits GPU/Cuda. See
 //! [cv::cuda](http://docs.opencv.org/3.1.0/d1/d1a/namespacecv_1_1cuda.html)
 
-use libc::{size_t, c_int, c_double, c_char};
+use libc::{c_char, c_double, c_int, size_t};
 use super::core::*;
 use super::errors::*;
-use super::objdetect::{SvmDetector, CSvmDetector, ObjectDetect, HogParams};
+use super::objdetect::{CSvmDetector, HogParams, ObjectDetect, SvmDetector};
 use std::ffi::CString;
 use std::path::Path;
 
@@ -106,16 +106,22 @@ unsafe impl Send for GpuHog {}
 
 extern "C" {
     fn cv_gpu_hog_default() -> *mut CGpuHog;
-    fn cv_gpu_hog_new(win_size: Size2i,
-                      block_size: Size2i,
-                      block_stride: Size2i,
-                      cell_size: Size2i,
-                      nbins: i32)
-                      -> *mut CGpuHog;
+    fn cv_gpu_hog_new(
+        win_size: Size2i,
+        block_size: Size2i,
+        block_stride: Size2i,
+        cell_size: Size2i,
+        nbins: i32,
+    ) -> *mut CGpuHog;
     fn cv_gpu_hog_drop(hog: *mut CGpuHog);
     fn cv_gpu_hog_set_detector(hog: *mut CGpuHog, d: *const CSvmDetector);
     fn cv_gpu_hog_detect(hog: *mut CGpuHog, mat: *mut CGpuMat, found: *mut CVec<Rect>);
-    fn cv_gpu_hog_detect_with_conf(hog: *mut CGpuHog, mat: *mut CGpuMat, found: *mut CVec<Rect>, conf: *mut CVec<c_double>);
+    fn cv_gpu_hog_detect_with_conf(
+        hog: *mut CGpuHog,
+        mat: *mut CGpuMat,
+        found: *mut CVec<Rect>,
+        conf: *mut CVec<c_double>,
+    );
 
     fn cv_gpu_hog_set_gamma_correction(hog: *mut CGpuHog, gamma: bool);
     fn cv_gpu_hog_set_group_threshold(hog: *mut CGpuHog, group_threshold: c_int);
@@ -163,12 +169,7 @@ impl Default for GpuHog {
 
 impl GpuHog {
     /// Creates a new GpuHog detector.
-    pub fn new(win_size: Size2i,
-               block_size: Size2i,
-               block_stride: Size2i,
-               cell_size: Size2i,
-               nbins: i32)
-               -> GpuHog {
+    pub fn new(win_size: Size2i, block_size: Size2i, block_stride: Size2i, cell_size: Size2i, nbins: i32) -> GpuHog {
         let inner = unsafe { cv_gpu_hog_new(win_size, block_size, block_stride, cell_size, nbins) };
         let mut params = HogParams::default();
         GpuHog::update_params(inner, &mut params);
@@ -187,11 +188,13 @@ impl GpuHog {
     /// Creates a new GpuHog detector with parameters specified inside `params`.
     pub fn with_params(params: HogParams) -> GpuHog {
         let inner = unsafe {
-            cv_gpu_hog_new(params.win_size,
-                           params.block_size,
-                           params.block_stride,
-                           params.cell_size,
-                           params.nbins)
+            cv_gpu_hog_new(
+                params.win_size,
+                params.block_size,
+                params.block_stride,
+                params.cell_size,
+                params.nbins,
+            )
         };
         unsafe {
             cv_gpu_hog_set_gamma_correction(inner, params.gamma_correction);
@@ -234,7 +237,11 @@ impl GpuHog {
         unsafe {
             cv_gpu_hog_detect(self.inner, mat.inner, &mut found);
         }
-        found.unpack().into_iter().map(|r| (r, 0f64)).collect::<Vec<_>>()
+        found
+            .unpack()
+            .into_iter()
+            .map(|r| (r, 0f64))
+            .collect::<Vec<_>>()
     }
 
     /// Detects and returns the results with confidence (scores)
@@ -243,7 +250,11 @@ impl GpuHog {
         let mut conf = CVec::<c_double>::default();
         unsafe { cv_gpu_hog_detect_with_conf(self.inner, mat.inner, &mut found, &mut conf) }
 
-        found.unpack().into_iter().zip(conf.unpack().into_iter()).collect::<Vec<_>>()
+        found
+            .unpack()
+            .into_iter()
+            .zip(conf.unpack().into_iter())
+            .collect::<Vec<_>>()
     }
 }
 
@@ -299,9 +310,7 @@ impl GpuCascade {
         if let Some(p) = path.as_ref().to_str() {
             let s = CString::new(p)?;
             let inner = unsafe { cv_gpu_cascade_new((&s).as_ptr()) };
-            return Ok(GpuCascade {
-                inner: inner
-            });
+            return Ok(GpuCascade { inner: inner });
         }
         let error = ErrorKind::InvalidPath(path.as_ref().to_path_buf());
         Err(error.into())
@@ -360,52 +369,38 @@ impl GpuCascade {
 
     /// Returns the classifier size.
     pub fn get_classifier_size(&self) -> Size2i {
-        unsafe {
-            cv_gpu_cascade_get_classifier_size(self.inner)
-        }
+        unsafe { cv_gpu_cascade_get_classifier_size(self.inner) }
     }
 
     /// Returns if the CascadeClassifier will only return the largest object.
     pub fn get_find_largest_object_flag(&self) -> bool {
-        unsafe {
-            cv_gpu_cascade_get_find_largest_object(self.inner)
-        }
+        unsafe { cv_gpu_cascade_get_find_largest_object(self.inner) }
     }
 
     /// Returns the allowed maximal number of detected objects.
     pub fn get_max_num_objects(&self) -> i32 {
-        unsafe {
-            cv_gpu_cascade_get_max_num_objects(self.inner)
-        }
+        unsafe { cv_gpu_cascade_get_max_num_objects(self.inner) }
     }
 
     /// Returns the number of minimal neighbors required for a detection to be
     /// valid.
     pub fn get_min_neighbors(&self) -> i32 {
-        unsafe {
-            cv_gpu_cascade_get_min_neighbors(self.inner)
-        }
+        unsafe { cv_gpu_cascade_get_min_neighbors(self.inner) }
     }
 
     /// Returns the maximum object size.
     pub fn get_max_object_size(&self) -> Size2i {
-        unsafe {
-            cv_gpu_cascade_get_max_object_size(self.inner)
-        }
+        unsafe { cv_gpu_cascade_get_max_object_size(self.inner) }
     }
 
     /// Returns the minimal object size.
     pub fn get_min_object_size(&self) -> Size2i {
-        unsafe {
-            cv_gpu_cascade_get_min_object_size(self.inner)
-        }
+        unsafe { cv_gpu_cascade_get_min_object_size(self.inner) }
     }
 
     /// Returns the scale factor.
     pub fn get_scale_factor(&self) -> f64 {
-        unsafe {
-            cv_gpu_cascade_get_scale_factor(self.inner)
-        }
+        unsafe { cv_gpu_cascade_get_scale_factor(self.inner) }
     }
 }
 
@@ -413,7 +408,10 @@ impl ObjectDetect for GpuCascade {
     fn detect(&self, image: &Mat) -> Vec<(Rect, f64)> {
         let mut gpu_mat = GpuMat::default();
         gpu_mat.upload(image);
-        self.detect_multiscale(&gpu_mat).into_iter().map(|r| (r, 0.0)).collect()
+        self.detect_multiscale(&gpu_mat)
+            .into_iter()
+            .map(|r| (r, 0.0))
+            .collect()
     }
 }
 

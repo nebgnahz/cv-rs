@@ -1,6 +1,5 @@
 /// These tests will run regardless of cuda or not. When tested with `--features
 /// cuda`, it will use CUDA-enabled `HOG` and `CascadeClassifier`.
-
 extern crate cv;
 
 #[cfg(feature = "gpu")]
@@ -52,12 +51,16 @@ fn test_cascade_lenna() {
 
 #[cfg(feature = "gpu")]
 fn cascade_model_path() -> &'static str {
-    concat!(env!("CARGO_MANIFEST_DIR"),
-            "/assets/cuda_haarcascade_frontalface_default.xml")
+    concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/assets/cuda_haarcascade_frontalface_default.xml"
+    )
 }
 
 #[cfg(not(feature = "gpu"))]
 fn cascade_model_path() -> &'static str {
-    concat!(env!("CARGO_MANIFEST_DIR"),
-            "/assets/haarcascade_frontalface_default.xml")
+    concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/assets/haarcascade_frontalface_default.xml"
+    )
 }

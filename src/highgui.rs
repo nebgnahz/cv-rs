@@ -8,9 +8,11 @@ use std::ptr;
 extern "C" {
     fn cv_named_window(name: *const c_char, flags: c_int);
     fn cv_destroy_window(name: *const c_char);
-    fn cv_set_mouse_callback(name: *const c_char,
-                                 on_mouse: extern "C" fn(e: i32, x: i32, y: i32, f: i32, data: *mut c_void),
-                                 userdata: *mut c_void);
+    fn cv_set_mouse_callback(
+        name: *const c_char,
+        on_mouse: extern "C" fn(e: i32, x: i32, y: i32, f: i32, data: *mut c_void),
+        userdata: *mut c_void,
+    );
 }
 
 

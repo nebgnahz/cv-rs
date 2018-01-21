@@ -22,12 +22,11 @@ fn opencv_link() {
 fn try_opencv_link() -> Result<(), Box<std::error::Error>> {
     let opencv_dir = std::env::var("OPENCV_LIB")?;
     let files = std::fs::read_dir(&opencv_dir)?;
-    let opencv_world_entry = files
-        .filter_map(|entry| entry.ok())
-        .find(|entry| {
-            let file_name = entry.file_name().to_string_lossy().into_owned();
-            (file_name.starts_with("opencv_world") || file_name.starts_with("libopencv_world")) && !file_name.ends_with("d.lib")
-        });
+    let opencv_world_entry = files.filter_map(|entry| entry.ok()).find(|entry| {
+        let file_name = entry.file_name().to_string_lossy().into_owned();
+        (file_name.starts_with("opencv_world") || file_name.starts_with("libopencv_world"))
+            && !file_name.ends_with("d.lib")
+    });
     match opencv_world_entry {
         Some(opencv_world) => {
             let opencv_world = opencv_world.file_name();
@@ -36,8 +35,10 @@ fn try_opencv_link() -> Result<(), Box<std::error::Error>> {
             println!("cargo:rustc-link-search=native={}", opencv_dir);
             println!("cargo:rustc-link-lib={}", opencv_world_without_extension);
             Ok(())
-        },
-        None => Err(Box::new(BuildError{details: "Cannot find opencv_world file in provided %OPENCV_LIB% directory"}))
+        }
+        None => Err(Box::new(BuildError {
+            details: "Cannot find opencv_world file in provided %OPENCV_LIB% directory",
+        })),
     }
 }
 
@@ -71,7 +72,7 @@ fn main() {
         .file("native/utils.cc")
         .include("native")
         .include(opencv_include());
-		
+
     if cfg!(not(target_env = "msvc")) {
         opencv_config.flag("--std=c++11");
     }
@@ -87,7 +88,7 @@ fn main() {
 #[cfg(windows)]
 #[derive(Debug)]
 struct BuildError {
-    details: &'static str
+    details: &'static str,
 }
 
 #[cfg(windows)]

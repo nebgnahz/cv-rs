@@ -227,8 +227,8 @@ pub struct CVec<T: Sized + NestedVec> {
 
 // Unsafe because CVec is not guaranteed to contain valid pointer and size
 unsafe fn unpack<T: NestedVec, U, F>(v: &CVec<T>, mut f: F) -> Vec<U>
-    where
-        F: FnMut(&T) -> U,
+where
+    F: FnMut(&T) -> U,
 {
     (0..v.size)
         .map(|i| f(&*v.array.offset(i as isize)))
@@ -243,9 +243,7 @@ pub trait Unpack {
 impl<T: Unpack + NestedVec> Unpack for CVec<T> {
     type Out = Vec<T::Out>;
     fn unpack(&self) -> Self::Out {
-        unsafe {
-            unpack(self, |e| e.unpack())
-        }
+        unsafe { unpack(self, |e| e.unpack()) }
     }
 }
 
@@ -285,7 +283,7 @@ impl<T: NestedVec> Drop for CVec<T> {
         unsafe {
             let depth = CVec::<T>::LEVEL;
             let self_ptr: *mut _ = self;
-            let self_ptr: *mut c_void =  self_ptr as *mut _;
+            let self_ptr: *mut c_void = self_ptr as *mut _;
             cv_vec_drop(self_ptr, depth);
         }
     }
@@ -627,8 +625,8 @@ impl Mat {
     /// [Mat::at3](struct.Mat.html#method.at3).
     pub fn at2<T: FromBytes>(&self, i0: i32, i1: i32) -> T {
         let data: *const u8 = self.data();
-        let pos = (i0 as isize) * ((self.step1(0) * self.elem_size1()) as isize) +
-            (i1 as isize) * ((self.step1(1) * self.elem_size1()) as isize);
+        let pos = (i0 as isize) * ((self.step1(0) * self.elem_size1()) as isize)
+            + (i1 as isize) * ((self.step1(1) * self.elem_size1()) as isize);
         unsafe {
             let ptr: *const u8 = data.offset(pos);
             let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
@@ -643,9 +641,8 @@ impl Mat {
     /// [Mat::at2](struct.Mat.html#method.at2).
     pub fn at3<T: FromBytes>(&self, i0: i32, i1: i32, i2: i32) -> T {
         let data: *const u8 = self.data();
-        let pos = (i0 as isize) * ((self.step1(0) * self.elem_size1()) as isize) +
-            (i1 as isize) * ((self.step1(1) * self.elem_size1()) as isize) +
-            i2 as isize;
+        let pos = (i0 as isize) * ((self.step1(0) * self.elem_size1()) as isize)
+            + (i1 as isize) * ((self.step1(1) * self.elem_size1()) as isize) + i2 as isize;
         unsafe {
             let ptr: *const u8 = data.offset(pos);
             let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
@@ -786,13 +783,7 @@ extern "C" {
         from_to: *const i32,
         npairs: isize,
     );
-    fn cv_normalize(
-        csrc: *const CMat,
-        cdst: *mut CMat,
-        alpha: c_double,
-        beta: c_double,
-        norm_type: c_int,
-    );
+    fn cv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: c_int);
 
     fn cv_bitwise_and(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
     fn cv_bitwise_not(src: *const CMat, dst: *mut CMat);
@@ -866,13 +857,7 @@ impl Mat {
     /// `Mat`.
     // TODO(benzh) Avoid using raw pointers but rather take a vec for `from_to`?
     // The usage (self.depth) here is buggy, it should actually be the type!
-    pub fn mix_channels(
-        &self,
-        nsrcs: isize,
-        ndsts: isize,
-        from_to: *const i32,
-        npairs: isize,
-    ) -> Mat {
+    pub fn mix_channels(&self, nsrcs: isize, ndsts: isize, from_to: *const i32, npairs: isize) -> Mat {
         let m = Mat::with_size(self.rows, self.cols, self.depth);
         unsafe {
             cv_mix_channels(self.inner, nsrcs, m.inner, ndsts, from_to, npairs);

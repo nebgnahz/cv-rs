@@ -55,7 +55,9 @@ impl ObjectDetect for CascadeClassifier {
 impl CascadeClassifier {
     /// Creates a cascade classifier, uninitialized. Before use, call load.
     pub fn new() -> CascadeClassifier {
-        CascadeClassifier { inner: unsafe { cv_cascade_classifier_new() } }
+        CascadeClassifier {
+            inner: unsafe { cv_cascade_classifier_new() },
+        }
     }
 
     /// Creates a cascade classifier using the model specified.
@@ -154,12 +156,16 @@ impl SvmDetector {
     /// The size of the default people detector is 64x128, that mean that the
     /// people you would want to detect have to be atleast 64x128.
     pub fn default_people_detector() -> SvmDetector {
-        SvmDetector { inner: unsafe { cv_hog_default_people_detector() } }
+        SvmDetector {
+            inner: unsafe { cv_hog_default_people_detector() },
+        }
     }
 
     /// Returns the Daimler people detector.
     pub fn daimler_people_detector() -> SvmDetector {
-        SvmDetector { inner: unsafe { cv_hog_daimler_people_detector() } }
+        SvmDetector {
+            inner: unsafe { cv_hog_daimler_people_detector() },
+        }
     }
 }
 
@@ -248,7 +254,6 @@ const DEFAULT_NLEVELS: usize = 64;
 
 impl Default for HogParams {
     fn default() -> HogParams {
-
         let win_sigma = {
             if cfg!(feature = "gpu") {
                 4.0
