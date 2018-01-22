@@ -70,7 +70,7 @@ features = [ "gpu" ]
 
 ### Windows
 
-#### If you are using MSVC toolchain (mandatory if you want to use CUDA):
+#### If you are using MSVC toolchain (mandatory if you want to use CUDA)
 
 ##### For installation without CUDA
 - Download and run `vc14_vc15.exe` from [official site](https://github.com/opencv/opencv/releases)
@@ -79,37 +79,33 @@ features = [ "gpu" ]
 - Add `%OPENCV_DIR%\x64\<vc14 or vc15>\bin` to the `%PATH%`. Check that this directory has `opencv_world<version_number>.dll`
 
 ##### For installation with CUDA
-Prerequisites:
-- Installed git
-- Installed CMake x64 ([download link](https://cmake.org/download/))
+###### Prerequisites
+- Installed git.
+- Installed CMake x64 ([download link](https://cmake.org/download/)).
 - Installed Visual Studio 2015 ([download link](https://go.microsoft.com/fwlink/?LinkId=532606&clcid=0x409)), VS2017 is not supported by nVidia at this moment, don't even try, it won't compile.
 
-Installation steps:
-- Create directory `C:\opencv`
-- Copy files from `.windows` folder there
+###### Installation steps
+- Create directory `C:\opencv`.
+- Copy files from `.windows` folder there.
 - Download CUDA from [official site](https://developer.nvidia.com/cuda-downloads?target_os=Windows&target_arch=x86_64&target_version=10). Choose `local` package.
 - Run powershell console as administrator in `c:\opencv`.
-- Run `.\1_install_CUDA.ps1 -FileName path_to_installer` (for example, `C:\Users\UserName\Downloads\cuda_9.1.85_win10.exe`).
-- Run `PowerShell -NoExit ".\2_build_OCV.ps1"`.
+- Run `PowerShell -NoExit .\1_install_CUDA.ps1 -FileName path_to_installer` (for example, `C:\Users\UserName\Downloads\cuda_9.1.85_win10.exe`).
+- Run `PowerShell -NoExit .\msvc_2_build_OCV.ps1 -EnableCuda 1`. `1` stays for compilation with CUDA, `0` for compilation without it.
 - Wait until installation finishes. Now you have properly configured OpenCV with CUDA.
 
-#### If you are using GNU toolchain:
+#### If you are using GNU toolchain
 
-In this case, configuration process is a bit more complicated, because you have to build OpenCV from sources. Follow these steps:
-- Add `MinGW` to the `PATH`. This path could look like `C:\Program Files\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin`. If you haven't installed it yet, download it from [here](https://sourceforge.net/projects/mingw-w64/files/latest/download). Choose architecture `x86_64` during installation.
-- Download and install [CMake](https://cmake.org/download/). Caution, don't download the source code, you need the binary.
-- Run ‘cmake-gui’ in `<cmake-binary>\bin`. For example, `C:\Program Files\CMake\bin\cmake-gui.exe`
-- Enter `%OPENCV_DIR%\..\sources` path in the Windows Explorer and copy result in ‘Where is the source code:’ text box (_CMake doesn't understand path traversal syntax while explorer does_). For example, it could be `C:\opencv\sources`.
-- Do the same thing with `%OPENCV_DIR%\x64\mingw` and paste it in ‘Where to build the binaries:’ text box. For example, it could be `C:\opencv\build\x64\mingw`.
-- Click ‘Configure’. In the popping window, select MinGW option under ‘Specify the generator for this project’ and click ‘Finish’.
-- Search for `WITH_IPP` and **disable** it (otherwise ‘cannot find -lRunTmChk’ error is expected when building OpenCV).
-- Search for `BUILD_opencv_world` and **enable** it (otherwise `cv-rs` won't compile).
-- Click ‘Generate’. Select 'MinGW makefiles' from the dropdown and click ok. Now you have properly configured OpenCV.
-- Open bash shell in `OPENCV_DIR%\x64\mingw` directory and run `mingw32-make`. You should get following result:
-![MinGW make](https://user-images.githubusercontent.com/941519/34654809-836fe56c-f3b5-11e7-87b3-46bb7667bf34.png)
-- Set environment variable `%OPENCV_LIB%` to `%OPENCV_DIR%\x64\mingw\lib`. Check that this directory has `libopencv_world<version_number>.dll.a`.
-- Add `%OPENCV_DIR%\x64\mingw\bin` to the `%PATH%`. Check that this directory has  `libopencv_world<version_number>.dll`
+###### Prerequisites
+- Installed git.
+- Installed CMake x64 ([download link](https://cmake.org/download/)).
+- Installed MinGW ([download link](https://sourceforge.net/projects/mingw-w64/files/latest/download)). Choose architecture `x86_64` during installation.
 
+###### Installation steps
+- Create directory `C:\opencv`.
+- Copy files from `.windows` folder there.
+- Run powershell console as administrator in `c:\opencv`.
+- Run `PowerShell -NoExit .\mingw_build_OCV.ps1 -MinGWPath "C:\Program Files\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin"` (your path may be different).
+- Wait until installation finishes. Now you have properly configured OpenCV.
 
 ## Usage
 
