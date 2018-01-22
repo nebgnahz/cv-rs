@@ -15,8 +15,9 @@
 #![deny(unused_import_braces)]
 #![deny(unused_qualifications)]
 
-#[macro_use] extern crate failure;
 extern crate bytes;
+#[macro_use]
+extern crate failure;
 extern crate num;
 #[macro_use]
 extern crate num_derive;

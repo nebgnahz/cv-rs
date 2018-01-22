@@ -306,14 +306,13 @@ impl GpuCascade {
     /// nvbin are supported for HAAR and only new type of OpenCV XML cascade
     /// supported for LBP. The working haar models can be found at
     /// opencv_folder/data/haarcascades_cuda/.
-    pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self> {
+    pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self, CvError> {
         if let Some(p) = path.as_ref().to_str() {
             let s = CString::new(p)?;
             let inner = unsafe { cv_gpu_cascade_new((&s).as_ptr()) };
             return Ok(GpuCascade { inner: inner });
         }
-        let error = ErrorKind::InvalidPath(path.as_ref().to_path_buf());
-        Err(error.into())
+        Err(CvError::InvalidPath {path: path.as_ref().to_path_buf()})
     }
 
     /// Detects objects of different sizes in the input image.

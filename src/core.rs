@@ -496,7 +496,7 @@ impl Mat {
     /// [CvType](enum.CvType).
     pub fn cv_type(&self) -> Result<CvType, CvError> {
         let t = unsafe { cv_mat_type(self.inner) };
-        num::FromPrimitive::from_i32(t).ok_or(CvError::EnumFromPrimitiveConversionError {value: t})
+        num::FromPrimitive::from_i32(t).ok_or(CvError::EnumFromPrimitiveConversionError { value: t })
     }
 }
 
