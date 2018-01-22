@@ -1,6 +1,5 @@
 //! highgui: high-level GUI
-extern crate libc;
-use libc::{c_char, c_int, c_void};
+use std::os::raw::{c_char, c_int, c_void};
 use std::ffi::CString;
 use std::mem;
 use std::ptr;
