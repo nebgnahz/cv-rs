@@ -61,23 +61,22 @@ impl CascadeClassifier {
     }
 
     /// Creates a cascade classifier using the model specified.
-    pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self> {
+    pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self, CvError> {
         let cc = CascadeClassifier::new();
         cc.load(path)?;
         Ok(cc)
     }
 
     /// Loads the classifier model from a path.
-    pub fn load<P: AsRef<Path>>(&self, path: P) -> Result<()> {
-        let error = ErrorKind::InvalidPath(path.as_ref().to_path_buf());
+    pub fn load<P: AsRef<Path>>(&self, path: P) -> Result<(), CvError> {
         if let Some(p) = path.as_ref().to_str() {
-            let s = CString::new(p)?;
+            let s = CString::new(p).map_err(|_| CvError::NullError)?;
             if unsafe { cv_cascade_classifier_load(self.inner, (&s).as_ptr()) } {
                 return Ok(());
             }
         }
 
-        Err(error.into())
+        Err(CvError::InvalidPath {path: path.as_ref().to_path_buf()})
     }
 
     /// The default detection uses scale factor 1.1, minNeighbors 3, no min size

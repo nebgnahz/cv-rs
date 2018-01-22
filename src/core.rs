@@ -478,13 +478,13 @@ impl Mat {
 
     /// Calls out to highgui to show the image, the duration is specified by
     /// `delay`.
-    pub fn show(&self, name: &str, delay: i32) -> Result<()> {
+    pub fn show(&self, name: &str, delay: i32) -> Result<(), CvError> {
         extern "C" {
             fn cv_imshow(name: *const c_char, cmat: *mut CMat);
             fn cv_wait_key(delay_ms: c_int) -> c_int;
         }
 
-        let s = CString::new(name)?;
+        let s = CString::new(name).map_err(|_| CvError::NullError)?;
         unsafe {
             cv_imshow((&s).as_ptr(), self.inner);
             cv_wait_key(delay);
@@ -494,10 +494,9 @@ impl Mat {
 
     /// Returns the images type. For supported types, please see
     /// [CvType](enum.CvType).
-    pub fn cv_type(&self) -> Result<CvType> {
+    pub fn cv_type(&self) -> Result<CvType, CvError> {
         let t = unsafe { cv_mat_type(self.inner) };
-        let e = ErrorKind::NumFromPrimitive(t as i64).into();
-        num::FromPrimitive::from_i32(t).ok_or(e)
+        num::FromPrimitive::from_i32(t).ok_or(CvError::EnumFromPrimitiveConversionError {value: t})
     }
 }
 
