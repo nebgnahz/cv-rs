@@ -409,8 +409,7 @@ impl Mat {
 
     /// Returns the total number of array elements. The method returns the
     /// number of array elements (a number of pixels if the array represents an
-    /// image). For example, images with 1920x1080 resolution will return
-    /// 2073600.
+    /// image). For example, images with 1920x1080 resolution will return 2073600.
     pub fn total(&self) -> usize {
         unsafe { cv_mat_total(self.inner) }
     }

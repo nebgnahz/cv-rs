@@ -185,9 +185,9 @@ impl Drop for VideoCapture {
 enum CvVideoWriter {}
 
 /// `VideoWriter` provides easy access to write videos to files.
-/// - On Linux FFMPEG is used to write videos;
-/// - On Windows FFMPEG or VFW is used;
-/// - On MacOSX QTKit is used.
+/// -On Linux FFMPEG is used to write videos;
+/// -On Windows FFMPEG or VFW is used;
+/// -On MacOSX QTKit is used.
 #[derive(Debug)]
 pub struct VideoWriter {
     inner: *mut CvVideoWriter,
@@ -220,16 +220,16 @@ extern "C" {
 
 impl VideoWriter {
     /// `VideoWriter` constructor.
-    /// * path – Name of the output video file.
-    /// * fourcc – 4-character code of codec used to compress the frames. For
-    ///   example, VideoWriter::fourcc('P','I','M','1') is a MPEG-1 codec,
-    ///   VideoWriter::fourcc('M','J','P','G') is a motion-jpeg codec etc. List
-    ///   of codes can be obtained at Video Codecs by FOURCC page.
-    /// * fps – Framerate of the created video stream.
-    /// * frame_size – Size of the video frames.
-    /// * is_color – If it is not zero, the encoder will expect and encode color
-    ///   frames, otherwise it will work with grayscale frames (the flag is
-    ///   currently supported on Windows only).
+    /// -path – Name of the output video file.
+    /// -fourcc – 4-character code of codec used to compress the frames. For
+    ///  example, VideoWriter::fourcc('P','I','M','1') is a MPEG-1 codec,
+    ///  VideoWriter::fourcc('M','J','P','G') is a motion-jpeg codec etc. List
+    ///  of codes can be obtained at Video Codecs by FOURCC page.
+    /// -fps – Framerate of the created video stream.
+    /// -frame_size – Size of the video frames.
+    /// -is_color – If it is not zero, the encoder will expect and encode color
+    ///  frames, otherwise it will work with grayscale frames (the flag is
+    ///  currently supported on Windows only).
     pub fn new(path: &str, fourcc: i32, fps: f64, frame_size: Size2i, is_color: bool) -> VideoWriter {
         let s = ::std::ffi::CString::new(path).unwrap();
         let writer = unsafe { cv_videowriter_new((&s).as_ptr(), fourcc, fps, frame_size, is_color) };
@@ -237,16 +237,16 @@ impl VideoWriter {
     }
 
     /// `VideoWriter` constructor.
-    /// * path – Name of the output video file.
-    /// * fourcc – 4-character code of codec used to compress the frames. For
-    ///   example, VideoWriter::fourcc('P','I','M','1') is a MPEG-1 codec,
-    ///   VideoWriter::fourcc('M','J','P','G') is a motion-jpeg codec etc. List
-    ///   of codes can be obtained at Video Codecs by FOURCC page.
-    /// * fps – Framerate of the created video stream.
-    /// * frame_size – Size of the video frames.
-    /// * is_color – If it is not zero, the encoder will expect and encode color
-    ///   frames, otherwise it will work with grayscale frames (the flag is
-    ///   currently supported on Windows only).
+    /// -path – Name of the output video file.
+    /// -fourcc – 4-character code of codec used to compress the frames. For
+    ///  example, VideoWriter::fourcc('P','I','M','1') is a MPEG-1 codec,
+    ///  VideoWriter::fourcc('M','J','P','G') is a motion-jpeg codec etc. List
+    ///  of codes can be obtained at Video Codecs by FOURCC page.
+    /// -fps – Framerate of the created video stream.
+    /// -frame_size – Size of the video frames.
+    /// -is_color – If it is not zero, the encoder will expect and encode color
+    ///  frames, otherwise it will work with grayscale frames (the flag is
+    ///  currently supported on Windows only).
     pub fn open(&self, path: &str, fourcc: i32, fps: f64, frame_size: Size2i, is_color: bool) -> bool {
         let s = ::std::ffi::CString::new(path).unwrap();
         unsafe { cv_videowriter_open(self.inner, (&s).as_ptr(), fourcc, fps, frame_size, is_color) }
