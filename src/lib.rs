@@ -14,12 +14,10 @@
 #![deny(trivial_numeric_casts)]
 #![deny(unused_import_braces)]
 #![deny(unused_qualifications)]
-// `error_chain!` can recurse deeply
-#![recursion_limit = "1024"]
 
 extern crate bytes;
 #[macro_use]
-extern crate error_chain;
+extern crate failure;
 extern crate num;
 #[macro_use]
 extern crate num_derive;

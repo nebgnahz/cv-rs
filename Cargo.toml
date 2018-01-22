@@ -11,8 +11,8 @@ documentation = "rust-vision.s3-website-us-west-2.amazonaws.com"
 description = "This library primarily provides a binding and API for OpenCV 3.x."
 
 [dependencies]
-bytes = "0.4.5"
-error-chain = "0.11.0"
+bytes = "0.4"
+failure = "0.1"
 getopts = "0.2"
 num = "0.1"
 num-derive = "0.1"

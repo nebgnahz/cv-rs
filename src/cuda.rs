@@ -1,6 +1,7 @@
 //! Bindings to OpenCV's classes and functions that exploits GPU/Cuda. See
 //! [cv::cuda](http://docs.opencv.org/3.1.0/d1/d1a/namespacecv_1_1cuda.html)
 
+use failure::Error as Error;
 use std::os::raw::{c_char, c_double, c_int};
 use super::core::*;
 use super::errors::*;
@@ -306,14 +307,13 @@ impl GpuCascade {
     /// nvbin are supported for HAAR and only new type of OpenCV XML cascade
     /// supported for LBP. The working haar models can be found at
     /// opencv_folder/data/haarcascades_cuda/.
-    pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self> {
+    pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Self, Error> {
         if let Some(p) = path.as_ref().to_str() {
             let s = CString::new(p)?;
             let inner = unsafe { cv_gpu_cascade_new((&s).as_ptr()) };
             return Ok(GpuCascade { inner: inner });
         }
-        let error = ErrorKind::InvalidPath(path.as_ref().to_path_buf());
-        Err(error.into())
+        Err(CvError::InvalidPath {path: path.as_ref().to_path_buf()}.into())
     }
 
     /// Detects objects of different sizes in the input image.

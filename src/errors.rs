@@ -3,19 +3,8 @@
 
 use std::path::PathBuf;
 
-error_chain!{
-    foreign_links {
-        CStringConvert(::std::ffi::NulError);
-    }
-
-    errors {
-        InvalidPath(p: PathBuf) {
-            description("invalid path"),
-            display("invalid path: '{:?}'", p),
-        }
-        NumFromPrimitive(n: i64) {
-            description("fail to convert from primitive "),
-            display("fail to convert from primitive: '{:?}'", n),
-        }
-    }
+#[derive(Debug, Fail)]
+pub enum CvError {
+    #[fail(display = "invalid path: {:?}", path)] InvalidPath { path: PathBuf },
+    #[fail(display = "failed to convert from primitive: {}", value)] EnumFromPrimitiveConversionError { value: i32 },
 }
