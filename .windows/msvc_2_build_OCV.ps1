@@ -1,4 +1,4 @@
-param([Parameter(mandatory=$true)][[bool] $EnableCuda)
+param([Parameter(mandatory=$true)][bool] $EnableCuda)
 $CudaSwitch = If ($EnableCuda) {"ON"} Else {"OFF"}
 #SCRIPT CONSTANTS
 $pwd = Get-Location
