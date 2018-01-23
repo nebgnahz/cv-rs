@@ -14,7 +14,7 @@ description = "This library primarily provides a binding and API for OpenCV 3.x.
 bytes = "0.4"
 failure = "0.1"
 num = "0.1"
-num-derive = "0.1.41"
+num-derive = "=0.1.41"
 
 [dev-dependencies]
 getopts = "0.2"
