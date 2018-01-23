@@ -2,11 +2,11 @@
 
 use bytes::{self, ByteOrder};
 use errors::*;
-use failure::Error as Error;
-use std::os::raw::{c_char, c_double, c_int, c_uchar, c_void};
+use failure::Error;
 use num;
 use std::ffi::CString;
 use std::mem;
+use std::os::raw::{c_char, c_double, c_int, c_uchar, c_void};
 use std::slice;
 
 /// Opaque data struct for C bindings

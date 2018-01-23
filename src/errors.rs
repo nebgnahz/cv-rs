@@ -8,12 +8,12 @@ pub enum CvError {
     ///Indicates that path was invalid
     InvalidPath {
         ///Path that caused an error
-        path: PathBuf
+        path: PathBuf,
     },
     #[fail(display = "failed to convert from primitive: {}", value)]
     ///Indicates that conversion from primitive to enum type is failed
     EnumFromPrimitiveConversionError {
         ///Value that caused an error
-        value: i32
+        value: i32,
     },
 }

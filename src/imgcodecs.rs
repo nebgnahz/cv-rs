@@ -1,10 +1,10 @@
 //! Image file reading and writing, see [OpenCV
 //! imgcodecs](http://docs.opencv.org/3.1.0/d4/da8/group__imgcodecs.html).
 
-use std::ffi::CString;
-use std::path::Path;
-use std::os::raw::{c_char, c_int};
 use super::core::{CMat, Mat};
+use std::ffi::CString;
+use std::os::raw::{c_char, c_int};
+use std::path::Path;
 
 // =============================================================================
 //  Imgproc

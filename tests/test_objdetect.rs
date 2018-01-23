@@ -12,9 +12,9 @@ use cv::cuda::GpuCascade as CascadeClassifier;
 #[cfg(not(feature = "gpu"))]
 use cv::objdetect::CascadeClassifier;
 
-use cv::objdetect::SvmDetector;
 use cv::objdetect::HogParams;
 use cv::objdetect::ObjectDetect;
+use cv::objdetect::SvmDetector;
 mod utils;
 
 #[test]

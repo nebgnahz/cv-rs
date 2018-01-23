@@ -1,8 +1,8 @@
 extern crate cv;
 mod utils;
 
-use utils::*;
 use cv::features2d::*;
+use utils::*;
 
 #[test]
 fn mser_lenna() {
