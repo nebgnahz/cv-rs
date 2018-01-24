@@ -4,7 +4,6 @@ dist: trusty
 language: rust
 rust:
   - stable
-  - nightly
 
 addons:
   apt:
@@ -28,9 +27,11 @@ addons:
     - xvfb
 
 before_install:
+  - export PATH="$PATH:$HOME/.cargo/bin"
   - sudo -E ./.ci/install_cuda.sh
   - sudo -E ./.ci/travis_build_opencv.sh
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+  - which rustfmt || cargo install rustfmt-nightly
 
 script:
   - cargo build
@@ -38,10 +39,7 @@ script:
   - cargo test --no-default-features
   - cargo build --features gpu
   - cargo doc --features gpu --no-deps
-  - if [ "$TRAVIS_RUST_VERSION" == "nightly" ]; then cargo bench ; fi
-  - if [ "$TRAVIS_RUST_VERSION" == "nightly" ]; then
-      cargo fmt -- --write-mode=diff;
-    fi
+  - cargo fmt -- --write-mode=diff;
 
 notifications:
   email:
