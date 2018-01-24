@@ -1,10 +1,10 @@
 //! Image file reading and writing, see [OpenCV
 //! imgcodecs](http://docs.opencv.org/3.1.0/d4/da8/group__imgcodecs.html).
 
-use std::ffi::CString;
-use std::path::Path;
-use std::os::raw::{c_char, c_int};
 use super::core::{CMat, Mat};
+use std::ffi::CString;
+use std::os::raw::{c_char, c_int};
+use std::path::Path;
 
 // =============================================================================
 //  Imgproc
@@ -63,8 +63,8 @@ pub enum ImwriteFlags {
     /// Separate chroma quality level, 0 - 100, default is 0 - don't use.
     ImwriteJpegChromaQuality = 6,
     /// For PNG, it can be the compression level from 0 to 9. A higher value
-    /// means a smaller size and longer compression time. Default value is
-    /// 3. Also strategy is changed to IMWRITE_PNG_STRATEGY_DEFAULT
+    /// means a smaller size and longer compression time. Default value is 3.
+    /// Also strategy is changed to IMWRITE_PNG_STRATEGY_DEFAULT
     /// (Z_DEFAULT_STRATEGY).
     ImwritePngCompression = 16,
     /// One of cv::ImwritePNGFlags, default is IMWRITE_PNG_STRATEGY_DEFAULT.

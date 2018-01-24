@@ -2,11 +2,11 @@
 
 use bytes::{self, ByteOrder};
 use errors::*;
-use failure::Error as Error;
-use std::os::raw::{c_char, c_double, c_int, c_uchar, c_void};
+use failure::Error;
 use num;
 use std::ffi::CString;
 use std::mem;
+use std::os::raw::{c_char, c_double, c_int, c_uchar, c_void};
 use std::slice;
 
 /// Opaque data struct for C bindings
@@ -409,8 +409,7 @@ impl Mat {
 
     /// Returns the total number of array elements. The method returns the
     /// number of array elements (a number of pixels if the array represents an
-    /// image). For example, images with 1920x1080 resolution will return
-    /// 2073600.
+    /// image). For example, images with 1920x1080 resolution will return 2073600.
     pub fn total(&self) -> usize {
         unsafe { cv_mat_total(self.inner) }
     }

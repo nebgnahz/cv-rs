@@ -60,8 +60,8 @@ fn run() -> Result<()> {
     let detector = SvmDetector::default_people_detector();
     hog.set_svm_detector(detector);
 
-    for entry in try!(fs::read_dir(Path::new(&dir))) {
-        let dir = try!(entry);
+    for entry in fs::read_dir(Path::new(&dir))? {
+        let dir = entry?;
         println!("Processing {:?}", dir.path());
         run_detect_for_image(&mut hog, dir.path(), show, measure);
     }

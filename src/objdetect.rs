@@ -3,9 +3,9 @@
 
 use super::core::*;
 use super::errors::*;
-use failure::Error as Error;
-use std::os::raw::{c_char, c_double, c_int};
+use failure::Error;
 use std::ffi::CString;
+use std::os::raw::{c_char, c_double, c_int};
 use std::path::Path;
 use std::vec::Vec;
 
@@ -77,9 +77,11 @@ impl CascadeClassifier {
             }
         }
 
-        Err(CvError::InvalidPath {
-            path: path.as_ref().to_path_buf(),
-        }.into())
+        Err(
+            CvError::InvalidPath {
+                path: path.as_ref().to_path_buf(),
+            }.into(),
+        )
     }
 
     /// The default detection uses scale factor 1.1, minNeighbors 3, no min size

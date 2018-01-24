@@ -1,12 +1,12 @@
 //! Bindings to OpenCV's classes and functions that exploits GPU/Cuda. See
 //! [cv::cuda](http://docs.opencv.org/3.1.0/d1/d1a/namespacecv_1_1cuda.html)
 
-use failure::Error as Error;
-use std::os::raw::{c_char, c_double, c_int};
 use super::core::*;
 use super::errors::*;
 use super::objdetect::{CSvmDetector, HogParams, ObjectDetect, SvmDetector};
+use failure::Error;
 use std::ffi::CString;
+use std::os::raw::{c_char, c_double, c_int};
 use std::path::Path;
 
 /// Opaque data struct for C/C++ cv::cuda::GpuMat bindings
@@ -313,7 +313,11 @@ impl GpuCascade {
             let inner = unsafe { cv_gpu_cascade_new((&s).as_ptr()) };
             return Ok(GpuCascade { inner: inner });
         }
-        Err(CvError::InvalidPath {path: path.as_ref().to_path_buf()}.into())
+        Err(
+            CvError::InvalidPath {
+                path: path.as_ref().to_path_buf(),
+            }.into(),
+        )
     }
 
     /// Detects objects of different sizes in the input image.
