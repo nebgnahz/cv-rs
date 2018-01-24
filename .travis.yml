@@ -31,7 +31,7 @@ before_install:
   - sudo -E ./.ci/install_cuda.sh
   - sudo -E ./.ci/travis_build_opencv.sh
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
-  - which rustfmt || cargo install rustfmt-nightly
+  - rustup component add rustfmt-preview
 
 script:
   - cargo build
@@ -39,7 +39,7 @@ script:
   - cargo test --no-default-features
   - cargo build --features gpu
   - cargo doc --features gpu --no-deps
-  - find src/*.rs -exec rustfmt {} \;
+  - find src/*.rs | xargs rustfmt --write-mode=diff
   # Available until `cargo fmt` landed in stable rust 1.24
   # - cargo fmt -- --write-mode=diff;
 
