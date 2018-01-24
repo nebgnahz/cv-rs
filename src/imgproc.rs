@@ -58,7 +58,7 @@ extern "C" {
         ranges: *const *const c_float,
     );
 
-    fn cv_compare_hist(first_image: *const CMat, second_image: *const CMat, method: c_int) -> COption<c_double>;
+    fn cv_compare_hist(first_image: *const CMat, second_image: *const CMat, method: c_int) -> CResult<c_double>;
 }
 
 /// Possible methods for histogram comparision method

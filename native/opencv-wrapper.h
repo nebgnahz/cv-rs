@@ -13,7 +13,7 @@
 #endif
 
 #define VecType(type,name) typedef struct { type* array; size_t size; } name
-#define Option(type,name) typedef struct { type value; const char* message; } name
+#define Result(type,name) typedef struct { type value; const char* message; } name
 
 EXTERN_C_BEGIN
 
@@ -60,7 +60,7 @@ VecType(Rect, VecRect);
 VecType(double, VecDouble);
 VecType(Point2i, VecPoint);
 VecType(VecPoint, VecPoints);
-Option(double, OptionDouble);
+Result(double, ResultDouble);
 
 typedef struct {
     int32_t v0;
@@ -255,7 +255,7 @@ void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, Vec
 //   Other
 // =============================================================================
 
-OptionDouble cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method);
+ResultDouble cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method);
 
 EXTERN_C_END
 

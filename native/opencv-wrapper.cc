@@ -624,17 +624,17 @@ void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, Vec
     vec_rect_cxx_to_c(bboxes_vector, bboxes);
 }
 
-OptionDouble cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method) {
+ResultDouble cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method) {
     cv::Mat* first_mat = reinterpret_cast<cv::Mat*>(first_image);
     cv::Mat* second_mat = reinterpret_cast<cv::Mat*>(second_image);
     try
     {
-        return OptionDouble{value: cv::compareHist(*first_mat, *second_mat, method), message: nullptr};
+        return ResultDouble{value: cv::compareHist(*first_mat, *second_mat, method), message: nullptr};
     }
     catch( cv::Exception& e )
     {
         const char* err_msg = e.what();
-        return OptionDouble{value: 0, message: err_msg};
+        return ResultDouble{value: 0, message: err_msg};
     }
 }
 
