@@ -4,6 +4,7 @@ dist: trusty
 language: rust
 rust:
   - stable
+  - nightly
 
 addons:
   apt:
@@ -38,6 +39,9 @@ script:
   - cargo build --features gpu
   - cargo doc --features gpu --no-deps
   - if [ "$TRAVIS_RUST_VERSION" == "nightly" ]; then cargo bench ; fi
+  - if [ "$TRAVIS_RUST_VERSION" == "nightly" ]; then
+      cargo fmt -- --write-mode=diff;
+    fi
 
 notifications:
   email:
