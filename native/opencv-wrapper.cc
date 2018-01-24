@@ -627,15 +627,7 @@ void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, Vec
 ResultDouble cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method) {
     cv::Mat* first_mat = reinterpret_cast<cv::Mat*>(first_image);
     cv::Mat* second_mat = reinterpret_cast<cv::Mat*>(second_image);
-    try
-    {
-        return ResultDouble{value: cv::compareHist(*first_mat, *second_mat, method), message: nullptr};
-    }
-    catch( cv::Exception& e )
-    {
-        const char* err_msg = e.what();
-        return ResultDouble{value: 0, message: err_msg};
-    }
+    TryReturnResult(cv::compareHist(*first_mat, *second_mat, method), ResultDouble);
 }
 
 EXTERN_C_END

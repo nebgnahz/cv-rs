@@ -13,7 +13,23 @@
 #endif
 
 #define VecType(type,name) typedef struct { type* array; size_t size; } name
-#define Result(type,name) typedef struct { type value; const char* message; } name
+// Caller is responsible for freeing `error` field
+#define Result(type,name) typedef struct { const char* error; type value; } name
+#define TryReturnResult(value, resultName) \
+    #define DW \
+    try \
+    { \
+        return resultName{nullptr, value}; \
+    } \
+    catch( cv::Exception& e ) \
+    { \
+        const char* err_msg = e.what(); \
+        auto len = std::strlen(err_msg); \
+        auto retained_err = new char[len + 1]; \
+        std::strcpy(retained_err, err_msg); \
+        return ResultDouble{retained_err}; \
+    } \
+    #define EW
 
 EXTERN_C_BEGIN
 

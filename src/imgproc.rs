@@ -435,13 +435,13 @@ impl Cv {
         let result = unsafe {
             cv_compare_hist(first_image.inner, second_image.inner, method)
         };
-        if result.message.is_null()            {
+        if result.error.is_null() {
             Ok(result.value)
-            }
+        }
         else {
             unsafe {
-                let str = std::ffi::CString::from_raw(result.message);
-                let err = match str.into_string(){
+                let c_str = std::ffi::CStr::from_ptr(result.error);
+                let err = match c_str.to_str() {
                     Ok(message) => message.into(),
                     _ => "Unknown error".into()
                 };
