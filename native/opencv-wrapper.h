@@ -13,6 +13,7 @@
 #endif
 
 #define VecType(type,name) typedef struct { type* array; size_t size; } name
+#define Option(type,name) typedef struct { type value; const char* message; } name
 
 EXTERN_C_BEGIN
 
@@ -59,6 +60,7 @@ VecType(Rect, VecRect);
 VecType(double, VecDouble);
 VecType(Point2i, VecPoint);
 VecType(VecPoint, VecPoints);
+Option(double, OptionDouble);
 
 typedef struct {
     int32_t v0;
@@ -248,6 +250,12 @@ CMSER* cv_mser_new(int delta,
                    int edge_blur_size);
 void cv_mser_drop(CMSER* cmser);
 void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, VecRect* bboxes);
+
+// =============================================================================
+//   Other
+// =============================================================================
+
+OptionDouble cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method);
 
 EXTERN_C_END
 

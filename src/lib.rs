@@ -8,8 +8,6 @@
 //! [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
 //! bindings using a Python script.
 #![deny(missing_docs)]
-#![deny(missing_debug_implementations)]
-#![deny(missing_copy_implementations)]
 #![deny(trivial_casts)]
 #![deny(trivial_numeric_casts)]
 #![deny(unused_import_braces)]
@@ -35,6 +33,8 @@ pub use core::Scalar;
 pub use core::Size2f;
 pub use core::Size2i;
 
+use std::os::raw::c_char;
+
 pub mod errors;
 pub mod imgproc;
 pub mod imgcodecs;
@@ -46,3 +46,12 @@ pub mod features2d;
 
 #[cfg(feature = "gpu")]
 pub mod cuda;
+
+/// Structure that contains global cv functions
+pub struct Cv {}
+
+#[repr(C)]
+struct COption<T> {
+    value: T,
+    message: *mut c_char
+}

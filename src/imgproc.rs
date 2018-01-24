@@ -1,8 +1,11 @@
 //! Image processing, see [OpenCV
 //! imgproc](http://docs.opencv.org/3.1.0/d7/dbd/group__imgproc.html).
 
+use super::*;
 use super::core::*;
 use std::os::raw::{c_double, c_float, c_int};
+use num::ToPrimitive;
+use std::borrow::Cow;
 
 // =============================================================================
 //  Imgproc
@@ -54,6 +57,25 @@ extern "C" {
         cback_project: *mut CMat,
         ranges: *const *const c_float,
     );
+
+    fn cv_compare_hist(first_image: *const CMat, second_image: *const CMat, method: c_int) -> COption<c_double>;
+}
+
+/// Possible methods for histogram comparision method
+#[derive(Debug, PartialEq, Clone, Copy, ToPrimitive)]
+pub enum HistogramComparisionMethod {
+    /// HISTCMP_CORREL
+    Corellation = 0,
+    /// HISTCMP_CHISQR
+    ChiSquare = 1,
+    /// HISTCMP_INTERSECT
+    Intersection = 2,
+    /// HISTCMP_BHATTACHARYYA **and** HISTCMP_HELLINGER
+    Bhattacharyya = 3,
+    /// HISTCMP_CHISQR_ALT
+    ChiSquareAlternative = 4,
+    /// HISTCMP_KL_DIV
+    KullbackLeiblerDivergence = 5
 }
 
 /// Color conversion code used in
@@ -395,5 +417,36 @@ impl Mat {
             cv_calc_back_project(self.inner, 1, channels, (*hist).inner, m, ranges);
         }
         Mat::from_raw(m)
+    }
+}
+
+impl Cv {
+    /// Compares two histograms.
+    /// The function compare two histograms using the specified method.
+    /// The function returns d(first_image, second_image).
+    /// While the function works well with 1-, 2-, 3-dimensional dense histograms, it may not be
+    /// suitable for high-dimensional sparse histograms.
+    /// In such histograms, because of aliasing and sampling problems,
+    /// the coordinates of non-zero histogram bins can slightly shift.
+    /// To compare such histograms or more general sparse configurations of weighted points,
+    /// consider using the cv::EMD function.
+    pub fn compare_hist(first_image: &Mat, second_image: &Mat, method: HistogramComparisionMethod) -> Result<f64, Cow<'static, str>> {
+        let method: c_int = method.to_i64().unwrap() as i32;
+        let result = unsafe {
+            cv_compare_hist(first_image.inner, second_image.inner, method)
+        };
+        if result.message.is_null()            {
+            Ok(result.value)
+            }
+        else {
+            unsafe {
+                let str = std::ffi::CString::from_raw(result.message);
+                let err = match str.into_string(){
+                    Ok(message) => message.into(),
+                    _ => "Unknown error".into()
+                };
+                Err(err)
+            }
+        }
     }
 }
