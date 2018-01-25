@@ -5,7 +5,6 @@ use super::*;
 use super::core::*;
 use std::os::raw::{c_double, c_float, c_int};
 use num::ToPrimitive;
-use std::borrow::Cow;
 
 // =============================================================================
 //  Imgproc
@@ -430,23 +429,11 @@ impl Cv {
     /// the coordinates of non-zero histogram bins can slightly shift.
     /// To compare such histograms or more general sparse configurations of weighted points,
     /// consider using the cv::EMD function.
-    pub fn compare_hist(first_image: &Mat, second_image: &Mat, method: HistogramComparisionMethod) -> Result<f64, Cow<'static, str>> {
+    pub fn compare_hist(first_image: &Mat, second_image: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
         let method: c_int = method.to_i64().unwrap() as i32;
         let result = unsafe {
             cv_compare_hist(first_image.inner, second_image.inner, method)
         };
-        if result.error.is_null() {
-            Ok(result.value)
-        }
-        else {
-            unsafe {
-                let c_str = std::ffi::CStr::from_ptr(result.error);
-                let err = match c_str.to_str() {
-                    Ok(message) => message.into(),
-                    _ => "Unknown error".into()
-                };
-                Err(err)
-            }
-        }
+        result.into()
     }
 }

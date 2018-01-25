@@ -134,6 +134,7 @@ size_t cv_mat_step1(const CvMatrix* const cmat, int i);
 void cv_mat_drop(CvMatrix* cmat);
 
 void cv_vec_drop(Vec* vec, unsigned int depth);
+void c_drop(void* value);
 
 // =============================================================================
 //  core array
