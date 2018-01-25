@@ -1,7 +1,6 @@
 extern crate cv;
 mod utils;
 
-use cv::Cv;
 use cv::imgproc::*;
 use utils::*;
 
@@ -9,6 +8,6 @@ use utils::*;
 fn compare_hist() {
     let first_image = load_unchanged("assets/Histogram_Comparison_Source_0.jpg");
     let second_image = load_unchanged("assets/Histogram_Comparison_Source_1.jpg");
-    let result = Cv::compare_hist(&first_image, &second_image, HistogramComparisionMethod::ChiSquare).unwrap();
+    let result = first_image.compare_hist(&second_image, HistogramComparisionMethod::ChiSquare).unwrap();
     assert_eq!(0f64, result);
 }

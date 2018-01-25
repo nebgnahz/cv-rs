@@ -417,9 +417,7 @@ impl Mat {
         }
         Mat::from_raw(m)
     }
-}
 
-impl Cv {
     /// Compares two histograms.
     /// The function compare two histograms using the specified method.
     /// The function returns d(first_image, second_image).
@@ -429,10 +427,10 @@ impl Cv {
     /// the coordinates of non-zero histogram bins can slightly shift.
     /// To compare such histograms or more general sparse configurations of weighted points,
     /// consider using the cv::EMD function.
-    pub fn compare_hist(first_image: &Mat, second_image: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
+    pub fn compare_hist(&self, other: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
         let method: c_int = method.to_i64().unwrap() as i32;
         let result = unsafe {
-            cv_compare_hist(first_image.inner, second_image.inner, method)
+            cv_compare_hist(self.inner, other.inner, method)
         };
         result.into()
     }
