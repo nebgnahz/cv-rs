@@ -27,9 +27,11 @@ addons:
     - xvfb
 
 before_install:
+  - export PATH="$PATH:$HOME/.cargo/bin"
   - sudo -E ./.ci/install_cuda.sh
   - sudo -E ./.ci/travis_build_opencv.sh
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+  - rustup component add rustfmt-preview
 
 script:
   - cargo build
@@ -37,7 +39,9 @@ script:
   - cargo test --no-default-features
   - cargo build --features gpu
   - cargo doc --features gpu --no-deps
-  - if [ "$TRAVIS_RUST_VERSION" == "nightly" ]; then cargo bench ; fi
+  - find src/*.rs | xargs rustfmt --write-mode=diff
+  # Available until `cargo fmt` landed in stable rust 1.24
+  # - cargo fmt -- --write-mode=diff;
 
 notifications:
   email:
