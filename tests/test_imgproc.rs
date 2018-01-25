@@ -1,16 +1,18 @@
 extern crate cv;
+extern crate float_cmp;
 mod utils;
 
 use cv::*;
 use cv::imgproc::*;
 use utils::*;
+use float_cmp::ApproxEqUlps;
 
 #[test]
 fn compare_hist() {
     let first_image = get_image_histogram("assets/Histogram_Comparison_Source_0.jpg");
     let second_image = get_image_histogram("assets/Histogram_Comparison_Source_1.jpg");
     let result = first_image.compare_hist(&second_image, HistogramComparisionMethod::Corellation).unwrap();
-    assert!((result - 0.211).abs() < 0.001);
+    assert_eq!(result, 0f64);
 }
 
 fn get_image_histogram(path: &'static str) -> Mat {
