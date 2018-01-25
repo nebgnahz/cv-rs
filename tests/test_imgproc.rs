@@ -8,6 +8,14 @@ use float_cmp::ApproxEqRatio;
 use utils::*;
 
 #[test]
+#[should_panic]
+fn compare_hist_different_dimensions_panic() {
+    let first_image = load_unchanged("assets/Histogram_Comparison_Source_0.jpg");
+    let second_image = load_unchanged("assets/Histogram_Comparison_Source_1.jpg");
+    let result = first_image.compare_hist(&second_image, HistogramComparisionMethod::Corellation).unwrap();
+}
+
+#[test]
 fn compare_hist_correlation() {
     compare_hist(HistogramComparisionMethod::Corellation, 0.211);
 }

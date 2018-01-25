@@ -15,17 +15,19 @@
 #endif
 
 #define VecType(type,name) typedef struct { type* array; size_t size; } name
+#define CResult(type,name) typedef struct { type value; const char* error; } name
+
 
 // Caller is responsible for disposing `error` field
 template<typename T>
-struct CResult
+struct Result
 {
     T value;
     const char* error;
 
-    static CResult<T> FromFunction(std::function<T()> function)
+    static Result<T> FromFunction(std::function<T()> function)
     {
-        CResult<T> result = {};
+        Result<T> result = {};
         try
         {
             result.value = function();
@@ -88,6 +90,9 @@ VecType(Rect, VecRect);
 VecType(double, VecDouble);
 VecType(Point2i, VecPoint);
 VecType(VecPoint, VecPoints);
+CResult(double, CResultDouble);
+
+typedef struct { double value; const char* error; } CResultdouble;
 
 typedef struct {
     int32_t v0;
@@ -283,7 +288,7 @@ void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, Vec
 //   Other
 // =============================================================================
 
-CResult<double> cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method);
+CResultDouble cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method);
 
 EXTERN_C_END
 
