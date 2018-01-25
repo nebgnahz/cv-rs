@@ -5,14 +5,14 @@ mod utils;
 use cv::*;
 use cv::imgproc::*;
 use utils::*;
-use float_cmp::ApproxEqUlps;
+use float_cmp::ApproxEqRatio;
 
 #[test]
 fn compare_hist() {
     let first_image = get_image_histogram("assets/Histogram_Comparison_Source_0.jpg");
     let second_image = get_image_histogram("assets/Histogram_Comparison_Source_1.jpg");
     let result = first_image.compare_hist(&second_image, HistogramComparisionMethod::Corellation).unwrap();
-    assert_eq!(result, 0f64);
+    assert_eq(result, 0.211);
 }
 
 fn get_image_histogram(path: &'static str) -> Mat {
@@ -26,4 +26,8 @@ fn get_image_histogram(path: &'static str) -> Mat {
     let image = image.calc_hist(channels.as_ptr(), Mat::new(), 2, hsize.as_ptr(), ranges.as_ptr());
     let image = image.normalize(0_f64, 1_f64, NormTypes::NormMinMax);
     image
+}
+
+fn assert_eq(a: f64, b: f64) {
+    assert!(a.approx_eq_ratio(&b,0.0001), format!("{} == {}", a, b));
 }
