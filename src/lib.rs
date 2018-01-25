@@ -57,15 +57,14 @@ pub struct Cv {}
 #[repr(C)]
 struct CResult<T: Copy> {
     value: T,
-    error: *const c_char
+    error: *const c_char,
 }
 
 impl<T: Copy> Into<Result<T, String>> for CResult<T> {
     fn into(self) -> Result<T, String> {
         if self.error.is_null() {
             Ok(self.value)
-        }
-        else {
+        } else {
             unsafe {
                 let c_str = std::ffi::CStr::from_ptr(self.error);
                 let err = c_str.to_string_lossy().into_owned();
@@ -78,7 +77,7 @@ impl<T: Copy> Into<Result<T, String>> for CResult<T> {
 impl<T: Copy> Drop for CResult<T> {
     fn drop(&mut self) {
         if !self.error.is_null() {
-            unsafe { c_drop(self.error as *mut c_void)}
+            unsafe { c_drop(self.error as *mut c_void) }
         }
     }
 }

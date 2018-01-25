@@ -3,8 +3,8 @@
 
 use super::*;
 use super::core::*;
-use std::os::raw::{c_double, c_float, c_int};
 use num::ToPrimitive;
+use std::os::raw::{c_double, c_float, c_int};
 
 // =============================================================================
 //  Imgproc
@@ -74,7 +74,7 @@ pub enum HistogramComparisionMethod {
     /// HISTCMP_CHISQR_ALT
     ChiSquareAlternative = 4,
     /// HISTCMP_KL_DIV
-    KullbackLeiblerDivergence = 5
+    KullbackLeiblerDivergence = 5,
 }
 
 /// Color conversion code used in
@@ -429,9 +429,7 @@ impl Mat {
     /// consider using the cv::EMD function.
     pub fn compare_hist(&self, other: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
         let method: c_int = method.to_i64().unwrap() as i32;
-        let result = unsafe {
-            cv_compare_hist(self.inner, other.inner, method)
-        };
+        let result = unsafe { cv_compare_hist(self.inner, other.inner, method) };
         result.into()
     }
 }
