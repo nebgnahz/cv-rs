@@ -11,7 +11,7 @@
 #![deny(trivial_casts)]
 #![deny(trivial_numeric_casts)]
 #![deny(unused_import_braces)]
-#![warn(unused_qualifications)]
+#![deny(unused_qualifications)]
 
 extern crate bytes;
 #[macro_use]
@@ -52,6 +52,6 @@ pub struct Cv {}
 
 #[repr(C)]
 struct CResult<T> {
-    error: *mut c_char,
-    value: T
+    value: T,
+    error: *mut c_char
 }

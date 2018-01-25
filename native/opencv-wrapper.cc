@@ -624,10 +624,13 @@ void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, Vec
     vec_rect_cxx_to_c(bboxes_vector, bboxes);
 }
 
-ResultDouble cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method) {
+CResult<double> cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method) {
     cv::Mat* first_mat = reinterpret_cast<cv::Mat*>(first_image);
     cv::Mat* second_mat = reinterpret_cast<cv::Mat*>(second_image);
-    TryReturnResult(cv::compareHist(*first_mat, *second_mat, method), ResultDouble);
+    auto result = CResult<double>::FromFunction([first_mat, second_mat, method](){
+        return cv::compareHist(*first_mat, *second_mat, method);
+    });
+    return result;
 }
 
 EXTERN_C_END

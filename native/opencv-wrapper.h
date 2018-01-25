@@ -1,6 +1,8 @@
 #ifndef OPENCV_WRAPPER_H_
 #define OPENCV_WRAPPER_H_
 
+#include <opencv2/core.hpp>
+#include <functional>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -13,22 +15,33 @@
 #endif
 
 #define VecType(type,name) typedef struct { type* array; size_t size; } name
-// Caller is responsible for freeing `error` field
-#define Result(type,name) typedef struct { const char* error; type value; } name
-#define TryReturnResult(valueExpr, resultName) \
-    resultName result = {0};  \
-    try \
-    { \
-        result.value = valueExpr; \
-    } \
-    catch( cv::Exception& e ) \
-    { \
-        const char* err_msg = e.what(); \
-        auto len = std::strlen(err_msg); \
-        auto retained_err = new char[len + 1]; \
-        std::strcpy(retained_err, err_msg); \
-        result.error = retained_err;  \
+
+// Caller is responsible for disposing `error` field
+template<typename T>
+struct CResult
+{
+    T value;
+    const char* error;
+
+    static CResult<T> FromFunction(std::function<T()> function)
+    {
+        CResult<T> result = {};
+        try
+        {
+            result.value = function();
+        }
+        catch( cv::Exception& e )
+        {
+            const char* err_msg = e.what();
+            auto len = std::strlen(err_msg);
+            auto retained_err = new char[len + 1];
+            std::strcpy(retained_err, err_msg);
+            result.error = retained_err;
+        }
+        return result;
     }
+};
+
 
 EXTERN_C_BEGIN
 
@@ -75,7 +88,6 @@ VecType(Rect, VecRect);
 VecType(double, VecDouble);
 VecType(Point2i, VecPoint);
 VecType(VecPoint, VecPoints);
-Result(double, ResultDouble);
 
 typedef struct {
     int32_t v0;
@@ -270,7 +282,7 @@ void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, Vec
 //   Other
 // =============================================================================
 
-ResultDouble cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method);
+CResult<double> cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method);
 
 EXTERN_C_END
 
