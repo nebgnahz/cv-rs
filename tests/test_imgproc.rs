@@ -8,11 +8,40 @@ use utils::*;
 use float_cmp::ApproxEqRatio;
 
 #[test]
-fn compare_hist() {
+fn compare_hist_correlation(){
+    compare_hist(HistogramComparisionMethod::Corellation,0.211);
+}
+
+#[test]
+fn compare_hist_chi_square(){
+    compare_hist(HistogramComparisionMethod::ChiSquare,1360.7);
+}
+
+#[test]
+fn compare_hist_intersection(){
+    compare_hist(HistogramComparisionMethod::Intersection,5.682);
+}
+
+#[test]
+fn compare_hist_bhattacharyya(){
+    compare_hist(HistogramComparisionMethod::Bhattacharyya,0.6679);
+}
+
+#[test]
+fn compare_hist_chi_square_alternative(){
+    compare_hist(HistogramComparisionMethod::ChiSquareAlternative,41.027);
+}
+
+#[test]
+fn compare_hist_kullback_leibler_divergence(){
+    compare_hist(HistogramComparisionMethod::KullbackLeiblerDivergence,54.06287);
+}
+
+fn compare_hist(method: HistogramComparisionMethod, expected_result: f64) {
     let first_image = get_image_histogram("assets/Histogram_Comparison_Source_0.jpg");
     let second_image = get_image_histogram("assets/Histogram_Comparison_Source_1.jpg");
-    let result = first_image.compare_hist(&second_image, HistogramComparisionMethod::Corellation).unwrap();
-    assert_eq(result, 0.211);
+    let result = first_image.compare_hist(&second_image, method).unwrap();
+    assert_eq(result, expected_result);
 }
 
 fn get_image_histogram(path: &'static str) -> Mat {
