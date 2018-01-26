@@ -8,6 +8,8 @@
 //! [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
 //! bindings using a Python script.
 #![deny(missing_docs)]
+#![deny(missing_debug_implementations)]
+#![deny(missing_copy_implementations)]
 #![deny(trivial_casts)]
 #![deny(trivial_numeric_casts)]
 #![deny(unused_import_braces)]
@@ -50,9 +52,6 @@ pub mod cuda;
 extern "C" {
     fn c_drop(value: *mut c_void);
 }
-
-/// Structure that contains global cv functions
-pub struct Cv {}
 
 #[repr(C)]
 struct CResult<T: Copy> {
