@@ -1,6 +1,8 @@
 #ifndef OPENCV_WRAPPER_H_
 #define OPENCV_WRAPPER_H_
 
+#include <opencv2/core.hpp>
+#include <functional>
 #include <stddef.h>
 #include <stdint.h>
 
@@ -13,6 +15,35 @@
 #endif
 
 #define VecType(type,name) typedef struct { type* array; size_t size; } name
+#define CResult(type,name) typedef struct { type value; const char* error; } name
+
+
+// Caller is responsible for disposing `error` field
+template<typename T>
+struct Result
+{
+    T value;
+    const char* error;
+
+    static Result<T> FromFunction(std::function<T()> function)
+    {
+        Result<T> result = {};
+        try
+        {
+            result.value = function();
+        }
+        catch( cv::Exception& e )
+        {
+            const char* err_msg = e.what();
+            auto len = std::strlen(err_msg);
+            auto retained_err = new char[len + 1];
+            std::strcpy(retained_err, err_msg);
+            result.error = retained_err;
+        }
+        return result;
+    }
+};
+
 
 EXTERN_C_BEGIN
 
@@ -59,6 +90,9 @@ VecType(Rect, VecRect);
 VecType(double, VecDouble);
 VecType(Point2i, VecPoint);
 VecType(VecPoint, VecPoints);
+CResult(double, CResultDouble);
+
+typedef struct { double value; const char* error; } CResultdouble;
 
 typedef struct {
     int32_t v0;
@@ -105,6 +139,7 @@ size_t cv_mat_step1(const CvMatrix* const cmat, int i);
 void cv_mat_drop(CvMatrix* cmat);
 
 void cv_vec_drop(Vec* vec, unsigned int depth);
+void c_drop(void* value);
 
 // =============================================================================
 //  core array
@@ -248,6 +283,12 @@ CMSER* cv_mser_new(int delta,
                    int edge_blur_size);
 void cv_mser_drop(CMSER* cmser);
 void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, VecRect* bboxes);
+
+// =============================================================================
+//   Other
+// =============================================================================
+
+CResultDouble cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method);
 
 EXTERN_C_END
 

@@ -1,5 +1,6 @@
 condense_wildcard_suffixes = true
 error_on_line_overflow_comments = false
+fn_single_line = false
 max_width = 120
 reorder_imported_names = true
 reorder_imports = true

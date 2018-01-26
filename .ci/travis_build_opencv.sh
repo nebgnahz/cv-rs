@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eux -o pipefail
 
-OPENCV_VERSION=${OPENCV_VERSION:-3.3.0}
+OPENCV_VERSION=${OPENCV_VERSION:-3.4.0}
 URL=https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
 
 if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
