@@ -3,19 +3,21 @@ extern crate float_cmp;
 mod utils;
 
 use cv::*;
-use cv::imgproc::*;
 use cv::imgcodecs::ImreadModes;
+use cv::imgproc::*;
 use float_cmp::ApproxEqRatio;
 
-const FIRST_IMAGE_PATH : &str =  "assets/Histogram_Comparison_Source_0.png";
-const SECOND_IMAGE_PATH : &str =  "assets/Histogram_Comparison_Source_1.png";
+const FIRST_IMAGE_PATH: &str = "assets/Histogram_Comparison_Source_0.png";
+const SECOND_IMAGE_PATH: &str = "assets/Histogram_Comparison_Source_1.png";
 
 #[test]
 #[should_panic]
 fn compare_hist_different_dimensions_panic() {
     let first_image = Mat::from_path(FIRST_IMAGE_PATH, ImreadModes::ImreadColor).unwrap();
     let second_image = Mat::from_path(SECOND_IMAGE_PATH, ImreadModes::ImreadColor).unwrap();
-    let _ = first_image.compare_hist(&second_image, HistogramComparisionMethod::Corellation).unwrap();
+    let _ = first_image
+        .compare_hist(&second_image, HistogramComparisionMethod::Corellation)
+        .unwrap();
 }
 
 #[test]
