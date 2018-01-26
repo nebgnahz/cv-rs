@@ -5,6 +5,7 @@ use super::*;
 use super::core::*;
 use num::ToPrimitive;
 use std::os::raw::{c_double, c_float, c_int};
+use std::mem;
 
 // =============================================================================
 //  Imgproc
@@ -57,7 +58,7 @@ extern "C" {
         ranges: *const *const c_float,
     );
 
-    fn cv_compare_hist(first_image: *const CMat, second_image: *const CMat, method: c_int) -> CResult<c_double>;
+    fn cv_compare_hist(first_image: *const CMat, second_image: *const CMat, method: c_int, result: *mut CResult<c_double>);
 }
 
 /// Possible methods for histogram comparision method
@@ -429,7 +430,12 @@ impl Mat {
     /// consider using the cv::EMD function.
     pub fn compare_hist(&self, other: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
         let method: c_int = method.to_i64().unwrap() as i32;
-        let result = unsafe { cv_compare_hist(self.inner, other.inner, method) };
+        let mut result: CResult<f64>;
+        unsafe {
+            result = mem::uninitialized();
+            let result_ref: *mut CResult<f64> = &mut result;
+            cv_compare_hist(self.inner, other.inner, method, result_ref);
+        };
         result.into()
     }
 }

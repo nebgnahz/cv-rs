@@ -15,8 +15,6 @@
 #endif
 
 #define VecType(type,name) typedef struct { type* array; size_t size; } name
-#define CResult(type,name) typedef struct { type value; const char* error; } name
-
 
 // Caller is responsible for disposing `error` field
 template<typename T>
@@ -90,7 +88,6 @@ VecType(Rect, VecRect);
 VecType(double, VecDouble);
 VecType(Point2i, VecPoint);
 VecType(VecPoint, VecPoints);
-CResult(double, CResultDouble);
 
 typedef struct { double value; const char* error; } CResultdouble;
 
@@ -288,7 +285,7 @@ void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, Vec
 //   Other
 // =============================================================================
 
-CResultDouble cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method);
+void cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method, Result<double>* result);
 
 EXTERN_C_END
 
