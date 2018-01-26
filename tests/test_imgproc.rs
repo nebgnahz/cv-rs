@@ -4,14 +4,14 @@ mod utils;
 
 use cv::*;
 use cv::imgproc::*;
+use cv::imgcodecs::ImreadModes;
 use float_cmp::ApproxEqRatio;
-use utils::*;
 
 #[test]
 #[should_panic]
 fn compare_hist_different_dimensions_panic() {
-    let first_image = load_unchanged("assets/Histogram_Comparison_Source_0.jpg");
-    let second_image = load_unchanged("assets/Histogram_Comparison_Source_1.jpg");
+    let first_image = Mat::from_path("assets/Histogram_Comparison_Source_0.jpg", ImreadModes::ImreadColor).unwrap();
+    let second_image = Mat::from_path("assets/Histogram_Comparison_Source_1.jpg", ImreadModes::ImreadColor).unwrap();
     let _ = first_image.compare_hist(&second_image, HistogramComparisionMethod::Corellation).unwrap();
 }
 
@@ -56,7 +56,7 @@ fn compare_hist(method: HistogramComparisionMethod, expected_result: f64) {
 }
 
 fn get_image_histogram(path: &'static str) -> Mat {
-    let image = load_unchanged(path);
+    let image = Mat::from_path(path, ImreadModes::ImreadColor).unwrap();
     let image = image.cvt_color(ColorConversionCodes::BGR2HSV);
     let hsize = [50, 60];
     let h_ranges = [0_f32, 180_f32];

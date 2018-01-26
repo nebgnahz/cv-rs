@@ -55,11 +55,6 @@ pub fn load_lenna() -> Mat {
     Mat::imdecode(&buf, ImreadModes::ImreadGrayscale)
 }
 
-pub fn load_unchanged<P: AsRef<Path>>(img: P) -> Mat {
-    let buf = load_image_as_buf(img);
-    Mat::imdecode(&buf, ImreadModes::ImreadUnchanged)
-}
-
 pub fn load_messi_color() -> Mat {
     let buf = load_image_as_buf("assets/messi5.jpg");
     Mat::imdecode(&buf, ImreadModes::ImreadColor)
