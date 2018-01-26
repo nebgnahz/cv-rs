@@ -16,13 +16,13 @@ fn compare_hist_different_dimensions_panic() {
     let first_image = Mat::from_path(FIRST_IMAGE_PATH, ImreadModes::ImreadColor).unwrap();
     let second_image = Mat::from_path(SECOND_IMAGE_PATH, ImreadModes::ImreadColor).unwrap();
     let _ = first_image
-        .compare_hist(&second_image, HistogramComparisionMethod::Corellation)
+        .compare_hist(&second_image, HistogramComparisionMethod::Correlation)
         .unwrap();
 }
 
 #[test]
 fn compare_hist_correlation() {
-    compare_hist(HistogramComparisionMethod::Corellation, 0.204);
+    compare_hist(HistogramComparisionMethod::Correlation, 0.204);
 }
 
 #[test]

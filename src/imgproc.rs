@@ -64,7 +64,7 @@ extern "C" {
 #[derive(Debug, PartialEq, Clone, Copy, ToPrimitive)]
 pub enum HistogramComparisionMethod {
     /// HISTCMP_CORREL
-    Corellation = 0,
+    Correlation = 0,
     /// HISTCMP_CHISQR
     ChiSquare = 1,
     /// HISTCMP_INTERSECT
