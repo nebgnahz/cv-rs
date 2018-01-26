@@ -78,5 +78,5 @@ fn get_image_histogram(path: &'static str) -> Mat {
 }
 
 fn assert_eq(a: f64, b: f64) {
-    assert!(a.approx_eq_ratio(&b, 0.0001), format!("{} == {}", a, b));
+    assert!(a.approx_eq_ratio(&b, 0.001), format!("{} == {}", a, b));
 }
