@@ -4,13 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
 #define EXTERN_C_BEGIN extern "C" {
 #define EXTERN_C_END }
-#else
-#define EXTERN_C_BEGIN
-#define EXTERN_C_END
-#endif
 
 #include "opencv-wrapper.h"
 
@@ -19,42 +14,40 @@ EXTERN_C_BEGIN
 // =============================================================================
 //   Basic
 // =============================================================================
-typedef struct _GpuMat GpuMat;
-GpuMat* cv_gpu_mat_default();
-void cv_gpu_mat_drop(GpuMat*);
-void cv_gpu_mat_upload(GpuMat*, CvMatrix*);
-CvMatrix* cv_mat_from_gpu_mat(GpuMat*);
-GpuMat* cv_gpu_mat_from_mat(CvMatrix*);
+void* cv_gpu_mat_default();
+void cv_gpu_mat_drop(cv::cuda::GpuMat*);
+void cv_gpu_mat_upload(cv::cuda::GpuMat*, cv::Mat*);
+void* cv_mat_from_gpu_mat(cv::cuda::GpuMat*);
+cv::cuda::GpuMat* cv_gpu_mat_from_mat(cv::Mat*);
 
 // =============================================================================
 //   Hog
 // =============================================================================
-typedef struct _GpuHog GpuHog;
-GpuHog* cv_gpu_hog_default();
-GpuHog* cv_gpu_hog_new(Size2i win_size, Size2i block_size,
+CV_GPU_HOG* cv_gpu_hog_default();
+CV_GPU_HOG* cv_gpu_hog_new(Size2i win_size, Size2i block_size,
                        Size2i block_stride, Size2i cell_size, int32_t nbins);
-void cv_gpu_hog_drop(GpuHog*);
-void cv_gpu_hog_set_detector(GpuHog*, SvmDetector*);
-void cv_gpu_hog_detect(GpuHog*, GpuMat*, CVec<Rect>*);
-void cv_gpu_hog_detect_with_conf(GpuHog*, GpuMat*, CVec<Rect>*, CVec<double>*);
+void cv_gpu_hog_drop(CV_GPU_HOG*);
+void cv_gpu_hog_set_detector(CV_GPU_HOG*, std::vector<float>*);
+void cv_gpu_hog_detect(CV_GPU_HOG*, cv::cuda::GpuMat*, CVec<Rect>*);
+void cv_gpu_hog_detect_with_conf(CV_GPU_HOG*, cv::cuda::GpuMat*, CVec<Rect>*, CVec<double>*);
 
-void cv_gpu_hog_set_gamma_correction(GpuHog*, bool gamma);
-void cv_gpu_hog_set_group_threshold(GpuHog*, int32_t group_threshold);
-void cv_gpu_hog_set_hit_threshold(GpuHog*, double hit_threshold);
-void cv_gpu_hog_set_l2hys_threshold(GpuHog*, double l2hys_threshold);
-void cv_gpu_hog_set_num_levels(GpuHog*, size_t num_levels);
-void cv_gpu_hog_set_scale_factor(GpuHog*, double scale_factor);
-void cv_gpu_hog_set_win_sigma(GpuHog*, double win_sigma);
-void cv_gpu_hog_set_win_stride(GpuHog*, Size2i win_stride);
+void cv_gpu_hog_set_gamma_correction(CV_GPU_HOG*, bool gamma);
+void cv_gpu_hog_set_group_threshold(CV_GPU_HOG*, int32_t group_threshold);
+void cv_gpu_hog_set_hit_threshold(CV_GPU_HOG*, double hit_threshold);
+void cv_gpu_hog_set_l2hys_threshold(CV_GPU_HOG*, double l2hys_threshold);
+void cv_gpu_hog_set_num_levels(CV_GPU_HOG*, size_t num_levels);
+void cv_gpu_hog_set_scale_factor(CV_GPU_HOG*, double scale_factor);
+void cv_gpu_hog_set_win_sigma(CV_GPU_HOG*, double win_sigma);
+void cv_gpu_hog_set_win_stride(CV_GPU_HOG*, Size2i win_stride);
 
-bool cv_gpu_hog_get_gamma_correction(GpuHog*);
-int32_t cv_gpu_hog_get_group_threshold(GpuHog*);
-double cv_gpu_hog_get_hit_threshold(GpuHog*);
-double cv_gpu_hog_get_l2hys_threshold(GpuHog*);
-size_t cv_gpu_hog_get_num_levels(GpuHog*);
-double cv_gpu_hog_get_scale_factor(GpuHog*);
-double cv_gpu_hog_get_win_sigma(GpuHog*);
-Size2i cv_gpu_hog_get_win_stride(GpuHog *);
+bool cv_gpu_hog_get_gamma_correction(CV_GPU_HOG*);
+int32_t cv_gpu_hog_get_group_threshold(CV_GPU_HOG*);
+double cv_gpu_hog_get_hit_threshold(CV_GPU_HOG*);
+double cv_gpu_hog_get_l2hys_threshold(CV_GPU_HOG*);
+size_t cv_gpu_hog_get_num_levels(CV_GPU_HOG*);
+double cv_gpu_hog_get_scale_factor(CV_GPU_HOG*);
+double cv_gpu_hog_get_win_sigma(CV_GPU_HOG*);
+Size2i cv_gpu_hog_get_win_stride(CV_GPU_HOG *);
 
 // =============================================================================
 //   CascadeClassifier
@@ -62,7 +55,7 @@ Size2i cv_gpu_hog_get_win_stride(GpuHog *);
 typedef struct _GpuCascade GpuCascade;
 GpuCascade* cv_gpu_cascade_new(const char* const filename);
 void cv_gpu_cascade_drop(GpuCascade*);
-void cv_gpu_cascade_detect(GpuCascade*, GpuMat*, CVec<Rect>*);
+void cv_gpu_cascade_detect(GpuCascade*, cv::cuda::GpuMat*, CVec<Rect>*);
 
 void cv_gpu_cascade_set_find_largest_object(GpuCascade*, bool);
 void cv_gpu_cascade_set_max_num_objects(GpuCascade*, int32_t);

@@ -2,20 +2,17 @@
 #define OPENCV_WRAPPER_H_
 
 #include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/objdetect.hpp>
+#include <opencv2/video/tracking.hpp>
 #include <opencv2/features2d.hpp>
 #include <functional>
 #include <stddef.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
 #define EXTERN_C_BEGIN extern "C" {
 #define EXTERN_C_END }
-#else
-#define EXTERN_C_BEGIN
-#define EXTERN_C_END
-#endif
-
-#define VecType(type,name) typedef struct { type* array; size_t size; } name
 
 // Caller is responsible for disposing `error` field
 template<typename T>
@@ -55,8 +52,6 @@ EXTERN_C_BEGIN
 // =============================================================================
 //   Core/Types
 // =============================================================================
-typedef struct _CvMatrixrix CvMatrix;
-
 typedef struct {
     int32_t x;
     int32_t y;
@@ -103,36 +98,36 @@ typedef struct {
     size_t size;
 } ImencodeResult;
 
-// The caller owns the returned data CvMatrix
-CvMatrix* cv_mat_new();
-CvMatrix* cv_mat_new_with_size(int rows, int cols, int type);
-CvMatrix* cv_mat_zeros(int rows, int cols, int type);
-CvMatrix* cv_mat_from_buffer(int rows, int cols, int type, const uint8_t* buf);
+// The caller owns the returned data cv::Mat
+void* cv_mat_new();
+void* cv_mat_new_with_size(int rows, int cols, int type);
+void* cv_mat_zeros(int rows, int cols, int type);
+void* cv_mat_from_buffer(int rows, int cols, int type, const uint8_t* buf);
 
-bool cv_mat_valid(CvMatrix* cmat);
+bool cv_mat_valid(cv::Mat* mat);
 
-// The caller owns the returned CvMatrix
-CvMatrix* cv_mat_roi(CvMatrix* cmat, Rect crect);
+// The caller owns the returned cv::Mat
+void* cv_mat_roi(cv::Mat* mat, Rect crect);
 
-void cv_mat_logic_and(CvMatrix* image, const CvMatrix* const mask);
-void cv_mat_flip(CvMatrix* image, int code);
+void cv_mat_logic_and(cv::Mat* image, const cv::Mat* const mask);
+void cv_mat_flip(cv::Mat* image, int code);
 
-// The caller owns the returned data CvMatrix
-CvMatrix* cv_imread(const char* const filename, int flags);
+// The caller owns the returned data cv::Mat
+void* cv_imread(const char* const filename, int flags);
 
-int cv_mat_rows(const CvMatrix* const cmat);
-int cv_mat_cols(const CvMatrix* const cmat);
-int cv_mat_depth(const CvMatrix* const cmat);
-int cv_mat_channels(const CvMatrix* const cmat);
-int cv_mat_type(const CvMatrix* const cmat);
-const uint8_t* cv_mat_data(const CvMatrix* const cmat);
-size_t cv_mat_total(const CvMatrix* const cmat);
-size_t cv_mat_elem_size(const CvMatrix* const cmat);
-size_t cv_mat_elem_size1(const CvMatrix* const cmat);
-size_t cv_mat_step1(const CvMatrix* const cmat, int i);
+int cv_mat_rows(const cv::Mat* const mat);
+int cv_mat_cols(const cv::Mat* const mat);
+int cv_mat_depth(const cv::Mat* const mat);
+int cv_mat_channels(const cv::Mat* const mat);
+int cv_mat_type(const cv::Mat* const mat);
+const uint8_t* cv_mat_data(const cv::Mat* const mat);
+size_t cv_mat_total(const cv::Mat* const mat);
+size_t cv_mat_elem_size(const cv::Mat* const mat);
+size_t cv_mat_elem_size1(const cv::Mat* const mat);
+size_t cv_mat_step1(const cv::Mat* const mat, int i);
 
 // Free a Mat object
-void cv_mat_drop(CvMatrix* cmat);
+void cv_mat_drop(cv::Mat* mat);
 
 void cv_vec_drop(CVec<void>* vec, unsigned int depth);
 void c_drop(void* value);
@@ -140,50 +135,50 @@ void c_drop(void* value);
 // =============================================================================
 //  core array
 // =============================================================================
-void cv_in_range(CvMatrix* cmat, Scalar lowerb, Scalar upperb, CvMatrix* dst);
-void cv_min_max_loc(const CvMatrix* const cmat, double* min, double* max,
+void cv_in_range(cv::Mat* mat, Scalar lowerb, Scalar upperb, cv::Mat* dst);
+void cv_min_max_loc(const cv::Mat* const mat, double* min, double* max,
                     Point2i* minLoc, Point2i* maxLoc,
-                    const CvMatrix* const cmask);
-void cv_mix_channels(CvMatrix* cmat, size_t nsrcs, CvMatrix* dst, size_t ndsts,
+                    const cv::Mat* const cmask);
+void cv_mix_channels(cv::Mat* mat, size_t nsrcs, cv::Mat* dst, size_t ndsts,
                      const int* from_to, size_t npairs);
-void cv_normalize(CvMatrix* csrc, CvMatrix* cdst, double alpha, double beta,
+void cv_normalize(cv::Mat* csrc, cv::Mat* cdst, double alpha, double beta,
                   int norm_type);
-void cv_bitwise_and(const CvMatrix* const src1, const CvMatrix* const src2,
-                    CvMatrix* dst);
-void cv_bitwise_not(const CvMatrix* const src, CvMatrix* const dst);
-void cv_bitwise_or(const CvMatrix* const src1, const CvMatrix* const src2,
-                   CvMatrix* dst);
-void cv_bitwise_xor(const CvMatrix* const src1, const CvMatrix* const src2,
-                    CvMatrix* dst);
-int cv_count_non_zero(const CvMatrix* const src);
+void cv_bitwise_and(const cv::Mat* const src1, const cv::Mat* const src2,
+                    cv::Mat* dst);
+void cv_bitwise_not(const cv::Mat* const src, cv::Mat* const dst);
+void cv_bitwise_or(const cv::Mat* const src1, const cv::Mat* const src2,
+                   cv::Mat* dst);
+void cv_bitwise_xor(const cv::Mat* const src1, const cv::Mat* const src2,
+                    cv::Mat* dst);
+int cv_count_non_zero(const cv::Mat* const src);
 
 // =============================================================================
 //  Imgproc
 // =============================================================================
-void cv_line(CvMatrix* cmat, Point2i pt1, Point2i pt2, Scalar color,
+void cv_line(cv::Mat* mat, Point2i pt1, Point2i pt2, Scalar color,
              int thickness, int linetype, int shift);
-void cv_rectangle(CvMatrix* cmat, Rect crect, Scalar color, int thickness,
+void cv_rectangle(cv::Mat* mat, Rect crect, Scalar color, int thickness,
                   int linetype);
-void cv_ellipse(CvMatrix* cmat, Point2i center, Size2i axes, double angle,
+void cv_ellipse(cv::Mat* mat, Point2i center, Size2i axes, double angle,
                 double start_angle, double end_angle, Scalar color,
                 int thickness, int linetype, int shift);
 
-void cv_cvt_color(CvMatrix* cmat, CvMatrix* output, int code);
-void cv_pyr_down(CvMatrix* cmat, CvMatrix* output);
-void cv_resize(CvMatrix* from, CvMatrix* to, Size2i dsize, double fx, double fy,
+void cv_cvt_color(cv::Mat* mat, cv::Mat* output, int code);
+void cv_pyr_down(cv::Mat* mat, cv::Mat* output);
+void cv_resize(cv::Mat* from, cv::Mat* to, Size2i dsize, double fx, double fy,
                int interpolation);
-void cv_calc_hist(const CvMatrix* const cimages, int nimages,
-                  const int* channels, CvMatrix* mask, CvMatrix* hist, int dims,
+void cv_calc_hist(const cv::Mat* const cimages, int nimages,
+                  const int* channels, cv::Mat* mask, cv::Mat* hist, int dims,
                   const int* hist_size, const float** ranges);
-void cv_calc_back_project(const CvMatrix* images, int nimages,
-                          const int* channels, CvMatrix* hist,
-                          CvMatrix* back_project, const float** ranges);
+void cv_calc_back_project(const cv::Mat* images, int nimages,
+                          const int* channels, cv::Mat* hist,
+                          cv::Mat* back_project, const float** ranges);
 
 // =============================================================================
 //  Imgcodecs
 // =============================================================================
-CvMatrix* cv_imdecode(const uint8_t* const buffer, size_t len, int flag);
-ImencodeResult cv_imencode(const char* const ext, const CvMatrix* const cmat,
+void* cv_imdecode(const uint8_t* const buffer, size_t len, int flag);
+ImencodeResult cv_imencode(const char* const ext, const cv::Mat* const mat,
                            const int* const flag_ptr, size_t flag_size);
 
 // =============================================================================
@@ -191,7 +186,7 @@ ImencodeResult cv_imencode(const char* const ext, const CvMatrix* const cmat,
 // =============================================================================
 void cv_named_window(const char* const winname, int flags);
 void cv_destroy_window(const char* const winname);
-void cv_imshow(const char* const winname, CvMatrix* mat);
+void cv_imshow(const char* const winname, cv::Mat* mat);
 int cv_wait_key(int delay_in_millis);
 
 typedef void (*MouseCallback)(int e, int x, int y, int flags, void* data);
@@ -206,7 +201,7 @@ typedef struct _CVideoCapture CVideoCapture;
 CVideoCapture* cv_videocapture_new(int index);
 CVideoCapture* cv_videocapture_from_file(const char* const filename);
 bool cv_videocapture_is_opened(const CVideoCapture* const ccap);
-bool cv_videocapture_read(CVideoCapture* ccap, CvMatrix* cmat);
+bool cv_videocapture_read(CVideoCapture* ccap, cv::Mat* mat);
 void cv_videocapture_drop(CVideoCapture* ccap);
 bool cv_videocapture_set(CVideoCapture* ccap, int property, double value);
 double cv_videocapture_get(CVideoCapture* ccap, int property);
@@ -223,7 +218,7 @@ bool cv_videowriter_open(CVideoWriter* writer, const char* const path,
                          int fourcc, double fps, Size2i frame_size,
                          bool is_color);
 bool cv_videowriter_is_opened(CVideoWriter* writer);
-void cv_videowriter_write(CVideoWriter* writer, CvMatrix* cmat);
+void cv_videowriter_write(CVideoWriter* writer, cv::Mat* mat);
 bool cv_videowriter_set(CVideoWriter* writer, int property, double value);
 double cv_videowriter_get(CVideoWriter* writer, int property);
 
@@ -237,21 +232,19 @@ bool cv_cascade_classifier_load(CCascadeClassifier* cc, const char* const path);
 void cv_cascade_classifier_drop(CCascadeClassifier* cc);
 
 // vec_of_rect is dynamically allocated, the caller should take ownership of it.
-void cv_cascade_classifier_detect(CCascadeClassifier* cc, CvMatrix* cmat,
+void cv_cascade_classifier_detect(cv::CascadeClassifier* cascade, cv::Mat* mat,
                                   CVec<Rect>* vec_of_rect, double scale_factor,
                                   int min_neighbors, int flags, Size2i min_size,
                                   Size2i max_size);
 
-typedef struct _SvmDetector SvmDetector;
-SvmDetector* cv_hog_default_people_detector();
-SvmDetector* cv_hog_daimler_people_detector();
-void cv_hog_detector_drop(SvmDetector*);
+void* cv_hog_default_people_detector();
+void* cv_hog_daimler_people_detector();
+void cv_hog_detector_drop(std::vector<float>*);
 
-typedef struct _HogDescriptor HogDescriptor;
-HogDescriptor* cv_hog_new();
-void cv_hog_drop(HogDescriptor*);
-void cv_hog_set_svm_detector(HogDescriptor*, SvmDetector*);
-void cv_hog_detect(HogDescriptor*, CvMatrix*, CVec<Rect>* vec_detected,
+void* cv_hog_new();
+void cv_hog_drop(cv::HOGDescriptor*);
+void cv_hog_set_svm_detector(cv::HOGDescriptor*, std::vector<float>*);
+void cv_hog_detect(cv::HOGDescriptor*, cv::Mat*, CVec<Rect>* vec_detected,
                    CVec<double>* vec_weight, Size2i win_stride, Size2i padding,
                    double scale, double final_threshold, bool use_means_shift);
 
@@ -260,7 +253,7 @@ void cv_hog_detect(HogDescriptor*, CvMatrix*, CVec<Rect>* vec_detected,
 // =============================================================================
 void* cv_term_criteria_new(int type, int count, double epsilon);
 void cv_term_criteria_drop(cv::TermCriteria* criteria);
-RotatedRect cv_camshift(CvMatrix* back_project_image, Rect window,
+RotatedRect cv_camshift(cv::Mat* back_project_image, Rect window,
                         cv::TermCriteria* criteria);
 
 // =============================================================================
@@ -276,7 +269,7 @@ void* cv_mser_new(int delta,
                   double min_margin,
                   int edge_blur_size);
 void cv_mser_drop(cv::Ptr<cv::MSER>* mser);
-void cv_mser_detect_regions(cv::Ptr<cv::MSER>* mser, CvMatrix* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes);
+void cv_mser_detect_regions(cv::Ptr<cv::MSER>* mser, cv::Mat* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes);
 
 // =============================================================================
 //   Other
