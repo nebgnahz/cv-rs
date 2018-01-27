@@ -35,8 +35,8 @@ pub use core::Scalar;
 pub use core::Size2f;
 pub use core::Size2i;
 
-use std::os::raw::{c_char, c_void};
 use std::mem;
+use std::os::raw::{c_char, c_void};
 
 pub mod errors;
 pub mod imgproc;
