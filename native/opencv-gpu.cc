@@ -32,11 +32,9 @@ void* cv_gpu_mat_from_mat(cv::Mat* image) {
 // =============================================================================
 //   Hog
 // =============================================================================
-using CV_GPU_HOG = cv::Ptr<cv::cuda::HOG>;
-
 void* cv_gpu_hog_default() {
     auto hog = cv::cuda::HOG::create();
-    return new CV_GPU_HOG(hog);
+    return new cv::Ptr<cv::cuda::HOG>(hog);
 }
 
 void* cv_gpu_hog_new(Size2i win_size, Size2i block_size,
@@ -46,26 +44,26 @@ void* cv_gpu_hog_new(Size2i win_size, Size2i block_size,
     cv::Size cv_block_stride(block_stride.width, block_stride.height);
     cv::Size cv_cell_size(cell_size.width, cell_size.height);
 
-    return new CV_GPU_HOG(cv::cuda::HOG::create(
+    return new cv::Ptr<cv::cuda::HOG>(cv::cuda::HOG::create(
             cv_win_size, cv_block_size, cv_block_stride, cv_cell_size, nbins));
 }
 
-void cv_gpu_hog_drop(CV_GPU_HOG* hog) {
+void cv_gpu_hog_drop(cv::Ptr<cv::cuda::HOG>* hog) {
     delete hog;
     hog = nullptr;
 }
 
-void cv_gpu_hog_set_detector(CV_GPU_HOG* hog, std::vector<float>* detector) {
+void cv_gpu_hog_set_detector(cv::Ptr<cv::cuda::HOG>* hog, std::vector<float>* detector) {
     (*hog)->setSVMDetector(*detector);
 }
 
-void cv_gpu_hog_detect(CV_GPU_HOG* hog, cv::cuda::GpuMat* image, CVec<Rect>* found) {
+void cv_gpu_hog_detect(cv::Ptr<cv::cuda::HOG>* hog, cv::cuda::GpuMat* image, CVec<Rect>* found) {
     std::vector<cv::Rect> vec_object;
     (*hog)->detectMultiScale(*image, vec_object);
     vec_rect_cxx_to_c(vec_object, found);
 }
 
-void cv_gpu_hog_detect_with_conf(CV_GPU_HOG* hog, cv::cuda::GpuMat* image, CVec<Rect>* found, CVec<double>* conf) {
+void cv_gpu_hog_detect_with_conf(cv::Ptr<cv::cuda::HOG>* hog, cv::cuda::GpuMat* image, CVec<Rect>* found, CVec<double>* conf) {
     std::vector<cv::Rect> vec_object;
     std::vector<double> vec_confidences;
     (*hog)->setGroupThreshold(0);
@@ -74,73 +72,73 @@ void cv_gpu_hog_detect_with_conf(CV_GPU_HOG* hog, cv::cuda::GpuMat* image, CVec<
     vec_double_cxx_to_c(vec_confidences, conf);
 }
 
-void cv_gpu_hog_set_gamma_correction(CV_GPU_HOG* hog, bool gamma) {
+void cv_gpu_hog_set_gamma_correction(cv::Ptr<cv::cuda::HOG>* hog, bool gamma) {
     (*hog)->setGammaCorrection(gamma);
 }
 
-void cv_gpu_hog_set_group_threshold(CV_GPU_HOG* hog, int32_t group_threshold) {
+void cv_gpu_hog_set_group_threshold(cv::Ptr<cv::cuda::HOG>* hog, int32_t group_threshold) {
     (*hog)->setGroupThreshold(group_threshold);
 }
 
-void cv_gpu_hog_set_hit_threshold(CV_GPU_HOG* hog, double hit_threshold) {
+void cv_gpu_hog_set_hit_threshold(cv::Ptr<cv::cuda::HOG>* hog, double hit_threshold) {
     (*hog)->setHitThreshold(hit_threshold);
 }
 
-void cv_gpu_hog_set_l2hys_threshold(CV_GPU_HOG* hog, double l2hys_threshold) {
+void cv_gpu_hog_set_l2hys_threshold(cv::Ptr<cv::cuda::HOG>* hog, double l2hys_threshold) {
     (*hog)->setL2HysThreshold(l2hys_threshold);
 }
 
-void cv_gpu_hog_set_num_levels(CV_GPU_HOG* hog, size_t num_levels) {
+void cv_gpu_hog_set_num_levels(cv::Ptr<cv::cuda::HOG>* hog, size_t num_levels) {
     (*hog)->setNumLevels(num_levels);
 }
 
-void cv_gpu_hog_set_scale_factor(CV_GPU_HOG* hog, double scale_factor) {
+void cv_gpu_hog_set_scale_factor(cv::Ptr<cv::cuda::HOG>* hog, double scale_factor) {
     (*hog)->setScaleFactor(scale_factor);
 }
 
-void cv_gpu_hog_set_win_sigma(CV_GPU_HOG* hog, double win_sigma) {
+void cv_gpu_hog_set_win_sigma(cv::Ptr<cv::cuda::HOG>* hog, double win_sigma) {
     (*hog)->setWinSigma(win_sigma);
 }
 
-void cv_gpu_hog_set_win_stride(CV_GPU_HOG* hog, Size2i win_stride) {
+void cv_gpu_hog_set_win_stride(cv::Ptr<cv::cuda::HOG>* hog, Size2i win_stride) {
     cv::Size cv_win_stride(win_stride.width, win_stride.height);
     (*hog)->setWinStride(cv_win_stride);
 }
 
-bool cv_gpu_hog_get_gamma_correction(CV_GPU_HOG* hog) {
+bool cv_gpu_hog_get_gamma_correction(cv::Ptr<cv::cuda::HOG>* hog) {
     return (*hog)->getGammaCorrection();
 }
 
-int32_t cv_gpu_hog_get_group_threshold(CV_GPU_HOG* hog) {
+int32_t cv_gpu_hog_get_group_threshold(cv::Ptr<cv::cuda::HOG>* hog) {
     return (*hog)->getGroupThreshold();
 }
 
-double cv_gpu_hog_get_hit_threshold(CV_GPU_HOG* hog) {
+double cv_gpu_hog_get_hit_threshold(cv::Ptr<cv::cuda::HOG>* hog) {
 
     return (*hog)->getHitThreshold();
 }
 
-double cv_gpu_hog_get_l2hys_threshold(CV_GPU_HOG* hog) {
+double cv_gpu_hog_get_l2hys_threshold(cv::Ptr<cv::cuda::HOG>* hog) {
 
     return (*hog)->getL2HysThreshold();
 }
 
-size_t cv_gpu_hog_get_num_levels(CV_GPU_HOG* hog) {
+size_t cv_gpu_hog_get_num_levels(cv::Ptr<cv::cuda::HOG>* hog) {
 
     return (*hog)->getNumLevels();
 }
 
-double cv_gpu_hog_get_scale_factor(CV_GPU_HOG* hog) {
+double cv_gpu_hog_get_scale_factor(cv::Ptr<cv::cuda::HOG>* hog) {
 
     return (*hog)->getScaleFactor();
 }
 
-double cv_gpu_hog_get_win_sigma(CV_GPU_HOG* hog) {
+double cv_gpu_hog_get_win_sigma(cv::Ptr<cv::cuda::HOG>* hog) {
 
     return (*hog)->getWinSigma();
 }
 
-Size2i cv_gpu_hog_get_win_stride(CV_GPU_HOG* hog) {
+Size2i cv_gpu_hog_get_win_stride(cv::Ptr<cv::cuda::HOG>* hog) {
 
     cv::Size size = (*hog)->getWinStride();
     Size2i c_size;
