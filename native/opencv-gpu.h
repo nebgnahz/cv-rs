@@ -1,12 +1,11 @@
 #ifndef OPENCV_GPU_H_
 #define OPENCV_GPU_H_
-
-#include <stddef.h>
-#include <stdint.h>
-
 #define EXTERN_C_BEGIN extern "C" {
 #define EXTERN_C_END }
 
+#include <stddef.h>
+#include <stdint.h>
+#include <opencv2/cudaobjdetect.hpp>
 #include "opencv-wrapper.h"
 
 EXTERN_C_BEGIN
