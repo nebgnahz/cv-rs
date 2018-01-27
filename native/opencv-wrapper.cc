@@ -310,40 +310,32 @@ void cv_set_mouse_callback(const char* const winname, MouseCallback on_mouse,
 // =============================================================================
 //   VideoCapture
 // =============================================================================
-CVideoCapture* cv_videocapture_new(int index) {
-    cv::VideoCapture* cap = new cv::VideoCapture(index);
-    return reinterpret_cast<CVideoCapture*>(cap);
+void* cv_videocapture_new(int index) {
+    return new cv::VideoCapture(index);
 }
 
-CVideoCapture* cv_videocapture_from_file(const char* const filename) {
-    cv::VideoCapture* cap = new cv::VideoCapture(filename);
-    return reinterpret_cast<CVideoCapture*>(cap);
+void* cv_videocapture_from_file(const char* const filename) {
+    return new cv::VideoCapture(filename);
 }
 
-bool cv_videocapture_is_opened(const CVideoCapture* const ccap) {
-    const cv::VideoCapture* const cap =
-        reinterpret_cast<const cv::VideoCapture* const>(ccap);
+bool cv_videocapture_is_opened(const cv::VideoCapture* const cap) {
     return cap->isOpened();
 }
 
-bool cv_videocapture_read(CVideoCapture* ccap, cv::Mat* mat) {
-    cv::VideoCapture* cap = reinterpret_cast<cv::VideoCapture*>(ccap);
-        return cap->read(*mat);
+bool cv_videocapture_read(cv::VideoCapture* cap, cv::Mat* mat) {
+    return cap->read(*mat);
 }
 
-void cv_videocapture_drop(CVideoCapture* ccap) {
-    cv::VideoCapture* cap = reinterpret_cast<cv::VideoCapture*>(ccap);
+void cv_videocapture_drop(cv::VideoCapture* cap) {
     delete cap;
-    ccap = nullptr;
+    cap = nullptr;
 }
 
-bool cv_videocapture_set(CVideoCapture* ccap, int property, double value) {
-    cv::VideoCapture* cap = reinterpret_cast<cv::VideoCapture*>(ccap);
+bool cv_videocapture_set(cv::VideoCapture* cap, int property, double value) {
     return cap->set(property, value);
 }
 
-double cv_videocapture_get(CVideoCapture* ccap, int property) {
-    cv::VideoCapture* cap = reinterpret_cast<cv::VideoCapture*>(ccap);
+double cv_videocapture_get(cv::VideoCapture* cap, int property) {
     return cap->get(property);
 }
 
@@ -356,77 +348,64 @@ int cv_fourcc(char c1, char c2, char c3, char c4) {
             (((c4) &255) << 24));
 }
 
-CVideoWriter* cv_videowriter_default() {
-    cv::VideoWriter* writer = new cv::VideoWriter();
-    return reinterpret_cast<CVideoWriter*>(writer);
+void* cv_videowriter_default() {
+    return new cv::VideoWriter();
 }
 
-CVideoWriter* cv_videowriter_new(const char* const path, int fourcc, double fps,
+void* cv_videowriter_new(const char* const path, int fourcc, double fps,
                                  Size2i frame_size, bool is_color) {
     cv::Size cv_frame_size(frame_size.width, frame_size.height);
     cv::VideoWriter* writer =
         new cv::VideoWriter(path, fourcc, fps, cv_frame_size, is_color);
-    return reinterpret_cast<CVideoWriter*>(writer);
+    return writer;
 }
 
-void cv_videowriter_drop(CVideoWriter* writer) {
-    cv::VideoWriter* cv_writer = reinterpret_cast<cv::VideoWriter*>(writer);
-    delete cv_writer;
-    cv_writer = nullptr;
+void cv_videowriter_drop(cv::VideoWriter* writer) {
+    delete writer;
+    writer = nullptr;
 }
 
-bool cv_videowriter_open(CVideoWriter* writer, const char* const path,
+bool cv_videowriter_open(cv::VideoWriter* writer, const char* const path,
                          int fourcc, double fps, Size2i frame_size,
                          bool is_color) {
-    cv::VideoWriter* cv_writer = reinterpret_cast<cv::VideoWriter*>(writer);
     cv::Size cv_frame_size(frame_size.width, frame_size.height);
-    return cv_writer->open(path, fourcc, fps, cv_frame_size, is_color);
+    return writer->open(path, fourcc, fps, cv_frame_size, is_color);
 }
 
-bool cv_videowriter_is_opened(CVideoWriter* writer) {
-    cv::VideoWriter* cv_writer = reinterpret_cast<cv::VideoWriter*>(writer);
-    return cv_writer->isOpened();
+bool cv_videowriter_is_opened(cv::VideoWriter* writer) {
+    return writer->isOpened();
 }
 
-void cv_videowriter_write(CVideoWriter* writer, cv::Mat* mat) {
-    cv::VideoWriter* cv_writer = reinterpret_cast<cv::VideoWriter*>(writer);
-        (*cv_writer) << (*mat);
+void cv_videowriter_write(cv::VideoWriter* writer, cv::Mat* mat) {
+    (*writer) << (*mat);
 }
 
-bool cv_videowriter_set(CVideoWriter* writer, int property, double value) {
-    cv::VideoWriter* cv_writer = reinterpret_cast<cv::VideoWriter*>(writer);
-    return cv_writer->set(property, value);
+bool cv_videowriter_set(cv::VideoWriter* writer, int property, double value) {
+    return writer->set(property, value);
 }
 
-double cv_videowriter_get(CVideoWriter* writer, int property) {
-    cv::VideoWriter* cv_writer = reinterpret_cast<cv::VideoWriter*>(writer);
-    return cv_writer->get(property);
+double cv_videowriter_get(cv::VideoWriter* writer, int property) {
+    return writer->get(property);
 }
 
 // =============================================================================
 //   CascadeClassifier
 // =============================================================================
-CCascadeClassifier* cv_cascade_classifier_new() {
-    cv::CascadeClassifier* cc = new cv::CascadeClassifier();
-    return reinterpret_cast<CCascadeClassifier*>(cc);
+void* cv_cascade_classifier_new() {
+    return new cv::CascadeClassifier();
 }
 
-bool cv_cascade_classifier_load(CCascadeClassifier* cc, const char* const p) {
-    cv::CascadeClassifier* cascade =
-        reinterpret_cast<cv::CascadeClassifier*>(cc);
+bool cv_cascade_classifier_load(cv::CascadeClassifier* cascade, const char* const p) {
     return cascade->load(p);
 }
 
-CCascadeClassifier* cv_cascade_classifier_from_path(const char* const p) {
-    cv::CascadeClassifier* cc = new cv::CascadeClassifier(p);
-    return reinterpret_cast<CCascadeClassifier*>(cc);
+void* cv_cascade_classifier_from_path(const char* const p) {
+    return new cv::CascadeClassifier(p);
 }
 
-void cv_cascade_classifier_drop(CCascadeClassifier* cc) {
-    cv::CascadeClassifier* cascade =
-        reinterpret_cast<cv::CascadeClassifier*>(cc);
+void cv_cascade_classifier_drop(cv::CascadeClassifier* cascade) {
     delete cascade;
-    cc = nullptr;
+    cascade = nullptr;
 }
 
 void cv_cascade_classifier_detect(cv::CascadeClassifier* cascade, cv::Mat* image,
@@ -452,15 +431,11 @@ void cv_cascade_classifier_detect(cv::CascadeClassifier* cascade, cv::Mat* image
 }
 
 void* cv_hog_default_people_detector() {
-    std::vector<float>* detector =
-        new std::vector<float>(cv::HOGDescriptor::getDefaultPeopleDetector());
-    return reinterpret_cast<std::vector<float>*>(detector);
+    return new std::vector<float>(cv::HOGDescriptor::getDefaultPeopleDetector());
 }
 
 void* cv_hog_daimler_people_detector() {
-    std::vector<float>* detector =
-        new std::vector<float>(cv::HOGDescriptor::getDaimlerPeopleDetector());
-    return detector;
+    return new std::vector<float>(cv::HOGDescriptor::getDaimlerPeopleDetector());
 }
 
 void cv_hog_detector_drop(std::vector<float>* detector) {
@@ -479,9 +454,7 @@ void cv_hog_drop(cv::HOGDescriptor* hog) {
 
 void cv_hog_set_svm_detector(cv::HOGDescriptor* hog, std::vector<float>* detector) {
 
-    std::vector<float>* cv_detector =
-        reinterpret_cast<std::vector<float>*>(detector);
-    hog->setSVMDetector(*cv_detector);
+    hog->setSVMDetector(*detector);
 }
 
 void cv_hog_detect(cv::HOGDescriptor* hog, cv::Mat* image, CVec<Rect>* vec_rect,
@@ -517,9 +490,8 @@ void cv_term_criteria_drop(cv::TermCriteria* criteria) {
     criteria = nullptr;
 }
 
-RotatedRect cv_camshift(cv::Mat* c_bp_image, Rect crect,
+RotatedRect cv_camshift(cv::Mat* bp_image, Rect crect,
                         cv::TermCriteria* criteria) {
-    cv::Mat* bp_image = reinterpret_cast<cv::Mat*>(c_bp_image);
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
     cv::RotatedRect rr = cv::CamShift(*bp_image, rect, *criteria);
     RotatedRect c_rr;
@@ -562,11 +534,10 @@ void cv_mser_drop(cv::Ptr<cv::MSER>* mser) {
 }
 
 void cv_mser_detect_regions(cv::Ptr<cv::MSER>* mser, cv::Mat* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes) {
-    cv::Mat* mat = reinterpret_cast<cv::Mat*>(image);
     std::vector<std::vector<cv::Point>> msers_vector;
     std::vector<cv::Rect> bboxes_vector;
 
-    mser->get()->detectRegions(*mat, msers_vector, bboxes_vector);
+    mser->get()->detectRegions(*image, msers_vector, bboxes_vector);
 
     vec_points_cxx_to_c(msers_vector, msers);
     vec_rect_cxx_to_c(bboxes_vector, bboxes);

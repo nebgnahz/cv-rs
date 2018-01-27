@@ -44,8 +44,8 @@ void* cv_gpu_hog_new(Size2i win_size, Size2i block_size,
     cv::Size cv_block_stride(block_stride.width, block_stride.height);
     cv::Size cv_cell_size(cell_size.width, cell_size.height);
 
-    return new cv::Ptr<cv::cuda::HOG>(cv::cuda::HOG::create(
-            cv_win_size, cv_block_size, cv_block_stride, cv_cell_size, nbins));
+    auto hog = cv::cuda::HOG::create(cv_win_size, cv_block_size, cv_block_stride, cv_cell_size, nbins);
+    return new cv::Ptr<cv::cuda::HOG>(hog);
 }
 
 void cv_gpu_hog_drop(cv::Ptr<cv::cuda::HOG>* hog) {
@@ -151,102 +151,83 @@ Size2i cv_gpu_hog_get_win_stride(cv::Ptr<cv::cuda::HOG>* hog) {
 // =============================================================================
 //   CascadeClassifier
 // =============================================================================
-using GpuCascadePtr = cv::Ptr<cv::cuda::CascadeClassifier>;
-
-GpuCascade* cv_gpu_cascade_new(const char* const filename) {
-    auto cascade = cv::cuda::CascadeClassifier::create(filename);
-    return reinterpret_cast<GpuCascade*>(new GpuCascadePtr(cascade));
+void* cv_gpu_cascade_new(const char* const filename) {
+    return cv::cuda::CascadeClassifier::create(filename);
 }
 
-void cv_gpu_cascade_drop(GpuCascade* cascade) {
-    GpuCascadePtr* cascade_ptr = reinterpret_cast<GpuCascadePtr*>(cascade);
-    delete cascade_ptr;
-    cascade_ptr = nullptr;
+void cv_gpu_cascade_drop(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+    delete cascade;
+    cascade = nullptr;
 }
 
-void cv_gpu_cascade_detect(GpuCascade* cascade, cv::cuda::GpuMat* image, CVec<Rect>* objects) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
-    cv::cuda::GpuMat* cv_image = reinterpret_cast<cv::cuda::GpuMat*>(image);
+void cv_gpu_cascade_detect(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, cv::cuda::GpuMat* image, CVec<Rect>* objects) {
     cv::cuda::GpuMat objbuf;
     std::vector<cv::Rect> vec_object;
 
-    (*cv_cascade)->detectMultiScale(*cv_image, objbuf);
-    (*cv_cascade)->convert(objbuf, vec_object);
+    (*cascade)->detectMultiScale(*image, objbuf);
+    (*cascade)->convert(objbuf, vec_object);
 
     vec_rect_cxx_to_c(vec_object, objects);
 }
 
-void cv_gpu_cascade_set_find_largest_object(GpuCascade* cascade, bool value) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
-    (*cv_cascade)->setFindLargestObject(value);
+void cv_gpu_cascade_set_find_largest_object(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, bool value) {
+    (*cascade)->setFindLargestObject(value);
 }
 
-void cv_gpu_cascade_set_max_num_objects(GpuCascade* cascade, int32_t num) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
-    (*cv_cascade)->setMaxNumObjects(num);
+void cv_gpu_cascade_set_max_num_objects(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, int32_t num) {
+    (*cascade)->setMaxNumObjects(num);
 }
 
-void cv_gpu_cascade_set_min_neighbors(GpuCascade* cascade, int32_t min) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
-    (*cv_cascade)->setMinNeighbors(min);
+void cv_gpu_cascade_set_min_neighbors(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, int32_t min) {
+    (*cascade)->setMinNeighbors(min);
 }
 
-void cv_gpu_cascade_set_max_object_size(GpuCascade* cascade, Size2i max_size) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
+void cv_gpu_cascade_set_max_object_size(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, Size2i max_size) {
     cv::Size cv_max_size(max_size.width, max_size.height);
-    (*cv_cascade)->setMaxObjectSize(cv_max_size);
+    (*cascade)->setMaxObjectSize(cv_max_size);
 }
 
-void cv_gpu_cascade_set_min_object_size(GpuCascade* cascade, Size2i min_size) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
+void cv_gpu_cascade_set_min_object_size(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, Size2i min_size) {
     cv::Size cv_min_size(min_size.width, min_size.height);
-    (*cv_cascade)->setMinObjectSize(cv_min_size);
+    (*cascade)->setMinObjectSize(cv_min_size);
 }
 
-void cv_gpu_cascade_set_scale_factor(GpuCascade* cascade, double factor) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
-    (*cv_cascade)->setScaleFactor(factor);
+void cv_gpu_cascade_set_scale_factor(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, double factor) {
+    (*cascade)->setScaleFactor(factor);
 }
 
-Size2i cv_gpu_cascade_get_classifier_size(GpuCascade* cascade) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
-    cv::Size2i size = (*cv_cascade)->getClassifierSize();
+Size2i cv_gpu_cascade_get_classifier_size(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+    cv::Size2i size = (*cascade)->getClassifierSize();
     Size2i c_size = {.width = size.width, .height = size.height };
     return c_size;
 }
 
-bool cv_gpu_cascade_get_find_largest_object(GpuCascade* cascade) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
-    return (*cv_cascade)->getFindLargestObject();
+bool cv_gpu_cascade_get_find_largest_object(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+    return (*cascade)->getFindLargestObject();
 }
 
-int32_t cv_gpu_cascade_get_max_num_objects(GpuCascade* cascade) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
-    return (*cv_cascade)->getMaxNumObjects();
+int32_t cv_gpu_cascade_get_max_num_objects(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+    return (*cascade)->getMaxNumObjects();
 }
 
-int32_t cv_gpu_cascade_get_min_neighbors(GpuCascade* cascade) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
-    return (*cv_cascade)->getMinNeighbors();
+int32_t cv_gpu_cascade_get_min_neighbors(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+    return (*cascade)->getMinNeighbors();
 }
 
-Size2i cv_gpu_cascade_get_max_object_size(GpuCascade* cascade) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
-    cv::Size2i size = (*cv_cascade)->getMaxObjectSize();
+Size2i cv_gpu_cascade_get_max_object_size(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+    cv::Size2i size = (*cascade)->getMaxObjectSize();
     Size2i c_size = {.width = size.width, .height = size.height};
     return c_size;
 }
 
-Size2i cv_gpu_cascade_get_min_object_size(GpuCascade* cascade) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
-    cv::Size2i size = (*cv_cascade)->getMinObjectSize();
+Size2i cv_gpu_cascade_get_min_object_size(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+    cv::Size2i size = (*cascade)->getMinObjectSize();
     Size2i c_size = {.width = size.width, .height = size.height};
     return c_size;
 }
 
-double cv_gpu_cascade_get_scale_factor(GpuCascade* cascade) {
-    GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
-    return (*cv_cascade)->getScaleFactor();
+double cv_gpu_cascade_get_scale_factor(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+    return (*cascade)->getScaleFactor();
 }
 
 EXTERN_C_END

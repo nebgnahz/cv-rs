@@ -196,40 +196,35 @@ void cv_set_mouse_callback(const char* const winname, MouseCallback onMouse,
 // =============================================================================
 //   VideoIO
 // =============================================================================
-typedef struct _CVideoCapture CVideoCapture;
-
-CVideoCapture* cv_videocapture_new(int index);
-CVideoCapture* cv_videocapture_from_file(const char* const filename);
-bool cv_videocapture_is_opened(const CVideoCapture* const ccap);
-bool cv_videocapture_read(CVideoCapture* ccap, cv::Mat* mat);
-void cv_videocapture_drop(CVideoCapture* ccap);
-bool cv_videocapture_set(CVideoCapture* ccap, int property, double value);
-double cv_videocapture_get(CVideoCapture* ccap, int property);
-
-typedef struct _CVideoWriter CVideoWriter;
+void* cv_videocapture_new(int index);
+void* cv_videocapture_from_file(const char* const filename);
+bool cv_videocapture_is_opened(const cv::VideoCapture* const cap);
+bool cv_videocapture_read(cv::VideoCapture* cap, cv::Mat* mat);
+void cv_videocapture_drop(cv::VideoCapture* cap);
+bool cv_videocapture_set(cv::VideoCapture* cap, int property, double value);
+double cv_videocapture_get(cv::VideoCapture* cap, int property);
 
 int cv_fourcc(char c1, char c2, char c3, char c4);
 
-CVideoWriter* cv_videowriter_default();
-CVideoWriter* cv_videowriter_new(const char* const path, int fourcc, double fps,
+void* cv_videowriter_default();
+void* cv_videowriter_new(const char* const path, int fourcc, double fps,
                                  Size2i frame_size, bool is_color);
-void cv_videowriter_drop(CVideoWriter* writer);
-bool cv_videowriter_open(CVideoWriter* writer, const char* const path,
+void cv_videowriter_drop(cv::VideoWriter* writer);
+bool cv_videowriter_open(cv::VideoWriter* writer, const char* const path,
                          int fourcc, double fps, Size2i frame_size,
                          bool is_color);
-bool cv_videowriter_is_opened(CVideoWriter* writer);
-void cv_videowriter_write(CVideoWriter* writer, cv::Mat* mat);
-bool cv_videowriter_set(CVideoWriter* writer, int property, double value);
-double cv_videowriter_get(CVideoWriter* writer, int property);
+bool cv_videowriter_is_opened(cv::VideoWriter* writer);
+void cv_videowriter_write(cv::VideoWriter* writer, cv::Mat* mat);
+bool cv_videowriter_set(cv::VideoWriter* writer, int property, double value);
+double cv_videowriter_get(cv::VideoWriter* writer, int property);
 
 // =============================================================================
 //   CascadeClassifier
 // =============================================================================
-typedef struct _CCascadeClassifier CCascadeClassifier;
-CCascadeClassifier* cv_cascade_classifier_new();
-CCascadeClassifier* cv_cascade_classifier_from_path(const char* const path);
-bool cv_cascade_classifier_load(CCascadeClassifier* cc, const char* const path);
-void cv_cascade_classifier_drop(CCascadeClassifier* cc);
+void* cv_cascade_classifier_new();
+void* cv_cascade_classifier_from_path(const char* const path);
+bool cv_cascade_classifier_load(cv::CascadeClassifier* cc, const char* const path);
+void cv_cascade_classifier_drop(cv::CascadeClassifier* cc);
 
 // vec_of_rect is dynamically allocated, the caller should take ownership of it.
 void cv_cascade_classifier_detect(cv::CascadeClassifier* cascade, cv::Mat* mat,
