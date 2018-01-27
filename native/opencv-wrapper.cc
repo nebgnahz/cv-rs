@@ -109,10 +109,10 @@ void cv_mat_drop(CvMatrix* cmat) {
     cmat = nullptr;
 }
 
-void cv_vec_drop(Vec* vec, unsigned int depth) {
+void cv_vec_drop(CVec<void>* vec, unsigned int depth) {
     if (vec->array != nullptr) {
         if (depth > 1) {
-            Vec* nestedVec = (Vec*) vec->array;
+            auto nestedVec = (CVec<void>*) vec->array;
             for (size_t i = 0; i < vec->size; ++i) {
                 cv_vec_drop(&nestedVec[i], depth - 1);
             }

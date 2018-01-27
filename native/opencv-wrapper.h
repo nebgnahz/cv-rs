@@ -42,6 +42,12 @@ struct Result
     }
 };
 
+template<typename T>
+struct CVec
+{
+    T* array;
+    size_t size;
+};
 
 EXTERN_C_BEGIN
 
@@ -83,13 +89,10 @@ typedef struct {
     float angle;
 } RotatedRect;
 
-VecType(void, Vec);
 VecType(Rect, VecRect);
 VecType(double, VecDouble);
 VecType(Point2i, VecPoint);
 VecType(VecPoint, VecPoints);
-
-typedef struct { double value; const char* error; } CResultdouble;
 
 typedef struct {
     int32_t v0;
@@ -135,7 +138,7 @@ size_t cv_mat_step1(const CvMatrix* const cmat, int i);
 // Free a Mat object
 void cv_mat_drop(CvMatrix* cmat);
 
-void cv_vec_drop(Vec* vec, unsigned int depth);
+void cv_vec_drop(CVec<void>* vec, unsigned int depth);
 void c_drop(void* value);
 
 // =============================================================================
