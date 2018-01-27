@@ -22,9 +22,9 @@ void* cv_gpu_mat_from_mat(cv::Mat*);
 // =============================================================================
 //   Hog
 // =============================================================================
-cv::Ptr<cv::cuda::HOG>* cv_gpu_hog_default();
-cv::Ptr<cv::cuda::HOG>* cv_gpu_hog_new(Size2i win_size, Size2i block_size,
-                       Size2i block_stride, Size2i cell_size, int32_t nbins);
+void* cv_gpu_hog_default();
+void* cv_gpu_hog_new(Size2i win_size, Size2i block_size,
+                     Size2i block_stride, Size2i cell_size, int32_t nbins);
 void cv_gpu_hog_drop(cv::Ptr<cv::cuda::HOG>*);
 void cv_gpu_hog_set_detector(cv::Ptr<cv::cuda::HOG>*, std::vector<float>*);
 void cv_gpu_hog_detect(cv::Ptr<cv::cuda::HOG>*, cv::cuda::GpuMat*, CVec<Rect>*);

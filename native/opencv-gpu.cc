@@ -14,7 +14,7 @@ void* cv_gpu_mat_default() {
 
 void cv_gpu_mat_drop(cv::cuda::GpuMat* gpu_image) {
     delete gpu_image;
-    gpu_mat = nullptr;
+    gpu_image = nullptr;
 }
 
 void cv_gpu_mat_upload(cv::cuda::GpuMat* gpu_image, cv::Mat* image) {
