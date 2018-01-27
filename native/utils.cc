@@ -31,7 +31,7 @@ void vec_point_cxx_to_c(const std::vector<cv::Point>& cxx_vec_point,
     }
 }
 
-void vec_points_cxx_to_c(const std::vector<std::vector<cv::Point>> &cxx_vec_points,
+void vec_points_cxx_to_c(const std::vector<std::vector<cv::Point>>& cxx_vec_points,
                          CVec<CVec<Point2i>>* vps) {
     size_t num = cxx_vec_points.size();
     vps->size = num;

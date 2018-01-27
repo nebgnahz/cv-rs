@@ -258,11 +258,10 @@ void cv_hog_detect(HogDescriptor*, CvMatrix*, CVec<Rect>* vec_detected,
 // =============================================================================
 //   VideoTrack
 // =============================================================================
-typedef struct _CTermCriteria CTermCriteria;
-CTermCriteria* cv_term_criteria_new(int type, int count, double epsilon);
-void cv_term_criteria_drop(CTermCriteria* c_criteria);
+void* cv_term_criteria_new(int type, int count, double epsilon);
+void cv_term_criteria_drop(cv::TermCriteria* criteria);
 RotatedRect cv_camshift(CvMatrix* back_project_image, Rect window,
-                        CTermCriteria* term_criteria);
+                        cv::TermCriteria* criteria);
 
 // =============================================================================
 //   MSER

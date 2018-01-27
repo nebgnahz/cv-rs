@@ -559,24 +559,19 @@ void cv_hog_detect(HogDescriptor* hog, CvMatrix* cmat, CVec<Rect>* vec_rect,
 // =============================================================================
 //  Object Tracking
 // =============================================================================
-CTermCriteria* cv_term_criteria_new(int type, int count, double epsilon) {
-    cv::TermCriteria* criteria = new cv::TermCriteria(type, count, epsilon);
-    return reinterpret_cast<CTermCriteria*>(criteria);
+void* cv_term_criteria_new(int type, int count, double epsilon) {
+    return new cv::TermCriteria(type, count, epsilon);
 }
 
-void cv_term_criteria_drop(CTermCriteria* c_criteria) {
-    cv::TermCriteria* criteria =
-        reinterpret_cast<cv::TermCriteria*>(c_criteria);
+void cv_term_criteria_drop(cv::TermCriteria* criteria) {
     delete criteria;
-    c_criteria = nullptr;
+    criteria = nullptr;
 }
 
 RotatedRect cv_camshift(CvMatrix* c_bp_image, Rect crect,
-                        CTermCriteria* c_criteria) {
+                        cv::TermCriteria* criteria) {
     cv::Mat* bp_image = reinterpret_cast<cv::Mat*>(c_bp_image);
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
-    cv::TermCriteria* criteria =
-        reinterpret_cast<cv::TermCriteria*>(c_criteria);
     cv::RotatedRect rr = cv::CamShift(*bp_image, rect, *criteria);
     RotatedRect c_rr;
     c_rr.center.x = rr.center.x;
