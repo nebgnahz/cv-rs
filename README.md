@@ -119,7 +119,7 @@ See available examples on how this library might be used.
 
 ## Contribute
 
-See [the contribute file](contribute.md)! PRs highly welcome.
+See [the contribute file](CONTRIBUTING.md)! PRs highly welcome.
 
 You may also simply open up an issue for feature/porting request.
 
