@@ -9,7 +9,7 @@ EXTERN_C_BEGIN
 //   Basic
 // =============================================================================
 void* cv_gpu_mat_default() {
-    return new cv::cuda::cv::cuda::GpuMat();
+    return new cv::cuda::GpuMat();
 }
 
 void cv_gpu_mat_drop(cv::cuda::GpuMat* gpu_image) {
@@ -26,7 +26,7 @@ void* cv_mat_from_gpu_mat(cv::cuda::GpuMat* gpu_image) {
 }
 
 void* cv_gpu_mat_from_mat(cv::Mat* image) {
-  return new cv::cuda::cv::cuda::GpuMat(*image);
+  return new cv::cuda::GpuMat(*image);
 }
 
 // =============================================================================
@@ -166,8 +166,8 @@ void cv_gpu_cascade_drop(GpuCascade* cascade) {
 
 void cv_gpu_cascade_detect(GpuCascade* cascade, cv::cuda::GpuMat* image, CVec<Rect>* objects) {
     GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
-    cv::cuda::cv::cuda::GpuMat* cv_image = reinterpret_cast<cv::cuda::cv::cuda::GpuMat*>(image);
-    cv::cuda::cv::cuda::GpuMat objbuf;
+    cv::cuda::GpuMat* cv_image = reinterpret_cast<cv::cuda::GpuMat*>(image);
+    cv::cuda::GpuMat objbuf;
     std::vector<cv::Rect> vec_object;
 
     (*cv_cascade)->detectMultiScale(*cv_image, objbuf);
