@@ -2,6 +2,7 @@
 #define OPENCV_WRAPPER_H_
 
 #include <opencv2/core.hpp>
+#include <opencv2/features2d.hpp>
 #include <functional>
 #include <stddef.h>
 #include <stdint.h>
@@ -266,24 +267,23 @@ RotatedRect cv_camshift(CvMatrix* back_project_image, Rect window,
 // =============================================================================
 //   MSER
 // =============================================================================
-typedef struct _CMSER CMSER;
-CMSER* cv_mser_new(int delta,
-                   int min_area,
-                   int max_area,
-                   double max_variation,
-                   double min_diversity,
-                   int max_evolution,
-                   double area_threshold,
-                   double min_margin,
-                   int edge_blur_size);
-void cv_mser_drop(CMSER* cmser);
-void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes);
+void* cv_mser_new(int delta,
+                  int min_area,
+                  int max_area,
+                  double max_variation,
+                  double min_diversity,
+                  int max_evolution,
+                  double area_threshold,
+                  double min_margin,
+                  int edge_blur_size);
+void cv_mser_drop(cv::Ptr<cv::MSER>* mser);
+void cv_mser_detect_regions(cv::Ptr<cv::MSER>* mser, CvMatrix* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes);
 
 // =============================================================================
 //   Other
 // =============================================================================
 
-void cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method, Result<double>* result);
+void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result);
 
 EXTERN_C_END
 

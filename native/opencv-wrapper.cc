@@ -591,7 +591,7 @@ RotatedRect cv_camshift(CvMatrix* c_bp_image, Rect crect,
 //   MSER
 // =============================================================================
 
-CMSER* cv_mser_new(int delta,
+void* cv_mser_new(int delta,
                    int min_area,
                    int max_area,
                    double max_variation,
@@ -609,17 +609,15 @@ CMSER* cv_mser_new(int delta,
                                                 area_threshold,
                                                 min_margin,
                                                 edge_blur_size);
-    return reinterpret_cast<CMSER*>(new cv::Ptr<cv::MSER>(result));
+    return new cv::Ptr<cv::MSER>(result);
 }
 
-void cv_mser_drop(CMSER* cmser) {
-    cv::Ptr<cv::MSER>* mser = reinterpret_cast<cv::Ptr<cv::MSER>*>(cmser);
+void cv_mser_drop(cv::Ptr<cv::MSER>* mser) {
     delete mser;
     mser = nullptr;
 }
 
-void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes) {
-    cv::Ptr<cv::MSER>* mser = reinterpret_cast<cv::Ptr<cv::MSER>*>(cmser);
+void cv_mser_detect_regions(cv::Ptr<cv::MSER>* mser, CvMatrix* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes) {
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(image);
     std::vector<std::vector<cv::Point>> msers_vector;
     std::vector<cv::Rect> bboxes_vector;
@@ -630,11 +628,9 @@ void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, CVec<CVec<Point2i>>* 
     vec_rect_cxx_to_c(bboxes_vector, bboxes);
 }
 
-void cv_compare_hist(CvMatrix* first_image, CvMatrix* second_image, int method, Result<double>* result) {
-    cv::Mat* first_mat = reinterpret_cast<cv::Mat*>(first_image);
-    cv::Mat* second_mat = reinterpret_cast<cv::Mat*>(second_image);
-    *result = Result<double>::FromFunction([first_mat, second_mat, method](){
-        return cv::compareHist(*first_mat, *second_mat, method);
+void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result) {
+    *result = Result<double>::FromFunction([first_image, second_image, method](){
+        return cv::compareHist(*first_image, *second_image, method);
     });
 }
 
