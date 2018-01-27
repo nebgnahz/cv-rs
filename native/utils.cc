@@ -1,6 +1,6 @@
 #include "utils.h"
 
-void vec_rect_cxx_to_c(const std::vector<cv::Rect>& cxx_vec_rect, VecRect* vr) {
+void vec_rect_cxx_to_c(const std::vector<cv::Rect>& cxx_vec_rect, CVec<Rect>* vr) {
     size_t num = cxx_vec_rect.size();
     vr->size = num;
     vr->array = (Rect*) malloc(num * sizeof(Rect));
@@ -13,7 +13,7 @@ void vec_rect_cxx_to_c(const std::vector<cv::Rect>& cxx_vec_rect, VecRect* vr) {
 }
 
 void vec_double_cxx_to_c(const std::vector<double>& cxx_vec_double,
-                         VecDouble* vd) {
+                         CVec<double>* vd) {
     size_t num = cxx_vec_double.size();
     vd->size = num;
     vd->array = (double*) malloc(num * sizeof(double));
@@ -21,7 +21,7 @@ void vec_double_cxx_to_c(const std::vector<double>& cxx_vec_double,
 }
 
 void vec_point_cxx_to_c(const std::vector<cv::Point>& cxx_vec_point,
-                        VecPoint* vp) {
+                        CVec<Point2i>* vp) {
     size_t num = cxx_vec_point.size();
     vp->size = num;
     vp->array = (Point2i*) malloc(num * sizeof(Point2i));
@@ -32,10 +32,10 @@ void vec_point_cxx_to_c(const std::vector<cv::Point>& cxx_vec_point,
 }
 
 void vec_points_cxx_to_c(const std::vector<std::vector<cv::Point>> &cxx_vec_points,
-                         VecPoints* vps) {
+                         CVec<CVec<Point2i>>* vps) {
     size_t num = cxx_vec_points.size();
     vps->size = num;
-    vps->array = (VecPoint*) malloc(num * sizeof(VecPoint));
+    vps->array = (CVec<Point2i>*) malloc(num * sizeof(CVec<Point2i>));
     for (size_t i = 0; i < num; i++) {
         vec_point_cxx_to_c(cxx_vec_points[i], &vps->array[i]);
     }

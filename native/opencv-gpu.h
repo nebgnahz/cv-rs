@@ -35,8 +35,8 @@ GpuHog* cv_gpu_hog_new(Size2i win_size, Size2i block_size,
                        Size2i block_stride, Size2i cell_size, int32_t nbins);
 void cv_gpu_hog_drop(GpuHog*);
 void cv_gpu_hog_set_detector(GpuHog*, SvmDetector*);
-void cv_gpu_hog_detect(GpuHog*, GpuMat*, VecRect*);
-void cv_gpu_hog_detect_with_conf(GpuHog*, GpuMat*, VecRect*, VecDouble*);
+void cv_gpu_hog_detect(GpuHog*, GpuMat*, CVec<Rect>*);
+void cv_gpu_hog_detect_with_conf(GpuHog*, GpuMat*, CVec<Rect>*, CVec<double>*);
 
 void cv_gpu_hog_set_gamma_correction(GpuHog*, bool gamma);
 void cv_gpu_hog_set_group_threshold(GpuHog*, int32_t group_threshold);
@@ -62,7 +62,7 @@ Size2i cv_gpu_hog_get_win_stride(GpuHog *);
 typedef struct _GpuCascade GpuCascade;
 GpuCascade* cv_gpu_cascade_new(const char* const filename);
 void cv_gpu_cascade_drop(GpuCascade*);
-void cv_gpu_cascade_detect(GpuCascade*, GpuMat*, VecRect*);
+void cv_gpu_cascade_detect(GpuCascade*, GpuMat*, CVec<Rect>*);
 
 void cv_gpu_cascade_set_find_largest_object(GpuCascade*, bool);
 void cv_gpu_cascade_set_max_num_objects(GpuCascade*, int32_t);

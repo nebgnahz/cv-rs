@@ -475,7 +475,7 @@ void cv_cascade_classifier_drop(CCascadeClassifier* cc) {
 }
 
 void cv_cascade_classifier_detect(CCascadeClassifier* cc, CvMatrix* cmat,
-                                  VecRect* vec_of_rect, double scale_factor,
+                                  CVec<Rect>* vec_of_rect, double scale_factor,
                                   int min_neighbors, int flags, Size2i min_size,
                                   Size2i max_size) {
     cv::CascadeClassifier* cascade =
@@ -535,8 +535,8 @@ void cv_hog_set_svm_detector(HogDescriptor* hog, SvmDetector* detector) {
     cv_hog->setSVMDetector(*cv_detector);
 }
 
-void cv_hog_detect(HogDescriptor* hog, CvMatrix* cmat, VecRect* vec_rect,
-                   VecDouble* vec_weight, Size2i win_stride, Size2i padding,
+void cv_hog_detect(HogDescriptor* hog, CvMatrix* cmat, CVec<Rect>* vec_rect,
+                   CVec<double>* vec_weight, Size2i win_stride, Size2i padding,
                    double scale, double final_threshold, bool use_means_shift) {
     // convert all types
     cv::HOGDescriptor* cv_hog = reinterpret_cast<cv::HOGDescriptor*>(hog);
@@ -618,7 +618,7 @@ void cv_mser_drop(CMSER* cmser) {
     mser = nullptr;
 }
 
-void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, VecRect* bboxes) {
+void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes) {
     cv::Ptr<cv::MSER>* mser = reinterpret_cast<cv::Ptr<cv::MSER>*>(cmser);
     cv::Mat* mat = reinterpret_cast<cv::Mat*>(image);
     std::vector<std::vector<cv::Point>> msers_vector;

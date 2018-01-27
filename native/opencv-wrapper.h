@@ -89,11 +89,6 @@ typedef struct {
     float angle;
 } RotatedRect;
 
-VecType(Rect, VecRect);
-VecType(double, VecDouble);
-VecType(Point2i, VecPoint);
-VecType(VecPoint, VecPoints);
-
 typedef struct {
     int32_t v0;
     int32_t v1;
@@ -242,7 +237,7 @@ void cv_cascade_classifier_drop(CCascadeClassifier* cc);
 
 // vec_of_rect is dynamically allocated, the caller should take ownership of it.
 void cv_cascade_classifier_detect(CCascadeClassifier* cc, CvMatrix* cmat,
-                                  VecRect* vec_of_rect, double scale_factor,
+                                  CVec<Rect>* vec_of_rect, double scale_factor,
                                   int min_neighbors, int flags, Size2i min_size,
                                   Size2i max_size);
 
@@ -255,8 +250,8 @@ typedef struct _HogDescriptor HogDescriptor;
 HogDescriptor* cv_hog_new();
 void cv_hog_drop(HogDescriptor*);
 void cv_hog_set_svm_detector(HogDescriptor*, SvmDetector*);
-void cv_hog_detect(HogDescriptor*, CvMatrix*, VecRect* vec_detected,
-                   VecDouble* vec_weight, Size2i win_stride, Size2i padding,
+void cv_hog_detect(HogDescriptor*, CvMatrix*, CVec<Rect>* vec_detected,
+                   CVec<double>* vec_weight, Size2i win_stride, Size2i padding,
                    double scale, double final_threshold, bool use_means_shift);
 
 // =============================================================================
@@ -282,7 +277,7 @@ CMSER* cv_mser_new(int delta,
                    double min_margin,
                    int edge_blur_size);
 void cv_mser_drop(CMSER* cmser);
-void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, VecPoints* msers, VecRect* bboxes);
+void cv_mser_detect_regions(CMSER* cmser, CvMatrix* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes);
 
 // =============================================================================
 //   Other

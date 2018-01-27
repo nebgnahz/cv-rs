@@ -69,7 +69,7 @@ void cv_gpu_hog_set_detector(GpuHog* hog, SvmDetector* detector) {
     (*cv_hog)->setSVMDetector(*cv_detector);
 }
 
-void cv_gpu_hog_detect(GpuHog* hog, GpuMat* image, VecRect* found) {
+void cv_gpu_hog_detect(GpuHog* hog, GpuMat* image, CVec<Rect>* found) {
     CV_GPU_HOG* cv_hog = reinterpret_cast<CV_GPU_HOG*>(hog);
     cv::cuda::GpuMat* cv_image = reinterpret_cast<cv::cuda::GpuMat*>(image);
     std::vector<cv::Rect> vec_object;
@@ -77,7 +77,7 @@ void cv_gpu_hog_detect(GpuHog* hog, GpuMat* image, VecRect* found) {
     vec_rect_cxx_to_c(vec_object, found);
 }
 
-void cv_gpu_hog_detect_with_conf(GpuHog* hog, GpuMat* image, VecRect* found, VecDouble* conf) {
+void cv_gpu_hog_detect_with_conf(GpuHog* hog, GpuMat* image, CVec<Rect>* found, CVec<double>* conf) {
     CV_GPU_HOG* cv_hog = reinterpret_cast<CV_GPU_HOG*>(hog);
     cv::cuda::GpuMat* cv_image = reinterpret_cast<cv::cuda::GpuMat*>(image);
     std::vector<cv::Rect> vec_object;
@@ -190,7 +190,7 @@ void cv_gpu_cascade_drop(GpuCascade* cascade) {
     cascade_ptr = nullptr;
 }
 
-void cv_gpu_cascade_detect(GpuCascade* cascade, GpuMat* image, VecRect* objects) {
+void cv_gpu_cascade_detect(GpuCascade* cascade, GpuMat* image, CVec<Rect>* objects) {
     GpuCascadePtr* cv_cascade = reinterpret_cast<GpuCascadePtr*>(cascade);
     cv::cuda::GpuMat* cv_image = reinterpret_cast<cv::cuda::GpuMat*>(image);
     cv::cuda::GpuMat objbuf;
