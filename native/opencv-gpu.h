@@ -6,7 +6,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <opencv2/cudaobjdetect.hpp>
-#include "opencv-wrapper.h"
+#include "common.h"
 
 EXTERN_C_BEGIN
 
