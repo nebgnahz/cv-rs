@@ -55,20 +55,20 @@ struct Result
 
     static Result<T> FromFunction(std::function<T()> function)
     {
-        Result<T> result = {};
+        T value;
+        char* error = nullptr;
         try
         {
-            result.value = function();
+            value = function();
         }
         catch( cv::Exception& e )
         {
             const char* err_msg = e.what();
             auto len = std::strlen(err_msg);
-            auto retained_err = new char[len + 1];
-            std::strcpy(retained_err, err_msg);
-            result.error = retained_err;
+            error = new char[len + 1];
+            std::strcpy(error, err_msg);
         }
-        return result;
+        return Result<T>{value: value, error: error};
     }
 };
 

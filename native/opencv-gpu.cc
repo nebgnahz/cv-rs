@@ -152,7 +152,8 @@ Size2i cv_gpu_hog_get_win_stride(cv::Ptr<cv::cuda::HOG>* hog) {
 //   CascadeClassifier
 // =============================================================================
 void* cv_gpu_cascade_new(const char* const filename) {
-    return cv::cuda::CascadeClassifier::create(filename);
+    auto cascade = cv::cuda::CascadeClassifier::create(filename);
+    return new cv::Ptr<cv::cuda::CascadeClassifier>(cascade);
 }
 
 void cv_gpu_cascade_drop(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
