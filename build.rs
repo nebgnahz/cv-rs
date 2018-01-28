@@ -69,7 +69,6 @@ fn main() {
     opencv_config
         .cpp(true)
         .file("native/opencv-wrapper.cc")
-        .file("native/utils.cc")
         .include("native")
         .include(opencv_include());
 

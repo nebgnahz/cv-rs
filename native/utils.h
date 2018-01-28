@@ -9,8 +9,33 @@
 //   Utils
 // =============================================================================
 
-void vec_rect_cxx_to_c(const std::vector<cv::Rect>& cxx_vec_rect, CVec<Rect>* vr);
-void vec_double_cxx_to_c(const std::vector<double>& cxx_vec, CVec<double>* v);
-void vec_point_cxx_to_c(const std::vector<cv::Point>& cxx_vec_point, CVec<Point2i>* vp);
-void vec_points_cxx_to_c(const std::vector<std::vector<cv::Point>>& cxx_vec_points, CVec<CVec<Point2i>>* vps);
+void cv_to_ffi(const cv::Rect& source, Rect* dest){
+    dest->x = source.x;
+    dest->y = source.y;
+    dest->width = source.width;
+    dest->height = source.height;
+}
+
+void cv_to_ffi(const cv::Point& source, Point2i* dest){
+    dest->x = source.x;
+    dest->y = source.y;
+};
+
+void cv_to_ffi(const std::vector<double>& source, CVec<double>* dest) {
+    size_t num = source.size();
+    dest->size = num;
+    dest->array = (double*) malloc(num * sizeof(double));
+    ::memcpy(dest->array, source.data(), num * sizeof(double));
+}
+
+template <typename T, typename U>
+void cv_to_ffi(const std::vector<T>& source, CVec<U>* dest)
+{
+    size_t num = source.size();
+    dest->size = num;
+    dest->array = (U*) malloc(num * sizeof(U));
+    for (size_t i = 0; i < num; i++) {
+        cv_to_ffi(source[i], &dest->array[i]);
+    }
+}
 #endif  // UTILS_H_

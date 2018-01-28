@@ -474,8 +474,8 @@ void cv_hog_detect(cv::HOGDescriptor* hog, cv::Mat* image, CVec<Rect>* vec_rect,
                              use_means_shift);
 
     // Prepare the results
-    vec_rect_cxx_to_c(objects, vec_rect);
-    vec_double_cxx_to_c(weights, vec_weight);
+    cv_to_ffi(objects, vec_rect);
+    cv_to_ffi(weights, vec_weight);
 }
 
 // =============================================================================
@@ -539,8 +539,8 @@ void cv_mser_detect_regions(cv::Ptr<cv::MSER>* mser, cv::Mat* image, CVec<CVec<P
 
     mser->get()->detectRegions(*image, msers_vector, bboxes_vector);
 
-    vec_points_cxx_to_c(msers_vector, msers);
-    vec_rect_cxx_to_c(bboxes_vector, bboxes);
+    cv_to_ffi(msers_vector, msers);
+    cv_to_ffi(bboxes_vector, bboxes);
 }
 
 void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result) {

@@ -60,7 +60,7 @@ void cv_gpu_hog_set_detector(cv::Ptr<cv::cuda::HOG>* hog, std::vector<float>* de
 void cv_gpu_hog_detect(cv::Ptr<cv::cuda::HOG>* hog, cv::cuda::GpuMat* image, CVec<Rect>* found) {
     std::vector<cv::Rect> vec_object;
     (*hog)->detectMultiScale(*image, vec_object);
-    vec_rect_cxx_to_c(vec_object, found);
+    cv_to_ffi(vec_object, found);
 }
 
 void cv_gpu_hog_detect_with_conf(cv::Ptr<cv::cuda::HOG>* hog, cv::cuda::GpuMat* image, CVec<Rect>* found, CVec<double>* conf) {
@@ -68,8 +68,8 @@ void cv_gpu_hog_detect_with_conf(cv::Ptr<cv::cuda::HOG>* hog, cv::cuda::GpuMat* 
     std::vector<double> vec_confidences;
     (*hog)->setGroupThreshold(0);
     (*hog)->detectMultiScale(*image, vec_object, &vec_confidences);
-    vec_rect_cxx_to_c(vec_object, found);
-    vec_double_cxx_to_c(vec_confidences, conf);
+    cv_to_ffi(vec_object, found);
+    cv_to_ffi(vec_confidences, conf);
 }
 
 void cv_gpu_hog_set_gamma_correction(cv::Ptr<cv::cuda::HOG>* hog, bool gamma) {
@@ -167,7 +167,7 @@ void cv_gpu_cascade_detect(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, cv::cu
     (*cascade)->detectMultiScale(*image, objbuf);
     (*cascade)->convert(objbuf, vec_object);
 
-    vec_rect_cxx_to_c(vec_object, objects);
+    cv_to_ffi(vec_object, objects);
 }
 
 void cv_gpu_cascade_set_find_largest_object(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, bool value) {
