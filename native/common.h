@@ -68,7 +68,7 @@ struct Result
             error = new char[len + 1];
             std::strcpy(error, err_msg);
         }
-        return Result<T>{value: value, error: error};
+        return Result<T>{value, error};
     }
 };
 
