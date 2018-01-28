@@ -1,42 +1,38 @@
+#ifndef UTILS_H_
+#define UTILS_H_
+
+#include <vector>
+#include <opencv2/core.hpp>
+#include "common.h"
 #include "utils.h"
 
-void vec_rect_cxx_to_c(const std::vector<cv::Rect>& cxx_vec_rect, VecRect* vr) {
-    size_t num = cxx_vec_rect.size();
-    vr->size = num;
-    vr->array = (Rect*) malloc(num * sizeof(Rect));
-    for (size_t i = 0; i < num; i++) {
-        vr->array[i].x = cxx_vec_rect[i].x;
-        vr->array[i].y = cxx_vec_rect[i].y;
-        vr->array[i].width = cxx_vec_rect[i].width;
-        vr->array[i].height = cxx_vec_rect[i].height;
-    }
+void cv_to_ffi(const cv::Rect& source, Rect* dest){
+    dest->x = source.x;
+    dest->y = source.y;
+    dest->width = source.width;
+    dest->height = source.height;
 }
 
-void vec_double_cxx_to_c(const std::vector<double>& cxx_vec_double,
-                         VecDouble* vd) {
-    size_t num = cxx_vec_double.size();
-    vd->size = num;
-    vd->array = (double*) malloc(num * sizeof(double));
-    ::memcpy(vd->array, cxx_vec_double.data(), num * sizeof(double));
+void cv_to_ffi(const cv::Point& source, Point2i* dest){
+    dest->x = source.x;
+    dest->y = source.y;
+};
+
+void cv_to_ffi(const std::vector<double>& source, CVec<double>* dest) {
+    size_t num = source.size();
+    dest->size = num;
+    dest->array = (double*) malloc(num * sizeof(double));
+    ::memcpy(dest->array, source.data(), num * sizeof(double));
 }
 
-void vec_point_cxx_to_c(const std::vector<cv::Point>& cxx_vec_point,
-                        VecPoint* vp) {
-    size_t num = cxx_vec_point.size();
-    vp->size = num;
-    vp->array = (Point2i*) malloc(num * sizeof(Point2i));
+template <typename T, typename U>
+void cv_to_ffi(const std::vector<T>& source, CVec<U>* dest)
+{
+    size_t num = source.size();
+    dest->size = num;
+    dest->array = (U*) malloc(num * sizeof(U));
     for (size_t i = 0; i < num; i++) {
-        vp->array[i].x = cxx_vec_point[i].x;
-        vp->array[i].y = cxx_vec_point[i].y;
+        cv_to_ffi(source[i], &dest->array[i]);
     }
 }
-
-void vec_points_cxx_to_c(const std::vector<std::vector<cv::Point>> &cxx_vec_points,
-                         VecPoints* vps) {
-    size_t num = cxx_vec_points.size();
-    vps->size = num;
-    vps->array = (VecPoint*) malloc(num * sizeof(VecPoint));
-    for (size_t i = 0; i < num; i++) {
-        vec_point_cxx_to_c(cxx_vec_points[i], &vps->array[i]);
-    }
-}
+#endif

@@ -3,14 +3,20 @@
 
 #include <vector>
 #include <opencv2/core.hpp>
-#include "opencv-wrapper.h"
+#include "common.h"
 
-// =============================================================================
-//   Utils
-// =============================================================================
+void cv_to_ffi(const cv::Rect& source, Rect* dest);
+void cv_to_ffi(const cv::Point& source, Point2i* dest);
+void cv_to_ffi(const std::vector<double>& source, CVec<double>* dest);
 
-void vec_rect_cxx_to_c(const std::vector<cv::Rect>& cxx_vec_rect, VecRect* vr);
-void vec_double_cxx_to_c(const std::vector<double>& cxx_vec, VecDouble* v);
-void vec_point_cxx_to_c(const std::vector<cv::Point>& cxx_vec_point, VecPoint* vp);
-void vec_points_cxx_to_c(const std::vector<std::vector<cv::Point>> &cxx_vec_points, VecPoints* vps);
+template <typename T, typename U>
+void cv_to_ffi(const std::vector<T>& source, CVec<U>* dest)
+{
+    size_t num = source.size();
+    dest->size = num;
+    dest->array = (U*) malloc(num * sizeof(U));
+    for (size_t i = 0; i < num; i++) {
+        cv_to_ffi(source[i], &dest->array[i]);
+    }
+}
 #endif  // UTILS_H_

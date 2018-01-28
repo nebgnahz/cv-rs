@@ -35,6 +35,7 @@ pub use core::Scalar;
 pub use core::Size2f;
 pub use core::Size2i;
 
+use std::mem;
 use std::os::raw::{c_char, c_void};
 
 pub mod errors;
@@ -78,5 +79,17 @@ impl<T: Copy> Drop for CResult<T> {
         if !self.error.is_null() {
             unsafe { c_drop(self.error as *mut c_void) }
         }
+    }
+}
+
+impl<T: Copy> CResult<T> {
+    pub fn from_callback<F: FnOnce(*mut CResult<T>)>(func: F) -> CResult<T> {
+        let mut result: CResult<T>;
+        unsafe {
+            result = mem::uninitialized();
+            let result_ref: *mut CResult<T> = &mut result;
+            func(result_ref);
+        };
+        result
     }
 }
