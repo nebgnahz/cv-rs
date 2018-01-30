@@ -44,6 +44,24 @@ pub struct Mat {
 // https://github.com/rust-lang/rust/issues/27730
 unsafe impl Send for Mat {}
 
+/// Data structure for salient point detectors
+#[derive(Default, Debug, Clone, Copy)]
+#[repr(C)]
+pub struct KeyPoint {
+    /// Coordinates of the keypoint
+    pub point: Point2f,
+    /// Diameter of the meaningful keypoint neighborhood
+    pub size: f32,
+    /// Computed orientation of the keypoint (-1 if not applicable); it's in [0,360) degrees and measured relative to image coordinate system, ie in clockwise.
+    pub angle: f32,
+    /// The response by which the most strong keypoints have been selected. Can be used for the further sorting or subsampling
+    pub response: f32,
+    /// Octave (pyramid layer) from which the keypoint has been extracted
+    pub octave: i32,
+    /// Object class (if the keypoints need to be clustered by an object they belong to)
+    pub class_id: i32,
+}
+
 /// A 4-element struct that is widely used to pass pixel values.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]

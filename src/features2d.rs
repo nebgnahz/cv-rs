@@ -3,7 +3,6 @@ use super::core::*;
 use std::os::raw::*;
 
 enum CMSER {}
-enum CKeyPoint {}
 
 extern "C" {
     fn cv_mser_new(
@@ -28,10 +27,17 @@ extern "C" {
     fn cv_detect_and_compute(
         cmser: *const CMSER,
         image: *const CMat,
-        keypoints: *mut CVec<CKeyPoint>,
+        mask: *const CMat,
+        keypoints: *mut CVec<KeyPoint>,
         descriptors: *mut CMat,
         use_provided_keypoints: bool
     );
+}
+
+/// Basic trait for 2D image feature detectors and descriptor extractors
+pub trait Feature2D {
+    /// Detects keypoints and computes the descriptors
+    fn detect_and_compute(&self, image: &Mat, mask: &Mat) -> (Vec<KeyPoint>, Mat);
 }
 
 /// Maximally stable extremal region extractor.
@@ -79,6 +85,17 @@ impl MSER {
         let msers = msers.unpack();
         let boxes = bboxes.unpack();
         (msers, boxes)
+    }
+}
+
+impl Feature2D for MSER {
+    fn detect_and_compute(&self, image: &Mat, mask: &Mat) -> (Vec<KeyPoint>, Mat) {
+        let mut keypoints = CVec::<KeyPoint>::default();
+        let descriptors = Mat::new();
+        unsafe {
+            cv_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors.inner, false);
+        }
+        (keypoints.unpack(), descriptors)
     }
 }
 
