@@ -46,6 +46,15 @@ typedef struct {
     size_t size;
 } ImencodeResult;
 
+typedef struct {
+    Point2f pt;
+    float size;
+    float angle;
+    float response;
+    int octave;
+    int class_id;
+} KeyPoint;
+
 // Caller is responsible for disposing `error` field
 template<typename T>
 struct Result

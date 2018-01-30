@@ -184,6 +184,7 @@ void* cv_mser_new(int delta,
                   int edge_blur_size);
 void cv_mser_drop(cv::Ptr<cv::MSER>* mser);
 void cv_mser_detect_regions(cv::Ptr<cv::MSER>* mser, cv::Mat* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes);
+void cv_detect_and_compute(cv::Ptr<cv::MSER>* mser, cv::Mat* image,  cv::Mat* mask, CVec<KeyPoint>* keypoints, cv::Mat* descriptors, bool useProvidedKeypoints);
 
 // =============================================================================
 //   Other

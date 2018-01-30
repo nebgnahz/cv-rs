@@ -1,19 +1,21 @@
 //! Provide the type that encapsulates all the parameters of the MSER extraction algorithm
 use super::core::*;
+use std::os::raw::*;
 
 enum CMSER {}
+enum CKeyPoint {}
 
 extern "C" {
     fn cv_mser_new(
-        delta: i32,
-        min_area: i32,
-        max_area: i32,
-        max_variation: f64,
-        min_diversity: f64,
-        max_evolution: i32,
-        area_threshold: f64,
-        min_margin: f64,
-        edge_blur_size: i32,
+        delta: c_int,
+        min_area: c_int,
+        max_area: c_int,
+        max_variation: c_double,
+        min_diversity: c_double,
+        max_evolution: c_int,
+        area_threshold: c_double,
+        min_margin: c_double,
+        edge_blur_size: c_int,
     ) -> *mut CMSER;
     fn cv_mser_drop(cmser: *mut CMSER);
     fn cv_mser_detect_regions(
@@ -21,6 +23,14 @@ extern "C" {
         image: *const CMat,
         msers: *mut CVec<CVec<Point2i>>,
         bboxes: *mut CVec<Rect>,
+    );
+    // void cv_detect_and_compute(cv::Ptr<cv::MSER>* mser, cv::Mat* image,  cv::Mat* mask, CVec<cv::KeyPoint>* keypoints, Mat* descriptors, bool use_provided_keypoints)
+    fn cv_detect_and_compute(
+        cmser: *const CMSER,
+        image: *const CMat,
+        keypoints: *mut CVec<CKeyPoint>,
+        descriptors: *mut CMat,
+        use_provided_keypoints: bool
     );
 }
 

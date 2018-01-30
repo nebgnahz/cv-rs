@@ -543,6 +543,12 @@ void cv_mser_detect_regions(cv::Ptr<cv::MSER>* mser, cv::Mat* image, CVec<CVec<P
     cv_to_ffi(bboxes_vector, bboxes);
 }
 
+void cv_detect_and_compute(cv::Ptr<cv::MSER>* mser, cv::Mat* image,  cv::Mat* mask, CVec<KeyPoint>* keypoints, cv::Mat* descriptors, bool useProvidedKeypoints) {
+    std::vector<cv::KeyPoint> keypoints_vector;
+    mser->get()->detectAndCompute(*image, *mask, keypoints_vector, *descriptors, useProvidedKeypoints);
+    cv_to_ffi(keypoints_vector, keypoints);
+}
+
 void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result) {
     *result = Result<double>::FromFunction([first_image, second_image, method](){
         return cv::compareHist(*first_image, *second_image, method);
