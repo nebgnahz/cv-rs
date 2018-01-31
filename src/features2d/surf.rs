@@ -1,7 +1,7 @@
 //! Provide the type that encapsulates all the parameters of the MSER extraction algorithm
+use super::*;
 use core::*;
 use std::os::raw::*;
-use super::*;
 
 enum CSURF {}
 
@@ -11,16 +11,16 @@ extern "C" {
         octaves: c_int,
         octave_layers: c_int,
         extended: bool,
-        upright: bool
+        upright: bool,
     ) -> *mut CSURF;
     fn cv_surf_drop(cmser: *mut CSURF);
-    fn cv_surf_detect_and_compute (
+    fn cv_surf_detect_and_compute(
         detector: *const CSURF,
         image: *const CMat,
         mask: *const CMat,
         keypoints: *mut CVec<KeyPoint>,
         descriptors: *mut CMat,
-        use_provided_keypoints: bool
+        use_provided_keypoints: bool,
     );
 }
 
@@ -32,22 +32,8 @@ pub struct SURF {
 
 impl SURF {
     /// Creates a new maximally stable extremal region extractor criteria.
-    pub fn new(
-        hessian_threshold: f64,
-        octaves: i32,
-        octave_layers: i32,
-        extended: bool,
-        upright: bool
-    ) -> Self {
-        let surf = unsafe {
-            cv_surf_new(
-                hessian_threshold,
-                octaves,
-                octave_layers,
-                extended,
-                upright
-            )
-        };
+    pub fn new(hessian_threshold: f64, octaves: i32, octave_layers: i32, extended: bool, upright: bool) -> Self {
+        let surf = unsafe { cv_surf_new(hessian_threshold, octaves, octave_layers, extended, upright) };
         SURF { value: surf }
     }
 }
@@ -67,7 +53,7 @@ pub struct SURFBuilder {
     octaves: Option<i32>,
     octave_layers: Option<i32>,
     extended: Option<bool>,
-    upright: Option<bool>
+    upright: Option<bool>,
 }
 
 impl SURFBuilder {
@@ -119,7 +105,14 @@ impl Feature2D for SURF {
         let mut keypoints = CVec::<KeyPoint>::default();
         let descriptors = unsafe { cv_mat_new() };
         unsafe {
-            cv_surf_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
+            cv_surf_detect_and_compute(
+                self.value,
+                image.inner,
+                mask.inner,
+                &mut keypoints,
+                descriptors,
+                false,
+            );
         }
         (keypoints.unpack(), Mat::from_raw(descriptors))
     }

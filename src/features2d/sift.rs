@@ -1,26 +1,26 @@
 //! Provide the type that encapsulates all the parameters of the MSER extraction algorithm
+use super::*;
 use core::*;
 use std::os::raw::*;
-use super::*;
 
 enum CSIFT {}
 
 extern "C" {
     fn cv_sift_new(
-        features : c_int,
+        features: c_int,
         octave_layers: c_int,
-        contrast_threshold : c_double,
-        edge_threshold  : c_double,
-        sigma : c_double,
+        contrast_threshold: c_double,
+        edge_threshold: c_double,
+        sigma: c_double,
     ) -> *mut CSIFT;
     fn cv_sift_drop(cmser: *mut CSIFT);
-    fn cv_sift_detect_and_compute (
+    fn cv_sift_detect_and_compute(
         detector: *const CSIFT,
         image: *const CMat,
         mask: *const CMat,
         keypoints: *mut CVec<KeyPoint>,
         descriptors: *mut CMat,
-        use_provided_keypoints: bool
+        use_provided_keypoints: bool,
     );
 }
 
@@ -32,20 +32,14 @@ pub struct SIFT {
 
 impl SIFT {
     /// Creates a new maximally stable extremal region extractor criteria.
-    pub fn new(
-        features : i32,
-        octave_layers: i32,
-        contrast_threshold : f64,
-        edge_threshold  : f64,
-        sigma : f64,
-    ) -> Self {
+    pub fn new(features: i32, octave_layers: i32, contrast_threshold: f64, edge_threshold: f64, sigma: f64) -> Self {
         let sift = unsafe {
             cv_sift_new(
                 features,
                 octave_layers,
                 contrast_threshold,
                 edge_threshold,
-                sigma
+                sigma,
             )
         };
         SIFT { value: sift }
@@ -63,11 +57,11 @@ impl Drop for SIFT {
 /// Builder that provides defaults for MSER
 #[derive(Debug, Copy, Clone, Default)]
 pub struct SIFTBuilder {
-    features : Option<i32>,
+    features: Option<i32>,
     octave_layers: Option<i32>,
-    contrast_threshold : Option<f64>,
-    edge_threshold  : Option<f64>,
-    sigma : Option<f64>,
+    contrast_threshold: Option<f64>,
+    edge_threshold: Option<f64>,
+    sigma: Option<f64>,
 }
 
 impl SIFTBuilder {
@@ -119,7 +113,14 @@ impl Feature2D for SIFT {
         let mut keypoints = CVec::<KeyPoint>::default();
         let descriptors = unsafe { cv_mat_new() };
         unsafe {
-            cv_sift_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
+            cv_sift_detect_and_compute(
+                self.value,
+                image.inner,
+                mask.inner,
+                &mut keypoints,
+                descriptors,
+                false,
+            );
         }
         (keypoints.unpack(), Mat::from_raw(descriptors))
     }
