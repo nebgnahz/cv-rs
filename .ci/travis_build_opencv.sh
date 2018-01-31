@@ -34,7 +34,7 @@ if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
         -D BUILD_opencv_python2=OFF \
         -D BUILD_opencv_python3=OFF \
         -D CMAKE_INSTALL_PREFIX=$HOME/usr \
-        -D CMAKE_BUILD_TYPE=Release
+        -D CMAKE_BUILD_TYPE=Release \
         -D OPENCV_EXTRA_MODULES_PATH=$OPENCV_CONTRIB_DIR/modules \
         -D CUDA_ARCH_BIN=5.2 \
         -D CUDA_ARCH_PTX="" \
