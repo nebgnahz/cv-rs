@@ -36,9 +36,9 @@ if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
         -D CMAKE_INSTALL_PREFIX=$HOME/usr \
         -D CMAKE_BUILD_TYPE=Release
         -D OPENCV_EXTRA_MODULES_PATH=$OPENCV_CONTRIB_DIR/modules \
-        ..
         -D CUDA_ARCH_BIN=5.2 \
         -D CUDA_ARCH_PTX="" \
+        ..
     make -j4
     make install && touch $HOME/usr/installed-${OPENCV_VERSION}
     popd
