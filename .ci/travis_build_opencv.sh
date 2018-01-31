@@ -25,20 +25,20 @@ if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
 
     pushd $OPENCV_DIR/build
     cmake \
-        -DWITH_CUDA=ON \
-        -DBUILD_EXAMPLES=OFF \
-        -DBUILD_TESTS=OFF \
-        -DBUILD_PERF_TESTS=OFF  \
-        -DBUILD_opencv_java=OFF \
-        -DBUILD_opencv_python=OFF \
-        -DBUILD_opencv_python2=OFF \
-        -DBUILD_opencv_python3=OFF \
-        -DCMAKE_INSTALL_PREFIX=$HOME/usr \
-        -DCUDA_ARCH_BIN=5.2 \
-        -DCUDA_ARCH_PTX="" \
-        -DCMAKE_BUILD_TYPE=Release
-        -DOPENCV_EXTRA_MODULES_PATH=$OPENCV_CONTRIB_DIR/modules \
-        $OPENCV_DIR
+        -D WITH_CUDA=ON \
+        -D BUILD_EXAMPLES=OFF \
+        -D BUILD_TESTS=OFF \
+        -D BUILD_PERF_TESTS=OFF  \
+        -D BUILD_opencv_java=OFF \
+        -D BUILD_opencv_python=OFF \
+        -D BUILD_opencv_python2=OFF \
+        -D BUILD_opencv_python3=OFF \
+        -D CMAKE_INSTALL_PREFIX=$HOME/usr \
+        -D CUDA_ARCH_BIN=5.2 \
+        -D CUDA_ARCH_PTX="" \
+        -D CMAKE_BUILD_TYPE=Release
+        -D OPENCV_EXTRA_MODULES_PATH=$OPENCV_CONTRIB_DIR/modules \
+        ..
     make -j4
     make install && touch $HOME/usr/installed-${OPENCV_VERSION}
     popd
