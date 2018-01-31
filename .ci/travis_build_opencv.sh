@@ -38,7 +38,7 @@ if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
         -DCUDA_ARCH_PTX="" \
         -DCMAKE_BUILD_TYPE=Release
         -DOPENCV_EXTRA_MODULES_PATH=$OPENCV_CONTRIB_DIR/modules \
-        ..
+        $OPENCV_DIR
     make -j4
     make install && touch $HOME/usr/installed-${OPENCV_VERSION}
     popd
