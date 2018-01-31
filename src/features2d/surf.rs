@@ -1,6 +1,7 @@
 //! Provide the type that encapsulates all the parameters of the MSER extraction algorithm
 use core::*;
 use std::os::raw::*;
+use super::*;
 
 enum CSURF {}
 
@@ -21,12 +22,6 @@ extern "C" {
         descriptors: *mut CMat,
         use_provided_keypoints: bool
     );
-}
-
-/// Basic trait for 2D image feature detectors and descriptor extractors
-pub trait Feature2D {
-    /// Detects keypoints and computes the descriptors
-    fn detect_and_compute(&self, image: &Mat, mask: &Mat) -> (Vec<KeyPoint>, Mat);
 }
 
 /// Speeded up robust features extractor.

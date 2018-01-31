@@ -574,6 +574,31 @@ void cv_surf_detect_and_compute(cv::Ptr<cv::xfeatures2d::SURF>* detector, cv::Ma
     cv_to_ffi(keypoints_vector, keypoints);
 }
 
+void *cv_sift_new(int nfeatures,
+                  int nOctaveLayers,
+                  double contrastThreshold,
+                  double edgeThreshold,
+                  double sigma
+) {
+    auto result = cv::xfeatures2d::SIFT::create(nfeatures,
+                                                nOctaveLayers,
+                                                contrastThreshold,
+                                                edgeThreshold,
+                                                sigma);
+    return new cv::Ptr<cv::xfeatures2d::SIFT>(result);
+}
+void cv_sift_drop(cv::Ptr <cv::xfeatures2d::SIFT> *detector) {
+    delete detector;
+    detector = nullptr;
+}
+
+void cv_sift_detect_and_compute(cv::Ptr <cv::xfeatures2d::SIFT> *detector, cv::Mat *image, cv::Mat *mask,
+                                CVec<KeyPoint> *keypoints, cv::Mat *descriptors, bool useProvidedKeypoints) {
+    std::vector <cv::KeyPoint> keypoints_vector;
+    detector->get()->detectAndCompute(*image, *mask, keypoints_vector, *descriptors, useProvidedKeypoints);
+    cv_to_ffi(keypoints_vector, keypoints);
+}
+
 void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result) {
     *result = Result<double>::FromFunction([first_image, second_image, method](){
         return cv::compareHist(*first_image, *second_image, method);

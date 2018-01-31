@@ -188,7 +188,7 @@ void cv_mser_detect_regions(cv::Ptr<cv::MSER>* detector, cv::Mat* image, CVec<CV
 void cv_mser_detect_and_compute(cv::Ptr<cv::MSER>* detector, cv::Mat* image,  cv::Mat* mask, CVec<KeyPoint>* keypoints, cv::Mat* descriptors, bool useProvidedKeypoints);
 
 // =============================================================================
-//   MSER
+//   SURF
 // =============================================================================
 
 void* cv_surf_new(double hessianThreshold,
@@ -199,6 +199,21 @@ void* cv_surf_new(double hessianThreshold,
 );
 void cv_surf_drop(cv::Ptr <cv::xfeatures2d::SURF> *detector);
 void cv_surf_detect_and_compute(cv::Ptr<cv::xfeatures2d::SURF>* detector, cv::Mat* image,  cv::Mat* mask, CVec<KeyPoint>* keypoints, cv::Mat* descriptors, bool useProvidedKeypoints);
+
+
+// =============================================================================
+//   SIFT
+// =============================================================================
+
+void *cv_sift_new(int nfeatures,
+                  int nOctaveLayers,
+                  double contrastThreshold,
+                  double edgeThreshold,
+                  double sigma
+);
+void cv_sift_drop(cv::Ptr <cv::xfeatures2d::SIFT> *detector);
+void cv_sift_detect_and_compute(cv::Ptr <cv::xfeatures2d::SIFT> *detector, cv::Mat *image, cv::Mat *mask,
+                                CVec<KeyPoint> *keypoints, cv::Mat *descriptors, bool useProvidedKeypoints);
 
 // =============================================================================
 //   Other
