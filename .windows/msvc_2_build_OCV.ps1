@@ -57,11 +57,13 @@ mkdir $OPENCV_DIR -ErrorAction SilentlyContinue
 $oldErrorAction = $ErrorActionPreference
 $ErrorActionPreference = "SilentlyContinue"
 git clone -b $OPENCV_VERSION_TAG --depth 1 https://github.com/opencv/opencv.git
+git clone -b $OPENCV_VERSION_TAG --depth 1 https://github.com/opencv/opencv_contrib.git
 $ErrorActionPreference = $oldErrorAction
 
 Push-Location -Path $OPENCV_BUILD_DIR
-Write-Host "cmake -G $CMAKE_CONFIG_GENERATOR -DCMAKE_INSTALL_PREFIX=$OPENCV_DIR -DCMAKE_BUILD_TYPE=Release $REPO_LOCATION $CMAKE_OPTIONS"
-cmake -G $CMAKE_CONFIG_GENERATOR "-DCMAKE_INSTALL_PREFIX=$OPENCV_DIR" -DCMAKE_BUILD_TYPE=Release $REPO_LOCATION @CMAKE_OPTIONS
+$CMakeArgs = $CMAKE_OPTIONS + ("-DCMAKE_INSTALL_PREFIX=$OPENCV_DIR", "-DCMAKE_BUILD_TYPE=Release", "-DOPENCV_EXTRA_MODULES_PATH=$pwd\opencv_contrib\modules", $REPO_LOCATION)
+Write-Host "cmake -G $CMAKE_CONFIG_GENERATOR $CMakeArgs"
+cmake -G $CMAKE_CONFIG_GENERATOR $CMakeArgs
 if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }
 cmake --build .  --target install --config release
 if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }

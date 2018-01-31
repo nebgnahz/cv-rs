@@ -23,15 +23,17 @@ extern "C" {
         msers: *mut CVec<CVec<Point2i>>,
         bboxes: *mut CVec<Rect>,
     );
-    // void cv_detect_and_compute(cv::Ptr<cv::MSER>* mser, cv::Mat* image,  cv::Mat* mask, CVec<cv::KeyPoint>* keypoints, Mat* descriptors, bool use_provided_keypoints)
-    fn cv_detect_and_compute(
-        cmser: *const CMSER,
-        image: *const CMat,
-        mask: *const CMat,
-        keypoints: *mut CVec<KeyPoint>,
-        descriptors: *mut CMat,
-        use_provided_keypoints: bool
-    );
+
+
+
+//    fn cv_detect_and_compute(
+//        cmser: *const CMSER,
+//        image: *const CMat,
+//        mask: *const CMat,
+//        keypoints: *mut CVec<KeyPoint>,
+//        descriptors: *mut CMat,
+//        use_provided_keypoints: bool
+//    );
 }
 
 /// Basic trait for 2D image feature detectors and descriptor extractors
@@ -88,16 +90,17 @@ impl MSER {
     }
 }
 
-impl Feature2D for MSER {
-    fn detect_and_compute(&self, image: &Mat, mask: &Mat) -> (Vec<KeyPoint>, Mat) {
-        let mut keypoints = CVec::<KeyPoint>::default();
-        let descriptors = Mat::new();
-        unsafe {
-            cv_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors.inner, false);
-        }
-        (keypoints.unpack(), descriptors)
-    }
-}
+//impl Feature2D for MSER {
+//    #[deprecated(note = "detect_and_compute is not implemented in OpenCV at this moment")]
+//    fn detect_and_compute(&self, image: &Mat, mask: &Mat) -> (Vec<KeyPoint>, Mat) {
+//        let mut keypoints = CVec::<KeyPoint>::default();
+//        let descriptors = Mat::new();
+//        unsafe {
+//            cv_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors.inner, false);
+//        }
+//        (keypoints.unpack(), descriptors)
+//    }
+//}
 
 impl Drop for MSER {
     fn drop(&mut self) {
