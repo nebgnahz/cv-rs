@@ -325,7 +325,7 @@ pub enum LineTypes {
 }
 
 extern "C" {
-    fn cv_mat_new() -> *mut CMat;
+    pub (crate) fn cv_mat_new() -> *mut CMat;
     fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: i32) -> *mut CMat;
     fn cv_mat_zeros(rows: c_int, cols: c_int, t: i32) -> *mut CMat;
     fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: i32, buffer: *const c_uchar) -> *mut CMat;

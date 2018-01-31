@@ -556,7 +556,7 @@ void* cv_surf_new(double hessianThreshold,
                   bool extended,
                   bool upright
 ) {
-    cv::Ptr<cv::xfeatures2d::SURF> result = cv::xfeatures2d::SURF::create(hessianThreshold,
+    auto result = cv::xfeatures2d::SURF::create(hessianThreshold,
                                                 nOctaves,
                                                 nOctaveLayers,
                                                 extended,

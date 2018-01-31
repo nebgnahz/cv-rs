@@ -14,15 +14,14 @@ fn mser_lenna_detect() {
     assert_ne!(boxes.len(), 0);
 }
 
-// detect_and_compute is not working for MSER atm
-//#[test]
-//#[should_panic]
-//fn mser_lenna_detect_and_compute() {
-//    let lenna = load_lenna();
-//    let mask = Mat::new();
-//    let mser: MSER = MSERBuilder::default().into();
-//    let (keypoints, descriptors) = mser.detect_and_compute(&lenna, &mask);
-//    assert_ne!(keypoints.len(), 0);
-//    assert_ne!(descriptors.rows, 0);
-//    assert_ne!(descriptors.cols, 0);
-//}
+#[test]
+fn surf_lenna_detect_and_compute() {
+    let lenna = load_lenna();
+    let mask = Mat::new();
+    let mser: SURF = SURFBuilder::default().into();
+    let (keypoints, descriptors) = mser.detect_and_compute(&lenna, &mask);
+    assert_ne!(keypoints.len(), 0);
+    assert_ne!(descriptors.rows, 0);
+    assert_ne!(descriptors.cols, 0);
+    assert_eq!(keypoints.len() as i32, descriptors.rows);
+}
