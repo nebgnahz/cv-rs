@@ -1,6 +1,6 @@
 env:
   global:
-    - MAKEFLAGS="-j 2"
+    - MAKEFLAGS="-j 4"
 sudo: required
 dist: trusty
 
