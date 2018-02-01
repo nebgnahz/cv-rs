@@ -5,8 +5,6 @@ OPENCV_VERSION=${OPENCV_VERSION:-3.4.0}
 URL=https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
 URL_CONTRUB=https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
 
-rm -rf "$HOME/usr/installed-${OPENCV_VERSION}"
-
 if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
     TMP=$(mktemp -d)
     OPENCV_DIR="$(pwd)/opencv-${OPENCV_VERSION}"
