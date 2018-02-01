@@ -44,9 +44,5 @@ if [[ ! -e INSTALL_DIR ]]; then
     touch $HOME/fresh-cache
 fi
 
-pushd $INSTALL_DIR/include/opencv2
-ls
-popd
-
 sudo cp -r $HOME/usr/include/* /usr/local/include/
 sudo cp -r $HOME/usr/lib/* /usr/local/lib/
