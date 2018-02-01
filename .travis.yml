@@ -10,7 +10,10 @@ rust:
 
 addons:
   apt:
+    sources:
+    - http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/
     packages:
+    - cuda
     - build-essential
     - cmake
     - git
@@ -31,7 +34,7 @@ addons:
 
 before_install:
   - export PATH="$PATH:$HOME/.cargo/bin"
-  - sudo -E ./.ci/install_cuda.sh
+  # - sudo -E ./.ci/install_cuda.sh
   - sudo -E ./.ci/travis_build_opencv.sh
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
   - rustup component add rustfmt-preview
