@@ -38,7 +38,7 @@ before_install:
 
 script:
   - cargo build --no-default-features
-  - cargo test --no-default-features
+  # - cargo test --no-default-features
   # - cargo build --features gpu
   # - cargo doc --features gpu --no-deps
   # - find src/*.rs | xargs rustfmt --write-mode=diff

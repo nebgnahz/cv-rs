@@ -44,7 +44,7 @@ if [[ ! -e INSTALL_DIR ]]; then
     touch $HOME/fresh-cache
 fi
 
-pushd INSTALL_DIR/include/opencv2
+pushd $INSTALL_DIR/include/opencv2
 ls
 popd
 
