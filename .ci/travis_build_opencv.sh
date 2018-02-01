@@ -4,6 +4,10 @@ set -eux -o pipefail
 OPENCV_VERSION=${OPENCV_VERSION:-3.4.0}
 URL=https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
 URL_CONTRUB=https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
+rf -rf "$HOME/usr/installed-${OPENCV_VERSION}"
+rf -rm "opencv-${OPENCV_VERSION}"
+rf -rm "opencv"
+rf -rm "opencv_contrib"
 
 if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
     TMP=$(mktemp -d)
