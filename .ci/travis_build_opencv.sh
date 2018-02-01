@@ -38,9 +38,13 @@ if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
         -D CUDA_ARCH_PTX="" \
         ..
     make -j4
-    make install && touch $HOME/usr/installed-${OPENCV_VERSION}
+    make install && touch $OPENCV_CONTRIB_DIR
     popd
     touch $HOME/fresh-cache
+
+    pushd $OPENCV_CONTRIB_DIR/include/opencv2
+    ls
+    popd
 fi
 
 sudo cp -r $HOME/usr/include/* /usr/local/include/
