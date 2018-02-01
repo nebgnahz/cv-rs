@@ -11,12 +11,13 @@ dpkg -i ${CUDA_REPO_PKG}
 rm ${CUDA_REPO_PKG}
 
 ## update and install package
-#for test
- cat /var/lib/apt/lists/*cuda*Packages | grep "Package:"
-#end
-CUDA_PACKAGES="cuda-drivers cuda-core-${CUDA_VERSION} cuda-cublas-dev-${CUDA_VERSION} cuda-cudart-dev-${CUDA_VERSION} cuda-cufft-dev-${CUDA_VERSION} cuda-npp-dev-${CUDA_VERSION}"
 apt-get -y update
-apt-get install -y ${CUDA_PACKAGES}
+apt-get install -y --no-install-recommends \
+    cuda-core-$CUDA_VERSION \
+    cuda-cublas-dev$CUDA_VERSION \
+    cuda-cudart-dev-$CUDA_VERSION \
+    cuda-cufft-dev-$CUDA_VERSION \
+    cuda-npp-dev-$CUDA_VERSION
 
 ## manually create CUDA symlink
 ln -s /usr/local/cuda-${CUDA_VERSION} /usr/local/cuda
