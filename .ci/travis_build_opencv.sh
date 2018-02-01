@@ -4,11 +4,11 @@ set -eux -o pipefail
 OPENCV_VERSION=${OPENCV_VERSION:-3.4.0}
 URL=https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
 URL_CONTRUB=https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
+OPENCV_DIR="$(pwd)/opencv-${OPENCV_VERSION}"
+OPENCV_CONTRIB_DIR="$(pwd)/opencv_contrib-${OPENCV_VERSION}"
 
 if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
     TMP=$(mktemp -d)
-    OPENCV_DIR="$(pwd)/opencv-${OPENCV_VERSION}"
-    OPENCV_CONTRIB_DIR="$(pwd)/opencv_contrib-${OPENCV_VERSION}"
     if [[ ! -d "${OPENCV_DIR}/build" ]]; then
         curl -sL ${URL}  > ${TMP}/opencv.zip
         unzip -q ${TMP}/opencv.zip
@@ -41,11 +41,11 @@ if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
     make install && touch $OPENCV_CONTRIB_DIR
     popd
     touch $HOME/fresh-cache
-
-    pushd $OPENCV_CONTRIB_DIR/include/opencv2
-    ls
-    popd
 fi
 
 sudo cp -r $HOME/usr/include/* /usr/local/include/
 sudo cp -r $HOME/usr/lib/* /usr/local/lib/
+
+pushd $OPENCV_CONTRIB_DIR/include/opencv2
+ls
+popd
