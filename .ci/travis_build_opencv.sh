@@ -4,25 +4,23 @@ set -eux -o pipefail
 OPENCV_VERSION=${OPENCV_VERSION:-3.4.0}
 URL=https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
 URL_CONTRUB=https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
-INSTALL_DIR="$HOME/usr/installed-${OPENCV_VERSION}"
 
-if [[ ! -e INSTALL_DIR ]]; then
+if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
     TMP=$(mktemp -d)
-    OPENCV_DIR="$(pwd)/opencv-${OPENCV_VERSION}"
-    OPENCV_CONTRIB_DIR="$(pwd)/opencv_contrib-${OPENCV_VERSION}"
-    if [[ ! -d "${OPENCV_DIR}/build" ]]; then
+    if [[ ! -d "opencv-${OPENCV_VERSION}/build" ]]; then
         curl -sL ${URL}  > ${TMP}/opencv.zip
         unzip -q ${TMP}/opencv.zip
         rm ${TMP}/opencv.zip
-
+        
         curl -sL ${URL_CONTRUB}  > ${TMP}/opencv_contrib.zip
         unzip -q ${TMP}/opencv_contrib.zip
         rm ${TMP}/opencv_contrib.zip
-
-        mkdir $OPENCV_DIR/build
+        
+        mkdir opencv-${OPENCV_VERSION}/build
+        
     fi
 
-    pushd $OPENCV_DIR/build
+    cd opencv-${OPENCV_VERSION}/build
     cmake \
         -D WITH_CUDA=ON \
         -D BUILD_EXAMPLES=OFF \
@@ -39,8 +37,8 @@ if [[ ! -e INSTALL_DIR ]]; then
         -D CUDA_ARCH_PTX="" \
         ..
     make -j4
-    make install && touch INSTALL_DIR
-    popd
+    make install && touch $HOME/usr/installed-${OPENCV_VERSION}
+    cd ../..
     touch $HOME/fresh-cache
 fi
 
