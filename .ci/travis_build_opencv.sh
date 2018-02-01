@@ -24,7 +24,7 @@ if [[ ! -e INSTALL_DIR ]]; then
 
     pushd $OPENCV_DIR/build
     cmake \
-        -D WITH_CUDA=OFF \
+        -D WITH_CUDA=ON \
         -D BUILD_EXAMPLES=OFF \
         -D BUILD_TESTS=OFF \
         -D BUILD_PERF_TESTS=OFF  \
