@@ -10,10 +10,7 @@ rust:
 
 addons:
   apt:
-    sources:
-    - sourceline: 'deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1404/x86_64/'
     packages:
-    - cuda
     - build-essential
     - cmake
     - git
