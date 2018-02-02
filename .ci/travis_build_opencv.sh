@@ -6,10 +6,12 @@ URL=https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
 URL_CONTRUB=https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
 INSTALL_FLAG=$HOME/usr/opencv-installation-flag-version-${OPENCV_VERSION}
 INSTALL_PATH=$HOME/usr
+OPENCV_BUILD=$(pwd)/opencv-${OPENCV_VERSION}/build
+OPENCV_CONTRIB=$(pwd)/opencv_contrib-${OPENCV_VERSION}/modules
 
 if [[ ! -e $INSTALL_FLAG ]]; then
     TMP=$(mktemp -d)
-    if [[ ! -d "opencv-${OPENCV_VERSION}/build" ]]; then
+    if [[ ! -d $OPENCV_BUILD ]]; then
         curl -sL ${URL}  > ${TMP}/opencv.zip
         unzip -q ${TMP}/opencv.zip
         rm ${TMP}/opencv.zip
@@ -18,11 +20,11 @@ if [[ ! -e $INSTALL_FLAG ]]; then
         unzip -q ${TMP}/opencv_contrib.zip
         rm ${TMP}/opencv_contrib.zip
         
-        mkdir opencv-${OPENCV_VERSION}/build
+        mkdir $OPENCV_BUILD
         
     fi
 
-    cd opencv-${OPENCV_VERSION}/build
+    pushd $OPENCV_BUILD
     cmake \
         -D WITH_CUDA=ON \
         -D BUILD_EXAMPLES=OFF \
@@ -38,9 +40,8 @@ if [[ ! -e $INSTALL_FLAG ]]; then
         -D CUDA_ARCH_BIN=5.2 \
         -D CUDA_ARCH_PTX="" \
         ..
-    make -j4
     make install && touch $INSTALL_FLAG
-    cd ../..
+    popd
     touch $HOME/fresh-cache
 fi
 

@@ -49,12 +49,6 @@ notifications:
   email:
     on_success: never
 
-cache:
-  timeout: 1000
-  directories:
-    - $HOME/usr
-    - $HOME/.cargo
-
 deploy:
   provider: pages
   skip_cleanup: true
