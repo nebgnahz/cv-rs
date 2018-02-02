@@ -4,7 +4,7 @@ set -eux -o pipefail
 OPENCV_VERSION=${OPENCV_VERSION:-3.4.0}
 URL=https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
 URL_CONTRUB=https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
-INSTALL_FLAG=$HOME/usr/installed-${OPENCV_VERSION}
+INSTALL_FLAG=$HOME/usr/opencv-installation-flag-version-${OPENCV_VERSION}
 INSTALL_PATH=$HOME/usr
 
 if [[ ! -e $INSTALL_FLAG ]]; then
@@ -43,10 +43,6 @@ if [[ ! -e $INSTALL_FLAG ]]; then
     cd ../..
     touch $HOME/fresh-cache
 fi
-
-ls $HOME/usr/lib/
-find $INSTALL_PATH -name "libopencv_*.so*"
-exit 1
 
 sudo cp -r $HOME/usr/include/* /usr/local/include/
 sudo cp -r $HOME/usr/lib/* /usr/local/lib/
