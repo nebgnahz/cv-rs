@@ -58,7 +58,8 @@ fn opencv_link() {
     println!("cargo:rustc-link-lib=opencv_objdetect");
     println!("cargo:rustc-link-lib=opencv_video");
     println!("cargo:rustc-link-lib=opencv_features2d");
-
+    println!("cargo:rustc-link-lib=opencv_xfeatures2d");
+    
     if cfg!(feature = "gpu") {
         println!("cargo:rustc-link-lib=opencv_cudaobjdetect");
     }
