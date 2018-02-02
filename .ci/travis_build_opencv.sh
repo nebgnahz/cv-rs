@@ -36,7 +36,7 @@ if [[ ! -e $INSTALL_FLAG ]]; then
         -D BUILD_opencv_python3=OFF \
         -D CMAKE_INSTALL_PREFIX=$INSTALL_PATH \
         -D CMAKE_BUILD_TYPE=Release \
-        -D OPENCV_EXTRA_MODULES_PATH=opencv_contrib-${OPENCV_VERSION}/modules \
+        -D OPENCV_EXTRA_MODULES_PATH=$OPENCV_CONTRIB \
         -D CUDA_ARCH_BIN=5.2 \
         -D CUDA_ARCH_PTX="" \
         ..
