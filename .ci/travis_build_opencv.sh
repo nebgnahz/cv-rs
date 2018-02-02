@@ -46,6 +46,8 @@ fi
 
 ls $INSTALL_PATH/include
 ls $INSTALL_PATH/include/opencv2
+ls $INSTALL_PATH/bin
+ls $INSTALL_PATH/bin/opencv2
 exit 1
 
 sudo cp -r $HOME/usr/include/* /usr/local/include/
