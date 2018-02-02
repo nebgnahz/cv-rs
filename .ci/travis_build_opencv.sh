@@ -4,8 +4,9 @@ set -eux -o pipefail
 OPENCV_VERSION=${OPENCV_VERSION:-3.4.0}
 URL=https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
 URL_CONTRUB=https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
+INSTALL_DIR=$HOME/usr/installed-${OPENCV_VERSION}
 
-if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
+if [[ ! -e $INSTALL_DIR ]]; then
     TMP=$(mktemp -d)
     if [[ ! -d "opencv-${OPENCV_VERSION}/build" ]]; then
         curl -sL ${URL}  > ${TMP}/opencv.zip
@@ -37,10 +38,12 @@ if [[ ! -e "$HOME/usr/installed-${OPENCV_VERSION}" ]]; then
         -D CUDA_ARCH_PTX="" \
         ..
     make -j4
-    make install && touch $HOME/usr/installed-${OPENCV_VERSION}
+    make install && touch $INSTALL_DIR
     cd ../..
     touch $HOME/fresh-cache
 fi
+
+ls INSTALL_DIR
 
 sudo cp -r $HOME/usr/include/* /usr/local/include/
 sudo cp -r $HOME/usr/lib/* /usr/local/lib/
