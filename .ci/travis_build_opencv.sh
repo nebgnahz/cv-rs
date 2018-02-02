@@ -4,9 +4,10 @@ set -eux -o pipefail
 OPENCV_VERSION=${OPENCV_VERSION:-3.4.0}
 URL=https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
 URL_CONTRUB=https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
-INSTALL_DIR=$HOME/usr/installed-${OPENCV_VERSION}
+INSTALL_FLAG=$HOME/usr/installed-${OPENCV_VERSION}
+INSTALL_PATH=$HOME/usr
 
-if [[ ! -e $INSTALL_DIR ]]; then
+if [[ ! -e $INSTALL_FLAG ]]; then
     TMP=$(mktemp -d)
     if [[ ! -d "opencv-${OPENCV_VERSION}/build" ]]; then
         curl -sL ${URL}  > ${TMP}/opencv.zip
@@ -31,21 +32,20 @@ if [[ ! -e $INSTALL_DIR ]]; then
         -D BUILD_opencv_python=OFF \
         -D BUILD_opencv_python2=OFF \
         -D BUILD_opencv_python3=OFF \
-        -D CMAKE_INSTALL_PREFIX=$HOME/usr \
+        -D CMAKE_INSTALL_PREFIX=$INSTALL_PATH \
         -D CMAKE_BUILD_TYPE=Release \
         -D OPENCV_EXTRA_MODULES_PATH=opencv_contrib-${OPENCV_VERSION}/modules \
         -D CUDA_ARCH_BIN=5.2 \
         -D CUDA_ARCH_PTX="" \
         ..
     make -j4
-    make install && touch $INSTALL_DIR
+    make install && touch $INSTALL_FLAG
     cd ../..
     touch $HOME/fresh-cache
 fi
 
-pushd $INSTALL_DIR
-ls
-popd
+ls INSTALL_PATH
+exit 1
 
 sudo cp -r $HOME/usr/include/* /usr/local/include/
 sudo cp -r $HOME/usr/lib/* /usr/local/lib/
