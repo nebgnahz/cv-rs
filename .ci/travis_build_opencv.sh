@@ -43,7 +43,9 @@ if [[ ! -e $INSTALL_DIR ]]; then
     touch $HOME/fresh-cache
 fi
 
-ls $INSTALL_DIR
+pushd $INSTALL_DIR
+ls
+popd
 
 sudo cp -r $HOME/usr/include/* /usr/local/include/
 sudo cp -r $HOME/usr/lib/* /usr/local/lib/
