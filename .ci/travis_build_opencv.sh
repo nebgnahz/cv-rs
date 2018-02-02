@@ -44,7 +44,7 @@ if [[ ! -e $INSTALL_FLAG ]]; then
     touch $HOME/fresh-cache
 fi
 
-ls $INSTALL_PATH
+ls $INSTALL_PATH/opencv-${OPENCV_VERSION}
 exit 1
 
 sudo cp -r $HOME/usr/include/* /usr/local/include/
