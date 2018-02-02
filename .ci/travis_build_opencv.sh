@@ -5,7 +5,7 @@ OPENCV_VERSION=${OPENCV_VERSION:-3.4.0}
 URL=https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
 URL_CONTRUB=https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
 INSTALL_FLAG=$HOME/usr/opencv-installation-flag-version-${OPENCV_VERSION}
-INSTALL_PATH=$HOME/usr
+INSTALL_PATH=$HOME/usr/local
 OPENCV_BUILD=$(pwd)/opencv-${OPENCV_VERSION}/build
 OPENCV_CONTRIB=$(pwd)/opencv_contrib-${OPENCV_VERSION}/modules
 
