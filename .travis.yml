@@ -37,6 +37,8 @@ before_install:
   - rustup component add rustfmt-preview
 
 script:
+  - ls /usr/include
+  - ls /usr/include/opencv
   - cargo build --no-default-features
   - cargo test --no-default-features
   # - cargo build --features gpu
@@ -48,6 +50,12 @@ script:
 notifications:
   email:
     on_success: never
+
+cache:
+  timeout: 1000
+  cargo: true
+  directories:
+    - $HOME/usr
 
 deploy:
   provider: pages
