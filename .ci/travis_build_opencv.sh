@@ -44,10 +44,7 @@ if [[ ! -e $INSTALL_FLAG ]]; then
     touch $HOME/fresh-cache
 fi
 
-ls $INSTALL_PATH/include
-ls $INSTALL_PATH/include/opencv2
-ls $INSTALL_PATH/bin
-ls $INSTALL_PATH/bin/opencv2
+find $INSTALL_PATH -name "libopencv_*.so*"
 exit 1
 
 sudo cp -r $HOME/usr/include/* /usr/local/include/
