@@ -44,9 +44,3 @@ if [[ ! -e $INSTALL_FLAG ]]; then
     popd
     touch $HOME/fresh-cache
 fi
-
-ls /home/travis/usr/lib/
-find /home/travis/usr -name 'libopencv_*.so*'
-
-sudo cp -r $HOME/usr/include/* /usr/local/include/
-sudo cp -r $HOME/usr/lib/* /usr/local/lib/
