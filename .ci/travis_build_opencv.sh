@@ -44,6 +44,7 @@ if [[ ! -e $INSTALL_FLAG ]]; then
     touch $HOME/fresh-cache
 fi
 
+ls $HOME/usr/lib/
 find $INSTALL_PATH -name "libopencv_*.so*"
 exit 1
 
