@@ -33,7 +33,7 @@ build: false
 
 test_script:
   - cargo build --no-default-features
-  - cargo test --no-default-features
+  - cargo test -vv --no-default-features
 
 cache:
   - '%USERPROFILE%\.cargo\registry'
