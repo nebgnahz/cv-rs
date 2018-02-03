@@ -2,14 +2,14 @@
 set -eux -o pipefail
 
 OPENCV_VERSION=${OPENCV_VERSION:-3.4.0}
-URL=https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
-URL_CONTRIB=https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
-OPENCV_BUILD=$(pwd)/opencv-${OPENCV_VERSION}/build
-OPENCV_CONTRIB=$(pwd)/opencv_contrib-${OPENCV_VERSION}/modules
+URL=https://github.com/opencv/opencv/archive/$OPENCV_VERSION.zip
+URL_CONTRIB=https://github.com/opencv/opencv_contrib/archive/$OPENCV_VERSION.zip
+OPENCV_BUILD=$(pwd)/opencv-$OPENCV_VERSION/build
+OPENCV_CONTRIB=$(pwd)/opencv_contrib-$OPENCV_VERSION/modules
 INSTALL_FLAG=$HOME/usr/installed-$OPENCV_VERSION
-INSTALL_PATH=$HOME/usr
+INSTALL_PREFIX=$HOME/usr
 
-if [[ ! -e ${INSTALL_FLAG} ]]; then
+if [[ ! -e $INSTALL_FLAG ]]; then
     TMP=$(mktemp -d)
     if [[ ! -d $OPENCV_BUILD ]]; then
         curl -sL ${URL}  > ${TMP}/opencv.zip
@@ -34,12 +34,12 @@ if [[ ! -e ${INSTALL_FLAG} ]]; then
         -D BUILD_opencv_python2=OFF \
         -D BUILD_opencv_python3=OFF \
         -D OPENCV_EXTRA_MODULES_PATH=$OPENCV_CONTRIB \
-        -D CMAKE_INSTALL_PREFIX=$INSTALL_PATH \
+        -D CMAKE_INSTALL_PREFIX=$INSTALL_PREFIX \
         -D CMAKE_BUILD_TYPE=Release \
         -D CUDA_ARCH_BIN=5.2 \
         -D CUDA_ARCH_PTX="" \
         ..
-    make install && touch ${CACHE}
+    make install && touch $INSTALL_FLAG
     popd
 fi
 
