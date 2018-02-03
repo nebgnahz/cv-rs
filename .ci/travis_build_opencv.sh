@@ -41,6 +41,7 @@ if [[ ! -e $INSTALL_FLAG ]]; then
         ..
     make install && touch $INSTALL_FLAG
     popd
+    touch $HOME/fresh-cache
 fi
 
 sudo cp -r $HOME/usr/include/* /usr/local/include/
