@@ -2,8 +2,6 @@ image: Visual Studio 2017
 environment:
   RUSTUP_USE_REQWEST: 1
   CARGO_HTTP_CHECK_REVOKE: false
-  OPENCV_DIR: C:\projects\cv-rs\vc15\install\opencv
-  OPENCV_LIB: C:\projects\cv-rs\vc15\install\opencv\x64\vc15\lib
 
   matrix:
     - TARGET: x86_64-pc-windows-msvc
@@ -28,14 +26,12 @@ install:
   - cargo -V
 
   # Install OpenCV
-  - PowerShell .\.windows\msvc_2_build_OCV.ps1 -EnableCuda 0 -Compiler vc15
+  - .\.windows\msvc_2_build_OCV.ps1 -EnableCuda 0 -Compiler vc15
 build: false
 
 test_script:
   - cargo build --no-default-features
-  - ps: $ErrorActionPreference = "SilentlyContinue"
-  # - ps: cargo test --no-run
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  - cargo test --no-default-features
 
 cache:
   - '%USERPROFILE%\.cargo\registry'
