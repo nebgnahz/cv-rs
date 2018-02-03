@@ -33,9 +33,10 @@ build: false
 
 test_script:
   - cargo build --no-default-features
-  - $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  - cargo test -vv --no-default-features
+  # - cargo test -vv --no-default-features
 
 cache:
   - '%USERPROFILE%\.cargo\registry'
   - vc15\install -> .windows\msvc_2_build_OCV.ps1
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
