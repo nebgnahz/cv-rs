@@ -6,7 +6,7 @@ URL=https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
 URL_CONTRIB=https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
 OPENCV_BUILD=$(pwd)/opencv-${OPENCV_VERSION}/build
 OPENCV_CONTRIB=$(pwd)/opencv_contrib-${OPENCV_VERSION}/modules
-INSTALL_FLAG=$HOME/usr/installed-${OPENCV_VERSION}
+INSTALL_FLAG=$HOME/usr/installed-$OPENCV_VERSION
 INSTALL_PATH=$HOME/usr
 
 if [[ ! -e ${INSTALL_FLAG} ]]; then
@@ -23,7 +23,7 @@ if [[ ! -e ${INSTALL_FLAG} ]]; then
         mkdir $OPENCV_BUILD
     fi
 
-    pushd
+    pushd $OPENCV_BUILD
     cmake \
         -D WITH_CUDA=ON \
         -D BUILD_EXAMPLES=OFF \
