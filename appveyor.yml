@@ -2,6 +2,8 @@ image: Visual Studio 2017
 environment:
   RUSTUP_USE_REQWEST: 1
   CARGO_HTTP_CHECK_REVOKE: false
+  OPENCV_DIR: C:\projects\cv-rs\vc15\install\opencv
+  OPENCV_LIB: C:\projects\cv-rs\vc15\install\opencv\x64\vc15\lib
 
   matrix:
     - TARGET: x86_64-pc-windows-msvc
