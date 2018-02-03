@@ -45,7 +45,7 @@ fn test_cascade_lenna() {
             width: 168,
             height: 168,
         },
-        3,
+        5,
     ));
 }
 
