@@ -34,6 +34,7 @@ build: false
 test_script:
   - cargo build --no-default-features
   - cargo test -vv --no-default-features
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 cache:
   - '%USERPROFILE%\.cargo\registry'
