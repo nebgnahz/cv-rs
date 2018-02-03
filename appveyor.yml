@@ -17,8 +17,6 @@ platform:
   - x64
 
 install:
-  - set ARCH=x64
-
   # Install Rust
   - set PATH=C:\Program Files\Git\mingw64\bin;%PATH%
   - curl -sSf -o rustup-init.exe https://win.rustup.rs/
@@ -28,18 +26,7 @@ install:
   - cargo -V
 
   # Install OpenCV
-  - echo "INSTALL OPENCV"
-  - choco install OpenCV
-
-  # Configure OpenCV
-  - set APP_PATH=%CD%
-  - IF EXIST c:\tools\opencv* CD c:\tools\opencv*
-  - echo "SET OPENCV_DIR"
-  - set OPENCV_DIR=%CD%\build
-  - cd %APP_PATH%
-  - set OPENCV_LIB=%OPENCV_DIR%\%ARCH%\vc15\lib
-  - set PATH=%OPENCV_DIR%\%ARCH%\vc15\bin;%PATH%
-
+  - PowerShell -NoExit .\.windows\msvc_2_build_OCV.ps1 -EnableCuda 0 -Compiler vc15
 build: false
 
 test_script:
@@ -48,3 +35,4 @@ test_script:
 
 cache:
   - '%USERPROFILE%\.cargo\registry'
+  - vc15\install -> .windows\msvc_2_build_OCV.ps1
