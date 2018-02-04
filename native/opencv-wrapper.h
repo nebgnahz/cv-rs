@@ -1,7 +1,6 @@
 #ifndef OPENCV_WRAPPER_H_
 #define OPENCV_WRAPPER_H_
 
-#include "common.h"
 #include <functional>
 #include <opencv2/core.hpp>
 #include <opencv2/features2d.hpp>
@@ -12,6 +11,8 @@
 #include <opencv2/xfeatures2d.hpp>
 #include <stddef.h>
 #include <stdint.h>
+
+#include "common.h"
 
 #define EXTERN_C_BEGIN extern "C" {
 #define EXTERN_C_END }

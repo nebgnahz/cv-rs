@@ -1,7 +1,8 @@
+#include <opencv2/cudaobjdetect.hpp>
+
 #include "opencv-gpu.h"
 #include "opencv-wrapper.h"
 #include "utils.h"
-#include <opencv2/cudaobjdetect.hpp>
 
 EXTERN_C_BEGIN
 
@@ -213,7 +214,7 @@ void cv_gpu_cascade_set_scale_factor(
 Size2i cv_gpu_cascade_get_classifier_size(
     cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
     cv::Size2i size = (*cascade)->getClassifierSize();
-    Size2i c_size = {.width = size.width, .height = size.height};
+    Size2i c_size = {size.width, size.height};
     return c_size;
 }
 

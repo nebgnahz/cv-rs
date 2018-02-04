@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <opencv2/core.hpp>
 
 typedef struct {
     int32_t x;
