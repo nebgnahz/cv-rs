@@ -1,8 +1,8 @@
+clone_depth: 50
 image: Visual Studio 2017
 environment:
   RUSTUP_USE_REQWEST: 1
   CARGO_HTTP_CHECK_REVOKE: false
-
   matrix:
     - TARGET: x86_64-pc-windows-msvc
 skip_commits:
@@ -15,24 +15,19 @@ skip_commits:
     - '*.md'
 platform:
   - x64
-
 install:
   # Install Rust
-  - set PATH=C:\Program Files\Git\mingw64\bin;%PATH%
-  - curl -sSf -o rustup-init.exe https://win.rustup.rs/
+  - appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
   - rustup-init.exe -y --default-host %TARGET%
   - set PATH=%PATH%;C:\Users\appveyor\.cargo\bin
   - rustc -V
   - cargo -V
-
   # Install OpenCV
   - ps: .\.windows\msvc_2_build_OCV.ps1 -EnableCuda 0 -Compiler vc15
-build: false
-
-test_script:
+build_script:
   - cargo build --no-default-features
+test_script:
   - cargo test --no-default-features
-
 cache:
   - '%USERPROFILE%\.cargo\registry'
   - vc15\install -> .windows\msvc_2_build_OCV.ps1
