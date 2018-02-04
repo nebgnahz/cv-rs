@@ -5,7 +5,7 @@ fn opencv_include() -> String {
     if let Ok(dir) = std::env::var("OPENCV_DIR") {
         format!("{}\\include", dir)
     } else {
-        eprint!("%OPENCV_DIR% is not set properly.");
+        eprint!("%OPENCV_DIR% is not set.");
         std::process::exit(0x0100);
     }
 }
@@ -58,6 +58,7 @@ fn opencv_link() {
     println!("cargo:rustc-link-lib=opencv_objdetect");
     println!("cargo:rustc-link-lib=opencv_video");
     println!("cargo:rustc-link-lib=opencv_features2d");
+    println!("cargo:rustc-link-lib=opencv_xfeatures2d");
 
     if cfg!(feature = "gpu") {
         println!("cargo:rustc-link-lib=opencv_cudaobjdetect");

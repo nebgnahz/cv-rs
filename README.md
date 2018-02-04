@@ -71,36 +71,29 @@ features = [ "gpu" ]
 ### Windows
 
 #### If you are using MSVC toolchain (mandatory if you want to use CUDA)
-
-##### For installation without CUDA
-- Download and run `vc14_vc15.exe` from [official site](https://github.com/opencv/opencv/releases)
-- Set `%OPENCV_DIR%` environment variable in such a way that `%OPENCV_DIR%\include` points to the OpenCV includes diretory (for example, it could be `C:\opencv\build`).
-- Set environment variable `%OPENCV_LIB%` to `%OPENCV_DIR%\x64\<vc14 or vc15>\lib`. Check that this directory has `opencv_world<version_number>.lib`. Use vc14 is for Visual Studio 2015, and vc15 for Visual Studio 2017
-- Add `%OPENCV_DIR%\x64\<vc14 or vc15>\bin` to the `%PATH%`. Check that this directory has `opencv_world<version_number>.dll`
-
-##### For installation with CUDA
-###### Prerequisites
+##### Prerequisites
 - Installed git.
 - Installed CMake x64 ([download link](https://cmake.org/download/)).
 - Installed Visual Studio 2015 ([download link](https://go.microsoft.com/fwlink/?LinkId=532606&clcid=0x409)), VS2017 is not supported by nVidia at this moment, don't even try, it won't compile.
 
-###### Installation steps
+##### Installation steps
 - Create directory `C:\opencv`.
 - Copy files from `.windows` folder there.
-- Download CUDA from [official site](https://developer.nvidia.com/cuda-downloads?target_os=Windows&target_arch=x86_64&target_version=10). Choose `local` package.
 - Run powershell console as administrator in `c:\opencv`.
-- Run `PowerShell -NoExit .\1_install_CUDA.ps1 -FileName path_to_installer` (for example, `C:\Users\UserName\Downloads\cuda_9.1.85_win10.exe`).
-- Run `PowerShell -NoExit .\msvc_2_build_OCV.ps1 -EnableCuda 1`. `1` stays for compilation with CUDA, `0` for compilation without it.
-- Wait until installation finishes. Now you have properly configured OpenCV with CUDA.
+- (***Optional, skip these steps if you don't need CUDA***) 
+    1. Download CUDA from [official site](https://developer.nvidia.com/cuda-downloads?target_os=Windows&target_arch=x86_64&target_version=10). Choose `local` package.
+    1. Run `PowerShell -NoExit .\1_install_CUDA.ps1 -FileName path_to_installer` (for example, `C:\Users\UserName\Downloads\cuda_9.1.85_win10.exe`).
+- Run `PowerShell -NoExit .\msvc_2_build_OCV.ps1  -EnableCuda 0 -Compiler vc15`. `1` stays for compilation with CUDA, `0` for compilation without it. Possible compiler values: `vc14` for VS2015/`vc15` for VS2017. **Caution: CUDA is compatible with VS2015 only**
+- Wait until installation finishes. Now you have properly configured OpenCV.
 
 #### If you are using GNU toolchain
 
-###### Prerequisites
+##### Prerequisites
 - Installed git.
 - Installed CMake x64 ([download link](https://cmake.org/download/)).
 - Installed MinGW ([download link](https://sourceforge.net/projects/mingw-w64/files/latest/download)). Choose architecture `x86_64` during installation.
 
-###### Installation steps
+##### Installation steps
 - Create directory `C:\opencv`.
 - Copy files from `.windows` folder there.
 - Run powershell console as administrator in `c:\opencv`.

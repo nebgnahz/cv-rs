@@ -7,6 +7,7 @@
 #include <opencv2/objdetect.hpp>
 #include <opencv2/video/tracking.hpp>
 #include <opencv2/features2d.hpp>
+#include <opencv2/xfeatures2d.hpp>
 #include <functional>
 #include <stddef.h>
 #include <stdint.h>
@@ -182,8 +183,37 @@ void* cv_mser_new(int delta,
                   double area_threshold,
                   double min_margin,
                   int edge_blur_size);
-void cv_mser_drop(cv::Ptr<cv::MSER>* mser);
-void cv_mser_detect_regions(cv::Ptr<cv::MSER>* mser, cv::Mat* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes);
+void cv_mser_drop(cv::Ptr<cv::MSER>* detector);
+void cv_mser_detect_regions(cv::Ptr<cv::MSER>* detector, cv::Mat* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes);
+void cv_mser_detect_and_compute(cv::Ptr<cv::MSER>* detector, cv::Mat* image,  cv::Mat* mask, CVec<KeyPoint>* keypoints, cv::Mat* descriptors, bool useProvidedKeypoints);
+
+// =============================================================================
+//   SURF
+// =============================================================================
+
+void* cv_surf_new(double hessianThreshold,
+                  int nOctaves,
+                  int nOctaveLayers,
+                  bool extended,
+                  bool upright
+);
+void cv_surf_drop(cv::Ptr <cv::xfeatures2d::SURF> *detector);
+void cv_surf_detect_and_compute(cv::Ptr<cv::xfeatures2d::SURF>* detector, cv::Mat* image,  cv::Mat* mask, CVec<KeyPoint>* keypoints, cv::Mat* descriptors, bool useProvidedKeypoints);
+
+
+// =============================================================================
+//   SIFT
+// =============================================================================
+
+void *cv_sift_new(int nfeatures,
+                  int nOctaveLayers,
+                  double contrastThreshold,
+                  double edgeThreshold,
+                  double sigma
+);
+void cv_sift_drop(cv::Ptr <cv::xfeatures2d::SIFT> *detector);
+void cv_sift_detect_and_compute(cv::Ptr <cv::xfeatures2d::SIFT> *detector, cv::Mat *image, cv::Mat *mask,
+                                CVec<KeyPoint> *keypoints, cv::Mat *descriptors, bool useProvidedKeypoints);
 
 // =============================================================================
 //   Other

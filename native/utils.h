@@ -7,6 +7,7 @@
 
 void cv_to_ffi(const cv::Rect& source, Rect* dest);
 void cv_to_ffi(const cv::Point& source, Point2i* dest);
+void cv_to_ffi(const cv::KeyPoint& source, KeyPoint* dest);
 void cv_to_ffi(const std::vector<double>& source, CVec<double>* dest);
 
 template <typename T, typename U>
