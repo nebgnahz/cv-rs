@@ -1,17 +1,17 @@
 #ifndef OPENCV_WRAPPER_H_
 #define OPENCV_WRAPPER_H_
 
+#include "common.h"
+#include <functional>
 #include <opencv2/core.hpp>
+#include <opencv2/features2d.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
 #include <opencv2/video/tracking.hpp>
-#include <opencv2/features2d.hpp>
 #include <opencv2/xfeatures2d.hpp>
-#include <functional>
 #include <stddef.h>
 #include <stdint.h>
-#include "common.h"
 
 #define EXTERN_C_BEGIN extern "C" {
 #define EXTERN_C_END }
@@ -128,7 +128,7 @@ int cv_fourcc(char c1, char c2, char c3, char c4);
 
 void* cv_videowriter_default();
 void* cv_videowriter_new(const char* const path, int fourcc, double fps,
-                                 Size2i frame_size, bool is_color);
+                         Size2i frame_size, bool is_color);
 void cv_videowriter_drop(cv::VideoWriter* writer);
 bool cv_videowriter_open(cv::VideoWriter* writer, const char* const path,
                          int fourcc, double fps, Size2i frame_size,
@@ -143,7 +143,8 @@ double cv_videowriter_get(cv::VideoWriter* writer, int property);
 // =============================================================================
 void* cv_cascade_classifier_new();
 void* cv_cascade_classifier_from_path(const char* const path);
-bool cv_cascade_classifier_load(cv::CascadeClassifier* cc, const char* const path);
+bool cv_cascade_classifier_load(cv::CascadeClassifier* cc,
+                                const char* const path);
 void cv_cascade_classifier_drop(cv::CascadeClassifier* cc);
 
 // vec_of_rect is dynamically allocated, the caller should take ownership of it.
@@ -174,53 +175,48 @@ RotatedRect cv_camshift(cv::Mat* back_project_image, Rect window,
 // =============================================================================
 //   MSER
 // =============================================================================
-void* cv_mser_new(int delta,
-                  int min_area,
-                  int max_area,
-                  double max_variation,
-                  double min_diversity,
-                  int max_evolution,
-                  double area_threshold,
-                  double min_margin,
-                  int edge_blur_size);
+void* cv_mser_new(int delta, int min_area, int max_area, double max_variation,
+                  double min_diversity, int max_evolution,
+                  double area_threshold, double min_margin, int edge_blur_size);
 void cv_mser_drop(cv::Ptr<cv::MSER>* detector);
-void cv_mser_detect_regions(cv::Ptr<cv::MSER>* detector, cv::Mat* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes);
-void cv_mser_detect_and_compute(cv::Ptr<cv::MSER>* detector, cv::Mat* image,  cv::Mat* mask, CVec<KeyPoint>* keypoints, cv::Mat* descriptors, bool useProvidedKeypoints);
+void cv_mser_detect_regions(cv::Ptr<cv::MSER>* detector, cv::Mat* image,
+                            CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes);
+void cv_mser_detect_and_compute(cv::Ptr<cv::MSER>* detector, cv::Mat* image,
+                                cv::Mat* mask, CVec<KeyPoint>* keypoints,
+                                cv::Mat* descriptors,
+                                bool useProvidedKeypoints);
 
 // =============================================================================
 //   SURF
 // =============================================================================
 
-void* cv_surf_new(double hessianThreshold,
-                  int nOctaves,
-                  int nOctaveLayers,
-                  bool extended,
-                  bool upright
-);
-void cv_surf_drop(cv::Ptr <cv::xfeatures2d::SURF> *detector);
-void cv_surf_detect_and_compute(cv::Ptr<cv::xfeatures2d::SURF>* detector, cv::Mat* image,  cv::Mat* mask, CVec<KeyPoint>* keypoints, cv::Mat* descriptors, bool useProvidedKeypoints);
-
+void* cv_surf_new(double hessianThreshold, int nOctaves, int nOctaveLayers,
+                  bool extended, bool upright);
+void cv_surf_drop(cv::Ptr<cv::xfeatures2d::SURF>* detector);
+void cv_surf_detect_and_compute(cv::Ptr<cv::xfeatures2d::SURF>* detector,
+                                cv::Mat* image, cv::Mat* mask,
+                                CVec<KeyPoint>* keypoints, cv::Mat* descriptors,
+                                bool useProvidedKeypoints);
 
 // =============================================================================
 //   SIFT
 // =============================================================================
 
-void *cv_sift_new(int nfeatures,
-                  int nOctaveLayers,
-                  double contrastThreshold,
-                  double edgeThreshold,
-                  double sigma
-);
-void cv_sift_drop(cv::Ptr <cv::xfeatures2d::SIFT> *detector);
-void cv_sift_detect_and_compute(cv::Ptr <cv::xfeatures2d::SIFT> *detector, cv::Mat *image, cv::Mat *mask,
-                                CVec<KeyPoint> *keypoints, cv::Mat *descriptors, bool useProvidedKeypoints);
+void* cv_sift_new(int nfeatures, int nOctaveLayers, double contrastThreshold,
+                  double edgeThreshold, double sigma);
+void cv_sift_drop(cv::Ptr<cv::xfeatures2d::SIFT>* detector);
+void cv_sift_detect_and_compute(cv::Ptr<cv::xfeatures2d::SIFT>* detector,
+                                cv::Mat* image, cv::Mat* mask,
+                                CVec<KeyPoint>* keypoints, cv::Mat* descriptors,
+                                bool useProvidedKeypoints);
 
 // =============================================================================
 //   Other
 // =============================================================================
 
-void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result);
+void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method,
+                     Result<double>* result);
 
 EXTERN_C_END
 
-#endif  // OPENCV_WRAPPER_H_
+#endif // OPENCV_WRAPPER_H_
