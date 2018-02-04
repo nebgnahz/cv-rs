@@ -5,7 +5,7 @@ fn opencv_include() -> String {
     if let Ok(dir) = std::env::var("OPENCV_DIR") {
         format!("{}\\include", dir)
     } else {
-        eprint!("%OPENCV_DIR% is not set properly.");
+        eprint!("%OPENCV_DIR% is not set.");
         std::process::exit(0x0100);
     }
 }
