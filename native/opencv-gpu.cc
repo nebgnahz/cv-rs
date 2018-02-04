@@ -9,7 +9,9 @@ EXTERN_C_BEGIN
 // =============================================================================
 //   Basic
 // =============================================================================
-void* cv_gpu_mat_default() { return new cv::cuda::GpuMat(); }
+void* cv_gpu_mat_default() {
+    return new cv::cuda::GpuMat();
+}
 
 void cv_gpu_mat_drop(cv::cuda::GpuMat* gpu_image) {
     delete gpu_image;
@@ -36,15 +38,18 @@ void* cv_gpu_hog_default() {
     return new cv::Ptr<cv::cuda::HOG>(hog);
 }
 
-void* cv_gpu_hog_new(Size2i win_size, Size2i block_size, Size2i block_stride,
-                     Size2i cell_size, int32_t nbins) {
+void* cv_gpu_hog_new(Size2i win_size,
+                     Size2i block_size,
+                     Size2i block_stride,
+                     Size2i cell_size,
+                     int32_t nbins) {
     cv::Size cv_win_size(win_size.width, win_size.height);
     cv::Size cv_block_size(block_size.width, block_size.height);
     cv::Size cv_block_stride(block_stride.width, block_stride.height);
     cv::Size cv_cell_size(cell_size.width, cell_size.height);
 
-    auto hog = cv::cuda::HOG::create(cv_win_size, cv_block_size,
-                                     cv_block_stride, cv_cell_size, nbins);
+    auto hog = cv::cuda::HOG::create(
+        cv_win_size, cv_block_size, cv_block_stride, cv_cell_size, nbins);
     return new cv::Ptr<cv::cuda::HOG>(hog);
 }
 
@@ -58,7 +63,8 @@ void cv_gpu_hog_set_detector(cv::Ptr<cv::cuda::HOG>* hog,
     (*hog)->setSVMDetector(*detector);
 }
 
-void cv_gpu_hog_detect(cv::Ptr<cv::cuda::HOG>* hog, cv::cuda::GpuMat* image,
+void cv_gpu_hog_detect(cv::Ptr<cv::cuda::HOG>* hog,
+                       cv::cuda::GpuMat* image,
                        CVec<Rect>* found) {
     std::vector<cv::Rect> vec_object;
     (*hog)->detectMultiScale(*image, vec_object);
@@ -66,7 +72,8 @@ void cv_gpu_hog_detect(cv::Ptr<cv::cuda::HOG>* hog, cv::cuda::GpuMat* image,
 }
 
 void cv_gpu_hog_detect_with_conf(cv::Ptr<cv::cuda::HOG>* hog,
-                                 cv::cuda::GpuMat* image, CVec<Rect>* found,
+                                 cv::cuda::GpuMat* image,
+                                 CVec<Rect>* found,
                                  CVec<double>* conf) {
     std::vector<cv::Rect> vec_object;
     std::vector<double> vec_confidences;
@@ -122,32 +129,26 @@ int32_t cv_gpu_hog_get_group_threshold(cv::Ptr<cv::cuda::HOG>* hog) {
 }
 
 double cv_gpu_hog_get_hit_threshold(cv::Ptr<cv::cuda::HOG>* hog) {
-
     return (*hog)->getHitThreshold();
 }
 
 double cv_gpu_hog_get_l2hys_threshold(cv::Ptr<cv::cuda::HOG>* hog) {
-
     return (*hog)->getL2HysThreshold();
 }
 
 size_t cv_gpu_hog_get_num_levels(cv::Ptr<cv::cuda::HOG>* hog) {
-
     return (*hog)->getNumLevels();
 }
 
 double cv_gpu_hog_get_scale_factor(cv::Ptr<cv::cuda::HOG>* hog) {
-
     return (*hog)->getScaleFactor();
 }
 
 double cv_gpu_hog_get_win_sigma(cv::Ptr<cv::cuda::HOG>* hog) {
-
     return (*hog)->getWinSigma();
 }
 
 Size2i cv_gpu_hog_get_win_stride(cv::Ptr<cv::cuda::HOG>* hog) {
-
     cv::Size size = (*hog)->getWinStride();
     Size2i c_size;
     c_size.width = size.width;
@@ -169,7 +170,8 @@ void cv_gpu_cascade_drop(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
 }
 
 void cv_gpu_cascade_detect(cv::Ptr<cv::cuda::CascadeClassifier>* cascade,
-                           cv::cuda::GpuMat* image, CVec<Rect>* objects) {
+                           cv::cuda::GpuMat* image,
+                           CVec<Rect>* objects) {
     cv::cuda::GpuMat objbuf;
     std::vector<cv::Rect> vec_object;
 

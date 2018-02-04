@@ -32,7 +32,7 @@ void cv_to_ffi(const cv::KeyPoint& source, KeyPoint* dest) {
 void cv_to_ffi(const std::vector<double>& source, CVec<double>* dest) {
     size_t num = source.size();
     dest->size = num;
-    dest->array = (double*)malloc(num * sizeof(double));
+    dest->array = (double*) malloc(num * sizeof(double));
     ::memcpy(dest->array, source.data(), num * sizeof(double));
 }
 
@@ -40,7 +40,7 @@ template <typename T, typename U>
 void cv_to_ffi(const std::vector<T>& source, CVec<U>* dest) {
     size_t num = source.size();
     dest->size = num;
-    dest->array = (U*)malloc(num * sizeof(U));
+    dest->array = (U*) malloc(num * sizeof(U));
     for (size_t i = 0; i < num; i++) {
         cv_to_ffi(source[i], &dest->array[i]);
     }

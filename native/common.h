@@ -87,4 +87,4 @@ struct CVec {
     T* array;
     size_t size;
 };
-#endif // CV_RS_COMMON_H
+#endif  // CV_RS_COMMON_H

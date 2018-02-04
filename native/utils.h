@@ -14,9 +14,9 @@ template <typename T, typename U>
 void cv_to_ffi(const std::vector<T>& source, CVec<U>* dest) {
     size_t num = source.size();
     dest->size = num;
-    dest->array = (U*)malloc(num * sizeof(U));
+    dest->array = (U*) malloc(num * sizeof(U));
     for (size_t i = 0; i < num; i++) {
         cv_to_ffi(source[i], &dest->array[i]);
     }
 }
-#endif // UTILS_H_
+#endif  // UTILS_H_

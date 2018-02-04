@@ -23,13 +23,18 @@ void* cv_gpu_mat_from_mat(cv::Mat*);
 //   Hog
 // =============================================================================
 void* cv_gpu_hog_default();
-void* cv_gpu_hog_new(Size2i win_size, Size2i block_size, Size2i block_stride,
-                     Size2i cell_size, int32_t nbins);
+void* cv_gpu_hog_new(Size2i win_size,
+                     Size2i block_size,
+                     Size2i block_stride,
+                     Size2i cell_size,
+                     int32_t nbins);
 void cv_gpu_hog_drop(cv::Ptr<cv::cuda::HOG>*);
 void cv_gpu_hog_set_detector(cv::Ptr<cv::cuda::HOG>*, std::vector<float>*);
 void cv_gpu_hog_detect(cv::Ptr<cv::cuda::HOG>*, cv::cuda::GpuMat*, CVec<Rect>*);
-void cv_gpu_hog_detect_with_conf(cv::Ptr<cv::cuda::HOG>*, cv::cuda::GpuMat*,
-                                 CVec<Rect>*, CVec<double>*);
+void cv_gpu_hog_detect_with_conf(cv::Ptr<cv::cuda::HOG>*,
+                                 cv::cuda::GpuMat*,
+                                 CVec<Rect>*,
+                                 CVec<double>*);
 
 void cv_gpu_hog_set_gamma_correction(cv::Ptr<cv::cuda::HOG>*, bool gamma);
 void cv_gpu_hog_set_group_threshold(cv::Ptr<cv::cuda::HOG>*,
@@ -58,7 +63,8 @@ Size2i cv_gpu_hog_get_win_stride(cv::Ptr<cv::cuda::HOG>*);
 void* cv_gpu_cascade_new(const char* const filename);
 void cv_gpu_cascade_drop(cv::Ptr<cv::cuda::CascadeClassifier>*);
 void cv_gpu_cascade_detect(cv::Ptr<cv::cuda::CascadeClassifier>*,
-                           cv::cuda::GpuMat*, CVec<Rect>*);
+                           cv::cuda::GpuMat*,
+                           CVec<Rect>*);
 
 void cv_gpu_cascade_set_find_largest_object(
     cv::Ptr<cv::cuda::CascadeClassifier>*, bool);
@@ -88,4 +94,4 @@ double cv_gpu_cascade_get_scale_factor(cv::Ptr<cv::cuda::CascadeClassifier>*);
 
 EXTERN_C_END
 
-#endif // OPENCV_GPU_H_
+#endif  // OPENCV_GPU_H_
