@@ -40,7 +40,7 @@ bindings using a Python script (more automated).
 
 ## Install
 
-Before anything, make sure you have OpenCV 3 installed. Read this
+Before anything, make sure you have OpenCV 3 installed. If you are using windows, follow [this instruction](#windows), otherwise read this
 [Introduction to OpenCV][opencv-intro] to get started.
 
 Then in any Rust project, add this to your `Cargo.toml`:
