@@ -1,5 +1,10 @@
 #ifndef CV_RS_COMMON_H
 #define CV_RS_COMMON_H
+
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+
 typedef struct {
     int32_t x;
     int32_t y;

@@ -1,6 +1,3 @@
-#include "opencv-wrapper.h"
-#include "utils.h"
-
 #include <opencv2/core.hpp>
 #include <opencv2/features2d.hpp>
 #include <opencv2/highgui.hpp>
@@ -8,6 +5,9 @@
 #include <opencv2/objdetect.hpp>
 #include <opencv2/video/tracking.hpp>
 #include <opencv2/xfeatures2d.hpp>
+
+#include "opencv-wrapper.h"
+#include "utils.h"
 
 EXTERN_C_BEGIN
 

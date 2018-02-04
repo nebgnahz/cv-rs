@@ -1,10 +1,11 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
-#include "utils.h"
-#include "common.h"
 #include <opencv2/core.hpp>
 #include <vector>
+
+#include "common.h"
+#include "utils.h"
 
 void cv_to_ffi(const cv::Rect& source, Rect* dest) {
     dest->x = source.x;
