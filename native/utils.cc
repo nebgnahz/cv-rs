@@ -28,6 +28,13 @@ void cv_to_ffi(const cv::KeyPoint& source, KeyPoint* dest) {
     dest->class_id = source.class_id;
 }
 
+void cv_to_ffi(const cv::DMatch& source, DMatch* dest){
+    dest->distance = dest->distance;
+    dest->imgIdx = dest->imgIdx;
+    dest->queryIdx = source.queryIdx;
+    dest->trainIdx = source.trainIdx;
+}
+
 void cv_to_ffi(const std::vector<double>& source, CVec<double>* dest) {
     size_t num = source.size();
     dest->size = num;

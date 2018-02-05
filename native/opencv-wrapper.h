@@ -216,6 +216,16 @@ void cv_sift_detect_and_compute(cv::Ptr <cv::xfeatures2d::SIFT> *detector, cv::M
                                 CVec<KeyPoint> *keypoints, cv::Mat *descriptors, bool useProvidedKeypoints);
 
 // =============================================================================
+//   FLANN
+// =============================================================================
+
+void cv_descriptor_matcher_match(cv::Mat* queryDescriptors,
+                                 cv::Mat*  trainDescriptors,
+                                 CVec<DMatch>* matches
+);
+
+
+// =============================================================================
 //   Other
 // =============================================================================
 

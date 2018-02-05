@@ -599,6 +599,16 @@ void cv_sift_detect_and_compute(cv::Ptr <cv::xfeatures2d::SIFT> *detector, cv::M
     cv_to_ffi(keypoints_vector, keypoints);
 }
 
+void cv_descriptor_matcher_match(cv::Mat* queryDescriptors,
+                                 cv::Mat*  trainDescriptors,
+                                 CVec<DMatch>* matches
+){
+    cv::FlannBasedMatcher matcher;
+    std::vector<cv::DMatch> matches_vector;
+    matcher.match(*queryDescriptors, *trainDescriptors, matches_vector);
+    cv_to_ffi(matches_vector, matches);
+}
+
 void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result) {
     *result = Result<double>::FromFunction([first_image, second_image, method](){
         return cv::compareHist(*first_image, *second_image, method);
