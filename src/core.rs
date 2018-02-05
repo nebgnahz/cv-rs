@@ -239,7 +239,48 @@ impl Rect2f {
 
 #[repr(C)]
 #[derive(Debug, Clone)]
-pub struct CVec<T: Sized + NestedVec> {
+pub(crate) struct CVecView<'a, T: 'a + Sized> {
+    array: *const T,
+    size: usize,
+    _marker: ::std::marker::PhantomData<&'a T>
+}
+
+fn pack<'a, T, U: Sized, F>(v: &'a Vec<T>, mut f: F) -> CVecView<'a, U>
+    where
+        F: FnMut(&T) -> U,
+{
+    let mut mapped: Vec<_> = v.into_iter()
+        .map(|i| f(i))
+        .collect();
+    let size = mapped.len();
+    let capacity = mapped.capacity();
+    let array = mapped.as_ptr();
+    assert_eq!(size, capacity);
+    CVecView { array, size, _marker: ::std::marker::PhantomData }
+}
+
+pub trait Pack<'a> {
+    type In;
+    fn pack(value: &'a Self::In) -> Self;
+}
+
+impl<'a, T: Copy> Pack<'a> for T {
+    type In = T;
+    fn pack(value: &'a T) -> Self {
+        &value
+    }
+}
+
+impl<'a, T: Pack<'a>> Pack<'a> for CVecView<'a, T> {
+    type In = Vec<T::In>;
+    fn pack(value: &'a Self::In) -> Self {
+        pack(value, |e| Pack::pack(e))
+    }
+}
+
+#[repr(C)]
+#[derive(Debug, Clone)]
+pub(crate) struct CVec<T: Sized + NestedVec> {
     array: *mut T,
     size: usize,
 }
@@ -254,7 +295,7 @@ where
         .collect()
 }
 
-pub trait Unpack {
+pub(crate) trait Unpack {
     type Out;
     fn unpack(&self) -> Self::Out;
 }
@@ -273,7 +314,7 @@ impl<T: Copy> Unpack for T {
     }
 }
 
-pub trait NestedVec {
+pub(crate) trait NestedVec {
     const LEVEL: u32;
 }
 
