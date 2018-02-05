@@ -44,6 +44,7 @@ script:
   - find src/*.rs | xargs rustfmt --write-mode=diff
   # Available until `cargo fmt` landed in stable rust 1.24
   # - cargo fmt -- --write-mode=diff;
+  - diff -u <(cat native/*) <(clang-format native/*)
 
 notifications:
   email:
