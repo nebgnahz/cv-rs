@@ -42,14 +42,7 @@ void cv_to_ffi(const std::vector<double>& source, CVec<double>* dest) {
     ::memcpy(dest->array, source.data(), num * sizeof(double));
 }
 
-template <typename T, typename U>
-void cv_to_ffi(const std::vector<T>& source, CVec<U>* dest)
-{
-    size_t num = source.size();
-    dest->size = num;
-    dest->array = (U*) malloc(num * sizeof(U));
-    for (size_t i = 0; i < num; i++) {
-        cv_to_ffi(source[i], &dest->array[i]);
-    }
+void ffi_to_cv(const cv::Mat& source, cv::Mat* dest) {
+    *dest = source;
 }
 #endif

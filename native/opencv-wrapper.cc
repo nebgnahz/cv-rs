@@ -599,13 +599,29 @@ void cv_sift_detect_and_compute(cv::Ptr <cv::xfeatures2d::SIFT> *detector, cv::M
     cv_to_ffi(keypoints_vector, keypoints);
 }
 
-void cv_descriptor_matcher_match(cv::Mat* queryDescriptors,
-                                 cv::Mat*  trainDescriptors,
-                                 CVec<DMatch>* matches
-){
-    cv::FlannBasedMatcher matcher;
+void* cv_matcher_new(const char* descriptorMatcherType) {
+    auto result = cv::DescriptorMatcher::create(descriptorMatcherType);
+    return new cv::Ptr<cv::DescriptorMatcher>(result);
+}
+
+void  cv_matcher_drop(cv::Ptr <cv::DescriptorMatcher>* descriptorMatcher) {
+    delete descriptorMatcher;
+    descriptorMatcher = nullptr;
+}
+
+void cv_matcher_add(cv::Ptr <cv::DescriptorMatcher>& descriptorMatcher, CVec<cv::Mat>& descriptors) {
+    std::vector<cv::Mat> descriptors_vector;
+    ffi_to_cv(descriptors, &descriptors_vector);
+    descriptorMatcher.get()->add(descriptors_vector);
+}
+
+void  cv_matcher_train(cv::Ptr <cv::DescriptorMatcher>& descriptorMatcher) {
+    descriptorMatcher.get()->train();
+}
+
+void  cv_matcher_match(cv::Ptr <cv::DescriptorMatcher>& descriptorMatcher, cv::Mat& queryDescriptors, CVec<DMatch>* matches) {
     std::vector<cv::DMatch> matches_vector;
-    matcher.match(*queryDescriptors, *trainDescriptors, matches_vector);
+    descriptorMatcher.get()->match(queryDescriptors, matches_vector);
     cv_to_ffi(matches_vector, matches);
 }
 

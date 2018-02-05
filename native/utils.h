@@ -21,4 +21,18 @@ void cv_to_ffi(const std::vector<T>& source, CVec<U>* dest)
         cv_to_ffi(source[i], &dest->array[i]);
     }
 }
+
+
+void ffi_to_cv(const cv::Mat& source, cv::Mat* dest);
+
+template <typename T, typename U>
+void ffi_to_cv(const CVec<U>& source, std::vector<T>* dest)
+{
+    dest = new std::vector<U>();
+    dest->reserve(source.size);
+    int i = 0;
+    for(auto it = dest->begin(); it != dest->end(); it++, i++) {
+        ffi_to_cv(source.array[i], &*it);
+    }
+}
 #endif  // UTILS_H_
