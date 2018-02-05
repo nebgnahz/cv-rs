@@ -37,3 +37,10 @@ fn sift_lenna_detect_and_compute() {
     assert_ne!(descriptors.cols, 0);
     assert_eq!(keypoints.len() as i32, descriptors.rows);
 }
+
+#[test]
+fn flann_based_matcher() {
+    let lenna = load_lenna();
+    let result = FlannBasedMatcher::match_(&lenna, &lenna);
+    assert_ne!(result.len(), 0);
+}
