@@ -28,7 +28,6 @@ void ffi_to_cv(const cv::Mat& source, cv::Mat* dest);
 template <typename T, typename U>
 void ffi_to_cv(const CVec<U*>& source, std::vector<T>* dest)
 {
-    dest = new std::vector<U>();
     dest->reserve(source.size);
     for (size_t i = 0; i < source.size; i++) {
         T* cell = new T();

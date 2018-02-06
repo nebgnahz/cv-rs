@@ -45,9 +45,10 @@ fn flann_based_matcher() {
     let mser: SIFT = SIFTBuilder::default().into();
     let (_, descriptors) = mser.detect_and_compute(&lenna, &mask);
 
-    let descriptor_matcher = DescriptorMatcher::new("FlannBased");
+    let descriptor_matcher = DescriptorMatcher::new(DescriptorMatcherType::FlannBased);
     let train_descriptors = vec!(&descriptors);
     descriptor_matcher.add(&train_descriptors);
-    let is_empty = descriptor_matcher.is_empty();
-    assert_eq!(is_empty, false);
+    descriptor_matcher.train();
+    let result = descriptor_matcher.match_(&descriptors);
+    assert_ne!(result.len(), 0);
 }
