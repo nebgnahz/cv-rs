@@ -26,9 +26,9 @@ wait
 changed_files=(\"\${rust_files[@]}\" \"\${cpp_files[@]}\")
 if [ \${#changed_files[@]} -ne 0 ]; then
     git add \${changed_files[@]}
-	echo \"Formatting done, changed files: \${changed_files[@]}\"
+    echo \"Formatting done, changed files: \${changed_files[@]}\"
 else
-	echo \"No changes, formatting skipped\"
+    echo \"No changes, formatting skipped\"
 fi"  > .git/hooks/pre-commit
 
 chmod +x .git/hooks/pre-commit
