@@ -239,42 +239,50 @@ impl Rect2f {
 
 #[repr(C)]
 #[derive(Debug, Clone)]
-pub(crate) struct CVecView<'a, T: 'a + Sized> {
-    array: *const T,
+pub(crate) struct CVecView<T: Sized> {
+    array: *mut T,
     size: usize,
-    _marker: ::std::marker::PhantomData<&'a T>
 }
 
-fn pack<'a, T, U: Sized, F>(v: &'a Vec<T>, mut f: F) -> CVecView<'a, U>
+fn pack<T, U: Sized, F>(v: &Vec<T>, mut f: F) -> CVecView<U>
     where
         F: FnMut(&T) -> U,
 {
-    let mut mapped: Vec<_> = v.into_iter()
+    let mut mapped: Vec<_> = v.iter()
         .map(|i| f(i))
         .collect();
     let size = mapped.len();
     let capacity = mapped.capacity();
-    let array = mapped.as_ptr();
+    let array = mapped.as_mut_ptr();
     assert_eq!(size, capacity);
-    CVecView { array, size, _marker: ::std::marker::PhantomData }
+    mem::forget(mapped);
+    CVecView { array, size }
 }
 
-pub trait Pack<'a> {
+pub trait Pack {
     type In;
-    fn pack(value: &'a Self::In) -> Self;
+    fn pack(v: &Self::In) -> Self;
 }
 
-impl<'a, T: Copy> Pack<'a> for T {
+impl<T: Copy> Pack for T {
     type In = T;
-    fn pack(value: &'a T) -> Self {
-        &value
+    fn pack(v: &T) -> Self {
+        *v
     }
 }
 
-impl<'a, T: Pack<'a>> Pack<'a> for CVecView<'a, T> {
+impl<T: Pack> Pack for CVecView<T> {
     type In = Vec<T::In>;
-    fn pack(value: &'a Self::In) -> Self {
-        pack(value, |e| Pack::pack(e))
+    fn pack(v: &Self::In) -> Self {
+        pack(v, |e| Pack::pack(e))
+    }
+}
+
+impl<T> Drop for CVecView<T> {
+    fn drop(&mut self) {
+        unsafe {
+            Vec::from_raw_parts(self.array, self.size, self.size);
+        }
     }
 }
 

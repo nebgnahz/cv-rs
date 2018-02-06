@@ -1,13 +1,15 @@
 //! Provide types for matching keypoint descriptors
 use core::*;
 use std::ffi::*;
+use std::os::raw::c_char;
+
 
 enum CDescriptorMatcher {}
 
 extern "C" {
-    fn cv_matcher_new(descriptor_matcher_type: &CStr) -> *mut CDescriptorMatcher;
+    fn cv_matcher_new(descriptor_matcher_type: *const c_char) -> *mut CDescriptorMatcher;
     fn cv_matcher_drop(descriptor_matcher: *mut CDescriptorMatcher);
-    fn cv_matcher_add(descriptor_matcher: *mut CDescriptorMatcher, descriptors: *mut CVec<CMat>);
+    fn cv_matcher_add(descriptor_matcher: *mut CDescriptorMatcher, descriptors: *const CVecView<*mut CMat>);
     fn cv_matcher_train(descriptor_matcher: *mut CDescriptorMatcher);
     fn cv_matcher_match(descriptor_matcher: *mut CDescriptorMatcher, query_descriptors: *mut CMat, matches: *mut CVec<DMatch>);
 }
@@ -41,14 +43,18 @@ impl DescriptorMatcher {
     pub fn new(descriptor_matcher_type: &str) -> DescriptorMatcher {
         let descriptor_matcher_type = CString::new(descriptor_matcher_type).unwrap();
         let value = unsafe {
-            cv_matcher_new(&descriptor_matcher_type)
+            cv_matcher_new(descriptor_matcher_type.as_ptr())
         };
         DescriptorMatcher { value: value }
     }
 
     /// Adds descriptors to train a CPU or GPU descriptor collection
     pub fn add(&self, descriptors: Vec<Mat>) {
-        unimplemented!()
+        let descriptors = descriptors.iter().map(|x| x.inner).collect();
+        let vec_view = CVecView::pack(&descriptors);
+        unsafe {
+            cv_matcher_add(self.value,&vec_view);
+        }
     }
 
     /// Trains a descriptor matcher
