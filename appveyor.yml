@@ -23,7 +23,7 @@ install:
   - rustc -V
   - cargo -V
   # Install OpenCV
-  - ps: .\.windows\msvc_2_build_OCV.ps1 -EnableCuda 0 -Compiler vc15             
+  - ps: .\.windows\msvc_2_build_OCV.ps1 -EnableCuda 0 -Compiler vc15
 build_script:
   - cargo build --no-default-features
 test_script:
