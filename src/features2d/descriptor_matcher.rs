@@ -49,7 +49,7 @@ impl DescriptorMatcher {
     }
 
     /// Adds descriptors to train a CPU or GPU descriptor collection
-    pub fn add(&self, descriptors: Vec<Mat>) {
+    pub fn add(&self, descriptors: &Vec<&Mat>) {
         let descriptors = descriptors.iter().map(|x| x.inner).collect();
         let vec_view = CVecView::pack(&descriptors);
         unsafe {

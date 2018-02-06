@@ -40,11 +40,15 @@ fn sift_lenna_detect_and_compute() {
 
 #[test]
 fn flann_based_matcher() {
-    let foo = DescriptorMatcher::new("FlannBased");
-//    let lenna = load_lenna();
-//    let mask = Mat::new();
-//    let mser: SIFT = SIFTBuilder::default().into();
-//    let (_, descriptors) = mser.detect_and_compute(&lenna, &mask);
-//    let result = FlannBasedMatcher::match_(&descriptors, &descriptors);
-//    assert_ne!(result.len(), 0);
+    let lenna = load_lenna();
+    let mask = Mat::new();
+    let mser: SIFT = SIFTBuilder::default().into();
+    let (_, descriptors) = mser.detect_and_compute(&lenna, &mask);
+
+    let descriptor_matcher = DescriptorMatcher::new("FlannBased");
+    let train_descriptors = vec!(&descriptors);
+    descriptor_matcher.add(&train_descriptors);
+    descriptor_matcher.train();
+    let result = descriptor_matcher.match_(&descriptors);
+    assert_ne!(result.len(), 0);
 }
