@@ -26,24 +26,14 @@ void cv_to_ffi(const std::vector<T>& source, CVec<U>* dest)
 void ffi_to_cv(const cv::Mat& source, cv::Mat* dest);
 
 template <typename T, typename U>
-void ffi_to_cv(const CVec<U>& source, std::vector<T>* dest)
-{
-    dest = new std::vector<U>();
-    dest->reserve(source.size);
-    int i = 0;
-    for(auto it = dest->begin(); it != dest->end(); it++, i++) {
-        ffi_to_cv(source.array[i], &*it);
-    }
-}
-
-template <typename T, typename U>
 void ffi_to_cv(const CVec<U*>& source, std::vector<T>* dest)
 {
     dest = new std::vector<U>();
     dest->reserve(source.size);
-    int i = 0;
-    for(auto it = dest->begin(); it != dest->end(); it++, i++) {
-        ffi_to_cv(*source.array[i], &*it);
+    for (size_t i = 0; i < source.size; i++) {
+        T* cell = new T();
+        ffi_to_cv(*source.array[i], cell);
+        dest->push_back(*cell);
     }
 }
 #endif  // UTILS_H_
