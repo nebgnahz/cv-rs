@@ -36,7 +36,19 @@ pub enum DescriptorMatcherType {
     FlannBased
 }
 
-/// Flann-based descriptor matcher
+impl DescriptorMatcherType {
+    pub(crate) fn as_str(&self)-> &'static str {
+        match *self {
+            DescriptorMatcherType::BruteForce => "BruteForce",
+            DescriptorMatcherType::BruteForceL1 => "BruteForce-L1",
+            DescriptorMatcherType::BruteForceHamming => "BruteForce-Hamming",
+            DescriptorMatcherType::BruteForceHamming2 => "BruteForce-Hamming(2)",
+            DescriptorMatcherType::FlannBased => "FlannBased"
+        }
+    }
+}
+
+/// Type for matching keypoint descriptors
 #[derive(Debug)]
 pub struct DescriptorMatcher {
     value: *mut CDescriptorMatcher,
@@ -51,20 +63,9 @@ impl Drop for DescriptorMatcher {
 }
 
 impl DescriptorMatcher {
-    fn get_descriptor_matcher_type(descriptor_matcher_type: DescriptorMatcherType) -> &'static str {
-        match descriptor_matcher_type {
-            DescriptorMatcherType::BruteForce => "BruteForce",
-            DescriptorMatcherType::BruteForceL1 => "BruteForce-L1",
-            DescriptorMatcherType::BruteForceHamming => "BruteForce-Hamming",
-            DescriptorMatcherType::BruteForceHamming2 => "BruteForce-Hamming(2)",
-            DescriptorMatcherType::FlannBased => "FlannBased"
-        }
-    }
-
     /// Creates a descriptor matcher of a given type with the default parameters (using default constructor).
     pub fn new(descriptor_matcher_type: DescriptorMatcherType) -> DescriptorMatcher {
-        let desscriptor_matcher_type = DescriptorMatcher::get_descriptor_matcher_type(descriptor_matcher_type);
-        let descriptor_matcher_type = CString::new(desscriptor_matcher_type).unwrap();
+        let descriptor_matcher_type = CString::new(descriptor_matcher_type.as_str()).unwrap();
         let value = unsafe {
             cv_matcher_new(descriptor_matcher_type.as_ptr())
         };
