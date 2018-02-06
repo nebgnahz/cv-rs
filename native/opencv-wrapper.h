@@ -222,7 +222,7 @@ void cv_sift_detect_and_compute(cv::Ptr <cv::xfeatures2d::SIFT> *detector, cv::M
 
 void* cv_matcher_new(const char* descriptorMatcherType);
 void  cv_matcher_drop(cv::Ptr <cv::DescriptorMatcher>* descriptorMatcher);
-void cv_matcher_add(cv::Ptr <cv::DescriptorMatcher>& descriptorMatcher, CVec<cv::Mat>& descriptors);
+void cv_matcher_add(cv::Ptr <cv::DescriptorMatcher>& descriptorMatcher, CVec<cv::Mat*>& descriptors);
 void  cv_matcher_train(cv::Ptr <cv::DescriptorMatcher>& descriptorMatcher);
 void  cv_matcher_match(cv::Ptr <cv::DescriptorMatcher>& descriptorMatcher, cv::Mat& queryDescriptors, CVec<DMatch>* matches);
 

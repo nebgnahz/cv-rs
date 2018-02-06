@@ -609,7 +609,7 @@ void  cv_matcher_drop(cv::Ptr <cv::DescriptorMatcher>* descriptorMatcher) {
     descriptorMatcher = nullptr;
 }
 
-void cv_matcher_add(cv::Ptr <cv::DescriptorMatcher>& descriptorMatcher, CVec<cv::Mat>& descriptors) {
+void cv_matcher_add(cv::Ptr <cv::DescriptorMatcher>& descriptorMatcher, CVec<cv::Mat*>& descriptors) {
     std::vector<cv::Mat> descriptors_vector;
     ffi_to_cv(descriptors, &descriptors_vector);
     descriptorMatcher.get()->add(descriptors_vector);
