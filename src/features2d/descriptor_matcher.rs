@@ -12,6 +12,7 @@ extern "C" {
     fn cv_matcher_add(descriptor_matcher: *mut CDescriptorMatcher, descriptors: *const CVecView<*mut CMat>);
     fn cv_matcher_train(descriptor_matcher: *mut CDescriptorMatcher);
     fn cv_matcher_match(descriptor_matcher: *mut CDescriptorMatcher, query_descriptors: *mut CMat, matches: *mut CVec<DMatch>);
+    fn cv_matcher_is_empty(descriptor_matcher: *mut CDescriptorMatcher) -> bool;
 }
 
 /// Type for matching keypoint descriptors
@@ -60,6 +61,11 @@ impl DescriptorMatcher {
     /// Trains a descriptor matcher
     pub fn train(&self) {
         unsafe{cv_matcher_train(self.value)}
+    }
+
+    /// Indicates if matcher is empty
+    pub fn is_empty(&self) -> bool {
+        unsafe{cv_matcher_is_empty(self.value)}
     }
 
     /// Finds the best match for each descriptor from a query set
