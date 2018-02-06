@@ -6,7 +6,7 @@ echo "#!/bin/sh
 declare -a rust_files=()
 declare -a cpp_files=()
 
-for file in \$(git ls-files -m); do
+for file in \$(git ls-files -m -o --exclude-standard); do
     if [[ \"\${file}\" == *.rs ]]; then
         rust_files+=(\"\${file}\")
     fi
