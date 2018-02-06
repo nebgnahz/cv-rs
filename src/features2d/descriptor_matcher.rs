@@ -85,7 +85,7 @@ impl DescriptorMatcher {
         unsafe{cv_matcher_train(self.value)}
     }
 
-    /// Indicates if matcher is empty
+    /// Returns true if there are no train descriptors
     pub fn is_empty(&self) -> bool {
         unsafe{cv_matcher_is_empty(self.value)}
     }
