@@ -7,6 +7,9 @@ declare -a rust_files=()
 declare -a cpp_files=()
 
 for file in \$(git ls-files -m -o --exclude-standard); do
+    if [ ! -f \"\${file}\" ]; then
+        continue
+    fi
     if [[ \"\${file}\" == *.rs ]]; then
         rust_files+=(\"\${file}\")
     fi
