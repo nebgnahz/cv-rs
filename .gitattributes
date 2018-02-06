@@ -1,9 +1,9 @@
 [core]
-    whitespace = trailing-space,space-before-tab
+    whitespace=trailing-space,space-before-tab
 [apply]
-    whitespace = fix
+    whitespace=fix
 
-*    binary
+* binary
                                                                 
 *.[sS][lL][nN]                                                   text=auto diff merge
 *.[cC][sS][pP][rR][oO][jJ]                                       text=auto diff merge
