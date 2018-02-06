@@ -1,7 +1,7 @@
 #!/bin/sh
 rustup component add rustfmt-preview
 
-rustfmt_path=`find $HOME/.rustup/toolchains/ -wholename '*bin/rustfmt*'`
+rustfmt_path=`which rustfmt`
 echo "#!/bin/sh
 declare -a rust_files=()
 declare -a cpp_files=()
@@ -19,8 +19,12 @@ for file in \$files; do
         cpp_files+=(\"\${file}\")
     fi
 done
-echo \${rust_files[@]} | xargs --no-run-if-empty $rustfmt_path &
-echo \${cpp_files[@]} | xargs --no-run-if-empty clang-format -i &
+if [ \${#rust_files[@]} -ne 0  ]; then
+     $rustfmt_path \${rust_files[@]} &
+fi
+if [ \${#cpp_files[@]} -ne 0  ]; then
+     clang-format -i \${cpp_files[@]} &
+fi
 wait
 
 changed_files=(\"\${rust_files[@]}\" \"\${cpp_files[@]}\")
