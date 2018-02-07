@@ -1,5 +1,8 @@
-*    binary                                                     
-                                                                
+[core]
+    whitespace=trailing-space,space-before-tab
+[apply]
+    whitespace=fix
+* binary
 *.[sS][lL][nN]                                                   text=auto diff merge
 *.[cC][sS][pP][rR][oO][jJ]                                       text=auto diff merge
 *.[vV][bB][pP][rR][oO][jJ]                                       text=auto diff merge
@@ -17,7 +20,7 @@
 *.[fF][iI][lL][tT][eE][rR][sS]                                   text=auto diff merge
 *.[vV][cC][xX][iI][tT][eE][mM][sS]                               text=auto diff merge
 *.[jJ][aA][vV][aA]                                               text=auto diff merge
-*.[rR][eE][sS][xX]                                               text=auto diff merge                                                                
+*.[rR][eE][sS][xX]                                               text=auto diff merge
 *.[bB][aA][tT]                                                   text=auto diff merge
 *.[pP][sS][11]                                                   text=auto diff merge
 *.[cC][oO][nN][fF][iI][gG]                                       text=auto diff merge
@@ -45,10 +48,10 @@
 *.[cC][oO][fF][fF][eE][eE]                                       text=auto diff merge
 *.[aA][sS][aA][xX]                                               text=auto diff merge
 *.[xX][sS][lL][tT]                                               text=auto diff merge
-*.[cC][fF][gG]                                                   text=auto diff merge                                                                 
+*.[cC][fF][gG]                                                   text=auto diff merge
 *.[cC][oO][nN][fF][iI][gG].[dD][eE][bB][uU][gG]                  text=auto diff merge
 *.[cC][oO][nN][fF][iI][gG].[rR][eE][lL][eE][aA][sS][eE]          text=auto diff merge
-*.[cC][oO][nN][fF][iI][gG].[sS][tT][aA][gG][iI][nN][gG]          text=auto diff merge                                                                 
+*.[cC][oO][nN][fF][iI][gG].[sS][tT][aA][gG][iI][nN][gG]          text=auto diff merge
 *.[dD][oO][tT][sS][eE][tT][tT][iI][nN][gG][sS]                   text=auto diff merge
 *.[pP][uU][bB][lL][iI][sS][hH][sS][eE][tT][tT][iI][nN][gG][sS]   text=auto diff merge
 *.[mM][dD]                                                       text=auto diff merge
@@ -69,7 +72,6 @@
 *.[lL][eE][sS][sS]                                               text=auto diff merge
 *.[nN][uU][sS][pP][eE][cC]                                       text=auto diff merge
 *.[lL][iI][cC][eE][nN][sS][eE]                                   text=auto diff merge
-        
-Cargo.lock                                                      text=auto diff merge
-.gitattributes                                                  text=auto diff merge
-.gitignore                                                      text=auto diff merge
+Cargo.lock                                                       text=auto diff merge
+.gitattributes                                                   text=auto diff merge
+.gitignore                                                       text=auto diff merge

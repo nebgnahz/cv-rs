@@ -1,5 +1,11 @@
 #ifndef CV_RS_COMMON_H
 #define CV_RS_COMMON_H
+
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <opencv2/core.hpp>
+
 typedef struct {
     int32_t x;
     int32_t y;
@@ -56,29 +62,24 @@ typedef struct {
 } KeyPoint;
 
 typedef struct {
-    float 	distance;
-    int 	imgIdx;
-    int 	queryIdx;
-    int 	trainIdx;
+    float distance;
+    int imgIdx;
+    int queryIdx;
+    int trainIdx;
 } DMatch;
 
 // Caller is responsible for disposing `error` field
-template<typename T>
-struct Result
-{
+template <typename T>
+struct Result {
     T value;
     const char* error;
 
-    static Result<T> FromFunction(std::function<T()> function)
-    {
+    static Result<T> FromFunction(std::function<T()> function) {
         T value;
         char* error = nullptr;
-        try
-        {
+        try {
             value = function();
-        }
-        catch( cv::Exception& e )
-        {
+        } catch (cv::Exception& e) {
             const char* err_msg = e.what();
             auto len = std::strlen(err_msg);
             error = new char[len + 1];
@@ -88,10 +89,9 @@ struct Result
     }
 };
 
-template<typename T>
-struct CVec
-{
+template <typename T>
+struct CVec {
     T* array;
     size_t size;
 };
-#endif //CV_RS_COMMON_H
+#endif  // CV_RS_COMMON_H

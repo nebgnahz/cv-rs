@@ -1,19 +1,20 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
-#include <vector>
 #include <opencv2/core.hpp>
+#include <vector>
+
 #include "common.h"
 #include "utils.h"
 
-void cv_to_ffi(const cv::Rect& source, Rect* dest){
+void cv_to_ffi(const cv::Rect& source, Rect* dest) {
     dest->x = source.x;
     dest->y = source.y;
     dest->width = source.width;
     dest->height = source.height;
 }
 
-void cv_to_ffi(const cv::Point& source, Point2i* dest){
+void cv_to_ffi(const cv::Point& source, Point2i* dest) {
     dest->x = source.x;
     dest->y = source.y;
 };
@@ -28,7 +29,7 @@ void cv_to_ffi(const cv::KeyPoint& source, KeyPoint* dest) {
     dest->class_id = source.class_id;
 }
 
-void cv_to_ffi(const cv::DMatch& source, DMatch* dest){
+void cv_to_ffi(const cv::DMatch& source, DMatch* dest) {
     dest->distance = dest->distance;
     dest->imgIdx = dest->imgIdx;
     dest->queryIdx = source.queryIdx;
