@@ -625,10 +625,12 @@ bool cv_matcher_is_empty(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher) {
     return descriptorMatcher.get()->empty();
 }
 
-void cv_matcher_match_two(cv::Mat& queryDescriptors, cv::Mat& trainDescriptors, CVec<DMatch>* matches) {
-    cv::FlannBasedMatcher matcher;
+void cv_matcher_match_two(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
+                          cv::Mat& queryDescriptors,
+                          cv::Mat& trainDescriptors,
+                          CVec<DMatch>* matches) {
     std::vector<cv::DMatch> matches_vector;
-    matcher.match(queryDescriptors, trainDescriptors, matches_vector);
+    descriptorMatcher.get()->match(queryDescriptors, trainDescriptors, matches_vector);
     cv_to_ffi(matches_vector, matches);
 }
 

@@ -59,6 +59,8 @@ fn flann_based_matcher_two() {
     let mask = Mat::new();
     let mser: SIFT = SIFTBuilder::default().into();
     let (_, descriptors) = mser.detect_and_compute(&lenna, &mask);
-    let result = DescriptorMatcher::match_two(&descriptors, &descriptors);
+
+    let descriptor_matcher = DescriptorMatcher::new(DescriptorMatcherType::FlannBased);
+    let result = descriptor_matcher.match_two(&descriptors, &descriptors);
     assert_ne!(result.len(), 0);
 }

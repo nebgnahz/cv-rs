@@ -16,7 +16,12 @@ extern "C" {
         query_descriptors: *mut CMat,
         matches: *mut CVec<DMatch>,
     );
-    fn cv_matcher_match_two(query_descriptors: *mut CMat, train_descriptors: *mut CMat, matches: *mut CVec<DMatch>);
+    fn cv_matcher_match_two(
+        descriptor_matcher: *mut CDescriptorMatcher,
+        query_descriptors: *mut CMat,
+        train_descriptors: *mut CMat,
+        matches: *mut CVec<DMatch>,
+    );
     fn cv_matcher_is_empty(descriptor_matcher: *mut CDescriptorMatcher) -> bool;
 }
 
@@ -100,10 +105,11 @@ impl DescriptorMatcher {
 
     /// Finds the best match for each descriptor from a query set.
     /// Unlike `match_`, train descriptors collection are passed directly
-    pub fn match_two(query_descriptors: &Mat, train_descriptors: &Mat) -> Vec<DMatch> {
+    pub fn match_two(&self, query_descriptors: &Mat, train_descriptors: &Mat) -> Vec<DMatch> {
         let mut matches = CVec::<DMatch>::default();
         unsafe {
             cv_matcher_match_two(
+                self.value,
                 query_descriptors.inner,
                 train_descriptors.inner,
                 &mut matches,
