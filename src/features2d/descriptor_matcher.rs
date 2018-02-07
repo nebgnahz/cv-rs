@@ -16,6 +16,7 @@ extern "C" {
         query_descriptors: *mut CMat,
         matches: *mut CVec<DMatch>,
     );
+    fn cv_matcher_match_two(query_descriptors: *mut CMat, train_descriptors: *mut CMat, matches: *mut CVec<DMatch>);
     fn cv_matcher_is_empty(descriptor_matcher: *mut CDescriptorMatcher) -> bool;
 }
 
@@ -88,11 +89,6 @@ impl DescriptorMatcher {
         unsafe { cv_matcher_train(self.value) }
     }
 
-    /// Returns true if there are no train descriptors
-    pub fn is_empty(&self) -> bool {
-        unsafe { cv_matcher_is_empty(self.value) }
-    }
-
     /// Finds the best match for each descriptor from a query set
     pub fn match_(&self, query_descriptors: &Mat) -> Vec<DMatch> {
         let mut matches = CVec::<DMatch>::default();
@@ -100,5 +96,24 @@ impl DescriptorMatcher {
             cv_matcher_match(self.value, query_descriptors.inner, &mut matches);
         }
         matches.unpack()
+    }
+
+    /// Finds the best match for each descriptor from a query set.
+    /// Unlike `match_`, train descriptors collection are passed directly
+    pub fn match_two(query_descriptors: &Mat, train_descriptors: &Mat) -> Vec<DMatch> {
+        let mut matches = CVec::<DMatch>::default();
+        unsafe {
+            cv_matcher_match_two(
+                query_descriptors.inner,
+                train_descriptors.inner,
+                &mut matches,
+            );
+        }
+        matches.unpack()
+    }
+
+    /// Returns true if there are no train descriptors
+    pub fn is_empty(&self) -> bool {
+        unsafe { cv_matcher_is_empty(self.value) }
     }
 }

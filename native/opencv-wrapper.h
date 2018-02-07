@@ -246,7 +246,7 @@ void cv_matcher_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
                       cv::Mat& queryDescriptors,
                       CVec<DMatch>* matches);
 bool cv_matcher_is_empty(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher);
-
+void cv_matcher_match_two(cv::Mat& queryDescriptors, cv::Mat& trainDescriptors, CVec<DMatch>* matches);
 // =============================================================================
 //   Other
 // =============================================================================
