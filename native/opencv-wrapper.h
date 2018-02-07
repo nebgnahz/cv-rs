@@ -57,44 +57,21 @@ void c_drop(void* value);
 //  core array
 // =============================================================================
 void cv_in_range(cv::Mat* mat, Scalar lowerb, Scalar upperb, cv::Mat* dst);
-void cv_min_max_loc(const cv::Mat* const mat,
-                    double* min,
-                    double* max,
-                    Point2i* minLoc,
-                    Point2i* maxLoc,
-                    const cv::Mat* const cmask);
-void cv_mix_channels(cv::Mat* mat,
-                     size_t nsrcs,
-                     cv::Mat* dst,
-                     size_t ndsts,
-                     const int* from_to,
-                     size_t npairs);
-void cv_normalize(
-    cv::Mat* csrc, cv::Mat* cdst, double alpha, double beta, int norm_type);
-void cv_bitwise_and(const cv::Mat* const src1,
-                    const cv::Mat* const src2,
-                    cv::Mat* dst);
+void cv_min_max_loc(
+    const cv::Mat* const mat, double* min, double* max, Point2i* minLoc, Point2i* maxLoc, const cv::Mat* const cmask);
+void cv_mix_channels(cv::Mat* mat, size_t nsrcs, cv::Mat* dst, size_t ndsts, const int* from_to, size_t npairs);
+void cv_normalize(cv::Mat* csrc, cv::Mat* cdst, double alpha, double beta, int norm_type);
+void cv_bitwise_and(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst);
 void cv_bitwise_not(const cv::Mat* const src, cv::Mat* const dst);
-void cv_bitwise_or(const cv::Mat* const src1,
-                   const cv::Mat* const src2,
-                   cv::Mat* dst);
-void cv_bitwise_xor(const cv::Mat* const src1,
-                    const cv::Mat* const src2,
-                    cv::Mat* dst);
+void cv_bitwise_or(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst);
+void cv_bitwise_xor(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst);
 int cv_count_non_zero(const cv::Mat* const src);
 
 // =============================================================================
 //  Imgproc
 // =============================================================================
-void cv_line(cv::Mat* mat,
-             Point2i pt1,
-             Point2i pt2,
-             Scalar color,
-             int thickness,
-             int linetype,
-             int shift);
-void cv_rectangle(
-    cv::Mat* mat, Rect crect, Scalar color, int thickness, int linetype);
+void cv_line(cv::Mat* mat, Point2i pt1, Point2i pt2, Scalar color, int thickness, int linetype, int shift);
+void cv_rectangle(cv::Mat* mat, Rect crect, Scalar color, int thickness, int linetype);
 void cv_ellipse(cv::Mat* mat,
                 Point2i center,
                 Size2i axes,
@@ -108,12 +85,7 @@ void cv_ellipse(cv::Mat* mat,
 
 void cv_cvt_color(cv::Mat* mat, cv::Mat* output, int code);
 void cv_pyr_down(cv::Mat* mat, cv::Mat* output);
-void cv_resize(cv::Mat* from,
-               cv::Mat* to,
-               Size2i dsize,
-               double fx,
-               double fy,
-               int interpolation);
+void cv_resize(cv::Mat* from, cv::Mat* to, Size2i dsize, double fx, double fy, int interpolation);
 void cv_calc_hist(const cv::Mat* const cimages,
                   int nimages,
                   const int* channels,
@@ -133,10 +105,8 @@ void cv_calc_back_project(const cv::Mat* images,
 //  Imgcodecs
 // =============================================================================
 void* cv_imdecode(const uint8_t* const buffer, size_t len, int flag);
-ImencodeResult cv_imencode(const char* const ext,
-                           const cv::Mat* const mat,
-                           const int* const flag_ptr,
-                           size_t flag_size);
+ImencodeResult
+cv_imencode(const char* const ext, const cv::Mat* const mat, const int* const flag_ptr, size_t flag_size);
 
 // =============================================================================
 //   Highgui: high-level GUI
@@ -147,9 +117,7 @@ void cv_imshow(const char* const winname, cv::Mat* mat);
 int cv_wait_key(int delay_in_millis);
 
 typedef void (*MouseCallback)(int e, int x, int y, int flags, void* data);
-void cv_set_mouse_callback(const char* const winname,
-                           MouseCallback onMouse,
-                           void* userdata);
+void cv_set_mouse_callback(const char* const winname, MouseCallback onMouse, void* userdata);
 
 // =============================================================================
 //   VideoIO
@@ -165,18 +133,10 @@ double cv_videocapture_get(cv::VideoCapture* cap, int property);
 int cv_fourcc(char c1, char c2, char c3, char c4);
 
 void* cv_videowriter_default();
-void* cv_videowriter_new(const char* const path,
-                         int fourcc,
-                         double fps,
-                         Size2i frame_size,
-                         bool is_color);
+void* cv_videowriter_new(const char* const path, int fourcc, double fps, Size2i frame_size, bool is_color);
 void cv_videowriter_drop(cv::VideoWriter* writer);
-bool cv_videowriter_open(cv::VideoWriter* writer,
-                         const char* const path,
-                         int fourcc,
-                         double fps,
-                         Size2i frame_size,
-                         bool is_color);
+bool cv_videowriter_open(
+    cv::VideoWriter* writer, const char* const path, int fourcc, double fps, Size2i frame_size, bool is_color);
 bool cv_videowriter_is_opened(cv::VideoWriter* writer);
 void cv_videowriter_write(cv::VideoWriter* writer, cv::Mat* mat);
 bool cv_videowriter_set(cv::VideoWriter* writer, int property, double value);
@@ -187,8 +147,7 @@ double cv_videowriter_get(cv::VideoWriter* writer, int property);
 // =============================================================================
 void* cv_cascade_classifier_new();
 void* cv_cascade_classifier_from_path(const char* const path);
-bool cv_cascade_classifier_load(cv::CascadeClassifier* cc,
-                                const char* const path);
+bool cv_cascade_classifier_load(cv::CascadeClassifier* cc, const char* const path);
 void cv_cascade_classifier_drop(cv::CascadeClassifier* cc);
 
 // vec_of_rect is dynamically allocated, the caller should take ownership of it.
@@ -223,9 +182,7 @@ void cv_hog_detect(cv::HOGDescriptor*,
 // =============================================================================
 void* cv_term_criteria_new(int type, int count, double epsilon);
 void cv_term_criteria_drop(cv::TermCriteria* criteria);
-RotatedRect cv_camshift(cv::Mat* back_project_image,
-                        Rect window,
-                        cv::TermCriteria* criteria);
+RotatedRect cv_camshift(cv::Mat* back_project_image, Rect window, cv::TermCriteria* criteria);
 
 // =============================================================================
 //   MSER
@@ -255,11 +212,7 @@ void cv_mser_detect_and_compute(cv::Ptr<cv::MSER>* detector,
 //   SURF
 // =============================================================================
 
-void* cv_surf_new(double hessianThreshold,
-                  int nOctaves,
-                  int nOctaveLayers,
-                  bool extended,
-                  bool upright);
+void* cv_surf_new(double hessianThreshold, int nOctaves, int nOctaveLayers, bool extended, bool upright);
 void cv_surf_drop(cv::Ptr<cv::xfeatures2d::SURF>* detector);
 void cv_surf_detect_and_compute(cv::Ptr<cv::xfeatures2d::SURF>* detector,
                                 cv::Mat* image,
@@ -272,11 +225,7 @@ void cv_surf_detect_and_compute(cv::Ptr<cv::xfeatures2d::SURF>* detector,
 //   SIFT
 // =============================================================================
 
-void* cv_sift_new(int nfeatures,
-                  int nOctaveLayers,
-                  double contrastThreshold,
-                  double edgeThreshold,
-                  double sigma);
+void* cv_sift_new(int nfeatures, int nOctaveLayers, double contrastThreshold, double edgeThreshold, double sigma);
 void cv_sift_drop(cv::Ptr<cv::xfeatures2d::SIFT>* detector);
 void cv_sift_detect_and_compute(cv::Ptr<cv::xfeatures2d::SIFT>* detector,
                                 cv::Mat* image,
@@ -291,8 +240,7 @@ void cv_sift_detect_and_compute(cv::Ptr<cv::xfeatures2d::SIFT>* detector,
 
 void* cv_matcher_new(const char* descriptorMatcherType);
 void cv_matcher_drop(cv::Ptr<cv::DescriptorMatcher>* descriptorMatcher);
-void cv_matcher_add(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
-                    CVec<cv::Mat*>& descriptors);
+void cv_matcher_add(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher, CVec<cv::Mat*>& descriptors);
 void cv_matcher_train(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher);
 void cv_matcher_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
                       cv::Mat& queryDescriptors,
@@ -303,10 +251,7 @@ bool cv_matcher_is_empty(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher);
 //   Other
 // =============================================================================
 
-void cv_compare_hist(cv::Mat* first_image,
-                     cv::Mat* second_image,
-                     int method,
-                     Result<double>* result);
+void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result);
 
 EXTERN_C_END
 

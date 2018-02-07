@@ -245,12 +245,10 @@ pub(crate) struct CVecView<T: Sized> {
 }
 
 fn pack<T, U: Sized, F>(v: &Vec<T>, mut f: F) -> CVecView<U>
-    where
-        F: FnMut(&T) -> U,
+where
+    F: FnMut(&T) -> U,
 {
-    let mut mapped: Vec<_> = v.iter()
-        .map(|i| f(i))
-        .collect();
+    let mut mapped: Vec<_> = v.iter().map(|i| f(i)).collect();
     let size = mapped.len();
     let capacity = mapped.capacity();
     let array = mapped.as_mut_ptr();

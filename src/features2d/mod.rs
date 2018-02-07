@@ -6,10 +6,10 @@ mod descriptor_matcher;
 
 use core::*;
 
+pub use self::descriptor_matcher::*;
 pub use self::mser::*;
 pub use self::sift::*;
 pub use self::surf::*;
-pub use self::descriptor_matcher::*;
 
 /// Basic trait for 2D image feature detectors and descriptor extractors
 pub trait Feature2D {

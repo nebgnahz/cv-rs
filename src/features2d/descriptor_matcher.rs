@@ -11,7 +11,11 @@ extern "C" {
     fn cv_matcher_drop(descriptor_matcher: *mut CDescriptorMatcher);
     fn cv_matcher_add(descriptor_matcher: *mut CDescriptorMatcher, descriptors: *const CVecView<*mut CMat>);
     fn cv_matcher_train(descriptor_matcher: *mut CDescriptorMatcher);
-    fn cv_matcher_match(descriptor_matcher: *mut CDescriptorMatcher, query_descriptors: *mut CMat, matches: *mut CVec<DMatch>);
+    fn cv_matcher_match(
+        descriptor_matcher: *mut CDescriptorMatcher,
+        query_descriptors: *mut CMat,
+        matches: *mut CVec<DMatch>,
+    );
     fn cv_matcher_is_empty(descriptor_matcher: *mut CDescriptorMatcher) -> bool;
 }
 
@@ -33,17 +37,17 @@ pub enum DescriptorMatcherType {
     BruteForceL1,
     BruteForceHamming,
     BruteForceHamming2,
-    FlannBased
+    FlannBased,
 }
 
 impl DescriptorMatcherType {
-    pub(crate) fn as_str(&self)-> &'static str {
+    pub(crate) fn as_str(&self) -> &'static str {
         match *self {
             DescriptorMatcherType::BruteForce => "BruteForce",
             DescriptorMatcherType::BruteForceL1 => "BruteForce-L1",
             DescriptorMatcherType::BruteForceHamming => "BruteForce-Hamming",
             DescriptorMatcherType::BruteForceHamming2 => "BruteForce-Hamming(2)",
-            DescriptorMatcherType::FlannBased => "FlannBased"
+            DescriptorMatcherType::FlannBased => "FlannBased",
         }
     }
 }
@@ -66,9 +70,7 @@ impl DescriptorMatcher {
     /// Creates a descriptor matcher of a given type with the default parameters (using default constructor).
     pub fn new(descriptor_matcher_type: DescriptorMatcherType) -> DescriptorMatcher {
         let descriptor_matcher_type = CString::new(descriptor_matcher_type.as_str()).unwrap();
-        let value = unsafe {
-            cv_matcher_new(descriptor_matcher_type.as_ptr())
-        };
+        let value = unsafe { cv_matcher_new(descriptor_matcher_type.as_ptr()) };
         DescriptorMatcher { value: value }
     }
 
@@ -77,25 +79,25 @@ impl DescriptorMatcher {
         let descriptors = descriptors.iter().map(|x| x.inner).collect();
         let vec_view = CVecView::pack(&descriptors);
         unsafe {
-            cv_matcher_add(self.value,&vec_view);
+            cv_matcher_add(self.value, &vec_view);
         }
     }
 
     /// Trains a descriptor matcher
     pub fn train(&self) {
-        unsafe{cv_matcher_train(self.value)}
+        unsafe { cv_matcher_train(self.value) }
     }
 
     /// Returns true if there are no train descriptors
     pub fn is_empty(&self) -> bool {
-        unsafe{cv_matcher_is_empty(self.value)}
+        unsafe { cv_matcher_is_empty(self.value) }
     }
 
     /// Finds the best match for each descriptor from a query set
     pub fn match_(&self, query_descriptors: &Mat) -> Vec<DMatch> {
         let mut matches = CVec::<DMatch>::default();
         unsafe {
-            cv_matcher_match(self.value,query_descriptors.inner, &mut matches);
+            cv_matcher_match(self.value, query_descriptors.inner, &mut matches);
         }
         matches.unpack()
     }

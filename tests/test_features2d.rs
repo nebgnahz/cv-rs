@@ -46,7 +46,7 @@ fn flann_based_matcher() {
     let (_, descriptors) = mser.detect_and_compute(&lenna, &mask);
 
     let descriptor_matcher = DescriptorMatcher::new(DescriptorMatcherType::FlannBased);
-    let train_descriptors = vec!(&descriptors);
+    let train_descriptors = vec![&descriptors];
     descriptor_matcher.add(&train_descriptors);
     descriptor_matcher.train();
     let result = descriptor_matcher.match_(&descriptors);
