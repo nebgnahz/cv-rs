@@ -33,7 +33,7 @@ void cv_gpu_hog_set_gamma_correction(cv::Ptr<cv::cuda::HOG>*, bool gamma);
 void cv_gpu_hog_set_group_threshold(cv::Ptr<cv::cuda::HOG>*, int group_threshold);
 void cv_gpu_hog_set_hit_threshold(cv::Ptr<cv::cuda::HOG>*, double hit_threshold);
 void cv_gpu_hog_set_l2hys_threshold(cv::Ptr<cv::cuda::HOG>*, double l2hys_threshold);
-void cv_gpu_hog_set_num_levels(cv::Ptr<cv::cuda::HOG>*, size_t num_levels);
+void cv_gpu_hog_set_num_levels(cv::Ptr<cv::cuda::HOG>*, int num_levels);
 void cv_gpu_hog_set_scale_factor(cv::Ptr<cv::cuda::HOG>*, double scale_factor);
 void cv_gpu_hog_set_win_sigma(cv::Ptr<cv::cuda::HOG>*, double win_sigma);
 void cv_gpu_hog_set_win_stride(cv::Ptr<cv::cuda::HOG>*, Size2i win_stride);

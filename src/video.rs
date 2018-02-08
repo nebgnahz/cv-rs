@@ -5,6 +5,7 @@ pub mod tracking {
     //! track](http://docs.opencv.org/3.1.0/dc/d6b/group__video__track.html)
 
     use super::super::core::*;
+    use std::os::raw::c_int;
     // =========================================================================
     //   VideoTrack
     // =========================================================================
@@ -22,7 +23,7 @@ pub mod tracking {
     }
 
     extern "C" {
-        fn cv_term_criteria_new(t: i32, count: i32, epsilon: f64) -> *mut CTermCriteria;
+        fn cv_term_criteria_new(t: c_int, count: c_int, epsilon: f64) -> *mut CTermCriteria;
         fn cv_term_criteria_drop(criteria: *mut CTermCriteria);
         fn cv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
     }
@@ -35,8 +36,8 @@ pub mod tracking {
 
     impl TermCriteria {
         /// Creates a new termination criteria.
-        pub fn new(t: TermType, max_count: i32, epsilon: f64) -> Self {
-            let c_criteria = unsafe { cv_term_criteria_new(t as i32, max_count, epsilon) };
+        pub fn new(t: TermType, max_count: c_int, epsilon: f64) -> Self {
+            let c_criteria = unsafe { cv_term_criteria_new(t as c_int, max_count, epsilon) };
             TermCriteria {
                 c_criteria: c_criteria,
             }

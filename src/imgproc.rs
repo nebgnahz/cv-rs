@@ -35,12 +35,12 @@ extern "C" {
         shift: c_int,
     );
 
-    fn cv_cvt_color(cmat: *const CMat, output: *mut CMat, code: i32);
+    fn cv_cvt_color(cmat: *const CMat, output: *mut CMat, code: c_int);
     fn cv_pyr_down(cmat: *const CMat, output: *mut CMat);
     fn cv_resize(from: *const CMat, to: *mut CMat, dsize: Size2i, fx: c_double, fy: c_double, interpolation: c_int);
     fn cv_calc_hist(
         cimages: *const CMat,
-        nimages: i32,
+        nimages: c_int,
         channels: *const c_int,
         cmask: *const CMat,
         chist: *mut CMat,
@@ -267,9 +267,9 @@ impl Mat {
         pt1: Point2i,
         pt2: Point2i,
         color: Scalar,
-        thickness: i32,
+        thickness: c_int,
         linetype: LineTypes,
-        shift: i32,
+        shift: c_int,
     ) {
         unsafe {
             cv_line(
@@ -278,7 +278,7 @@ impl Mat {
                 pt2,
                 color,
                 thickness,
-                linetype as i32,
+                linetype as c_int,
                 shift,
             );
         }
@@ -290,8 +290,8 @@ impl Mat {
     }
 
     /// Draws a rectangle with custom color, thickness and linetype.
-    pub fn rectangle_custom(&self, rect: Rect, color: Scalar, thickness: i32, linetype: LineTypes) {
-        unsafe { cv_rectangle(self.inner, rect, color, thickness, linetype as i32) }
+    pub fn rectangle_custom(&self, rect: Rect, color: Scalar, thickness: c_int, linetype: LineTypes) {
+        unsafe { cv_rectangle(self.inner, rect, color, thickness, linetype as c_int) }
     }
 
     /// Draw a simple, thick, or filled up-right rectangle.
@@ -324,9 +324,9 @@ impl Mat {
         start_angle: f64,
         end_angle: f64,
         color: Scalar,
-        thickness: i32,
+        thickness: c_int,
         linetype: LineTypes,
-        shift: i32,
+        shift: c_int,
     ) {
         unsafe {
             cv_ellipse(
@@ -338,7 +338,7 @@ impl Mat {
                 end_angle,
                 color,
                 thickness,
-                linetype as i32,
+                linetype as c_int,
                 shift,
             )
         }
@@ -347,7 +347,7 @@ impl Mat {
     /// Convert an image from one color space to another.
     pub fn cvt_color(&self, code: ColorConversionCodes) -> Mat {
         let m = CMat::new();
-        unsafe { cv_cvt_color(self.inner, m, code as i32) }
+        unsafe { cv_cvt_color(self.inner, m, code as c_int) }
         Mat::from_raw(m)
     }
 
@@ -415,7 +415,7 @@ impl Mat {
 
     /// Calculate the back projection of a histogram. The function calculates
     /// the back project of the histogram.
-    pub fn calc_back_project(&self, channels: *const i32, hist: &Mat, ranges: *const *const f32) -> Mat {
+    pub fn calc_back_project(&self, channels: *const c_int, hist: &Mat, ranges: *const *const f32) -> Mat {
         let m = CMat::new();
         unsafe {
             cv_calc_back_project(self.inner, 1, channels, (*hist).inner, m, ranges);
@@ -433,7 +433,7 @@ impl Mat {
     /// To compare such histograms or more general sparse configurations of weighted points,
     /// consider using the cv::EMD function.
     pub fn compare_hist(&self, other: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
-        let method: c_int = method.to_i64().unwrap() as i32;
+        let method: c_int = method.to_i64().unwrap() as c_int;
         let result = CResult::<f64>::from_callback(|r| unsafe {
             cv_compare_hist(self.inner, other.inner, method, r)
         });

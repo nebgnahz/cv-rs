@@ -20,13 +20,13 @@ pub struct GpuMat {
     pub inner: *mut CGpuMat,
 
     /// Number of columns
-    pub cols: i32,
+    pub cols: c_int,
 
     /// Number of rows
-    pub rows: i32,
+    pub rows: c_int,
 
     /// Depth of this mat
-    pub depth: i32,
+    pub depth: c_int,
 }
 
 extern "C" {
@@ -112,7 +112,7 @@ extern "C" {
         block_size: Size2i,
         block_stride: Size2i,
         cell_size: Size2i,
-        nbins: i32,
+        nbins: c_int,
     ) -> *mut CGpuHog;
     fn cv_gpu_hog_drop(hog: *mut CGpuHog);
     fn cv_gpu_hog_set_detector(hog: *mut CGpuHog, d: *const CSvmDetector);
@@ -170,7 +170,7 @@ impl Default for GpuHog {
 
 impl GpuHog {
     /// Creates a new GpuHog detector.
-    pub fn new(win_size: Size2i, block_size: Size2i, block_stride: Size2i, cell_size: Size2i, nbins: i32) -> GpuHog {
+    pub fn new(win_size: Size2i, block_size: Size2i, block_stride: Size2i, cell_size: Size2i, nbins: c_int) -> GpuHog {
         let inner = unsafe { cv_gpu_hog_new(win_size, block_size, block_stride, cell_size, nbins) };
         let mut params = HogParams::default();
         GpuHog::update_params(inner, &mut params);
@@ -337,14 +337,14 @@ impl GpuCascade {
     }
 
     /// Sets the maximum number of objects.
-    pub fn set_max_num_objects(&mut self, max: i32) {
+    pub fn set_max_num_objects(&mut self, max: c_int) {
         unsafe {
             cv_gpu_cascade_set_max_num_objects(self.inner, max);
         }
     }
 
     /// Sets minimal neighbors required for a detection to be valid.
-    pub fn set_min_neighbors(&mut self, min: i32) {
+    pub fn set_min_neighbors(&mut self, min: c_int) {
         unsafe {
             cv_gpu_cascade_set_min_neighbors(self.inner, min);
         }
@@ -382,13 +382,13 @@ impl GpuCascade {
     }
 
     /// Returns the allowed maximal number of detected objects.
-    pub fn get_max_num_objects(&self) -> i32 {
+    pub fn get_max_num_objects(&self) -> c_int {
         unsafe { cv_gpu_cascade_get_max_num_objects(self.inner) }
     }
 
     /// Returns the number of minimal neighbors required for a detection to be
     /// valid.
-    pub fn get_min_neighbors(&self) -> i32 {
+    pub fn get_min_neighbors(&self) -> c_int {
         unsafe { cv_gpu_cascade_get_min_neighbors(self.inner) }
     }
 
