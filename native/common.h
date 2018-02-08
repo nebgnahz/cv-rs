@@ -2,13 +2,12 @@
 #define CV_RS_COMMON_H
 
 #include <cstddef>
-#include <cstdint>
 #include <functional>
 #include <opencv2/core.hpp>
 
 typedef struct {
-    int32_t x;
-    int32_t y;
+    int x;
+    int y;
 } Point2i;
 
 typedef struct {
@@ -27,10 +26,10 @@ typedef struct {
 } Size2f;
 
 typedef struct {
-    int32_t x;
-    int32_t y;
-    int32_t width;
-    int32_t height;
+    int x;
+    int y;
+    int width;
+    int height;
 } Rect;
 
 typedef struct {
@@ -40,10 +39,10 @@ typedef struct {
 } RotatedRect;
 
 typedef struct {
-    int32_t v0;
-    int32_t v1;
-    int32_t v2;
-    int32_t v3;
+    int v0;
+    int v1;
+    int v2;
+    int v3;
 } Scalar;
 
 typedef struct {
