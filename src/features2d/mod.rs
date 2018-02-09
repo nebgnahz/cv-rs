@@ -1,10 +1,12 @@
 //! Provide 2D image feature detectors and descriptor extractors
+mod descriptor_matcher;
 mod mser;
-mod surf;
 mod sift;
+mod surf;
 
 use core::*;
 
+pub use self::descriptor_matcher::*;
 pub use self::mser::*;
 pub use self::sift::*;
 pub use self::surf::*;

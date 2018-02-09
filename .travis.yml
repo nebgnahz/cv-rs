@@ -54,7 +54,9 @@ cache:
   timeout: 1000
   cargo: true
   directories:
-    - $HOME/usr
+    - $HOME/usr/installed-version
+    - $HOME/usr/include
+    - $HOME/usr/lib
 
 deploy:
   provider: pages

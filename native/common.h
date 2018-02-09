@@ -61,6 +61,13 @@ typedef struct {
     int class_id;
 } KeyPoint;
 
+typedef struct {
+    float distance;
+    int imgIdx;
+    int queryIdx;
+    int trainIdx;
+} DMatch;
+
 // Caller is responsible for disposing `error` field
 template <typename T>
 struct Result {

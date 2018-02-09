@@ -51,15 +51,14 @@ fn opencv_include() -> &'static str {
 fn opencv_link() {
     println!("cargo:rustc-link-search=native=/usr/local/lib");
     println!("cargo:rustc-link-lib=opencv_core");
-    println!("cargo:rustc-link-lib=opencv_imgcodecs");
-    println!("cargo:rustc-link-lib=opencv_imgproc");
-    println!("cargo:rustc-link-lib=opencv_highgui");
-    println!("cargo:rustc-link-lib=opencv_videoio");
-    println!("cargo:rustc-link-lib=opencv_objdetect");
-    println!("cargo:rustc-link-lib=opencv_video");
     println!("cargo:rustc-link-lib=opencv_features2d");
     println!("cargo:rustc-link-lib=opencv_xfeatures2d");
-
+    println!("cargo:rustc-link-lib=opencv_highgui");
+    println!("cargo:rustc-link-lib=opencv_imgcodecs");
+    println!("cargo:rustc-link-lib=opencv_imgproc");
+    println!("cargo:rustc-link-lib=opencv_objdetect");
+    println!("cargo:rustc-link-lib=opencv_videoio");
+    println!("cargo:rustc-link-lib=opencv_video");
     if cfg!(feature = "gpu") {
         println!("cargo:rustc-link-lib=opencv_cudaobjdetect");
     }

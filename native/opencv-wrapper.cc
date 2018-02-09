@@ -593,6 +593,56 @@ void cv_sift_detect_and_compute(cv::Ptr<cv::xfeatures2d::SIFT>* detector,
     cv_to_ffi(keypoints_vector, keypoints);
 }
 
+void* cv_matcher_new(const char* descriptorMatcherType) {
+    auto result = cv::DescriptorMatcher::create(descriptorMatcherType);
+    return new cv::Ptr<cv::DescriptorMatcher>(result);
+}
+
+void cv_matcher_drop(cv::Ptr<cv::DescriptorMatcher>* descriptorMatcher) {
+    delete descriptorMatcher;
+    descriptorMatcher = nullptr;
+}
+
+void cv_matcher_add(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher, CVec<cv::Mat*>& descriptors) {
+    std::vector<cv::Mat> descriptors_vector;
+    ffi_to_cv(descriptors, &descriptors_vector);
+    descriptorMatcher.get()->add(descriptors_vector);
+}
+
+void cv_matcher_train(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher) {
+    descriptorMatcher.get()->train();
+}
+
+bool cv_matcher_is_empty(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher) {
+    return descriptorMatcher.get()->empty();
+}
+
+void cv_matcher_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
+                      cv::Mat& queryDescriptors,
+                      CVec<DMatch>* matches) {
+    std::vector<cv::DMatch> matches_vector;
+    descriptorMatcher.get()->match(queryDescriptors, matches_vector);
+    cv_to_ffi(matches_vector, matches);
+}
+
+void cv_matcher_match_two(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
+                          cv::Mat& queryDescriptors,
+                          cv::Mat& trainDescriptors,
+                          CVec<DMatch>* matches) {
+    std::vector<cv::DMatch> matches_vector;
+    descriptorMatcher.get()->match(queryDescriptors, trainDescriptors, matches_vector);
+    cv_to_ffi(matches_vector, matches);
+}
+
+void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
+                          cv::Mat& queryDescriptors,
+                          int k,
+                          CVec<CVec<DMatch>>* matches) {
+    std::vector<std::vector<cv::DMatch>> matches_vector;
+    descriptorMatcher.get()->knnMatch(queryDescriptors, matches_vector, k);
+    cv_to_ffi(matches_vector, matches);
+}
+
 void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result) {
     *result = Result<double>::FromFunction(
         [first_image, second_image, method]() { return cv::compareHist(*first_image, *second_image, method); });

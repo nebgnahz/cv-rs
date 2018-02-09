@@ -239,7 +239,54 @@ impl Rect2f {
 
 #[repr(C)]
 #[derive(Debug, Clone)]
-pub struct CVec<T: Sized + NestedVec> {
+pub(crate) struct CVecView<T: Sized> {
+    array: *mut T,
+    size: usize,
+}
+
+fn pack<T, U: Sized, F>(v: &Vec<T>, mut f: F) -> CVecView<U>
+where
+    F: FnMut(&T) -> U,
+{
+    let mut mapped: Vec<_> = v.iter().map(|i| f(i)).collect();
+    let size = mapped.len();
+    let capacity = mapped.capacity();
+    let array = mapped.as_mut_ptr();
+    assert_eq!(size, capacity);
+    mem::forget(mapped);
+    CVecView { array, size }
+}
+
+pub(crate) trait Pack {
+    type In;
+    fn pack(v: &Self::In) -> Self;
+}
+
+impl<T: Copy> Pack for T {
+    type In = T;
+    fn pack(v: &T) -> Self {
+        *v
+    }
+}
+
+impl<T: Pack> Pack for CVecView<T> {
+    type In = Vec<T::In>;
+    fn pack(v: &Self::In) -> Self {
+        pack(v, |e| Pack::pack(e))
+    }
+}
+
+impl<T> Drop for CVecView<T> {
+    fn drop(&mut self) {
+        unsafe {
+            Vec::from_raw_parts(self.array, self.size, self.size);
+        }
+    }
+}
+
+#[repr(C)]
+#[derive(Debug, Clone)]
+pub(crate) struct CVec<T: Sized + NestedVec> {
     array: *mut T,
     size: usize,
 }
@@ -254,7 +301,7 @@ where
         .collect()
 }
 
-pub trait Unpack {
+pub(crate) trait Unpack {
     type Out;
     fn unpack(&self) -> Self::Out;
 }
@@ -273,7 +320,7 @@ impl<T: Copy> Unpack for T {
     }
 }
 
-pub trait NestedVec {
+pub(crate) trait NestedVec {
     const LEVEL: u32;
 }
 
