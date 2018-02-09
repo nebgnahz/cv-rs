@@ -257,7 +257,7 @@ where
     CVecView { array, size }
 }
 
-pub trait Pack {
+pub(crate) trait Pack {
     type In;
     fn pack(v: &Self::In) -> Self;
 }

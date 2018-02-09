@@ -235,7 +235,7 @@ void cv_sift_detect_and_compute(cv::Ptr<cv::xfeatures2d::SIFT>* detector,
                                 bool useProvidedKeypoints);
 
 // =============================================================================
-//   FLANN
+//   DESCRIPTOR MATCHER
 // =============================================================================
 
 void* cv_matcher_new(const char* descriptorMatcherType);
