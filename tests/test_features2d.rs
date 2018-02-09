@@ -64,3 +64,20 @@ fn flann_based_matcher_two() {
     let result = descriptor_matcher.match_two(&descriptors, &descriptors);
     assert_ne!(result.len(), 0);
 }
+
+#[test]
+fn flann_based_matcher_knn() {
+    const K: usize = 3;
+    let lenna = load_lenna();
+    let mask = Mat::new();
+    let mser: SIFT = SIFTBuilder::default().into();
+    let (_, descriptors) = mser.detect_and_compute(&lenna, &mask);
+
+    let descriptor_matcher = DescriptorMatcher::new(DescriptorMatcherType::FlannBased);
+    let train_descriptors = vec![&descriptors];
+    descriptor_matcher.add(&train_descriptors);
+    descriptor_matcher.train();
+    let result = descriptor_matcher.knn_match(&descriptors, K);
+    assert_ne!(result.len(), 0);
+    assert_eq!(result.first().unwrap().len(), K);
+}

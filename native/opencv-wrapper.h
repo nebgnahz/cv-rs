@@ -242,14 +242,19 @@ void* cv_matcher_new(const char* descriptorMatcherType);
 void cv_matcher_drop(cv::Ptr<cv::DescriptorMatcher>* descriptorMatcher);
 void cv_matcher_add(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher, CVec<cv::Mat*>& descriptors);
 void cv_matcher_train(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher);
+bool cv_matcher_is_empty(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher);
 void cv_matcher_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
                       cv::Mat& queryDescriptors,
                       CVec<DMatch>* matches);
-bool cv_matcher_is_empty(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher);
 void cv_matcher_match_two(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
                           cv::Mat& queryDescriptors,
                           cv::Mat& trainDescriptors,
                           CVec<DMatch>* matches);
+void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
+                          cv::Mat& queryDescriptors,
+                          int k,
+                          CVec<CVec<DMatch>>* matches);
+
 // =============================================================================
 //   Other
 // =============================================================================

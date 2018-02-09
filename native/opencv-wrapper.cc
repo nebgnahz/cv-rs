@@ -613,6 +613,10 @@ void cv_matcher_train(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher) {
     descriptorMatcher.get()->train();
 }
 
+bool cv_matcher_is_empty(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher) {
+    return descriptorMatcher.get()->empty();
+}
+
 void cv_matcher_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
                       cv::Mat& queryDescriptors,
                       CVec<DMatch>* matches) {
@@ -621,16 +625,21 @@ void cv_matcher_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
     cv_to_ffi(matches_vector, matches);
 }
 
-bool cv_matcher_is_empty(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher) {
-    return descriptorMatcher.get()->empty();
-}
-
 void cv_matcher_match_two(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
                           cv::Mat& queryDescriptors,
                           cv::Mat& trainDescriptors,
                           CVec<DMatch>* matches) {
     std::vector<cv::DMatch> matches_vector;
     descriptorMatcher.get()->match(queryDescriptors, trainDescriptors, matches_vector);
+    cv_to_ffi(matches_vector, matches);
+}
+
+void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
+                          cv::Mat& queryDescriptors,
+                          int k,
+                          CVec<CVec<DMatch>>* matches) {
+    std::vector<std::vector<cv::DMatch>> matches_vector;
+    descriptorMatcher.get()->knnMatch(queryDescriptors, matches_vector, k);
     cv_to_ffi(matches_vector, matches);
 }
 

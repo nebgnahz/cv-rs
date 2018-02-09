@@ -1,7 +1,7 @@
 //! Provide types for matching keypoint descriptors
 use core::*;
 use std::ffi::*;
-use std::os::raw::c_char;
+use std::os::raw::{c_char, c_int};
 
 
 enum CDescriptorMatcher {}
@@ -11,6 +11,7 @@ extern "C" {
     fn cv_matcher_drop(descriptor_matcher: *mut CDescriptorMatcher);
     fn cv_matcher_add(descriptor_matcher: *mut CDescriptorMatcher, descriptors: *const CVecView<*mut CMat>);
     fn cv_matcher_train(descriptor_matcher: *mut CDescriptorMatcher);
+    fn cv_matcher_is_empty(descriptor_matcher: *mut CDescriptorMatcher) -> bool;
     fn cv_matcher_match(
         descriptor_matcher: *mut CDescriptorMatcher,
         query_descriptors: *mut CMat,
@@ -22,7 +23,12 @@ extern "C" {
         train_descriptors: *mut CMat,
         matches: *mut CVec<DMatch>,
     );
-    fn cv_matcher_is_empty(descriptor_matcher: *mut CDescriptorMatcher) -> bool;
+    fn cv_matcher_knn_match(
+        descriptor_matcher: *mut CDescriptorMatcher,
+        query_descriptors: *mut CMat,
+        k: c_int,
+        matches: *mut CVec<CVec<DMatch>>,
+    );
 }
 
 /// Type for matching keypoint descriptors
@@ -94,6 +100,11 @@ impl DescriptorMatcher {
         unsafe { cv_matcher_train(self.value) }
     }
 
+    /// Returns true if there are no train descriptors
+    pub fn is_empty(&self) -> bool {
+        unsafe { cv_matcher_is_empty(self.value) }
+    }
+
     /// Finds the best match for each descriptor from a query set
     pub fn match_(&self, query_descriptors: &Mat) -> Vec<DMatch> {
         let mut matches = CVec::<DMatch>::default();
@@ -118,8 +129,17 @@ impl DescriptorMatcher {
         matches.unpack()
     }
 
-    /// Returns true if there are no train descriptors
-    pub fn is_empty(&self) -> bool {
-        unsafe { cv_matcher_is_empty(self.value) }
+    /// Finds the k best matches for each descriptor from a query set.
+    pub fn knn_match(&self, query_descriptors: &Mat, k: usize) -> Vec<Vec<DMatch>> {
+        let mut matches = CVec::<CVec<DMatch>>::default();
+        unsafe {
+            cv_matcher_knn_match(
+                self.value,
+                query_descriptors.inner,
+                k as c_int,
+                &mut matches,
+            );
+        }
+        matches.unpack()
     }
 }
