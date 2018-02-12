@@ -74,7 +74,8 @@ struct Result {
     T value;
     const char* error;
 
-    static Result<T> FromFunction(std::function<T()> function) {
+    static Result<T> FromFunction(std::function<T()> function)
+    {
         T value;
         char* error = nullptr;
         try {

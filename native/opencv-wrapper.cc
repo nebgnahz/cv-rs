@@ -653,10 +653,12 @@ void* cv_tesseract_new(const char * 	datapath,
                       const char * 	language,
                       const char * 	char_whitelist,
                       int 	oem,
-                      int 	psmode) {
+                      int 	psmode)
+{
     auto result = cv::text::OCRTesseract::create(datapath, language, char_whitelist, oem, psmode);
     return new cv::Ptr<cv::text::OCRTesseract>(result);
 }
+
 
 void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr) {
     delete ocr;
