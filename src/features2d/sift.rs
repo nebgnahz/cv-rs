@@ -1,5 +1,6 @@
 //! Provide the type that encapsulates all the parameters of the SIFT extraction algorithm
 use super::*;
+use ::*;
 use core::*;
 use std::os::raw::*;
 

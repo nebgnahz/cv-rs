@@ -1,4 +1,5 @@
 //! Provide types for matching keypoint descriptors
+use ::*;
 use core::*;
 use std::ffi::*;
 use std::os::raw::{c_char, c_int};
