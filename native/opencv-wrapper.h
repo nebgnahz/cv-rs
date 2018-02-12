@@ -267,7 +267,6 @@ void* cv_tesseract_new(const char* datapath,
 
                        int oem,
                        int psmode);
-
 void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr);
 void cv_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
                 cv::Mat& image,
