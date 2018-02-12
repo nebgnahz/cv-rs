@@ -7,6 +7,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
+#include <opencv2/text/ocr.hpp>
 #include <opencv2/video/tracking.hpp>
 #include <opencv2/xfeatures2d.hpp>
 #include <stddef.h>
@@ -100,6 +101,7 @@ void cv_calc_back_project(const cv::Mat* images,
                           cv::Mat* hist,
                           cv::Mat* back_project,
                           const float** ranges);
+void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result);
 
 // =============================================================================
 //  Imgcodecs
@@ -256,10 +258,18 @@ void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
                           CVec<CVec<DMatch>>* matches);
 
 // =============================================================================
-//   Other
+//   Text
 // =============================================================================
 
-void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result);
+void* cv_tesseract_new(const char * 	datapath,
+                      const char * 	language,
+                      const char * 	char_whitelist,
+                      int 	oem,
+                      int 	psmode);
+
+void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr);
+void cv_ocr_run (cv::Ptr<cv::text::BaseOCR>& ocr, cv::Mat &image, char** output_text, CVec<Rect > *component_rects, CVec<char*> *component_texts, CVec<
+        float> *component_confidences, int component_level);
 
 EXTERN_C_END
 
