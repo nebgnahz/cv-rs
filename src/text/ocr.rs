@@ -2,7 +2,6 @@
 use ::*;
 use core::*;
 use std::ffi::CString;
-use std::os::raw::*;
 use std::path::Path;
 
 mod private {

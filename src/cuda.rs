@@ -4,6 +4,7 @@
 use super::core::*;
 use super::errors::*;
 use super::objdetect::{CSvmDetector, HogParams, ObjectDetect, SvmDetector};
+use ::*;
 use failure::Error;
 use std::ffi::CString;
 use std::os::raw::{c_char, c_double, c_int};
