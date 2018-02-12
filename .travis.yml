@@ -19,9 +19,9 @@ addons:
     - libdc1394-22-dev
     - libgmp-dev
     - libgtk2.0-dev
-    - libleptonica-dev
     - libjasper-dev
     - libjpeg-dev
+    - libleptonica-dev
     - libpng-dev
     - libswscale-dev
     - libtbb-dev
@@ -41,7 +41,7 @@ before_install:
 
 script:
   - cargo build --no-default-features
-  - cargo test --no-default-features
+  - cargo test --no-default-features --vv
   - cargo build --features gpu
   - cargo doc --features gpu --no-deps
   - find src/*.rs | xargs rustfmt --write-mode=diff
