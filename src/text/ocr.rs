@@ -26,7 +26,7 @@ extern "C" {
     fn cv_ocr_run(
         ocr: *const private::COCR,
         image: *const CMat,
-        output_text: *mut c_char,
+        output_text: *mut CDisposableString,
         component_rects: *mut CVec<Rect>,
         component_texts: *mut CVec<CDisposableString>,
         component_confidences: *mut CVec<f32>,
@@ -128,7 +128,7 @@ impl OcrImplInterface for OcrTesseract {}
 impl<T: OcrImplInterface> Ocr for T {
     fn run(&self, image: &Mat, component_level: ComponentLevel) -> (String, Vec<Rect>, Vec<String>, Vec<f32>) {
         let value = self.get_value();
-        let output_text = ::std::ptr::null_mut();
+        let mut output_text = CDisposableString::default();
         let mut component_rects = CVec::<Rect>::default();
         let mut component_texts = CVec::<CDisposableString>::default();
         let mut component_confidences = CVec::<f32>::default();
@@ -136,14 +136,13 @@ impl<T: OcrImplInterface> Ocr for T {
             cv_ocr_run(
                 value,
                 image.inner,
-                output_text,
+                &mut output_text,
                 &mut component_rects,
                 &mut component_texts,
                 &mut component_confidences,
                 component_level,
             );
         }
-        let output_text = CDisposableString { value: output_text };
         (
             output_text.unpack(),
             component_rects.unpack(),

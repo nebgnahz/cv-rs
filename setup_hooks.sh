@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 rustup component add rustfmt-preview
 
 rustfmt_path=`command -v rustfmt`

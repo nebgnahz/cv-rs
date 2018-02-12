@@ -16,5 +16,5 @@ fn ocr_tesseract_test() {
         PageSegmentationMode::Auto,
     );
     let res = ocr.run(&image, ComponentLevel::TextLine);
-    assert_eq!(res.0, "Heruro worudo");
+    assert!(res.0.contains("Heruro worudo"));
 }

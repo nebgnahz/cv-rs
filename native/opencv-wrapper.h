@@ -265,9 +265,9 @@ void* cv_tesseract_new(const char* datapath, const char* language, const char* c
 void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr);
 void cv_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
                 cv::Mat& image,
-                char** output_text,
+                CDisposableString* output_text,
                 CVec<Rect>* component_rects,
-                CVec<char*>* component_texts,
+                CVec<CDisposableString>* component_texts,
                 CVec<float>* component_confidences,
                 int component_level);
 
