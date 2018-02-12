@@ -29,8 +29,7 @@ void cv_to_ffi(const cv::KeyPoint& source, KeyPoint* dest) {
     dest->class_id = source.class_id;
 }
 
-void cv_to_ffi(const cv::DMatch& source, DMatch* dest)
-{
+void cv_to_ffi(const cv::DMatch& source, DMatch* dest) {
     dest->distance = dest->distance;
     dest->imgIdx = dest->imgIdx;
     dest->queryIdx = source.queryIdx;

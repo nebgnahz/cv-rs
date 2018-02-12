@@ -48,8 +48,7 @@ void* cv_gpu_hog_new(Size2i win_size, Size2i block_size, Size2i block_stride, Si
     return new cv::Ptr<cv::cuda::HOG>(hog);
 }
 
-void cv_gpu_hog_drop(cv::Ptr<cv::cuda::HOG>* hog)
-{
+void cv_gpu_hog_drop(cv::Ptr<cv::cuda::HOG>* hog) {
     delete hog;
     hog = nullptr;
 }

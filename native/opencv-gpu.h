@@ -67,8 +67,7 @@ int32_t cv_gpu_cascade_get_max_num_objects(cv::Ptr<cv::cuda::CascadeClassifier>*
 int32_t cv_gpu_cascade_get_min_neighbors(cv::Ptr<cv::cuda::CascadeClassifier>*);
 Size2i cv_gpu_cascade_get_max_object_size(cv::Ptr<cv::cuda::CascadeClassifier>*);
 Size2i cv_gpu_cascade_get_min_object_size(cv::Ptr<cv::cuda::CascadeClassifier>*);
-double cv_gpu_cascade_get_scale_factor(cv::Ptr<cv::cuda::CascadeClassifier>*
-);
+double cv_gpu_cascade_get_scale_factor(cv::Ptr<cv::cuda::CascadeClassifier>*);
 
 EXTERN_C_END
 
