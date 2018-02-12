@@ -27,6 +27,7 @@ addons:
     - libtbb2
     - libtiff-dev
     - pkg-config
+    - tesseract-ocr
     - xvfb
 
 before_install:
