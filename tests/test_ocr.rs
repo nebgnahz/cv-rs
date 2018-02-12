@@ -1,21 +1,20 @@
 extern crate cv;
 mod utils;
 
+use cv::*;
+use cv::imgcodecs::ImreadModes;
 use cv::text::*;
-use std::path::PathBuf;
-use utils::load_lenna;
 
 #[test]
 fn ocr_tesseract_test() {
-    let lenna = load_lenna();
-    let path = PathBuf::new();
+    let image = Mat::from_path("assets/HelloWorld.png", ImreadModes::ImreadColor).unwrap();
     let ocr = OcrTesseract::new(
-        Some(&path),
+        None,
         None,
         None,
         EngineMode::Default,
         PageSegmentationMode::Auto,
     );
-    let res = ocr.run(&lenna, ComponentLevel::Word);
-    assert_ne!(res.1.len(), 0);
+    let res = ocr.run(&image, ComponentLevel::TextLine);
+    assert_eq!(res.0, "Heruro worudo");
 }
