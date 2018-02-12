@@ -252,7 +252,7 @@ void cv_calc_back_project(const cv::Mat* images,
 
 void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result) {
     *result = Result<double>::FromFunction(
-            [first_image, second_image, method]() { return cv::compareHist(*first_image, *second_image, method); });
+        [first_image, second_image, method]() { return cv::compareHist(*first_image, *second_image, method); });
 }
 
 // =============================================================================
@@ -649,24 +649,23 @@ void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
     cv_to_ffi(matches_vector, matches);
 }
 
-void* cv_tesseract_new(const char* datapath,
-                      const char* language,
-                      const char* char_whitelist,
-                      int oem,
-                      int psmode)
-{
+void* cv_tesseract_new(const char* datapath, const char* language, const char* char_whitelist, int oem, int psmode) {
     auto result = cv::text::OCRTesseract::create(datapath, language, char_whitelist, oem, psmode);
     return new cv::Ptr<cv::text::OCRTesseract>(result);
 }
-
 
 void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr) {
     delete ocr;
     ocr = nullptr;
 }
 
-void cv_ocr_run (cv::Ptr<cv::text::BaseOCR>& ocr, cv::Mat &image, char** output_text, CVec<Rect > *component_rects, CVec<char*> *component_texts, CVec<
-        float> *component_confidences, int component_level) {
+void cv_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
+                cv::Mat& image,
+                char** output_text,
+                CVec<Rect>* component_rects,
+                CVec<char*>* component_texts,
+                CVec<float>* component_confidences,
+                int component_level) {
     std::string output;
     std::vector<cv::Rect> boxes;
     std::vector<std::string> words;
@@ -678,6 +677,5 @@ void cv_ocr_run (cv::Ptr<cv::text::BaseOCR>& ocr, cv::Mat &image, char** output_
     cv_to_ffi(words, component_texts);
     cv_to_ffi(confidences, component_confidences);
 }
-
 
 EXTERN_C_END
