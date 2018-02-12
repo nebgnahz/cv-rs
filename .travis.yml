@@ -19,12 +19,14 @@ addons:
     - libdc1394-22-dev
     - libgmp-dev
     - libgtk2.0-dev
+    - libleptonica-dev
     - libjasper-dev
     - libjpeg-dev
     - libpng-dev
     - libswscale-dev
     - libtbb-dev
     - libtbb2
+    - libtesseract-dev
     - libtiff-dev
     - pkg-config
     - tesseract-ocr

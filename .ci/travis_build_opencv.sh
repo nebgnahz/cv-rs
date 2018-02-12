@@ -19,7 +19,6 @@ if [[ ! -e $INSTALL_FLAG ]]; then
         curl -sL ${URL_CONTRIB}  > ${TMP}/opencv_contrib.zip
         unzip -q ${TMP}/opencv_contrib.zip
         rm ${TMP}/opencv_contrib.zip
-        sed -i -e 's/Tesseract QUIET/Tesseract REQUIRED/g' $OPENCV_CONTRIB/text/CMakeLists.txt
 
         mkdir $OPENCV_BUILD
     fi
