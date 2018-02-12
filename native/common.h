@@ -68,7 +68,9 @@ typedef struct {
     int trainIdx;
 } DMatch;
 
-typedef struct { const char* value; } CDisposableString;
+typedef struct {
+    const char* value;
+} CDisposableString;
 
 // Caller is responsible for disposing `error` field
 template <typename T>
