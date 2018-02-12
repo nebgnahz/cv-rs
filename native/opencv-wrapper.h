@@ -261,12 +261,7 @@ void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
 //   Text
 // =============================================================================
 
-void* cv_tesseract_new(const char* datapath,
-                       const char* language,
-                       const char* char_whitelist,
-
-                       int oem,
-                       int psmode);
+void* cv_tesseract_new(const char* datapath, const char* language, const char* char_whitelist, int oem, int psmode);
 void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr);
 void cv_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
                 cv::Mat& image,
