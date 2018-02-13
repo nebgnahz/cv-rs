@@ -1,7 +1,8 @@
 //! Tesseract
 use ::*;
 use core::*;
-use std::ffi::CString;
+use std::ffi::*;
+use std::os::raw::c_char;
 use std::path::Path;
 
 mod private {
@@ -96,12 +97,11 @@ impl OcrTesseract {
         let value = unsafe {
             let c_data_path = data_path.map(|x| CString::new(x.to_str().unwrap()).unwrap());
             let c_language = language.map(|x| CString::new(x).unwrap());
-            let c_char_whitelist = char_whitelist.map(|x| x.as_ptr());
+            let c_char_whitelist = char_whitelist.as_ref().map(|x| vec_to_string(x));
 
             let c_data_path = to_nullable_string(&c_data_path);
             let c_language = to_nullable_string(&c_language);
-            let c_char_whitelist = unwrap_or_null(&c_char_whitelist);
-
+            let c_char_whitelist = to_nullable_string(&c_char_whitelist);
 
             cv_tesseract_new(c_data_path, c_language, c_char_whitelist, oem, psmode)
         };
@@ -152,10 +152,16 @@ impl<T: OcrImplInterface> Ocr for T {
     }
 }
 
-unsafe fn to_nullable_string(value: &Option<CString>) -> *const c_char {
+fn to_nullable_string(value: &Option<CString>) -> *const c_char {
     unwrap_or_null(&value.as_ref().map(|x| x.as_ptr()))
 }
 
-unsafe fn unwrap_or_null(value: &Option<*const c_char>) -> *const c_char {
+fn unwrap_or_null(value: &Option<*const c_char>) -> *const c_char {
     value.unwrap_or(::std::ptr::null())
+}
+
+fn vec_to_string(value: &Vec<c_char>) -> CString {
+    let mut result = value.clone();
+    result.push('\0' as c_char);
+    unsafe { CStr::from_ptr(result.as_ptr()).to_owned() }
 }
