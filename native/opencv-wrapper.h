@@ -276,7 +276,8 @@ void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr);
 void* cv_hmm_new(const char* classifier_filename,
                  const char* vocabulary,
                  cv::Mat& transition_probabilities_table,
-                 cv::Mat& emission_probabilities_table);
+                 cv::Mat& emission_probabilities_table,
+                 cv::text::classifier_type classifier_type);
 void cv_hmm_drop(cv::Ptr<cv::text::OCRHMMDecoder>* ocr);
 
 EXTERN_C_END

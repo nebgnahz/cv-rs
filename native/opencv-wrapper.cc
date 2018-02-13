@@ -695,10 +695,11 @@ void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr) {
 void* cv_hmm_new(const char* classifier_filename,
                  const char* vocabulary,
                  cv::Mat& transition_probabilities_table,
-                 cv::Mat& emission_probabilities_table) {
+                 cv::Mat& emission_probabilities_table,
+                 cv::text::classifier_type classifier_type) {
     std::string filename(classifier_filename);
     std::string voc(vocabulary);
-    auto classifier = cv::text::loadOCRHMMClassifierNM(filename);
+    auto classifier = cv::text::loadOCRHMMClassifier(filename, classifier_type);
     auto result =
         cv::text::OCRHMMDecoder::create(classifier, voc, transition_probabilities_table, emission_probabilities_table);
     return new cv::Ptr<cv::text::OCRHMMDecoder>(result);

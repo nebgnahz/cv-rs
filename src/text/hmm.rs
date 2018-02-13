@@ -13,8 +13,17 @@ extern "C" {
         vocabulary: *const c_char,
         transition_probabilities_table: *mut CMat,
         emission_probabilities_table: *mut CMat,
+        classifier_type: ClassifierType,
     ) -> *mut COCR;
     fn cv_hmm_drop(ocr: *mut COCR);
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+#[allow(missing_docs)]
+pub enum ClassifierType {
+    Knn,
+    Cnn,
 }
 
 /// `OcrHmmDecoder` class provides an interface with the HmmDecoder-ocr API
@@ -30,6 +39,7 @@ impl OcrHmmDecoder {
         vocabulary: &str,
         transition_probabilities_table: &Mat,
         emission_probabilities_table: &Mat,
+        classifier_type: ClassifierType,
     ) -> Result<Self, Error> {
         let value = unsafe {
             let classifier_filename = classifier_filename.to_str().ok_or(CvError::InvalidPath {
@@ -43,6 +53,7 @@ impl OcrHmmDecoder {
                 vocabulary.as_ptr(),
                 transition_probabilities_table.inner,
                 emission_probabilities_table.inner,
+                classifier_type,
             )
         };
         Ok(Self { value })

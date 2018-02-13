@@ -39,18 +39,24 @@ fn ocr_tesseract_test_word() {
 
 #[test]
 fn ocr_hmm_test() {
+    const VOCABULARY: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let image = Mat::from_path("assets/Ubuntu.png", ImreadModes::ImreadColor).unwrap();
     let image = image.cvt_color(ColorConversionCodes::BGR2GRAY);
     let classifier_name = PathBuf::from("assets/OCRHMM_knn_model_data.xml.gz");
     let transition_probability_path = PathBuf::from("assets/OCRHMM_transitions_table.xml");
     let transition_probability_table =
         Mat::from_file_storage(&transition_probability_path, "transition_probabilities").unwrap();
-    let emission_probability_table = Mat::eye(62, 62, CvType::Cv32SC1);
+    let emission_probability_table = Mat::eye(
+        VOCABULARY.len() as i32,
+        VOCABULARY.len() as i32,
+        CvType::Cv32SC1,
+    );
     let ocr = OcrHmmDecoder::new(
         &classifier_name,
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        VOCABULARY,
         &transition_probability_table,
         &emission_probability_table,
+        ClassifierType::Knn,
     ).unwrap();
     let res = ocr.run(&image, ComponentLevel::Word);
     assert_contains(&res.0, "uBuntu");
