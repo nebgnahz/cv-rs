@@ -98,9 +98,9 @@ impl OcrTesseract {
             let c_language = language.map(|x| CString::new(x).unwrap());
             let c_char_whitelist = char_whitelist.map(|x| x.as_ptr());
 
-            let c_data_path = to_nullable_string(c_data_path);
-            let c_language = to_nullable_string(c_language);
-            let c_char_whitelist = unwrap_or_null(c_char_whitelist);
+            let c_data_path = to_nullable_string(&c_data_path);
+            let c_language = to_nullable_string(&c_language);
+            let c_char_whitelist = unwrap_or_null(&c_char_whitelist);
 
 
             cv_tesseract_new(c_data_path, c_language, c_char_whitelist, oem, psmode)
@@ -152,10 +152,10 @@ impl<T: OcrImplInterface> Ocr for T {
     }
 }
 
-unsafe fn to_nullable_string(value: Option<CString>) -> *const c_char {
-    unwrap_or_null(value.map(|x| x.as_ptr()))
+unsafe fn to_nullable_string(value: &Option<CString>) -> *const c_char {
+    unwrap_or_null(&value.as_ref().map(|x| x.as_ptr()))
 }
 
-unsafe fn unwrap_or_null(value: Option<*const c_char>) -> *const c_char {
+unsafe fn unwrap_or_null(value: &Option<*const c_char>) -> *const c_char {
     value.unwrap_or(::std::ptr::null())
 }
