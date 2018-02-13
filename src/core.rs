@@ -7,6 +7,7 @@ use num;
 use std::ffi::CString;
 use std::mem;
 use std::os::raw::{c_char, c_double, c_int, c_uchar};
+use std::path::Path;
 use std::slice;
 
 /// Opaque data struct for C bindings
@@ -255,6 +256,7 @@ pub enum LineTypes {
 
 extern "C" {
     pub(crate) fn cv_mat_new() -> *mut CMat;
+    fn from_file_storage(path: *const c_char, section: *const c_char) -> *mut CMat;
     fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: i32) -> *mut CMat;
     fn cv_mat_zeros(rows: c_int, cols: c_int, t: i32) -> *mut CMat;
     fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: i32, buffer: *const c_uchar) -> *mut CMat;
@@ -273,6 +275,7 @@ extern "C" {
     fn cv_mat_logic_and(cimage: *mut CMat, cmask: *const CMat);
     fn cv_mat_flip(src: *mut CMat, code: c_int);
     fn cv_mat_drop(mat: *mut CMat);
+    fn cv_mat_eye(rows: c_int, cols: c_int, cv_type: CvType) -> *mut CMat;
 }
 
 /// A flag to specify how to flip the image. see
@@ -288,6 +291,16 @@ pub enum FlipCode {
 }
 
 impl Mat {
+    /// Loads `Mat` from file storage
+    pub fn from_file_storage(path: &Path, section: &str) -> Result<Mat, Error> {
+        let path = path.to_str()
+            .ok_or(CvError::InvalidPath { path: path.into() })?;
+        let path = CString::new(path)?;
+        let section = CString::new(section)?;
+        let result = unsafe { from_file_storage(path.as_ptr(), section.as_ptr()) };
+        Ok(Mat::from_raw(result))
+    }
+
     #[inline]
     /// Creates a `Mat` object from raw `CMat` pointer. This will read the rows
     /// and cols of the image.
@@ -444,6 +457,12 @@ impl Mat {
     pub fn cv_type(&self) -> Result<CvType, Error> {
         let t = unsafe { cv_mat_type(self.inner) };
         num::FromPrimitive::from_i32(t).ok_or(CvError::EnumFromPrimitiveConversionError { value: t }.into())
+    }
+
+    /// Returns an identity matrix of the specified size and type.
+    pub fn eye(rows: i32, cols: i32, cv_type: CvType) -> Mat {
+        let result = unsafe { cv_mat_eye(rows, cols, cv_type) };
+        Mat::from_raw(result)
     }
 }
 
@@ -617,6 +636,7 @@ impl Drop for Mat {
 /// | CV_32F |  5 | 13 | 21 | 29 |   37 |   45 |   53 |   61 |
 /// | CV_64F |  6 | 14 | 22 | 30 |   38 |   46 |   54 |   62 |
 #[derive(Debug, PartialEq, Clone, Copy, FromPrimitive)]
+#[repr(C)]
 pub enum CvType {
     /// 8 bit unsigned (like `uchar`), single channel (grey image)
     Cv8UC1 = 0,

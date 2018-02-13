@@ -21,10 +21,12 @@
 EXTERN_C_BEGIN
 
 // The caller owns the returned data cv::Mat
+void* from_file_storage(const char* path, const char* section);
 void* cv_mat_new();
 void* cv_mat_new_with_size(int rows, int cols, int type);
 void* cv_mat_zeros(int rows, int cols, int type);
 void* cv_mat_from_buffer(int rows, int cols, int type, const uint8_t* buf);
+void* cv_mat_eye(int rows, int cols, int type);
 
 bool cv_mat_valid(cv::Mat* mat);
 
@@ -261,8 +263,6 @@ void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
 //   Text
 // =============================================================================
 
-void* cv_tesseract_new(const char* datapath, const char* language, const char* char_whitelist, int oem, int psmode);
-void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr);
 void cv_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
                 cv::Mat& image,
                 CDisposableString* output_text,
@@ -270,6 +270,14 @@ void cv_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
                 CVec<CDisposableString>* component_texts,
                 CVec<float>* component_confidences,
                 int component_level);
+
+void* cv_tesseract_new(const char* datapath, const char* language, const char* char_whitelist, int oem, int psmode);
+void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr);
+void* cv_hmm_new(const char* classifier_filename,
+                 const char* vocabulary,
+                 cv::Mat& transition_probabilities_table,
+                 cv::Mat& emission_probabilities_table);
+void cv_hmm_drop(cv::Ptr<cv::text::OCRHMMDecoder>* ocr);
 
 EXTERN_C_END
 

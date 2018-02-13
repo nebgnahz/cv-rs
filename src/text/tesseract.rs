@@ -2,7 +2,6 @@
 use super::*;
 use super::private::*;
 use ::*;
-use std::ffi::*;
 use std::os::raw::c_char;
 use std::path::Path;
 
@@ -97,17 +96,3 @@ impl OcrImpl for OcrTesseract {
 }
 
 impl OcrImplInterface for OcrTesseract {}
-
-fn to_nullable_string(value: &Option<CString>) -> *const c_char {
-    unwrap_or_null(&value.as_ref().map(|x| x.as_ptr()))
-}
-
-fn unwrap_or_null(value: &Option<*const c_char>) -> *const c_char {
-    value.unwrap_or(::std::ptr::null())
-}
-
-fn vec_to_string(value: &Vec<c_char>) -> CString {
-    let mut result = value.clone();
-    result.push('\0' as c_char);
-    unsafe { CStr::from_ptr(result.as_ptr()).to_owned() }
-}
