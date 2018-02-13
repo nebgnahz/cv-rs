@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 rustup component add rustfmt-preview
 
 rustfmt_path=`command -v rustfmt`
-echo "#!/bin/sh
+echo "#!/bin/bash
 declare -a rust_files=()
 declare -a cpp_files=()
 
