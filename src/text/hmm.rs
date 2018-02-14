@@ -42,9 +42,9 @@ impl OcrHmmDecoder {
         classifier_type: ClassifierType,
     ) -> Result<Self, Error> {
         let value = unsafe {
-            let classifier_filename = classifier_filename.to_str().ok_or(CvError::InvalidPath {
-                path: classifier_filename.into(),
-            })?;
+            let classifier_filename = classifier_filename
+                .to_str()
+                .ok_or(CvError::InvalidPath(classifier_filename.into()))?;
             let classifier_filename = CString::new(classifier_filename)?;
             let vocabulary = CString::new(vocabulary)?;
 

@@ -2,6 +2,7 @@
 use super::*;
 use super::private::*;
 use ::*;
+use errors::*;
 use std::os::raw::c_char;
 use std::path::Path;
 
@@ -62,14 +63,26 @@ impl OcrTesseract {
     pub fn new(
         data_path: Option<&Path>,
         language: Option<&str>,
-        char_whitelist: Option<&Vec<c_char>>,
+        char_whitelist: Option<&str>,
         oem: EngineMode,
         psmode: PageSegmentationMode,
-    ) -> Self {
+    ) -> Result<Self, Error> {
         let value = unsafe {
-            let c_data_path = data_path.map(|x| CString::new(x.to_str().unwrap()).unwrap());
-            let c_language = language.map(|x| CString::new(x).unwrap());
-            let c_char_whitelist = char_whitelist.as_ref().map(|x| vec_to_string(x));
+            let c_data_path = match data_path {
+                Some(x) => {
+                    let x = x.to_str().ok_or(CvError::InvalidPath(x.into()))?;
+                    Some(CString::new(x)?)
+                }
+                None => None,
+            };
+            let c_language = match language {
+                Some(x) => Some(CString::new(x)?),
+                None => None,
+            };
+            let c_char_whitelist = match char_whitelist {
+                Some(x) => Some(CString::new(x)?),
+                None => None,
+            };
 
             let c_data_path = to_nullable_string(&c_data_path);
             let c_language = to_nullable_string(&c_language);
@@ -77,7 +90,7 @@ impl OcrTesseract {
 
             cv_tesseract_new(c_data_path, c_language, c_char_whitelist, oem, psmode)
         };
-        Self { value }
+        Ok(Self { value })
     }
 }
 

@@ -293,8 +293,7 @@ pub enum FlipCode {
 impl Mat {
     /// Loads `Mat` from file storage
     pub fn from_file_storage(path: &Path, section: &str) -> Result<Mat, Error> {
-        let path = path.to_str()
-            .ok_or(CvError::InvalidPath { path: path.into() })?;
+        let path = path.to_str().ok_or(CvError::InvalidPath(path.into()))?;
         let path = CString::new(path)?;
         let section = CString::new(section)?;
         let result = unsafe { from_file_storage(path.as_ptr(), section.as_ptr()) };
