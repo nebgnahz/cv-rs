@@ -314,11 +314,7 @@ impl GpuCascade {
             let inner = unsafe { cv_gpu_cascade_new((&s).as_ptr()) };
             return Ok(GpuCascade { inner: inner });
         }
-        Err(
-            CvError::InvalidPath {
-                path: path.as_ref().to_path_buf(),
-            }.into(),
-        )
+        Err(CvError::InvalidPath(path.as_ref().to_path_buf()).into())
     }
 
     /// Detects objects of different sizes in the input image.
