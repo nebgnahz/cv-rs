@@ -32,7 +32,13 @@ pub struct SIFT {
 
 impl SIFT {
     /// Creates a new maximally stable extremal region extractor criteria.
-    pub fn new(features: i32, octave_layers: i32, contrast_threshold: f64, edge_threshold: f64, sigma: f64) -> Self {
+    pub fn new(
+        features: c_int,
+        octave_layers: c_int,
+        contrast_threshold: f64,
+        edge_threshold: f64,
+        sigma: f64,
+    ) -> Self {
         let sift = unsafe {
             cv_sift_new(
                 features,
@@ -57,8 +63,8 @@ impl Drop for SIFT {
 /// Builder that provides defaults for MSER
 #[derive(Debug, Copy, Clone, Default)]
 pub struct SIFTBuilder {
-    features: Option<i32>,
-    octave_layers: Option<i32>,
+    features: Option<c_int>,
+    octave_layers: Option<c_int>,
     contrast_threshold: Option<f64>,
     edge_threshold: Option<f64>,
     sigma: Option<f64>,
@@ -66,13 +72,13 @@ pub struct SIFTBuilder {
 
 impl SIFTBuilder {
     /// Replace current features with specified value
-    pub fn features(mut self, value: i32) -> Self {
+    pub fn features(mut self, value: c_int) -> Self {
         self.features = Some(value);
         self
     }
 
     /// Replace current octave_layers with specified value
-    pub fn octave_layers(mut self, value: i32) -> Self {
+    pub fn octave_layers(mut self, value: c_int) -> Self {
         self.octave_layers = Some(value);
         self
     }

@@ -130,7 +130,7 @@ impl Mat {
 
     /// Decodes an image from `buf` according to the specified mode.
     pub fn imdecode(buf: &[u8], mode: ImreadModes) -> Mat {
-        let inner = unsafe { cv_imdecode(buf.as_ptr(), buf.len(), mode as i32) };
+        let inner = unsafe { cv_imdecode(buf.as_ptr(), buf.len(), mode as c_int) };
         Mat::from_raw(inner)
     }
 
@@ -139,7 +139,7 @@ impl Mat {
     /// returns an owned vector of the encoded image.
     pub fn imencode(&self, ext: &str, f: Vec<ImwriteFlags>) -> Option<Vec<u8>> {
         let ext = CString::new(ext).expect("invalid extension string");
-        let flags = f.into_iter().map(|f| f as i32).collect::<Vec<_>>();
+        let flags = f.into_iter().map(|f| f as c_int).collect::<Vec<_>>();
         let r = unsafe { cv_imencode(ext.into_raw(), self.inner, flags.as_ptr(), flags.len()) };
         if r.status {
             unsafe { Some(::std::slice::from_raw_parts(r.buf, r.size).to_vec()) }

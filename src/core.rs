@@ -28,16 +28,16 @@ pub struct Mat {
     pub inner: *mut CMat,
 
     /// Number of columns
-    pub cols: i32,
+    pub cols: c_int,
 
     /// Number of rows
-    pub rows: i32,
+    pub rows: c_int,
 
     /// Depth of this mat (it should be the type).
-    pub depth: i32,
+    pub depth: c_int,
 
     /// Channels of this mat
-    pub channels: i32,
+    pub channels: c_int,
 }
 
 // TODO(benzh): Should consider Unique<T>,
@@ -57,24 +57,24 @@ pub struct KeyPoint {
     /// The response by which the most strong keypoints have been selected. Can be used for the further sorting or subsampling
     pub response: f32,
     /// Octave (pyramid layer) from which the keypoint has been extracted
-    pub octave: i32,
+    pub octave: c_int,
     /// Object class (if the keypoints need to be clustered by an object they belong to)
-    pub class_id: i32,
+    pub class_id: c_int,
 }
 
 /// A 4-element struct that is widely used to pass pixel values.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Scalar {
-    v0: i32,
-    v1: i32,
-    v2: i32,
-    v3: i32,
+    v0: c_int,
+    v1: c_int,
+    v2: c_int,
+    v3: c_int,
 }
 
 impl Scalar {
     /// Creates a new scalar object.
-    pub fn new(v0: i32, v1: i32, v2: i32, v3: i32) -> Self {
+    pub fn new(v0: c_int, v1: c_int, v2: c_int, v3: c_int) -> Self {
         Scalar {
             v0: v0,
             v1: v1,
@@ -84,7 +84,7 @@ impl Scalar {
     }
 
     /// Creates a new scalar object with all value being the same.
-    pub fn all(v: i32) -> Self {
+    pub fn all(v: c_int) -> Self {
         Scalar {
             v0: v,
             v1: v,
@@ -99,15 +99,15 @@ impl Scalar {
 #[repr(C)]
 pub struct Point2i {
     /// x coordinate
-    pub x: i32,
+    pub x: c_int,
 
     /// y coordinate
-    pub y: i32,
+    pub y: c_int,
 }
 
 impl Point2i {
     /// Creats a new `Point2i`.
-    pub fn new(x: i32, y: i32) -> Self {
+    pub fn new(x: c_int, y: c_int) -> Self {
         Point2i { x: x, y: y }
     }
 }
@@ -130,21 +130,20 @@ impl Point2f {
     }
 }
 
-/// `Size2i` struct is used for specifying the size (`width` and `height` as
-/// `i32`) of an image or rectangle.
+/// `Size2i` struct is used for specifying the size of an image or rectangle with integer dimensions.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Size2i {
     /// width
-    pub width: i32,
+    pub width: c_int,
 
     /// height
-    pub height: i32,
+    pub height: c_int,
 }
 
 impl Size2i {
     /// Creates a new `Size2i` object with `width` and `height`
-    pub fn new(width: i32, height: i32) -> Self {
+    pub fn new(width: c_int, height: c_int) -> Self {
         Size2i {
             width: width,
             height: height,
@@ -152,8 +151,7 @@ impl Size2i {
     }
 }
 
-/// `Size2f` struct is used for specifying the size (`width` and `height` as
-/// `f32`) of an image or rectangle.
+/// `Size2f` struct is used for specifying the size of an image or rectangle with float dimensions.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
 pub struct Size2f {
@@ -169,18 +167,18 @@ pub struct Size2f {
 #[repr(C)]
 pub struct Rect {
     /// x coordinate of the left-top corner
-    pub x: i32,
+    pub x: c_int,
     /// y coordinate of the left-top corner
-    pub y: i32,
+    pub y: c_int,
     /// width of this rectangle
-    pub width: i32,
+    pub width: c_int,
     /// height of this rectangle
-    pub height: i32,
+    pub height: c_int,
 }
 
 impl Rect {
     /// Creates a new `Rect` with (x, y, width, height) parameters.
-    pub fn new(x: i32, y: i32, width: i32, height: i32) -> Self {
+    pub fn new(x: c_int, y: c_int, width: c_int, height: c_int) -> Self {
         Rect {
             x: x,
             y: y,
@@ -191,10 +189,10 @@ impl Rect {
 
     /// Scales the rectangle by the specified ratio.
     pub fn scale(&self, ratio: f32) -> Rect {
-        let new_x = ((1.0 - ratio) * (self.width as f32) / 2.0) as i32 + self.x;
-        let new_y = ((1.0 - ratio) * (self.height as f32) / 2.0) as i32 + self.y;
-        let new_w = ((self.width as f32) * ratio) as i32;
-        let new_h = ((self.height as f32) * ratio) as i32;
+        let new_x = ((1.0 - ratio) * (self.width as f32) / 2.0) as c_int + self.x;
+        let new_y = ((1.0 - ratio) * (self.height as f32) / 2.0) as c_int + self.y;
+        let new_w = ((self.width as f32) * ratio) as c_int;
+        let new_h = ((self.height as f32) * ratio) as c_int;
         Rect {
             x: new_x,
             y: new_y,
@@ -229,10 +227,10 @@ impl Rect2f {
     /// Rect in absolute pixel numbers.
     pub fn normalize_to_mat(&self, mat: &Mat) -> Rect {
         Rect {
-            x: (self.x * mat.cols as f32) as i32,
-            y: (self.y * mat.rows as f32) as i32,
-            width: (self.width * mat.cols as f32) as i32,
-            height: (self.height * mat.rows as f32) as i32,
+            x: (self.x * mat.cols as f32) as c_int,
+            y: (self.y * mat.rows as f32) as c_int,
+            width: (self.width * mat.cols as f32) as c_int,
+            height: (self.height * mat.rows as f32) as c_int,
         }
     }
 }
@@ -373,9 +371,9 @@ pub enum LineTypes {
 
 extern "C" {
     pub(crate) fn cv_mat_new() -> *mut CMat;
-    fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: i32) -> *mut CMat;
-    fn cv_mat_zeros(rows: c_int, cols: c_int, t: i32) -> *mut CMat;
-    fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: i32, buffer: *const c_uchar) -> *mut CMat;
+    fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
+    fn cv_mat_zeros(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
+    fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: c_int, buffer: *const c_uchar) -> *mut CMat;
     fn cv_mat_is_valid(mat: *mut CMat) -> bool;
     fn cv_mat_rows(cmat: *const CMat) -> c_int;
     fn cv_mat_cols(cmat: *const CMat) -> c_int;
@@ -450,19 +448,19 @@ impl Mat {
     ///
     /// ::std::mem::forget(new_image);
     /// ```
-    pub fn from_buffer(rows: i32, cols: i32, cv_type: i32, buf: &Vec<u8>) -> Mat {
+    pub fn from_buffer(rows: c_int, cols: c_int, cv_type: c_int, buf: &Vec<u8>) -> Mat {
         let raw = unsafe { cv_mat_from_buffer(rows, cols, cv_type, buf.as_ptr()) };
         Mat::from_raw(raw)
     }
 
     /// Create an empty `Mat` with specific size (rows, cols and types).
-    pub fn with_size(rows: i32, cols: i32, t: i32) -> Self {
+    pub fn with_size(rows: c_int, cols: c_int, t: c_int) -> Self {
         let m = unsafe { cv_mat_new_with_size(rows, cols, t) };
         Mat::from_raw(m)
     }
 
     /// Create an empty `Mat` with specific size (rows, cols and types).
-    pub fn zeros(rows: i32, cols: i32, t: i32) -> Self {
+    pub fn zeros(rows: c_int, cols: c_int, t: c_int) -> Self {
         let m = unsafe { cv_mat_zeros(rows, cols, t) };
         Mat::from_raw(m)
     }
@@ -543,7 +541,7 @@ impl Mat {
 
     /// Calls out to highgui to show the image, the duration is specified by
     /// `delay`.
-    pub fn show(&self, name: &str, delay: i32) -> Result<(), Error> {
+    pub fn show(&self, name: &str, delay: c_int) -> Result<(), Error> {
         extern "C" {
             fn cv_imshow(name: *const c_char, cmat: *mut CMat);
             fn cv_wait_key(delay_ms: c_int) -> c_int;
@@ -560,7 +558,7 @@ impl Mat {
     /// Returns the images type. For supported types, please see
     /// [CvType](enum.CvType).
     pub fn cv_type(&self) -> Result<CvType, Error> {
-        let t = unsafe { cv_mat_type(self.inner) };
+        let t: i32 = unsafe { cv_mat_type(self.inner) };
         num::FromPrimitive::from_i32(t).ok_or(CvError::EnumFromPrimitiveConversionError { value: t }.into())
     }
 }
@@ -817,11 +815,11 @@ impl RotatedRect {
     /// Return the minimal up-right rectangle containing the rotated rectangle
     pub fn bounding_rect(&self) -> Rect {
         let pt = self.points();
-        let x = pt.iter().map(|p| p.x).fold(0. / 0., f32::min).floor() as i32;
-        let y = pt.iter().map(|p| p.y).fold(0. / 0., f32::min).floor() as i32;
+        let x = pt.iter().map(|p| p.x).fold(0. / 0., f32::min).floor() as c_int;
+        let y = pt.iter().map(|p| p.y).fold(0. / 0., f32::min).floor() as c_int;
 
-        let width = pt.iter().map(|p| p.x).fold(0. / 0., f32::max).ceil() as i32 - x + 1;
-        let height = pt.iter().map(|p| p.y).fold(0. / 0., f32::max).ceil() as i32 - y + 1;
+        let width = pt.iter().map(|p| p.x).fold(0. / 0., f32::max).ceil() as c_int - x + 1;
+        let height = pt.iter().map(|p| p.y).fold(0. / 0., f32::max).ceil() as c_int - y + 1;
         Rect::new(x, y, width, height)
     }
 }
@@ -844,7 +842,7 @@ extern "C" {
         nsrcs: isize,
         dst: *mut CMat,
         ndsts: isize,
-        from_to: *const i32,
+        from_to: *const c_int,
         npairs: isize,
     );
     fn cv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: c_int);
@@ -853,7 +851,7 @@ extern "C" {
     fn cv_bitwise_not(src: *const CMat, dst: *mut CMat);
     fn cv_bitwise_or(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
     fn cv_bitwise_xor(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
-    fn cv_count_non_zero(src: *const CMat) -> i32;
+    fn cv_count_non_zero(src: *const CMat) -> c_int;
 }
 
 /// Normalization type. Please refer to [OpenCV's
@@ -921,7 +919,7 @@ impl Mat {
     /// `Mat`.
     // TODO(benzh) Avoid using raw pointers but rather take a vec for `from_to`?
     // The usage (self.depth) here is buggy, it should actually be the type!
-    pub fn mix_channels(&self, nsrcs: isize, ndsts: isize, from_to: *const i32, npairs: isize) -> Mat {
+    pub fn mix_channels(&self, nsrcs: isize, ndsts: isize, from_to: *const c_int, npairs: isize) -> Mat {
         let m = Mat::with_size(self.rows, self.cols, self.depth);
         unsafe {
             cv_mix_channels(self.inner, nsrcs, m.inner, ndsts, from_to, npairs);
@@ -932,7 +930,7 @@ impl Mat {
     /// Normalize the Mat according to the normalization type.
     pub fn normalize(&self, alpha: f64, beta: f64, t: NormTypes) -> Mat {
         let m = CMat::new();
-        unsafe { cv_normalize(self.inner, m, alpha, beta, t as i32) }
+        unsafe { cv_normalize(self.inner, m, alpha, beta, t as c_int) }
         Mat::from_raw(m)
     }
 
@@ -965,7 +963,7 @@ impl Mat {
     }
 
     /// Counts non-zero array elements.
-    pub fn count_non_zero(&self) -> i32 {
+    pub fn count_non_zero(&self) -> c_int {
         unsafe { cv_count_non_zero(self.inner) }
     }
 }

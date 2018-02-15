@@ -34,15 +34,15 @@ pub struct MSER {
 impl MSER {
     /// Creates a new maximally stable extremal region extractor criteria.
     pub fn new(
-        delta: i32,
-        min_area: i32,
-        max_area: i32,
+        delta: c_int,
+        min_area: c_int,
+        max_area: c_int,
         max_variation: f64,
         min_diversity: f64,
-        max_evolution: i32,
+        max_evolution: c_int,
         area_threshold: f64,
         min_margin: f64,
-        edge_blur_size: i32,
+        edge_blur_size: c_int,
     ) -> Self {
         let mser = unsafe {
             cv_mser_new(
@@ -84,32 +84,32 @@ impl Drop for MSER {
 /// Builder that provides defaults for MSER
 #[derive(Debug, Copy, Clone, Default)]
 pub struct MSERBuilder {
-    delta: Option<i32>,
-    min_area: Option<i32>,
-    max_area: Option<i32>,
+    delta: Option<c_int>,
+    min_area: Option<c_int>,
+    max_area: Option<c_int>,
     max_variation: Option<f64>,
     min_diversity: Option<f64>,
-    max_evolution: Option<i32>,
+    max_evolution: Option<c_int>,
     area_threshold: Option<f64>,
     min_margin: Option<f64>,
-    edge_blur_size: Option<i32>,
+    edge_blur_size: Option<c_int>,
 }
 
 impl MSERBuilder {
     /// Replace current delta with specified value
-    pub fn delta(mut self, value: i32) -> Self {
+    pub fn delta(mut self, value: c_int) -> Self {
         self.delta = Some(value);
         self
     }
 
     /// Replace current min_area with specified value
-    pub fn min_area(mut self, value: i32) -> Self {
+    pub fn min_area(mut self, value: c_int) -> Self {
         self.min_area = Some(value);
         self
     }
 
     /// Replace current max_area with specified value
-    pub fn max_area(mut self, value: i32) -> Self {
+    pub fn max_area(mut self, value: c_int) -> Self {
         self.max_area = Some(value);
         self
     }
@@ -127,7 +127,7 @@ impl MSERBuilder {
     }
 
     /// Replace current max_evolution with specified value
-    pub fn max_evolution(mut self, value: i32) -> Self {
+    pub fn max_evolution(mut self, value: c_int) -> Self {
         self.max_evolution = Some(value);
         self
     }
@@ -145,7 +145,7 @@ impl MSERBuilder {
     }
 
     /// Replace current edge_blur_size with specified value
-    pub fn edge_blur_size(mut self, value: i32) -> Self {
+    pub fn edge_blur_size(mut self, value: c_int) -> Self {
         self.edge_blur_size = Some(value);
         self
     }
