@@ -20,14 +20,6 @@ extern "C" {
 #[repr(C)]
 #[derive(Clone, Copy, Debug)]
 #[allow(missing_docs)]
-pub enum ComponentLevel {
-    Word,
-    TextLine,
-}
-
-#[repr(C)]
-#[derive(Clone, Copy, Debug)]
-#[allow(missing_docs)]
 pub enum EngineMode {
     TesseractOnly,
     CubeOnly,
@@ -109,3 +101,11 @@ impl OcrImpl for OcrTesseract {
 }
 
 impl OcrImplInterface for OcrTesseract {}
+
+fn to_nullable_string(value: &Option<CString>) -> *const c_char {
+    unwrap_or_null(&value.as_ref().map(|x| x.as_ptr()))
+}
+
+fn unwrap_or_null(value: &Option<*const c_char>) -> *const c_char {
+    value.unwrap_or(::std::ptr::null())
+}

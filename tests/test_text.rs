@@ -10,6 +10,7 @@ use std::path::PathBuf;
 const VOCABULARY: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 #[test]
+#[cfg(feature = "tesseract")]
 fn ocr_tesseract_test_line() {
     let image = Mat::from_path("assets/HelloWorld.png", ImreadModes::ImreadColor).unwrap();
     let path = PathBuf::from("/usr/share/tesseract-ocr");
@@ -25,6 +26,7 @@ fn ocr_tesseract_test_line() {
 }
 
 #[test]
+#[cfg(feature = "tesseract")]
 fn ocr_tesseract_test_word() {
     let image = Mat::from_path("assets/Ubuntu.png", ImreadModes::ImreadColor).unwrap();
     let path = PathBuf::from("/usr/share/tesseract-ocr");
@@ -60,9 +62,11 @@ fn ocr_hmm_test() {
         ClassifierType::Knn,
     ).unwrap();
     let res = ocr.run(&image, ComponentLevel::Word);
-    assert_ne!(res.0.len(), 0); // do not check actual recognized text, waiting for fix: https://github.com/opencv/opencv_contrib/issues/1557
+    let reslen = res.0.len();
+    assert_ne!(reslen, 0); // do not check actual recognized text, waiting for fix: https://github.com/opencv/opencv_contrib/issues/1557
 }
 
+#[cfg(feature = "tesseract")]
 fn assert_contains(left: &str, right: &str) {
     assert!(left.contains(right), "{} != {}", left, right);
 }

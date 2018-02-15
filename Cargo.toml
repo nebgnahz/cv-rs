@@ -25,3 +25,4 @@ gcc = "0"
 
 [features]
 gpu = []
+tesseract = []

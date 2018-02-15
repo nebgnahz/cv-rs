@@ -1,13 +1,14 @@
 //! Provides different algorithms for text detection and recognition in natural scene images
-mod tesseract;
 mod hmm;
+#[cfg(feature = "tesseract")]
+mod tesseract;
 pub use self::hmm::*;
+#[cfg(feature = "tesseract")]
 pub use self::tesseract::*;
 
 use ::*;
 use core::CMat;
 use failure::Error;
-use std::os::raw::c_char;
 
 extern "C" {
     fn cv_ocr_run(
@@ -29,6 +30,14 @@ mod private {
     pub trait OcrImpl {
         fn get_value(&self) -> *mut COCR;
     }
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug)]
+#[allow(missing_docs)]
+pub enum ComponentLevel {
+    Word,
+    TextLine,
 }
 
 #[allow(missing_docs)]
@@ -66,13 +75,4 @@ impl<T: OcrImplInterface> Ocr for T {
             component_confidences.unpack(),
         )
     }
-}
-
-
-fn to_nullable_string(value: &Option<CString>) -> *const c_char {
-    unwrap_or_null(&value.as_ref().map(|x| x.as_ptr()))
-}
-
-fn unwrap_or_null(value: &Option<*const c_char>) -> *const c_char {
-    value.unwrap_or(::std::ptr::null())
 }
