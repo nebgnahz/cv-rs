@@ -8,38 +8,47 @@ use utils::*;
 
 const VOCABULARY: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
-#[test]
-#[cfg(feature = "tesseract")]
-fn ocr_tesseract_test_line() {
-    let image_path = get_asset_path("HelloWorld.png");
-    let image = Mat::from_path(image_path, ImreadModes::ImreadColor).unwrap();
-    let path = std::path::Path::new("/usr/share/tesseract-ocr");
-    let ocr = OcrTesseract::new(
-        Some(&path),
-        Some("eng"),
-        Some(VOCABULARY),
-        EngineMode::Default,
-        PageSegmentationMode::Auto,
-    ).unwrap();
-    let res = ocr.run(&image, ComponentLevel::TextLine);
-    assert_contains(&res.0, "Heruro worudo")
-}
 
-#[test]
 #[cfg(feature = "tesseract")]
-fn ocr_tesseract_test_word() {
-    let image_path = get_asset_path("Ubuntu.png");
-    let image = Mat::from_path(&image_path, ImreadModes::ImreadColor).unwrap();
-    let path = std::path::Path::new("/usr/share/tesseract-ocr");
-    let ocr = OcrTesseract::new(
-        Some(&path),
-        Some("eng"),
-        Some(VOCABULARY),
-        EngineMode::Default,
-        PageSegmentationMode::Auto,
-    ).unwrap();
-    let res = ocr.run(&image, ComponentLevel::Word);
-    assert_contains(&res.0, "uBuntu")
+mod tesseract {
+    use super::*;
+    use std::path::Path;
+
+    #[test]
+    fn ocr_tesseract_test_line() {
+        let image_path = get_asset_path("HelloWorld.png");
+        let image = Mat::from_path(image_path, ImreadModes::ImreadColor).unwrap();
+        let path = Path::new("/usr/share/tesseract-ocr");
+        let ocr = OcrTesseract::new(
+            Some(&path),
+            Some("eng"),
+            Some(VOCABULARY),
+            EngineMode::Default,
+            PageSegmentationMode::Auto,
+        ).unwrap();
+        let res = ocr.run(&image, ComponentLevel::TextLine);
+        assert_contains(&res.0, "Heruro worudo")
+    }
+
+    #[test]
+    fn ocr_tesseract_test_word() {
+        let image_path = get_asset_path("Ubuntu.png");
+        let image = Mat::from_path(&image_path, ImreadModes::ImreadColor).unwrap();
+        let path = Path::new("/usr/share/tesseract-ocr");
+        let ocr = OcrTesseract::new(
+            Some(&path),
+            Some("eng"),
+            Some(VOCABULARY),
+            EngineMode::Default,
+            PageSegmentationMode::Auto,
+        ).unwrap();
+        let res = ocr.run(&image, ComponentLevel::Word);
+        assert_contains(&res.0, "uBuntu")
+    }
+
+    fn assert_contains(left: &str, right: &str) {
+        assert!(left.contains(right), "{} != {}", left, right);
+    }
 }
 
 #[test]
@@ -67,9 +76,4 @@ fn ocr_hmm_test() {
     let reslen = res.0.len();
 
     assert_ne!(reslen, 0); // do not check actual recognized text, waiting for fix: https://github.com/opencv/opencv_contrib/issues/1557
-}
-
-#[cfg(feature = "tesseract")]
-fn assert_contains(left: &str, right: &str) {
-    assert!(left.contains(right), "{} != {}", left, right);
 }
