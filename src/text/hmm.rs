@@ -34,14 +34,15 @@ pub struct OcrHmmDecoder {
 
 impl OcrHmmDecoder {
     /// Creates an instance of the `OcrHmmDecoder` class. Initializes HmmDecoder.
-    pub fn new(
-        classifier_filename: &Path,
+    pub fn new<P: ?Sized + AsRef<Path>>(
+        classifier_filename: &P,
         vocabulary: &str,
         transition_probabilities_table: &Mat,
         emission_probabilities_table: &Mat,
         classifier_type: ClassifierType,
     ) -> Result<Self, Error> {
         let value = unsafe {
+            let classifier_filename = classifier_filename.as_ref();
             if !classifier_filename.exists() {
                 return Err(CvError::EntryNotFound(classifier_filename.into()).into());
             }
