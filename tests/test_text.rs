@@ -13,7 +13,7 @@ const VOCABULARY: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01
 fn ocr_tesseract_test_line() {
     let image_path = get_asset_path("HelloWorld.png");
     let image = Mat::from_path(image_path, ImreadModes::ImreadColor).unwrap();
-    let path = PathBuf::new("/usr/share/tesseract-ocr");
+    let path = std::path::Path::new("/usr/share/tesseract-ocr");
     let ocr = OcrTesseract::new(
         Some(&path),
         Some("eng"),
@@ -30,7 +30,7 @@ fn ocr_tesseract_test_line() {
 fn ocr_tesseract_test_word() {
     let image_path = get_asset_path("Ubuntu.png");
     let image = Mat::from_path(&image_path, ImreadModes::ImreadColor).unwrap();
-    let path = PathBuf::new("/usr/share/tesseract-ocr");
+    let path = std::path::Path::new("/usr/share/tesseract-ocr");
     let ocr = OcrTesseract::new(
         Some(&path),
         Some("eng"),
