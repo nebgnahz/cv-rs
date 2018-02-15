@@ -35,7 +35,7 @@ pub use core::Scalar;
 pub use core::Size2f;
 pub use core::Size2i;
 
-use std::ffi::CString;
+use std::ffi::{CStr, CString};
 use std::mem;
 use std::os::raw::{c_char, c_void};
 
@@ -235,8 +235,9 @@ impl Unpack for CDisposableString {
     type Out = String;
 
     fn unpack(&self) -> Self::Out {
-        unsafe { CString::from_raw(self.value) }
-            .into_string()
+        unsafe { CStr::from_ptr(self.value) }
+            .to_str()
             .unwrap()
+            .into()
     }
 }
