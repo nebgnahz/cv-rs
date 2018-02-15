@@ -434,9 +434,7 @@ impl Mat {
     /// consider using the cv::EMD function.
     pub fn compare_hist(&self, other: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
         let method: c_int = method.to_i64().unwrap() as c_int;
-        let result = CResult::<f64>::from_callback(|r| unsafe {
-            cv_compare_hist(self.inner, other.inner, method, r)
-        });
+        let result = CResult::<f64>::from_callback(|r| unsafe { cv_compare_hist(self.inner, other.inner, method, r) });
         result.into()
     }
 }

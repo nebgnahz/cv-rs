@@ -77,11 +77,9 @@ impl CascadeClassifier {
             }
         }
 
-        Err(
-            CvError::InvalidPath {
-                path: path.as_ref().to_path_buf(),
-            }.into(),
-        )
+        Err(CvError::InvalidPath {
+            path: path.as_ref().to_path_buf(),
+        }.into())
     }
 
     /// The default detection uses scale factor 1.1, minNeighbors 3, no min size
