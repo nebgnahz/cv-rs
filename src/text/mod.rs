@@ -1,10 +1,14 @@
 //! Provides different algorithms for text detection and recognition in natural scene images
+#[macro_use]
+mod macros;
 mod hmm;
 #[cfg(feature = "tesseract")]
 mod tesseract;
 pub use self::hmm::*;
+pub use self::holisticword::*;
 #[cfg(feature = "tesseract")]
 pub use self::tesseract::*;
+
 
 use ::*;
 use core::CMat;

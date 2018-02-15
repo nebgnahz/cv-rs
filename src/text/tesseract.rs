@@ -2,7 +2,6 @@
 use super::*;
 use super::private::*;
 use ::*;
-use errors::*;
 use std::os::raw::c_char;
 use std::path::Path;
 
@@ -60,21 +59,9 @@ impl OcrTesseract {
         psmode: PageSegmentationMode,
     ) -> Result<Self, Error> {
         let value = unsafe {
-            let c_data_path = match data_path {
-                Some(x) => {
-                    let x = x.to_str().ok_or(CvError::InvalidPath(x.into()))?;
-                    Some(CString::new(x)?)
-                }
-                None => None,
-            };
-            let c_language = match language {
-                Some(x) => Some(CString::new(x)?),
-                None => None,
-            };
-            let c_char_whitelist = match char_whitelist {
-                Some(x) => Some(CString::new(x)?),
-                None => None,
-            };
+            let c_data_path = path_to_cstring!(data_path);
+            let c_language = string_to_cstring!(language);
+            let c_char_whitelist = string_to_cstring!(char_whitelist);
 
             let c_data_path = to_nullable_string(&c_data_path);
             let c_language = to_nullable_string(&c_language);
