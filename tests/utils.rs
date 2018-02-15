@@ -77,3 +77,10 @@ pub fn load_frontal_face() -> CascadeClassifier {
     d.push("assets/haarcascade_frontalface_default.xml");
     CascadeClassifier::from_path(d).unwrap()
 }
+
+pub fn get_asset_path(name: &'static str) -> PathBuf {
+    let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    d.push("assets");
+    d.push(name);
+    d
+}

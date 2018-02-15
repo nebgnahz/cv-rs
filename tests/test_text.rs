@@ -3,9 +3,9 @@ mod utils;
 
 use cv::*;
 use cv::imgcodecs::ImreadModes;
-use cv::imgproc::*;
 use cv::text::*;
 use std::path::PathBuf;
+use utils::*;
 
 const VOCABULARY: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
@@ -43,9 +43,8 @@ fn ocr_tesseract_test_word() {
 
 #[test]
 fn ocr_hmm_test() {
-    let image = Mat::from_path("assets/Ubuntu.png", ImreadModes::ImreadColor).unwrap();
-    let image = image.cvt_color(ColorConversionCodes::BGR2GRAY);
-    let classifier_name = PathBuf::from("assets/OCRHMM_knn_model_data.xml.gz");
+    let image = Mat::from_path("assets/Ubuntu.png", ImreadModes::ImreadGrayscale).unwrap();
+    let classifier_name = get_asset_path("OCRHMM_knn_model_data.xml.gz");
     let transition_probability_path = PathBuf::from("assets/OCRHMM_transitions_table.xml");
     let transition_probability_table =
         Mat::from_file_storage(&transition_probability_path, "transition_probabilities").unwrap();

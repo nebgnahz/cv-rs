@@ -42,6 +42,9 @@ impl OcrHmmDecoder {
         classifier_type: ClassifierType,
     ) -> Result<Self, Error> {
         let value = unsafe {
+            if !classifier_filename.exists() {
+                return Err(CvError::EntryNotFound(classifier_filename.into()).into());
+            }
             let classifier_filename = classifier_filename
                 .to_str()
                 .ok_or(CvError::InvalidPath(classifier_filename.into()))?;
