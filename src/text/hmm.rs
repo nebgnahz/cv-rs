@@ -34,8 +34,8 @@ pub struct OcrHmmDecoder {
 
 impl OcrHmmDecoder {
     /// Creates an instance of the `OcrHmmDecoder` class. Initializes HmmDecoder.
-    pub fn new<P: ?Sized + AsRef<Path>>(
-        classifier_filename: &P,
+    pub fn new<P: AsRef<Path>>(
+        classifier_filename: P,
         vocabulary: &str,
         transition_probabilities_table: &Mat,
         emission_probabilities_table: &Mat,

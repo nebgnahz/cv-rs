@@ -118,10 +118,12 @@ struct ImencodeResult {
 
 impl Mat {
     /// Creates a `Mat` from reading the image specified by the path.
-    pub fn from_path<P: ?Sized + AsRef<Path>>(path: &P, flags: ImreadModes) -> Option<Mat> {
+    pub fn from_path<P: AsRef<Path>>(path: P, flags: ImreadModes) -> Option<Mat> {
         if let Some(unicode_path) = path.as_ref().as_os_str().to_str() {
             let s = CString::new(unicode_path).unwrap();
-            let m = unsafe { cv_imread((&s).as_ptr(), flags as c_int) };
+            let input = (&s).as_ptr();
+            let flags = flags as c_int;
+            let m = unsafe { cv_imread(input, flags) };
             Some(Mat::from_raw(m))
         } else {
             None

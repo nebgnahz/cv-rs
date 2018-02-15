@@ -4,7 +4,6 @@ mod utils;
 use cv::*;
 use cv::imgcodecs::ImreadModes;
 use cv::text::*;
-use std::path::PathBuf;
 use utils::*;
 
 const VOCABULARY: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -12,8 +11,9 @@ const VOCABULARY: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01
 #[test]
 #[cfg(feature = "tesseract")]
 fn ocr_tesseract_test_line() {
-    let image = Mat::from_path("assets/HelloWorld.png", ImreadModes::ImreadColor).unwrap();
-    let path = PathBuf::from("/usr/share/tesseract-ocr");
+    let image_path = get_asset_path("HelloWorld.png");
+    let image = Mat::from_path(image_path, ImreadModes::ImreadColor).unwrap();
+    let path = PathBuf::new("/usr/share/tesseract-ocr");
     let ocr = OcrTesseract::new(
         Some(&path),
         Some("eng"),
@@ -28,8 +28,9 @@ fn ocr_tesseract_test_line() {
 #[test]
 #[cfg(feature = "tesseract")]
 fn ocr_tesseract_test_word() {
-    let image = Mat::from_path("assets/Ubuntu.png", ImreadModes::ImreadColor).unwrap();
-    let path = PathBuf::from("/usr/share/tesseract-ocr");
+    let image_path = get_asset_path("Ubuntu.png");
+    let image = Mat::from_path(&image_path, ImreadModes::ImreadColor).unwrap();
+    let path = PathBuf::new("/usr/share/tesseract-ocr");
     let ocr = OcrTesseract::new(
         Some(&path),
         Some("eng"),
@@ -43,9 +44,11 @@ fn ocr_tesseract_test_word() {
 
 #[test]
 fn ocr_hmm_test() {
-    let image = Mat::from_path("assets/Ubuntu.png", ImreadModes::ImreadGrayscale).unwrap();
+    let image_path = get_asset_path("Ubuntu.png");
     let classifier_name = get_asset_path("OCRHMM_knn_model_data.xml.gz");
-    let transition_probability_path = PathBuf::from("assets/OCRHMM_transitions_table.xml");
+    let transition_probability_path = get_asset_path("OCRHMM_transitions_table.xml");
+
+    let image = Mat::from_path(&image_path, ImreadModes::ImreadGrayscale).unwrap();
     let transition_probability_table =
         Mat::from_file_storage(&transition_probability_path, "transition_probabilities").unwrap();
     let emission_probability_table = Mat::eye(
@@ -62,6 +65,7 @@ fn ocr_hmm_test() {
     ).unwrap();
     let res = ocr.run(&image, ComponentLevel::Word);
     let reslen = res.0.len();
+
     assert_ne!(reslen, 0); // do not check actual recognized text, waiting for fix: https://github.com/opencv/opencv_contrib/issues/1557
 }
 

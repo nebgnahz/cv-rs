@@ -79,8 +79,7 @@ pub fn load_frontal_face() -> CascadeClassifier {
 }
 
 pub fn get_asset_path(name: &'static str) -> PathBuf {
-    let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    d.push("assets");
-    d.push(name);
-    d
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("assets")
+        .join(name)
 }
