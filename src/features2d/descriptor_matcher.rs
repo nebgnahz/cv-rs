@@ -3,7 +3,6 @@ use core::*;
 use std::ffi::*;
 use std::os::raw::{c_char, c_int};
 
-
 enum CDescriptorMatcher {}
 
 extern "C" {

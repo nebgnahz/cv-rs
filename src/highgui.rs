@@ -14,7 +14,6 @@ extern "C" {
     );
 }
 
-
 /// Create a window that can be used as a placeholder for images and
 /// trackbars. All created windows are referred to by their names. If a window
 /// with the same name already exists, the function does nothing.
@@ -66,7 +65,6 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
         cv_set_mouse_callback((&s).as_ptr(), _mouse_callback, box_wrapper_raw);
     }
 }
-
 
 /// Flags for [highgui_named_window](fn.highgui_named_window.html). This only
 /// supports a subset of all cv::WindowFlags because C/C++ allows enum with the
