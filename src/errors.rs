@@ -16,4 +16,7 @@ pub enum CvError {
         /// Value that caused an error
         value: i32,
     },
+    #[fail(display = "Unknown error: {:?}", _0)]
+    /// Indicates that error occurred in C++ code
+    UnknownError(String),
 }

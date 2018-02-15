@@ -279,6 +279,8 @@ void* cv_hmm_new(const char* classifier_filename,
                  cv::Mat& emission_probabilities_table,
                  cv::text::classifier_type classifier_type);
 void cv_hmm_drop(cv::Ptr<cv::text::OCRHMMDecoder>* ocr);
+void cv_holistic_new(const char* archive_file, const char* weights_file, const char* words_file, Result<void*>* result);
+void cv_holistic_drop(cv::Ptr<cv::text::OCRHolisticWordRecognizer>* ocr);
 
 EXTERN_C_END
 

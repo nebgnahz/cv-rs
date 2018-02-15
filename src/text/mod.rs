@@ -2,6 +2,7 @@
 #[macro_use]
 mod macros;
 mod hmm;
+mod holisticword;
 #[cfg(feature = "tesseract")]
 mod tesseract;
 pub use self::hmm::*;

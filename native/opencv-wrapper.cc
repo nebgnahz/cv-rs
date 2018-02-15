@@ -710,4 +710,19 @@ void cv_hmm_drop(cv::Ptr<cv::text::OCRHMMDecoder>* ocr) {
     ocr = nullptr;
 }
 
+void cv_holistic_new(const char* archive_file,
+                     const char* weights_file,
+                     const char* words_file,
+                     Result<void*>* result) {
+    *result = Result<void*>::FromFunction([archive_file, weights_file, words_file]() {
+        auto result = cv::text::OCRHolisticWordRecognizer::create(archive_file, weights_file, words_file);
+        return new cv::Ptr<cv::text::OCRHolisticWordRecognizer>(result);
+    });
+}
+
+void cv_holistic_drop(cv::Ptr<cv::text::OCRHolisticWordRecognizer>* ocr) {
+    delete ocr;
+    ocr = nullptr;
+}
+
 EXTERN_C_END

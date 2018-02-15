@@ -77,3 +77,9 @@ fn ocr_hmm_test() {
 
     assert_ne!(reslen, 0); // do not check actual recognized text, waiting for fix: https://github.com/opencv/opencv_contrib/issues/1557
 }
+
+#[test]
+#[should_panic]
+fn ocr_holistic_word_panic() {
+    let _ = OcrHolisticWord::new("a", "a", "a").unwrap();
+}
