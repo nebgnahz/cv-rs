@@ -254,7 +254,7 @@ pub enum LineTypes {
 
 extern "C" {
     pub(crate) fn cv_mat_new() -> *mut CMat;
-    fn from_file_storage(path: *const c_char, section: *const c_char) -> *mut CMat;
+    fn cv_from_file_storage(path: *const c_char, section: *const c_char) -> *mut CMat;
     fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
     fn cv_mat_zeros(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
     fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: c_int, buffer: *const c_uchar) -> *mut CMat;
@@ -296,7 +296,7 @@ impl Mat {
 
         let path = path.as_ptr();
         let section = section.as_ptr();
-        let result = unsafe { from_file_storage(path, section) };
+        let result = unsafe { cv_from_file_storage(path, section) };
         Ok(Mat::from_raw(result))
     }
 
