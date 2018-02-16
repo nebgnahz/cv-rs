@@ -41,7 +41,7 @@ impl OcrHolisticWord {
         let result = CResult::<*mut COCR>::from_callback(|r| unsafe {
             cv_holistic_new(c_archive_file, c_weights_file, c_words_file, r)
         });
-        let result: Result<*mut COCR, String> = result.into();
+        let result: Result<_, String> = result.into();
         let result = result.map_err(CvError::UnknownError)?;
         Ok(Self { value: result })
     }
