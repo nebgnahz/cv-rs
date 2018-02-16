@@ -68,6 +68,10 @@ git = "https://github.com/nebgnahz/cv-rs"
 features = [ "gpu" ]
 ```
 
+All possible features are listed below:
+- `gpu` - for CUDA support, requires installed CUDA
+- `tesseract` - for Tesseract OCR support, requires installed Tesseract
+
 ### Windows
 
 #### If you are using MSVC toolchain (mandatory if you want to use CUDA)
