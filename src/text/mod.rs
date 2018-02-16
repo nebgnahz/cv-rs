@@ -10,7 +10,6 @@ pub use self::holisticword::*;
 #[cfg(feature = "tesseract")]
 pub use self::tesseract::*;
 
-
 use ::*;
 use core::CMat;
 use failure::Error;
@@ -26,7 +25,6 @@ extern "C" {
         component_level: ComponentLevel,
     );
 }
-
 
 mod private {
     #[allow(missing_copy_implementations, missing_debug_implementations)]
@@ -53,7 +51,6 @@ pub trait Ocr {
     /// Recognize text
     fn run(&self, image: &Mat, component_level: ComponentLevel) -> (String, Vec<Rect>, Vec<String>, Vec<f32>);
 }
-
 
 impl<T: OcrImplInterface> Ocr for T {
     fn run(&self, image: &Mat, component_level: ComponentLevel) -> (String, Vec<Rect>, Vec<String>, Vec<f32>) {

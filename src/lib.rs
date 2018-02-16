@@ -236,8 +236,7 @@ impl Unpack for CDisposableString {
 
     fn unpack(&self) -> Self::Out {
         unsafe { CStr::from_ptr(self.value) }
-            .to_str()
-            .unwrap()
-            .into()
+            .to_string_lossy()
+            .into_owned()
     }
 }
