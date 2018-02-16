@@ -9,11 +9,10 @@ extern "C" {
     fn cv_destroy_window(name: *const c_char);
     fn cv_set_mouse_callback(
         name: *const c_char,
-        on_mouse: extern "C" fn(e: i32, x: i32, y: i32, f: i32, data: *mut c_void),
+        on_mouse: extern "C" fn(e: c_int, x: c_int, y: c_int, f: c_int, data: *mut c_void),
         userdata: *mut c_void,
     );
 }
-
 
 /// Create a window that can be used as a placeholder for images and
 /// trackbars. All created windows are referred to by their names. If a window
@@ -21,7 +20,7 @@ extern "C" {
 pub fn highgui_named_window(name: &str, flags: WindowFlags) {
     let s = CString::new(name).unwrap();
     unsafe {
-        cv_named_window((&s).as_ptr(), flags as i32);
+        cv_named_window((&s).as_ptr(), flags as c_int);
     }
 }
 
@@ -38,7 +37,7 @@ pub type MouseCallbackData = *mut c_void;
 
 /// Callback function for mouse events, primarily used in
 /// [highgui_set_mouse_callback](fn.highgui_set_mouse_callback.html)
-pub type MouseCallback = fn(i32, i32, i32, i32, MouseCallbackData);
+pub type MouseCallback = fn(c_int, c_int, c_int, c_int, MouseCallbackData);
 
 /// Set mouse handler for the specified window (identified by name). A callback
 /// handler should be provided and optional user_data can be passed around.
@@ -48,7 +47,7 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
         data: *mut c_void,
     }
 
-    extern "C" fn _mouse_callback(e: i32, x: i32, y: i32, f: i32, ud: *mut c_void) {
+    extern "C" fn _mouse_callback(e: c_int, x: c_int, y: c_int, f: c_int, ud: *mut c_void) {
         let cb_wrapper = unsafe { ptr::read(ud as *mut CallbackWrapper) };
         let true_callback = *(cb_wrapper.cb);
         true_callback(e, x, y, f, cb_wrapper.data);
@@ -66,7 +65,6 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
         cv_set_mouse_callback((&s).as_ptr(), _mouse_callback, box_wrapper_raw);
     }
 }
-
 
 /// Flags for [highgui_named_window](fn.highgui_named_window.html). This only
 /// supports a subset of all cv::WindowFlags because C/C++ allows enum with the

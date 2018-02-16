@@ -105,7 +105,7 @@ impl CascadeClassifier {
         &self,
         mat: &Mat,
         scale_factor: f32,
-        min_neighbors: i32,
+        min_neighbors: c_int,
         min_size: Size2i,
         max_size: Size2i,
     ) -> Vec<Rect> {
@@ -196,7 +196,7 @@ pub struct HogParams {
     pub cell_size: Size2i,
 
     /// Number of bins. Only 9 bins per cell are supported for now.
-    pub nbins: i32,
+    pub nbins: c_int,
 
     /// Gaussian smoothing window parameter. Default -1 for CPU and 4.0 for GPU.
     pub win_sigma: f64,
@@ -232,7 +232,7 @@ pub struct HogParams {
     /// Coefficient to regulate the similarity threshold. When detected, some
     /// objects can be covered by many rectangles. 0 means not to perform
     /// grouping.
-    pub group_threshold: i32,
+    pub group_threshold: c_int,
 
     /// The useMeanShiftGrouping parameter is a boolean indicating whether or
     /// not mean-shift grouping should be performed to handle potential

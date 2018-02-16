@@ -117,7 +117,7 @@ pub enum CapProp {
 impl VideoCapture {
     /// Creates a capture device with specified camera id. If there is a single
     /// camera connected, just pass 0.
-    pub fn new(index: i32) -> Self {
+    pub fn new(index: c_int) -> Self {
         let cap = unsafe { cv_videocapture_new(index) };
         VideoCapture { inner: cap }
     }
@@ -230,7 +230,7 @@ impl VideoWriter {
     /// -is_color – If it is not zero, the encoder will expect and encode color
     ///  frames, otherwise it will work with grayscale frames (the flag is
     ///  currently supported on Windows only).
-    pub fn new(path: &str, fourcc: i32, fps: f64, frame_size: Size2i, is_color: bool) -> VideoWriter {
+    pub fn new(path: &str, fourcc: c_int, fps: f64, frame_size: Size2i, is_color: bool) -> VideoWriter {
         let s = ::std::ffi::CString::new(path).unwrap();
         let writer = unsafe { cv_videowriter_new((&s).as_ptr(), fourcc, fps, frame_size, is_color) };
         VideoWriter { inner: writer }
@@ -247,7 +247,7 @@ impl VideoWriter {
     /// -is_color – If it is not zero, the encoder will expect and encode color
     ///  frames, otherwise it will work with grayscale frames (the flag is
     ///  currently supported on Windows only).
-    pub fn open(&self, path: &str, fourcc: i32, fps: f64, frame_size: Size2i, is_color: bool) -> bool {
+    pub fn open(&self, path: &str, fourcc: c_int, fps: f64, frame_size: Size2i, is_color: bool) -> bool {
         let s = ::std::ffi::CString::new(path).unwrap();
         unsafe { cv_videowriter_open(self.inner, (&s).as_ptr(), fourcc, fps, frame_size, is_color) }
     }
@@ -317,15 +317,15 @@ extern "C" {
     fn cv_fourcc(c1: c_char, c2: c_char, c3: c_char, c4: c_char) -> c_int;
 }
 
-/// Converts from [four character code](https://www.fourcc.org/) to `i32` for
+/// Converts from [four character code](https://www.fourcc.org/) to `c_int` for
 /// OpenCV.
-pub fn fourcc(c1: char, c2: char, c3: char, c4: char) -> i32 {
+pub fn fourcc(c1: char, c2: char, c3: char, c4: char) -> c_int {
     unsafe { cv_fourcc(c1 as c_char, c2 as c_char, c3 as c_char, c4 as c_char) }
 }
 
 /// Converts from OpenCV's int to [four character
 /// code](https://www.fourcc.org/).
-pub fn codec_name(fourcc: i32) -> Option<String> {
+pub fn codec_name(fourcc: c_int) -> Option<String> {
     let ex = fourcc as u32;
     let vec = vec![
         (ex & 0xFFu32) as u8,

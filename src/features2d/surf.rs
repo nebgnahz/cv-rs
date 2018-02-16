@@ -33,7 +33,7 @@ pub struct SURF {
 
 impl SURF {
     /// Creates a new maximally stable extremal region extractor criteria.
-    pub fn new(hessian_threshold: f64, octaves: i32, octave_layers: i32, extended: bool, upright: bool) -> Self {
+    pub fn new(hessian_threshold: f64, octaves: c_int, octave_layers: c_int, extended: bool, upright: bool) -> Self {
         let surf = unsafe { cv_surf_new(hessian_threshold, octaves, octave_layers, extended, upright) };
         SURF { value: surf }
     }
@@ -51,8 +51,8 @@ impl Drop for SURF {
 #[derive(Debug, Copy, Clone, Default)]
 pub struct SURFBuilder {
     hessian_threshold: Option<f64>,
-    octaves: Option<i32>,
-    octave_layers: Option<i32>,
+    octaves: Option<c_int>,
+    octave_layers: Option<c_int>,
     extended: Option<bool>,
     upright: Option<bool>,
 }
@@ -65,13 +65,13 @@ impl SURFBuilder {
     }
 
     /// Replace current octave_layers with specified value
-    pub fn octaves(mut self, value: i32) -> Self {
+    pub fn octaves(mut self, value: c_int) -> Self {
         self.octaves = Some(value);
         self
     }
 
     /// Replace current octave_layers with specified value
-    pub fn octave_layers(mut self, value: i32) -> Self {
+    pub fn octave_layers(mut self, value: c_int) -> Self {
         self.octave_layers = Some(value);
         self
     }

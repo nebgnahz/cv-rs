@@ -38,7 +38,7 @@ void* cv_gpu_hog_default() {
     return new cv::Ptr<cv::cuda::HOG>(hog);
 }
 
-void* cv_gpu_hog_new(Size2i win_size, Size2i block_size, Size2i block_stride, Size2i cell_size, int32_t nbins) {
+void* cv_gpu_hog_new(Size2i win_size, Size2i block_size, Size2i block_stride, Size2i cell_size, int nbins) {
     cv::Size cv_win_size(win_size.width, win_size.height);
     cv::Size cv_block_size(block_size.width, block_size.height);
     cv::Size cv_block_stride(block_stride.width, block_stride.height);
@@ -79,7 +79,7 @@ void cv_gpu_hog_set_gamma_correction(cv::Ptr<cv::cuda::HOG>* hog, bool gamma) {
     (*hog)->setGammaCorrection(gamma);
 }
 
-void cv_gpu_hog_set_group_threshold(cv::Ptr<cv::cuda::HOG>* hog, int32_t group_threshold) {
+void cv_gpu_hog_set_group_threshold(cv::Ptr<cv::cuda::HOG>* hog, int group_threshold) {
     (*hog)->setGroupThreshold(group_threshold);
 }
 
@@ -91,7 +91,7 @@ void cv_gpu_hog_set_l2hys_threshold(cv::Ptr<cv::cuda::HOG>* hog, double l2hys_th
     (*hog)->setL2HysThreshold(l2hys_threshold);
 }
 
-void cv_gpu_hog_set_num_levels(cv::Ptr<cv::cuda::HOG>* hog, size_t num_levels) {
+void cv_gpu_hog_set_num_levels(cv::Ptr<cv::cuda::HOG>* hog, int num_levels) {
     (*hog)->setNumLevels(num_levels);
 }
 
@@ -112,7 +112,7 @@ bool cv_gpu_hog_get_gamma_correction(cv::Ptr<cv::cuda::HOG>* hog) {
     return (*hog)->getGammaCorrection();
 }
 
-int32_t cv_gpu_hog_get_group_threshold(cv::Ptr<cv::cuda::HOG>* hog) {
+int cv_gpu_hog_get_group_threshold(cv::Ptr<cv::cuda::HOG>* hog) {
     return (*hog)->getGroupThreshold();
 }
 
@@ -124,7 +124,7 @@ double cv_gpu_hog_get_l2hys_threshold(cv::Ptr<cv::cuda::HOG>* hog) {
     return (*hog)->getL2HysThreshold();
 }
 
-size_t cv_gpu_hog_get_num_levels(cv::Ptr<cv::cuda::HOG>* hog) {
+int cv_gpu_hog_get_num_levels(cv::Ptr<cv::cuda::HOG>* hog) {
     return (*hog)->getNumLevels();
 }
 
@@ -173,11 +173,11 @@ void cv_gpu_cascade_set_find_largest_object(cv::Ptr<cv::cuda::CascadeClassifier>
     (*cascade)->setFindLargestObject(value);
 }
 
-void cv_gpu_cascade_set_max_num_objects(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, int32_t num) {
+void cv_gpu_cascade_set_max_num_objects(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, int num) {
     (*cascade)->setMaxNumObjects(num);
 }
 
-void cv_gpu_cascade_set_min_neighbors(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, int32_t min) {
+void cv_gpu_cascade_set_min_neighbors(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, int min) {
     (*cascade)->setMinNeighbors(min);
 }
 
@@ -205,11 +205,11 @@ bool cv_gpu_cascade_get_find_largest_object(cv::Ptr<cv::cuda::CascadeClassifier>
     return (*cascade)->getFindLargestObject();
 }
 
-int32_t cv_gpu_cascade_get_max_num_objects(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+int cv_gpu_cascade_get_max_num_objects(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
     return (*cascade)->getMaxNumObjects();
 }
 
-int32_t cv_gpu_cascade_get_min_neighbors(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+int cv_gpu_cascade_get_min_neighbors(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
     return (*cascade)->getMinNeighbors();
 }
 
