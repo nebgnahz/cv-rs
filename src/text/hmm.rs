@@ -14,7 +14,8 @@ extern "C" {
         transition_probabilities_table: *mut CMat,
         emission_probabilities_table: *mut CMat,
         classifier_type: ClassifierType,
-    ) -> *mut COCR;
+        result: *mut CResult<*mut COCR>,
+    );
     fn cv_hmm_drop(ocr: *mut COCR);
 }
 
@@ -41,26 +42,29 @@ impl OcrHmmDecoder {
         emission_probabilities_table: &Mat,
         classifier_type: ClassifierType,
     ) -> Result<Self, Error> {
-        let value = unsafe {
-            let classifier_filename = classifier_filename.as_ref();
-            if !classifier_filename.exists() {
-                return Err(CvError::EntryNotFound(classifier_filename.into()).into());
-            }
-            let classifier_filename = classifier_filename
-                .to_str()
-                .ok_or(CvError::InvalidPath(classifier_filename.into()))?;
-            let classifier_filename = CString::new(classifier_filename)?;
-            let vocabulary = CString::new(vocabulary)?;
+        let classifier_filename = classifier_filename.as_ref();
+        if !classifier_filename.exists() {
+            return Err(CvError::EntryNotFound(classifier_filename.into()).into());
+        }
+        let classifier_filename = classifier_filename
+            .to_str()
+            .ok_or(CvError::InvalidPath(classifier_filename.into()))?;
+        let classifier_filename = CString::new(classifier_filename)?;
+        let vocabulary = CString::new(vocabulary)?;
 
+        let result = CResult::<*mut COCR>::from_callback(|r| unsafe {
             cv_hmm_new(
                 classifier_filename.as_ptr(),
                 vocabulary.as_ptr(),
                 transition_probabilities_table.inner,
                 emission_probabilities_table.inner,
                 classifier_type,
+                r,
             )
-        };
-        Ok(Self { value })
+        });
+        let result: Result<_, String> = result.into();
+        let result = result.map_err(CvError::UnknownError)?;
+        Ok(Self { value: result })
     }
 }
 

@@ -682,9 +682,16 @@ void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
     cv_to_ffi(matches_vector, matches);
 }
 
-void* cv_tesseract_new(const char* datapath, const char* language, const char* char_whitelist, int oem, int psmode) {
-    auto result = cv::text::OCRTesseract::create(datapath, language, char_whitelist, oem, psmode);
-    return new cv::Ptr<cv::text::OCRTesseract>(result);
+void cv_tesseract_new(const char* datapath,
+                      const char* language,
+                      const char* char_whitelist,
+                      int oem,
+                      int psmode,
+                      Result<void*>* result) {
+    *result = Result<void*>::FromFunction([datapath, language, char_whitelist, oem, psmode]() {
+        auto result = cv::text::OCRTesseract::create(datapath, language, char_whitelist, oem, psmode);
+        return new cv::Ptr<cv::text::OCRTesseract>(result);
+    });
 }
 
 void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr) {
@@ -692,17 +699,23 @@ void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr) {
     ocr = nullptr;
 }
 
-void* cv_hmm_new(const char* classifier_filename,
-                 const char* vocabulary,
-                 cv::Mat& transition_probabilities_table,
-                 cv::Mat& emission_probabilities_table,
-                 cv::text::classifier_type classifier_type) {
-    std::string filename(classifier_filename);
-    std::string voc(vocabulary);
-    auto classifier = cv::text::loadOCRHMMClassifier(filename, classifier_type);
-    auto result =
-        cv::text::OCRHMMDecoder::create(classifier, voc, transition_probabilities_table, emission_probabilities_table);
-    return new cv::Ptr<cv::text::OCRHMMDecoder>(result);
+void cv_hmm_new(const char* classifier_filename,
+                const char* vocabulary,
+                cv::Mat& transition_probabilities_table,
+                cv::Mat& emission_probabilities_table,
+                cv::text::classifier_type classifier_type,
+                Result<void*>* result) {
+    *result = Result<void*>::FromFunction([classifier_filename,
+                                           vocabulary,
+                                           transition_probabilities_table,
+                                           emission_probabilities_table,
+                                           classifier_type]() {
+        std::string voc(vocabulary);
+        auto classifier = cv::text::loadOCRHMMClassifier(classifier_filename, classifier_type);
+        auto result = cv::text::OCRHMMDecoder::create(
+            classifier, voc, transition_probabilities_table, emission_probabilities_table);
+        return new cv::Ptr<cv::text::OCRHMMDecoder>(result);
+    });
 }
 
 void cv_hmm_drop(cv::Ptr<cv::text::OCRHMMDecoder>* ocr) {

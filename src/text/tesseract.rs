@@ -1,6 +1,7 @@
 //! Tesseract
 use super::*;
 use super::private::*;
+use errors::*;
 use ::*;
 use std::os::raw::c_char;
 use std::path::Path;
@@ -12,7 +13,8 @@ extern "C" {
         char_whitelist: *const c_char,
         oem: EngineMode,
         psmode: PageSegmentationMode,
-    ) -> *mut COCR;
+        result: *mut CResult<*mut COCR>,
+    );
     fn cv_tesseract_drop(ocr: *mut COCR);
 }
 
@@ -58,18 +60,20 @@ impl OcrTesseract {
         oem: EngineMode,
         psmode: PageSegmentationMode,
     ) -> Result<Self, Error> {
-        let value = unsafe {
-            let c_data_path = path_to_cstring!(data_path);
-            let c_language = string_to_cstring!(language);
-            let c_char_whitelist = string_to_cstring!(char_whitelist);
+        let c_data_path = path_to_cstring!(data_path);
+        let c_language = string_to_cstring!(language);
+        let c_char_whitelist = string_to_cstring!(char_whitelist);
 
-            let c_data_path = to_nullable_string(&c_data_path);
-            let c_language = to_nullable_string(&c_language);
-            let c_char_whitelist = to_nullable_string(&c_char_whitelist);
+        let c_data_path = to_nullable_string(&c_data_path);
+        let c_language = to_nullable_string(&c_language);
+        let c_char_whitelist = to_nullable_string(&c_char_whitelist);
 
-            cv_tesseract_new(c_data_path, c_language, c_char_whitelist, oem, psmode)
-        };
-        Ok(Self { value })
+        let result = CResult::<*mut COCR>::from_callback(|r| unsafe {
+            cv_tesseract_new(c_data_path, c_language, c_char_whitelist, oem, psmode, r)
+        });
+        let result: Result<_, String> = result.into();
+        let result = result.map_err(CvError::UnknownError)?;
+        Ok(Self { value: result })
     }
 }
 
