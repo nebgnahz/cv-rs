@@ -15,7 +15,7 @@ EXTERN_C_BEGIN
 // =============================================================================
 //   Core
 // =============================================================================
-void* from_file_storage(const char* path, const char* section) {
+void* cv_from_file_storage(const char* path, const char* section) {
     auto result = new cv::Mat();
     cv::FileStorage fs(path, cv::FileStorage::READ);
     fs[section] >> *result;

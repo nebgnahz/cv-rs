@@ -21,7 +21,7 @@
 EXTERN_C_BEGIN
 
 // The caller owns the returned data cv::Mat
-void* from_file_storage(const char* path, const char* section);
+void* cv_from_file_storage(const char* path, const char* section);
 void* cv_mat_new();
 void* cv_mat_new_with_size(int rows, int cols, int type);
 void* cv_mat_zeros(int rows, int cols, int type);
