@@ -5,6 +5,7 @@ use ::*;
 use errors::*;
 use std::os::raw::c_char;
 use std::path::Path;
+use core::path_to_cstring;
 
 extern "C" {
     fn cv_holistic_new(
@@ -16,14 +17,14 @@ extern "C" {
     fn cv_holistic_drop(ocr: *mut COCR);
 }
 
-/// `OcrTesseract` class provides an interface with the tesseract-ocr API
+/// `OcrHolisticWord` class provides an interface with the tesseract-ocr API
 #[derive(Debug)]
 pub struct OcrHolisticWord {
     value: *mut COCR,
 }
 
 impl OcrHolisticWord {
-    /// Creates an instance of the `OcrTesseract` class. Initializes Tesseract.
+    /// Creates an instance of the `OcrHolisticWord` class.
     pub fn new<PArch: AsRef<Path>, PWeights: AsRef<Path>, PWords: AsRef<Path>>(
         archive_file: PArch,
         weights_file: PWeights,
@@ -61,10 +62,3 @@ impl OcrImpl for OcrHolisticWord {
 }
 
 impl OcrImplInterface for OcrHolisticWord {}
-
-fn path_to_cstring<P: AsRef<Path>>(path: P) -> Result<CString, Error> {
-    let path = path.as_ref();
-    let x = path.to_str().ok_or(CvError::InvalidPath(path.into()))?;
-    let result = CString::new(x)?;
-    Ok(result)
-}

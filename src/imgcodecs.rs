@@ -1,10 +1,11 @@
 //! Image file reading and writing, see [OpenCV
 //! imgcodecs](http://docs.opencv.org/3.1.0/d4/da8/group__imgcodecs.html).
 
-use super::core::{CMat, Mat};
+use core::*;
 use std::ffi::CString;
 use std::os::raw::{c_char, c_int};
 use std::path::Path;
+use failure::Error;
 
 // =============================================================================
 //  Imgproc
@@ -118,16 +119,11 @@ struct ImencodeResult {
 
 impl Mat {
     /// Creates a `Mat` from reading the image specified by the path.
-    pub fn from_path<P: AsRef<Path>>(path: P, flags: ImreadModes) -> Option<Mat> {
-        if let Some(unicode_path) = path.as_ref().as_os_str().to_str() {
-            let s = CString::new(unicode_path).unwrap();
-            let input = (&s).as_ptr();
-            let flags = flags as c_int;
-            let m = unsafe { cv_imread(input, flags) };
-            Some(Mat::from_raw(m))
-        } else {
-            None
-        }
+    pub fn from_path<P: AsRef<Path>>(path: P, flags: ImreadModes) -> Result<Mat, Error> {
+        let path = path_to_cstring(path)?;
+        let path = path.as_ptr();
+        let result = unsafe { cv_imread(path, flags as c_int) };
+        Ok(Mat::from_raw(result))
     }
 
     /// Decodes an image from `buf` according to the specified mode.

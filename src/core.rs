@@ -290,11 +290,13 @@ pub enum FlipCode {
 
 impl Mat {
     /// Loads `Mat` from file storage
-    pub fn from_file_storage(path: &Path, section: &str) -> Result<Mat, Error> {
-        let path = path.to_str().ok_or(CvError::InvalidPath(path.into()))?;
-        let path = CString::new(path)?;
+    pub fn from_file_storage<P: AsRef<Path>>(path: P, section: &str) -> Result<Mat, Error> {
+        let path = path_to_cstring(path)?;
         let section = CString::new(section)?;
-        let result = unsafe { from_file_storage(path.as_ptr(), section.as_ptr()) };
+
+        let path = path.as_ptr();
+        let section = section.as_ptr();
+        let result = unsafe { from_file_storage(path, section) };
         Ok(Mat::from_raw(result))
     }
 
@@ -867,4 +869,11 @@ impl Mat {
     pub fn count_non_zero(&self) -> c_int {
         unsafe { cv_count_non_zero(self.inner) }
     }
+}
+
+pub(crate) fn path_to_cstring<P: AsRef<Path>>(path: P) -> Result<CString, Error> {
+    let path = path.as_ref();
+    let x = path.to_str().ok_or(CvError::InvalidPath(path.into()))?;
+    let result = CString::new(x)?;
+    Ok(result)
 }
