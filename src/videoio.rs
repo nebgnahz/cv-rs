@@ -25,13 +25,14 @@ extern "C" {
     fn cv_videocapture_is_opened(ccap: *const CvVideoCapture) -> bool;
     fn cv_videocapture_read(v: *mut CvVideoCapture, m: *mut CMat) -> bool;
     fn cv_videocapture_drop(cap: *mut CvVideoCapture);
-    fn cv_videocapture_set(cap: *mut CvVideoCapture, property: c_int, value: c_double) -> bool;
-    fn cv_videocapture_get(cap: *mut CvVideoCapture, property: c_int) -> c_double;
+    fn cv_videocapture_set(cap: *mut CvVideoCapture, property: CapProp, value: c_double) -> bool;
+    fn cv_videocapture_get(cap: *mut CvVideoCapture, property: CapProp) -> c_double;
 }
 
-#[allow(missing_docs)]
 /// Video capture's property identifier.
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[allow(missing_docs)]
 pub enum CapProp {
     /// Current position of the video file in milliseconds or video capture
     /// timestamp.
@@ -155,12 +156,12 @@ impl VideoCapture {
 
     /// Sets a property in the `VideoCapture`.
     pub fn set(&self, property: CapProp, value: f64) -> bool {
-        unsafe { cv_videocapture_set(self.inner, property as c_int, value) }
+        unsafe { cv_videocapture_set(self.inner, property, value) }
     }
 
     /// Gets a property in the `VideoCapture`.
     pub fn get(&self, property: CapProp) -> Option<f64> {
-        let ret = unsafe { cv_videocapture_get(self.inner, property as c_int) };
+        let ret = unsafe { cv_videocapture_get(self.inner, property) };
         if ret != 0.0 {
             Some(ret)
         } else {
@@ -214,8 +215,8 @@ extern "C" {
     ) -> bool;
     fn cv_videowriter_is_opened(w: *mut CvVideoWriter) -> bool;
     fn cv_videowriter_write(w: *mut CvVideoWriter, m: *mut CMat);
-    fn cv_videowriter_set(w: *mut CvVideoWriter, property: c_int, value: c_double) -> bool;
-    fn cv_videowriter_get(w: *mut CvVideoWriter, property: c_int) -> c_double;
+    fn cv_videowriter_set(w: *mut CvVideoWriter, property: VideoWriterProperty, value: c_double) -> bool;
+    fn cv_videowriter_get(w: *mut CvVideoWriter, property: VideoWriterProperty) -> c_double;
 }
 
 impl VideoWriter {
@@ -266,12 +267,12 @@ impl VideoWriter {
     /// Sets a property in the `VideoWriter`.
     /// Note: `VideoWriterProperty::FrameBytes` is read-only.
     pub fn set(&self, property: VideoWriterProperty, value: f64) -> bool {
-        unsafe { cv_videowriter_set(self.inner, property as c_int, value) }
+        unsafe { cv_videowriter_set(self.inner, property, value) }
     }
 
     /// Gets a property in the `VideoWriter`.
     pub fn get(&self, property: VideoWriterProperty) -> Option<f64> {
-        let ret = unsafe { cv_videowriter_get(self.inner, property as c_int) };
+        let ret = unsafe { cv_videowriter_get(self.inner, property) };
         if ret != 0.0 {
             Some(ret)
         } else {
@@ -297,6 +298,7 @@ impl Drop for VideoWriter {
 }
 
 /// `VideoWriter`'s property identifier.
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum VideoWriterProperty {
     /// Current quality of the encoded videostream.

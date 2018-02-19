@@ -11,7 +11,8 @@ pub mod tracking {
     // =========================================================================
     enum CTermCriteria {}
 
-    #[derive(Clone, Copy, Debug)]
+    #[repr(C)]
+    #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
     /// Term criteria type, can be one of: Count, Eps or Count + Eps
     pub enum TermType {
         /// The maximum number of iterations or elements to compute
@@ -23,7 +24,7 @@ pub mod tracking {
     }
 
     extern "C" {
-        fn cv_term_criteria_new(t: c_int, count: c_int, epsilon: f64) -> *mut CTermCriteria;
+        fn cv_term_criteria_new(t: TermType, count: c_int, epsilon: f64) -> *mut CTermCriteria;
         fn cv_term_criteria_drop(criteria: *mut CTermCriteria);
         fn cv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
     }
@@ -37,7 +38,7 @@ pub mod tracking {
     impl TermCriteria {
         /// Creates a new termination criteria.
         pub fn new(t: TermType, max_count: c_int, epsilon: f64) -> Self {
-            let c_criteria = unsafe { cv_term_criteria_new(t as c_int, max_count, epsilon) };
+            let c_criteria = unsafe { cv_term_criteria_new(t, max_count, epsilon) };
             TermCriteria {
                 c_criteria: c_criteria,
             }

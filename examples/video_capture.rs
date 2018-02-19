@@ -31,7 +31,7 @@ fn main() {
     let cap = VideoCapture::new(0);
     assert!(cap.is_open());
 
-    highgui_named_window("Window", WindowFlags::WindowAutosize);
+    highgui_named_window("Window", WindowFlags::WindowAutosize).unwrap();
     while let Some(image) = cap.read() {
         image.show("Window", 30).unwrap();
     }

@@ -19,7 +19,7 @@ extern "C" {
 }
 
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[allow(missing_docs)]
 pub enum EngineMode {
     TesseractOnly,
@@ -29,7 +29,7 @@ pub enum EngineMode {
 }
 
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[allow(missing_docs)]
 pub enum PageSegmentationMode {
     OsdOnly,

@@ -44,8 +44,8 @@ fn main() {
     let cap = VideoCapture::new(0);
     assert!(cap.is_open());
 
-    highgui_named_window("Window", WindowFlags::WindowAutosize);
-    highgui_set_mouse_callback("Window", on_mouse, ss_ptr as MouseCallbackData);
+    highgui_named_window("Window", WindowFlags::WindowAutosize).unwrap();
+    highgui_set_mouse_callback("Window", on_mouse, ss_ptr as MouseCallbackData).unwrap();
 
     let mut is_tracking = false;
 

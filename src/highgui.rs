@@ -1,11 +1,12 @@
 //! highgui: high-level GUI
+use failure::Error;
 use std::ffi::CString;
 use std::mem;
 use std::os::raw::{c_char, c_int, c_void};
 use std::ptr;
 
 extern "C" {
-    fn cv_named_window(name: *const c_char, flags: c_int);
+    fn cv_named_window(name: *const c_char, flags: WindowFlags);
     fn cv_destroy_window(name: *const c_char);
     fn cv_set_mouse_callback(
         name: *const c_char,
@@ -17,11 +18,12 @@ extern "C" {
 /// Create a window that can be used as a placeholder for images and
 /// trackbars. All created windows are referred to by their names. If a window
 /// with the same name already exists, the function does nothing.
-pub fn highgui_named_window(name: &str, flags: WindowFlags) {
-    let s = CString::new(name).unwrap();
+pub fn highgui_named_window(name: &str, flags: WindowFlags) -> Result<(), Error> {
+    let s = CString::new(name)?;
     unsafe {
-        cv_named_window((&s).as_ptr(), flags as c_int);
+        cv_named_window(s.as_ptr(), flags);
     }
+    Ok(())
 }
 
 /// Destroy the specified window with the given name.
@@ -41,7 +43,7 @@ pub type MouseCallback = fn(c_int, c_int, c_int, c_int, MouseCallbackData);
 
 /// Set mouse handler for the specified window (identified by name). A callback
 /// handler should be provided and optional user_data can be passed around.
-pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data: *mut c_void) {
+pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data: *mut c_void) -> Result<(), Error> {
     struct CallbackWrapper {
         cb: Box<MouseCallback>,
         data: *mut c_void,
@@ -60,16 +62,18 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
     });
     let box_wrapper_raw = Box::into_raw(box_wrapper) as *mut c_void;
 
-    let s = CString::new(name).unwrap();
+    let s = CString::new(name)?;
     unsafe {
-        cv_set_mouse_callback((&s).as_ptr(), _mouse_callback, box_wrapper_raw);
+        cv_set_mouse_callback(s.as_ptr(), _mouse_callback, box_wrapper_raw);
     }
+    Ok(())
 }
 
 /// Flags for [highgui_named_window](fn.highgui_named_window.html). This only
 /// supports a subset of all cv::WindowFlags because C/C++ allows enum with the
 /// same value but Rust is stricter.
-#[derive(Clone, Copy, Debug)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum WindowFlags {
     /// the window can be resized (no constraint) or switched to fullscreen.
     WindowNormal = 0x00000000,
@@ -82,7 +86,7 @@ pub enum WindowFlags {
 }
 
 /// Mouse Events
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum MouseEventTypes {
     /// Indicates that the mouse has moved over the window.
     MouseMove = 0,

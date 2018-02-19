@@ -20,7 +20,7 @@ fn main() {
     d.push("assets/haarcascade_frontalface_default.xml");
     let cascade = CascadeClassifier::from_path(d).unwrap();
 
-    highgui_named_window("window", WindowFlags::WindowNormal);
+    highgui_named_window("window", WindowFlags::WindowNormal).unwrap();
 
     // result is a vector of rectangles
     let result = cascade.detect_with_params(&mat, 1.1, 15, Size2i::new(80, 80), Size2i::default());

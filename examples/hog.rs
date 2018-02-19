@@ -51,7 +51,7 @@ fn run() -> Result<()> {
         .expect("You need to provide the directory");
 
     if show {
-        highgui_named_window("window", WindowFlags::WindowAutosize);
+        highgui_named_window("window", WindowFlags::WindowAutosize).unwrap();
     }
 
     let mut param = HogParams::default();

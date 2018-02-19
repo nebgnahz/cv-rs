@@ -236,7 +236,8 @@ impl Rect2f {
 }
 
 /// Line type
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum LineTypes {
     /// Default type
     Filled = -1,
@@ -277,7 +278,7 @@ extern "C" {
 
 /// A flag to specify how to flip the image. see
 /// [Mat::flip](struct.Mat.html#method.flip)
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum FlipCode {
     /// Along x-axis: dst[i, j] = src[src.rows - i - 1, j]
     XAxis,
@@ -632,7 +633,7 @@ impl Drop for Mat {
 /// | CV_32S |  4 | 12 | 20 | 28 |   36 |   44 |   52 |   60 |
 /// | CV_32F |  5 | 13 | 21 | 29 |   37 |   45 |   53 |   61 |
 /// | CV_64F |  6 | 14 | 22 | 30 |   38 |   46 |   54 |   62 |
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[repr(C)]
 pub enum CvType {
     /// 8 bit unsigned (like `uchar`), single channel (grey image)
@@ -746,7 +747,7 @@ extern "C" {
         from_to: *const c_int,
         npairs: isize,
     );
-    fn cv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: c_int);
+    fn cv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: NormTypes);
 
     fn cv_bitwise_and(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
     fn cv_bitwise_not(src: *const CMat, dst: *mut CMat);
@@ -757,7 +758,8 @@ extern "C" {
 
 /// Normalization type. Please refer to [OpenCV's
 /// documentation](http://docs.cv.org/trunk/d2/de8/group__core__array.html).
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum NormTypes {
     /// Normalized using `max`
     NormInf = 1,
@@ -831,7 +833,7 @@ impl Mat {
     /// Normalize the Mat according to the normalization type.
     pub fn normalize(&self, alpha: f64, beta: f64, t: NormTypes) -> Mat {
         let m = CMat::new();
-        unsafe { cv_normalize(self.inner, m, alpha, beta, t as c_int) }
+        unsafe { cv_normalize(self.inner, m, alpha, beta, t) }
         Mat::from_raw(m)
     }
 

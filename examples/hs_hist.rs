@@ -79,6 +79,6 @@ fn main() {
         }
     }
 
-    highgui_named_window("Display window", WindowFlags::WindowNormal);
+    highgui_named_window("Display window", WindowFlags::WindowNormal).unwrap();
     hist_image.show("Histogram", 0).unwrap();
 }
