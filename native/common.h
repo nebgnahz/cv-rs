@@ -67,11 +67,15 @@ typedef struct {
     int trainIdx;
 } DMatch;
 
+typedef struct {
+    const char* value;
+} CDisposableString;
+
 // Caller is responsible for disposing `error` field
 template <typename T>
 struct Result {
     T value;
-    const char* error;
+    CDisposableString error;
 
     static Result<T> FromFunction(std::function<T()> function) {
         T value;
@@ -84,7 +88,7 @@ struct Result {
             error = new char[len + 1];
             std::strcpy(error, err_msg);
         }
-        return Result<T>{value, error};
+        return Result<T>{value, CDisposableString{error}};
     }
 };
 

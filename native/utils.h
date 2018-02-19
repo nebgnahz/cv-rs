@@ -10,7 +10,15 @@ void cv_to_ffi(const cv::Rect& source, Rect* dest);
 void cv_to_ffi(const cv::Point& source, Point2i* dest);
 void cv_to_ffi(const cv::KeyPoint& source, KeyPoint* dest);
 void cv_to_ffi(const cv::DMatch& source, DMatch* dest);
-void cv_to_ffi(const std::vector<double>& source, CVec<double>* dest);
+void cv_to_ffi(const std::string& source, CDisposableString* dest);
+
+template <typename T>
+void cv_to_ffi(const std::vector<T>& source, CVec<T>* dest) {
+    size_t num = source.size();
+    dest->size = num;
+    dest->array = (T*) malloc(num * sizeof(T));
+    ::memcpy(dest->array, source.data(), num * sizeof(T));
+}
 
 template <typename T, typename U>
 void cv_to_ffi(const std::vector<T>& source, CVec<U>* dest) {

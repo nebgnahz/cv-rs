@@ -6,7 +6,8 @@ use failure::Error;
 use num;
 use std::ffi::CString;
 use std::mem;
-use std::os::raw::{c_char, c_double, c_int, c_uchar, c_void};
+use std::os::raw::{c_char, c_double, c_int, c_uchar};
+use std::path::Path;
 use std::slice;
 
 /// Opaque data struct for C bindings
@@ -235,124 +236,6 @@ impl Rect2f {
     }
 }
 
-#[repr(C)]
-#[derive(Debug, Clone)]
-pub(crate) struct CVecView<T: Sized> {
-    array: *mut T,
-    size: usize,
-}
-
-fn pack<T, U: Sized, F>(v: &Vec<T>, mut f: F) -> CVecView<U>
-where
-    F: FnMut(&T) -> U,
-{
-    let mut mapped: Vec<_> = v.iter().map(|i| f(i)).collect();
-    let size = mapped.len();
-    let capacity = mapped.capacity();
-    let array = mapped.as_mut_ptr();
-    assert_eq!(size, capacity);
-    mem::forget(mapped);
-    CVecView { array, size }
-}
-
-pub(crate) trait Pack {
-    type In;
-    fn pack(v: &Self::In) -> Self;
-}
-
-impl<T: Copy> Pack for T {
-    type In = T;
-    fn pack(v: &T) -> Self {
-        *v
-    }
-}
-
-impl<T: Pack> Pack for CVecView<T> {
-    type In = Vec<T::In>;
-    fn pack(v: &Self::In) -> Self {
-        pack(v, |e| Pack::pack(e))
-    }
-}
-
-impl<T> Drop for CVecView<T> {
-    fn drop(&mut self) {
-        unsafe {
-            Vec::from_raw_parts(self.array, self.size, self.size);
-        }
-    }
-}
-
-#[repr(C)]
-#[derive(Debug, Clone)]
-pub(crate) struct CVec<T: Sized + NestedVec> {
-    array: *mut T,
-    size: usize,
-}
-
-// Unsafe because CVec is not guaranteed to contain valid pointer and size
-unsafe fn unpack<T: NestedVec, U, F>(v: &CVec<T>, mut f: F) -> Vec<U>
-where
-    F: FnMut(&T) -> U,
-{
-    (0..v.size)
-        .map(|i| f(&*v.array.offset(i as isize)))
-        .collect()
-}
-
-pub(crate) trait Unpack {
-    type Out;
-    fn unpack(&self) -> Self::Out;
-}
-
-impl<T: Unpack + NestedVec> Unpack for CVec<T> {
-    type Out = Vec<T::Out>;
-    fn unpack(&self) -> Self::Out {
-        unsafe { unpack(self, |e| e.unpack()) }
-    }
-}
-
-impl<T: Copy> Unpack for T {
-    type Out = T;
-    fn unpack(&self) -> Self::Out {
-        *self
-    }
-}
-
-pub(crate) trait NestedVec {
-    const LEVEL: u32;
-}
-
-impl<T: NestedVec> NestedVec for CVec<T> {
-    const LEVEL: u32 = T::LEVEL + 1;
-}
-
-impl<T: Copy> NestedVec for T {
-    const LEVEL: u32 = 0;
-}
-
-impl<T: NestedVec> Default for CVec<T> {
-    fn default() -> Self {
-        CVec {
-            array: ::std::ptr::null_mut::<T>(),
-            size: 0,
-        }
-    }
-}
-
-impl<T: NestedVec> Drop for CVec<T> {
-    fn drop(&mut self) {
-        extern "C" {
-            fn cv_vec_drop(vec: *mut c_void, depth: u32);
-        }
-        unsafe {
-            let depth = CVec::<T>::LEVEL;
-            let self_ptr: *mut _ = self;
-            let self_ptr: *mut c_void = self_ptr as *mut _;
-            cv_vec_drop(self_ptr, depth);
-        }
-    }
-}
-
 /// Line type
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum LineTypes {
@@ -371,6 +254,7 @@ pub enum LineTypes {
 
 extern "C" {
     pub(crate) fn cv_mat_new() -> *mut CMat;
+    fn cv_from_file_storage(path: *const c_char, section: *const c_char) -> *mut CMat;
     fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
     fn cv_mat_zeros(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
     fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: c_int, buffer: *const c_uchar) -> *mut CMat;
@@ -389,6 +273,7 @@ extern "C" {
     fn cv_mat_logic_and(cimage: *mut CMat, cmask: *const CMat);
     fn cv_mat_flip(src: *mut CMat, code: c_int);
     fn cv_mat_drop(mat: *mut CMat);
+    fn cv_mat_eye(rows: c_int, cols: c_int, cv_type: CvType) -> *mut CMat;
 }
 
 /// A flag to specify how to flip the image. see
@@ -404,6 +289,17 @@ pub enum FlipCode {
 }
 
 impl Mat {
+    /// Loads `Mat` from file storage
+    pub fn from_file_storage<P: AsRef<Path>>(path: P, section: &str) -> Result<Mat, Error> {
+        let path = path_to_cstring(path)?;
+        let section = CString::new(section)?;
+
+        let path = path.as_ptr();
+        let section = section.as_ptr();
+        let result = unsafe { cv_from_file_storage(path, section) };
+        Ok(Mat::from_raw(result))
+    }
+
     #[inline]
     /// Creates a `Mat` object from raw `CMat` pointer. This will read the rows
     /// and cols of the image.
@@ -560,6 +456,12 @@ impl Mat {
     pub fn cv_type(&self) -> Result<CvType, Error> {
         let t: i32 = unsafe { cv_mat_type(self.inner) };
         num::FromPrimitive::from_i32(t).ok_or(CvError::EnumFromPrimitiveConversionError { value: t }.into())
+    }
+
+    /// Returns an identity matrix of the specified size and type.
+    pub fn eye(rows: i32, cols: i32, cv_type: CvType) -> Mat {
+        let result = unsafe { cv_mat_eye(rows, cols, cv_type) };
+        Mat::from_raw(result)
     }
 }
 
@@ -733,6 +635,7 @@ impl Drop for Mat {
 /// | CV_32F |  5 | 13 | 21 | 29 |   37 |   45 |   53 |   61 |
 /// | CV_64F |  6 | 14 | 22 | 30 |   38 |   46 |   54 |   62 |
 #[derive(Debug, PartialEq, Clone, Copy, FromPrimitive)]
+#[repr(C)]
 pub enum CvType {
     /// 8 bit unsigned (like `uchar`), single channel (grey image)
     Cv8UC1 = 0,
@@ -966,4 +869,11 @@ impl Mat {
     pub fn count_non_zero(&self) -> c_int {
         unsafe { cv_count_non_zero(self.inner) }
     }
+}
+
+pub(crate) fn path_to_cstring<P: AsRef<Path>>(path: P) -> Result<CString, Error> {
+    let path = path.as_ref();
+    let x = path.to_str().ok_or(CvError::InvalidPath(path.into()))?;
+    let result = CString::new(x)?;
+    Ok(result)
 }

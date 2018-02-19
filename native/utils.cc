@@ -36,11 +36,10 @@ void cv_to_ffi(const cv::DMatch& source, DMatch* dest) {
     dest->trainIdx = source.trainIdx;
 }
 
-void cv_to_ffi(const std::vector<double>& source, CVec<double>* dest) {
-    size_t num = source.size();
-    dest->size = num;
-    dest->array = (double*) malloc(num * sizeof(double));
-    ::memcpy(dest->array, source.data(), num * sizeof(double));
+void cv_to_ffi(const std::string& source, CDisposableString* dest) {
+    char* result = new char[source.length() + 1];
+    strcpy(result, source.c_str());
+    dest->value = result;
 }
 
 void ffi_to_cv(const cv::Mat& source, cv::Mat* dest) {

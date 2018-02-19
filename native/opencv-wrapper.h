@@ -7,6 +7,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
+#include <opencv2/text/ocr.hpp>
 #include <opencv2/video/tracking.hpp>
 #include <opencv2/xfeatures2d.hpp>
 #include <stddef.h>
@@ -20,10 +21,12 @@
 EXTERN_C_BEGIN
 
 // The caller owns the returned data cv::Mat
+void* cv_from_file_storage(const char* path, const char* section);
 void* cv_mat_new();
 void* cv_mat_new_with_size(int rows, int cols, int type);
 void* cv_mat_zeros(int rows, int cols, int type);
 void* cv_mat_from_buffer(int rows, int cols, int type, const uint8_t* buf);
+void* cv_mat_eye(int rows, int cols, int type);
 
 bool cv_mat_valid(cv::Mat* mat);
 
@@ -100,6 +103,7 @@ void cv_calc_back_project(const cv::Mat* images,
                           cv::Mat* hist,
                           cv::Mat* back_project,
                           const float** ranges);
+void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result);
 
 // =============================================================================
 //  Imgcodecs
@@ -256,10 +260,29 @@ void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
                           CVec<CVec<DMatch>>* matches);
 
 // =============================================================================
-//   Other
+//   Text
 // =============================================================================
 
-void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result);
+void cv_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
+                cv::Mat& image,
+                CDisposableString* output_text,
+                CVec<Rect>* component_rects,
+                CVec<CDisposableString>* component_texts,
+                CVec<float>* component_confidences,
+                int component_level);
+
+void cv_tesseract_new(
+    const char* datapath, const char* language, const char* char_whitelist, int oem, int psmode, Result<void*>* result);
+void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr);
+void cv_hmm_new(const char* classifier_filename,
+                const char* vocabulary,
+                cv::Mat& transition_probabilities_table,
+                cv::Mat& emission_probabilities_table,
+                cv::text::classifier_type classifier_type,
+                Result<void*>* result);
+void cv_hmm_drop(cv::Ptr<cv::text::OCRHMMDecoder>* ocr);
+void cv_holistic_new(const char* archive_file, const char* weights_file, const char* words_file, Result<void*>* result);
+void cv_holistic_drop(cv::Ptr<cv::text::OCRHolisticWordRecognizer>* ocr);
 
 EXTERN_C_END
 

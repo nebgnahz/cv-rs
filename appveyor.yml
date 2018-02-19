@@ -27,7 +27,7 @@ install:
 build_script:
   - cargo build --no-default-features
 test_script:
-  - cargo test --no-default-features
+  - cargo test -v --no-default-features
 cache:
   - '%USERPROFILE%\.cargo\registry'
   - vc15\install -> .windows\msvc_2_build_OCV.ps1

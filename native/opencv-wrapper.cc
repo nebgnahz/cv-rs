@@ -3,6 +3,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
+#include <opencv2/text/ocr.hpp>
 #include <opencv2/video/tracking.hpp>
 #include <opencv2/xfeatures2d.hpp>
 
@@ -14,6 +15,14 @@ EXTERN_C_BEGIN
 // =============================================================================
 //   Core
 // =============================================================================
+void* cv_from_file_storage(const char* path, const char* section) {
+    auto result = new cv::Mat();
+    cv::FileStorage fs(path, cv::FileStorage::READ);
+    fs[section] >> *result;
+    fs.release();
+    return result;
+}
+
 void* cv_mat_new() {
     cv::Mat* image = new cv::Mat();
     return (image);
@@ -30,7 +39,13 @@ void* cv_mat_zeros(int rows, int cols, int type) {
 }
 
 void* cv_mat_from_buffer(int rows, int cols, int type, const uint8_t* buf) {
-    return (new cv::Mat(rows, cols, type, const_cast<void*>(reinterpret_cast<const void*>(buf))));
+    return new cv::Mat(rows, cols, type, const_cast<void*>(reinterpret_cast<const void*>(buf)));
+}
+
+void* cv_mat_eye(int rows, int cols, int type) {
+    auto result = new cv::Mat();
+    *result = cv::Mat::eye(rows, cols, type);
+    return result;
 }
 
 bool cv_mat_is_valid(cv::Mat* mat) {
@@ -247,6 +262,11 @@ void cv_calc_back_project(const cv::Mat* images,
                           cv::Mat* back_project,
                           const float** ranges) {
     cv::calcBackProject(images, nimages, channels, *hist, *back_project, ranges);
+}
+
+void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result) {
+    *result = Result<double>::FromFunction(
+        [first_image, second_image, method]() { return cv::compareHist(*first_image, *second_image, method); });
 }
 
 // =============================================================================
@@ -634,6 +654,25 @@ void cv_matcher_match_two(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
     cv_to_ffi(matches_vector, matches);
 }
 
+void cv_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
+                cv::Mat& image,
+                CDisposableString* output_text,
+                CVec<Rect>* component_rects,
+                CVec<CDisposableString>* component_texts,
+                CVec<float>* component_confidences,
+                int component_level) {
+    std::string output;
+    std::vector<cv::Rect> boxes;
+    std::vector<std::string> words;
+    std::vector<float> confidences;
+    ocr.get()->run(image, output, &boxes, &words, &confidences, component_level);
+
+    cv_to_ffi(output, output_text);
+    cv_to_ffi(boxes, component_rects);
+    cv_to_ffi(words, component_texts);
+    cv_to_ffi(confidences, component_confidences);
+}
+
 void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
                           cv::Mat& queryDescriptors,
                           int k,
@@ -643,9 +682,60 @@ void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
     cv_to_ffi(matches_vector, matches);
 }
 
-void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result) {
-    *result = Result<double>::FromFunction(
-        [first_image, second_image, method]() { return cv::compareHist(*first_image, *second_image, method); });
+void cv_tesseract_new(const char* datapath,
+                      const char* language,
+                      const char* char_whitelist,
+                      int oem,
+                      int psmode,
+                      Result<void*>* result) {
+    *result = Result<void*>::FromFunction([datapath, language, char_whitelist, oem, psmode]() {
+        auto result = cv::text::OCRTesseract::create(datapath, language, char_whitelist, oem, psmode);
+        return new cv::Ptr<cv::text::OCRTesseract>(result);
+    });
+}
+
+void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr) {
+    delete ocr;
+    ocr = nullptr;
+}
+
+void cv_hmm_new(const char* classifier_filename,
+                const char* vocabulary,
+                cv::Mat& transition_probabilities_table,
+                cv::Mat& emission_probabilities_table,
+                cv::text::classifier_type classifier_type,
+                Result<void*>* result) {
+    *result = Result<void*>::FromFunction([classifier_filename,
+                                           vocabulary,
+                                           transition_probabilities_table,
+                                           emission_probabilities_table,
+                                           classifier_type]() {
+        std::string voc(vocabulary);
+        auto classifier = cv::text::loadOCRHMMClassifier(classifier_filename, classifier_type);
+        auto result = cv::text::OCRHMMDecoder::create(
+            classifier, voc, transition_probabilities_table, emission_probabilities_table);
+        return new cv::Ptr<cv::text::OCRHMMDecoder>(result);
+    });
+}
+
+void cv_hmm_drop(cv::Ptr<cv::text::OCRHMMDecoder>* ocr) {
+    delete ocr;
+    ocr = nullptr;
+}
+
+void cv_holistic_new(const char* archive_file,
+                     const char* weights_file,
+                     const char* words_file,
+                     Result<void*>* result) {
+    *result = Result<void*>::FromFunction([archive_file, weights_file, words_file]() {
+        auto result = cv::text::OCRHolisticWordRecognizer::create(archive_file, weights_file, words_file);
+        return new cv::Ptr<cv::text::OCRHolisticWordRecognizer>(result);
+    });
+}
+
+void cv_holistic_drop(cv::Ptr<cv::text::OCRHolisticWordRecognizer>* ocr) {
+    delete ocr;
+    ocr = nullptr;
 }
 
 EXTERN_C_END

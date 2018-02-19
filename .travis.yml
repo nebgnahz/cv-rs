@@ -21,12 +21,15 @@ addons:
     - libgtk2.0-dev
     - libjasper-dev
     - libjpeg-dev
+    - libleptonica-dev
     - libpng-dev
     - libswscale-dev
     - libtbb-dev
     - libtbb2
+    - libtesseract-dev
     - libtiff-dev
     - pkg-config
+    - tesseract-ocr
     - xvfb
 
 before_install:
@@ -38,8 +41,10 @@ before_install:
 
 script:
   - cargo build --no-default-features
-  - cargo test --no-default-features
+  - cargo test -v --no-default-features
   - cargo build --features gpu
+  - cargo build --features tesseract
+  - cargo test -v --features tesseract
   - cargo doc --features gpu --no-deps
   - find src/*.rs | xargs rustfmt --write-mode=diff
   # Available until `cargo fmt` landed in stable rust 1.24

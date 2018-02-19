@@ -4,6 +4,7 @@
 use super::core::*;
 use super::errors::*;
 use super::objdetect::{CSvmDetector, HogParams, ObjectDetect, SvmDetector};
+use ::*;
 use failure::Error;
 use std::ffi::CString;
 use std::os::raw::{c_char, c_double, c_int};
@@ -313,9 +314,7 @@ impl GpuCascade {
             let inner = unsafe { cv_gpu_cascade_new((&s).as_ptr()) };
             return Ok(GpuCascade { inner: inner });
         }
-        Err(CvError::InvalidPath {
-            path: path.as_ref().to_path_buf(),
-        }.into())
+        Err(CvError::InvalidPath(path.as_ref().to_path_buf()).into())
     }
 
     /// Detects objects of different sizes in the input image.

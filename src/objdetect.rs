@@ -1,6 +1,7 @@
 //! Various object detection algorithms, such as Haar feature-based cascade
 //! classifier for object detection and histogram of oriented gradients (HOG).
 
+use super::*;
 use super::core::*;
 use super::errors::*;
 use failure::Error;
@@ -77,9 +78,7 @@ impl CascadeClassifier {
             }
         }
 
-        Err(CvError::InvalidPath {
-            path: path.as_ref().to_path_buf(),
-        }.into())
+        Err(CvError::InvalidPath(path.as_ref().to_path_buf()).into())
     }
 
     /// The default detection uses scale factor 1.1, minNeighbors 3, no min size

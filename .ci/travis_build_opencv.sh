@@ -39,7 +39,7 @@ if [[ ! -e $INSTALL_FLAG ]]; then
         -D CUDA_ARCH_BIN=5.2 \
         -D CUDA_ARCH_PTX="" \
         ..
-    make install && touch $INSTALL_FLAG
+    make install && sudo mkdir -p "$(dirname "$INSTALL_FLAG")" && sudo touch "$INSTALL_FLAG";
     popd
     touch $HOME/fresh-cache
 fi
