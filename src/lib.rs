@@ -18,9 +18,6 @@
 extern crate bytes;
 #[macro_use]
 extern crate failure;
-extern crate num;
-#[macro_use]
-extern crate num_derive;
 
 mod core;
 pub use core::CvType;
