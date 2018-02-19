@@ -11,7 +11,7 @@ use failure::Error;
 // =============================================================================
 //  Imgproc
 // =============================================================================
-/// ImreadModes
+/// ImreadModes. [See documentation](https://docs.opencv.org/trunk/d4/da8/group__imgcodecs.html#ga61d9b0126a3e57d9277ac48327799c80) for detauls
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum ImageReadMode {
@@ -49,7 +49,7 @@ pub enum ImageReadMode {
     ReducedColor8 = 65,
 }
 
-/// Imwrite flags
+/// Imwrite flags. [See documentation](https://docs.opencv.org/trunk/d4/da8/group__imgcodecs.html#ga292d81be8d76901bff7988d18d2b42ac) for detauls
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum ImageWriteMode {
@@ -87,10 +87,10 @@ pub enum ImageWriteMode {
     PamTupletype = 128,
 }
 
-/// Imwrite PNG flag
+/// Imwrite PNG flag. [See documentation](https://docs.opencv.org/3.3.0/d4/da8/group__imgcodecs.html#gaa60044d347ffd187161b5ec9ea2ef2f9) for detauls
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-pub enum ImwritePngStrategy {
+pub enum ImageWritePngStrategy {
     /// Use this value for normal data.
     Default = 0,
     ///  Use this value for data produced by a filter (or predictor).Filtered
