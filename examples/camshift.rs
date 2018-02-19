@@ -76,7 +76,7 @@ fn main() {
                 &hsize,
                 &phranges[0] as *const *const f32,
             );
-            hist = raw_hist.normalize(0.0, 255.0, NormType::NormMinMax);
+            hist = raw_hist.normalize(0.0, 255.0, NormType::MinMax);
 
             track_window = selection;
             m.rectangle(selection);

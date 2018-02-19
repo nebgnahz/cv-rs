@@ -75,7 +75,7 @@ fn get_image_histogram(path: &'static str) -> Mat {
         hsize.as_ptr(),
         ranges.as_ptr(),
     );
-    let image = image.normalize(0.0, 1.0, NormType::NormMinMax);
+    let image = image.normalize(0.0, 1.0, NormType::MinMax);
     image
 }
 

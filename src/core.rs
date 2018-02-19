@@ -759,21 +759,21 @@ extern "C" {
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum NormType {
     /// Normalized using `max`
-    NormInf = 1,
+    Inf = 1,
     /// Normalized using L1 distance
-    NormL1 = 2,
+    L1 = 2,
     /// Normalized using L2 distance
-    NormL2 = 4,
+    L2 = 4,
     /// Normalized using L2 sqr distance
-    NormL2Sqr = 5,
+    L2Sqr = 5,
     /// Normalized using hamming distance
-    NormHamming = 6,
+    Hamming = 6,
     /// Normalized using hamming2 distance
-    NormHamming2 = 7,
+    Hamming2 = 7,
     /// Normalized using relative distance
-    NormRelative = 8,
+    Relative = 8,
     /// Normalized using minmax distance
-    NormMinMax = 32,
+    MinMax = 32,
 }
 
 impl Mat {

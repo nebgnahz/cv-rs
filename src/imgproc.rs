@@ -237,28 +237,23 @@ pub enum ColorConversion {
 pub enum InterpolationFlag {
     /// nearest neighbor interpolation
     InterNearst = 0,
-
     /// bilinear interpolation
     InterLinear = 1,
-
     /// bicubic interpolation
     InterCubic = 2,
-
     /// resampling using pixel area relation. It may be a preferred method for
     /// image decimation, as it gives moire'-free results. But when the image is
     /// zoomed, it is similar to the INTER_NEAREST method.
     InterArea = 3,
-
     /// Lanczos interpolation over 8x8 neighborhood
     InterLanczos4 = 4,
-
+    /// Bit exact bilinear interpolation
+    InterLinearExact = 5,
     /// mask for interpolation codes
     InterMax = 7,
-
     /// flag, fills all of the destination image pixels. If some of them
     /// correspond to outliers in the source image, they are set to zero
     WarpFillOutliers = 8,
-
     /// flag, inverse transformation
     WarpInverseMap = 16,
 }
