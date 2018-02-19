@@ -100,7 +100,7 @@ pub enum ImwritePngStrategy {
     /// Use this value to force Huffman encoding only (no string match).
     HuffmanOnly = 2,
     /// Use this value to limit match distances to one (run-length encoding).
-    Rle = 3,
+    RLE = 3,
     /// Using this value prevents the use of dynamic Huffman codes, allowing for
     /// a simpler decoder for special applications.
     Fixed = 4,

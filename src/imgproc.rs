@@ -15,11 +15,11 @@ extern "C" {
         pt2: Point2i,
         color: Scalar,
         thickness: c_int,
-        linetype: LineTypes,
+        linetype: LineType,
         shift: c_int,
     );
 
-    fn cv_rectangle(cmat: *mut CMat, rect: Rect, color: Scalar, thickness: c_int, linetype: LineTypes);
+    fn cv_rectangle(cmat: *mut CMat, rect: Rect, color: Scalar, thickness: c_int, linetype: LineType);
 
     fn cv_ellipse(
         cmat: *mut CMat,
@@ -30,7 +30,7 @@ extern "C" {
         end_angle: c_double,
         color: Scalar,
         thickness: c_int,
-        linetype: LineTypes,
+        linetype: LineType,
         shift: c_int,
     );
 
@@ -267,7 +267,7 @@ impl Mat {
     /// Draws a simple line.
     pub fn line(&self, pt1: Point2i, pt2: Point2i) {
         let color = Scalar::new(255, 255, 0, 255);
-        self.line_custom(pt1, pt2, color, 1, LineTypes::Line8, 0);
+        self.line_custom(pt1, pt2, color, 1, LineType::Line8, 0);
     }
 
     /// Draws a line with custom color, thickness and linetype.
@@ -277,7 +277,7 @@ impl Mat {
         pt2: Point2i,
         color: Scalar,
         thickness: c_int,
-        linetype: LineTypes,
+        linetype: LineType,
         shift: c_int,
     ) {
         unsafe {
@@ -287,11 +287,11 @@ impl Mat {
 
     /// Draws a simple, thick, or filled up-right rectangle.
     pub fn rectangle(&self, rect: Rect) {
-        self.rectangle_custom(rect, Scalar::new(255, 255, 0, 255), 1, LineTypes::Line8);
+        self.rectangle_custom(rect, Scalar::new(255, 255, 0, 255), 1, LineType::Line8);
     }
 
     /// Draws a rectangle with custom color, thickness and linetype.
-    pub fn rectangle_custom(&self, rect: Rect, color: Scalar, thickness: c_int, linetype: LineTypes) {
+    pub fn rectangle_custom(&self, rect: Rect, color: Scalar, thickness: c_int, linetype: LineType) {
         unsafe { cv_rectangle(self.inner, rect, color, thickness, linetype) }
     }
 
@@ -311,7 +311,7 @@ impl Mat {
             end_angle,
             Scalar::new(255, 255, 0, 255),
             1,
-            LineTypes::Line8,
+            LineType::Line8,
             0,
         )
     }
@@ -326,7 +326,7 @@ impl Mat {
         end_angle: f64,
         color: Scalar,
         thickness: c_int,
-        linetype: LineTypes,
+        linetype: LineType,
         shift: c_int,
     ) {
         unsafe {
