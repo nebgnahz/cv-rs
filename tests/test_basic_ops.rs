@@ -7,6 +7,8 @@
 extern crate cv;
 mod utils;
 
+use cv::*;
+
 #[test]
 fn test_accessing_pixel() {
     let img = utils::load_messi_color();
@@ -18,9 +20,13 @@ fn test_accessing_pixel() {
 
     let blue = img.at3::<u8>(100, 100, 0);
     assert!(pixel_eq(blue, 156));
+}
 
-    // img.set(100, 100, (255, 255, 255));
-    // assert!(img.at(100, 100), (255, 255, 255));
+#[test]
+fn test_mat_type() {
+    let img = utils::load_lenna();
+    let res = img.cv_type();
+    assert_eq!(res, CvType::Cv8UC1);
 }
 
 fn pixel_eq(a: u8, b: u8) -> bool {

@@ -2,6 +2,8 @@
 //! videoio](http://docs.opencv.org/3.1.0/dd/de7/group__videoio.html)
 
 use core::{CMat, Mat, Size2i};
+use errors::*;
+use failure::Error;
 use std::os::raw::{c_char, c_double, c_int};
 
 // =============================================================================
@@ -25,13 +27,14 @@ extern "C" {
     fn cv_videocapture_is_opened(ccap: *const CvVideoCapture) -> bool;
     fn cv_videocapture_read(v: *mut CvVideoCapture, m: *mut CMat) -> bool;
     fn cv_videocapture_drop(cap: *mut CvVideoCapture);
-    fn cv_videocapture_set(cap: *mut CvVideoCapture, property: c_int, value: c_double) -> bool;
-    fn cv_videocapture_get(cap: *mut CvVideoCapture, property: c_int) -> c_double;
+    fn cv_videocapture_set(cap: *mut CvVideoCapture, property: CapProp, value: c_double) -> bool;
+    fn cv_videocapture_get(cap: *mut CvVideoCapture, property: CapProp) -> c_double;
 }
 
-#[allow(missing_docs)]
 /// Video capture's property identifier.
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
+#[allow(missing_docs)]
 pub enum CapProp {
     /// Current position of the video file in milliseconds or video capture
     /// timestamp.
@@ -155,12 +158,12 @@ impl VideoCapture {
 
     /// Sets a property in the `VideoCapture`.
     pub fn set(&self, property: CapProp, value: f64) -> bool {
-        unsafe { cv_videocapture_set(self.inner, property as c_int, value) }
+        unsafe { cv_videocapture_set(self.inner, property, value) }
     }
 
     /// Gets a property in the `VideoCapture`.
     pub fn get(&self, property: CapProp) -> Option<f64> {
-        let ret = unsafe { cv_videocapture_get(self.inner, property as c_int) };
+        let ret = unsafe { cv_videocapture_get(self.inner, property) };
         if ret != 0.0 {
             Some(ret)
         } else {
@@ -214,8 +217,8 @@ extern "C" {
     ) -> bool;
     fn cv_videowriter_is_opened(w: *mut CvVideoWriter) -> bool;
     fn cv_videowriter_write(w: *mut CvVideoWriter, m: *mut CMat);
-    fn cv_videowriter_set(w: *mut CvVideoWriter, property: c_int, value: c_double) -> bool;
-    fn cv_videowriter_get(w: *mut CvVideoWriter, property: c_int) -> c_double;
+    fn cv_videowriter_set(w: *mut CvVideoWriter, property: VideoWriterProperty, value: c_double) -> bool;
+    fn cv_videowriter_get(w: *mut CvVideoWriter, property: VideoWriterProperty) -> c_double;
 }
 
 impl VideoWriter {
@@ -266,12 +269,12 @@ impl VideoWriter {
     /// Sets a property in the `VideoWriter`.
     /// Note: `VideoWriterProperty::FrameBytes` is read-only.
     pub fn set(&self, property: VideoWriterProperty, value: f64) -> bool {
-        unsafe { cv_videowriter_set(self.inner, property as c_int, value) }
+        unsafe { cv_videowriter_set(self.inner, property, value) }
     }
 
     /// Gets a property in the `VideoWriter`.
     pub fn get(&self, property: VideoWriterProperty) -> Option<f64> {
-        let ret = unsafe { cv_videowriter_get(self.inner, property as c_int) };
+        let ret = unsafe { cv_videowriter_get(self.inner, property) };
         if ret != 0.0 {
             Some(ret)
         } else {
@@ -297,6 +300,7 @@ impl Drop for VideoWriter {
 }
 
 /// `VideoWriter`'s property identifier.
+#[repr(C)]
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 pub enum VideoWriterProperty {
     /// Current quality of the encoded videostream.
@@ -313,25 +317,26 @@ pub enum VideoWriterProperty {
 // =============================================================================
 //   Utility functions
 // =============================================================================
-extern "C" {
-    fn cv_fourcc(c1: c_char, c2: c_char, c3: c_char, c4: c_char) -> c_int;
+
+/// Converts from [four character code](https://www.fourcc.org/) to `u32`
+pub fn codec_name_from_4cc(value: &str) -> Result<u32, Error> {
+    if value.len() != 4 || value.chars().any(|c| !c.is_ascii()) {
+        Err(CvError::UnicodeChars(value.into()).into())
+    } else {
+        let bytes = value.as_bytes();
+        let result = ((bytes[0] as u32) & 0xFFu32) + (((bytes[1] as u32) & 0xFFu32) << 8)
+            + (((bytes[2] as u32) & 0xFFu32) << 16) + (((bytes[3] as u32) & 0xFFu32) << 24);
+        Ok(result)
+    }
 }
 
-/// Converts from [four character code](https://www.fourcc.org/) to `c_int` for
-/// OpenCV.
-pub fn fourcc(c1: char, c2: char, c3: char, c4: char) -> c_int {
-    unsafe { cv_fourcc(c1 as c_char, c2 as c_char, c3 as c_char, c4 as c_char) }
-}
-
-/// Converts from OpenCV's int to [four character
-/// code](https://www.fourcc.org/).
-pub fn codec_name(fourcc: c_int) -> Option<String> {
-    let ex = fourcc as u32;
+/// Converts to [four character code](https://www.fourcc.org/) from `u32`.
+pub fn codec_name_to_4cc(value: u32) -> String {
     let vec = vec![
-        (ex & 0xFFu32) as u8,
-        ((ex & 0xFF00u32) >> 8) as u8,
-        ((ex & 0xFF0000u32) >> 16) as u8,
-        ((ex & 0xFF000000u32) >> 24) as u8,
+        (value & 0xFFu32) as u8,
+        ((value & 0xFF00u32) >> 8) as u8,
+        ((value & 0xFF0000u32) >> 16) as u8,
+        ((value & 0xFF000000u32) >> 24) as u8,
     ];
-    String::from_utf8(vec).ok()
+    String::from_utf8(vec).unwrap()
 }

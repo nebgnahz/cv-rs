@@ -3,7 +3,6 @@
 
 use super::*;
 use super::core::*;
-use num::ToPrimitive;
 use std::os::raw::{c_double, c_float, c_int};
 
 // =============================================================================
@@ -16,11 +15,11 @@ extern "C" {
         pt2: Point2i,
         color: Scalar,
         thickness: c_int,
-        linetype: c_int,
+        linetype: LineType,
         shift: c_int,
     );
 
-    fn cv_rectangle(cmat: *mut CMat, rect: Rect, color: Scalar, thickness: c_int, linetype: c_int);
+    fn cv_rectangle(cmat: *mut CMat, rect: Rect, color: Scalar, thickness: c_int, linetype: LineType);
 
     fn cv_ellipse(
         cmat: *mut CMat,
@@ -31,13 +30,20 @@ extern "C" {
         end_angle: c_double,
         color: Scalar,
         thickness: c_int,
-        linetype: c_int,
+        linetype: LineType,
         shift: c_int,
     );
 
-    fn cv_cvt_color(cmat: *const CMat, output: *mut CMat, code: c_int);
+    fn cv_cvt_color(cmat: *const CMat, output: *mut CMat, code: ColorConversion);
     fn cv_pyr_down(cmat: *const CMat, output: *mut CMat);
-    fn cv_resize(from: *const CMat, to: *mut CMat, dsize: Size2i, fx: c_double, fy: c_double, interpolation: c_int);
+    fn cv_resize(
+        from: *const CMat,
+        to: *mut CMat,
+        dsize: Size2i,
+        fx: c_double,
+        fy: c_double,
+        interpolation: InterpolationFlag,
+    );
     fn cv_calc_hist(
         cimages: *const CMat,
         nimages: c_int,
@@ -60,13 +66,14 @@ extern "C" {
     fn cv_compare_hist(
         first_image: *const CMat,
         second_image: *const CMat,
-        method: c_int,
+        method: HistogramComparisionMethod,
         result: *mut CResult<c_double>,
     );
 }
 
 /// Possible methods for histogram comparision method
-#[derive(Debug, PartialEq, Clone, Copy, ToPrimitive)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum HistogramComparisionMethod {
     /// HISTCMP_CORREL
     Correlation = 0,
@@ -84,9 +91,10 @@ pub enum HistogramComparisionMethod {
 
 /// Color conversion code used in
 /// [cvt_color](../struct.Mat.html#method.cvt_color).
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[allow(non_camel_case_types, missing_docs)]
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub enum ColorConversionCodes {
+pub enum ColorConversion {
     BGR2BGRA = 0,
     BGRA2BGR = 1,
     BGR2RGBA = 2,
@@ -224,32 +232,28 @@ pub enum ColorConversionCodes {
 }
 
 /// Interpolation algorithm
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum InterpolationFlag {
     /// nearest neighbor interpolation
     InterNearst = 0,
-
     /// bilinear interpolation
     InterLinear = 1,
-
     /// bicubic interpolation
     InterCubic = 2,
-
     /// resampling using pixel area relation. It may be a preferred method for
     /// image decimation, as it gives moire'-free results. But when the image is
     /// zoomed, it is similar to the INTER_NEAREST method.
     InterArea = 3,
-
     /// Lanczos interpolation over 8x8 neighborhood
     InterLanczos4 = 4,
-
+    /// Bit exact bilinear interpolation
+    InterLinearExact = 5,
     /// mask for interpolation codes
     InterMax = 7,
-
     /// flag, fills all of the destination image pixels. If some of them
     /// correspond to outliers in the source image, they are set to zero
     WarpFillOutliers = 8,
-
     /// flag, inverse transformation
     WarpInverseMap = 16,
 }
@@ -258,7 +262,7 @@ impl Mat {
     /// Draws a simple line.
     pub fn line(&self, pt1: Point2i, pt2: Point2i) {
         let color = Scalar::new(255, 255, 0, 255);
-        self.line_custom(pt1, pt2, color, 1, LineTypes::Line8, 0);
+        self.line_custom(pt1, pt2, color, 1, LineType::Line8, 0);
     }
 
     /// Draws a line with custom color, thickness and linetype.
@@ -268,30 +272,22 @@ impl Mat {
         pt2: Point2i,
         color: Scalar,
         thickness: c_int,
-        linetype: LineTypes,
+        linetype: LineType,
         shift: c_int,
     ) {
         unsafe {
-            cv_line(
-                self.inner,
-                pt1,
-                pt2,
-                color,
-                thickness,
-                linetype as c_int,
-                shift,
-            );
+            cv_line(self.inner, pt1, pt2, color, thickness, linetype, shift);
         }
     }
 
     /// Draws a simple, thick, or filled up-right rectangle.
     pub fn rectangle(&self, rect: Rect) {
-        self.rectangle_custom(rect, Scalar::new(255, 255, 0, 255), 1, LineTypes::Line8);
+        self.rectangle_custom(rect, Scalar::new(255, 255, 0, 255), 1, LineType::Line8);
     }
 
     /// Draws a rectangle with custom color, thickness and linetype.
-    pub fn rectangle_custom(&self, rect: Rect, color: Scalar, thickness: c_int, linetype: LineTypes) {
-        unsafe { cv_rectangle(self.inner, rect, color, thickness, linetype as c_int) }
+    pub fn rectangle_custom(&self, rect: Rect, color: Scalar, thickness: c_int, linetype: LineType) {
+        unsafe { cv_rectangle(self.inner, rect, color, thickness, linetype) }
     }
 
     /// Draw a simple, thick, or filled up-right rectangle.
@@ -310,7 +306,7 @@ impl Mat {
             end_angle,
             Scalar::new(255, 255, 0, 255),
             1,
-            LineTypes::Line8,
+            LineType::Line8,
             0,
         )
     }
@@ -325,7 +321,7 @@ impl Mat {
         end_angle: f64,
         color: Scalar,
         thickness: c_int,
-        linetype: LineTypes,
+        linetype: LineType,
         shift: c_int,
     ) {
         unsafe {
@@ -338,16 +334,16 @@ impl Mat {
                 end_angle,
                 color,
                 thickness,
-                linetype as c_int,
+                linetype,
                 shift,
             )
         }
     }
 
     /// Convert an image from one color space to another.
-    pub fn cvt_color(&self, code: ColorConversionCodes) -> Mat {
+    pub fn cvt_color(&self, code: ColorConversion) -> Mat {
         let m = CMat::new();
-        unsafe { cv_cvt_color(self.inner, m, code as c_int) }
+        unsafe { cv_cvt_color(self.inner, m, code) }
         Mat::from_raw(m)
     }
 
@@ -365,7 +361,7 @@ impl Mat {
     /// size.
     pub fn resize_to(&self, dsize: Size2i, interpolation: InterpolationFlag) -> Mat {
         let m = CMat::new();
-        unsafe { cv_resize(self.inner, m, dsize, 0.0, 0.0, interpolation as c_int) }
+        unsafe { cv_resize(self.inner, m, dsize, 0.0, 0.0, interpolation) }
         Mat::from_raw(m)
     }
 
@@ -375,16 +371,7 @@ impl Mat {
     /// size.
     pub fn resize_by(&self, fx: f64, fy: f64, interpolation: InterpolationFlag) -> Mat {
         let m = CMat::new();
-        unsafe {
-            cv_resize(
-                self.inner,
-                m,
-                Size2i::default(),
-                fx,
-                fy,
-                interpolation as c_int,
-            )
-        }
+        unsafe { cv_resize(self.inner, m, Size2i::default(), fx, fy, interpolation) }
         Mat::from_raw(m)
     }
 
@@ -433,7 +420,6 @@ impl Mat {
     /// To compare such histograms or more general sparse configurations of weighted points,
     /// consider using the cv::EMD function.
     pub fn compare_hist(&self, other: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
-        let method: c_int = method.to_i64().unwrap() as c_int;
         let result = CResult::<f64>::from_callback(|r| unsafe { cv_compare_hist(self.inner, other.inner, method, r) });
         result.into()
     }

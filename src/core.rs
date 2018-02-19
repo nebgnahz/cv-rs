@@ -3,7 +3,6 @@
 use bytes::{self, ByteOrder};
 use errors::*;
 use failure::Error;
-use num;
 use std::ffi::CString;
 use std::mem;
 use std::os::raw::{c_char, c_double, c_int, c_uchar};
@@ -164,7 +163,7 @@ pub struct Size2f {
 }
 
 /// The `Rect` defines a rectangle in integer.
-#[derive(Default, Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Default, Debug, Clone, Copy, Eq, PartialEq)]
 #[repr(C)]
 pub struct Rect {
     /// x coordinate of the left-top corner
@@ -237,17 +236,15 @@ impl Rect2f {
 }
 
 /// Line type
-#[derive(Debug, PartialEq, Clone, Copy)]
-pub enum LineTypes {
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+pub enum LineType {
     /// Default type
     Filled = -1,
-
     /// 4-connected line
     Line4 = 4,
-
     /// 8-connected line
     Line8 = 8,
-
     /// antialiased line
     LineAA = 16,
 }
@@ -268,7 +265,7 @@ extern "C" {
     fn cv_mat_step1(cmat: *const CMat, i: c_int) -> usize;
     fn cv_mat_elem_size(cmat: *const CMat) -> usize;
     fn cv_mat_elem_size1(cmat: *const CMat) -> usize;
-    fn cv_mat_type(cmat: *const CMat) -> c_int;
+    fn cv_mat_type(cmat: *const CMat) -> CvType;
     fn cv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
     fn cv_mat_logic_and(cimage: *mut CMat, cmask: *const CMat);
     fn cv_mat_flip(src: *mut CMat, code: c_int);
@@ -278,7 +275,7 @@ extern "C" {
 
 /// A flag to specify how to flip the image. see
 /// [Mat::flip](struct.Mat.html#method.flip)
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum FlipCode {
     /// Along x-axis: dst[i, j] = src[src.rows - i - 1, j]
     XAxis,
@@ -453,9 +450,8 @@ impl Mat {
 
     /// Returns the images type. For supported types, please see
     /// [CvType](enum.CvType).
-    pub fn cv_type(&self) -> Result<CvType, Error> {
-        let t: i32 = unsafe { cv_mat_type(self.inner) };
-        num::FromPrimitive::from_i32(t).ok_or(CvError::EnumFromPrimitiveConversionError { value: t }.into())
+    pub fn cv_type(&self) -> CvType {
+        unsafe { cv_mat_type(self.inner) }
     }
 
     /// Returns an identity matrix of the specified size and type.
@@ -634,8 +630,8 @@ impl Drop for Mat {
 /// | CV_32S |  4 | 12 | 20 | 28 |   36 |   44 |   52 |   60 |
 /// | CV_32F |  5 | 13 | 21 | 29 |   37 |   45 |   53 |   61 |
 /// | CV_64F |  6 | 14 | 22 | 30 |   38 |   46 |   54 |   62 |
-#[derive(Debug, PartialEq, Clone, Copy, FromPrimitive)]
 #[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum CvType {
     /// 8 bit unsigned (like `uchar`), single channel (grey image)
     Cv8UC1 = 0,
@@ -748,7 +744,7 @@ extern "C" {
         from_to: *const c_int,
         npairs: isize,
     );
-    fn cv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: c_int);
+    fn cv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: NormType);
 
     fn cv_bitwise_and(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
     fn cv_bitwise_not(src: *const CMat, dst: *mut CMat);
@@ -759,24 +755,25 @@ extern "C" {
 
 /// Normalization type. Please refer to [OpenCV's
 /// documentation](http://docs.cv.org/trunk/d2/de8/group__core__array.html).
-#[derive(Debug, PartialEq, Clone, Copy, FromPrimitive)]
-pub enum NormTypes {
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+pub enum NormType {
     /// Normalized using `max`
-    NormInf = 1,
+    Inf = 1,
     /// Normalized using L1 distance
-    NormL1 = 2,
+    L1 = 2,
     /// Normalized using L2 distance
-    NormL2 = 4,
+    L2 = 4,
     /// Normalized using L2 sqr distance
-    NormL2Sqr = 5,
+    L2Sqr = 5,
     /// Normalized using hamming distance
-    NormHamming = 6,
+    Hamming = 6,
     /// Normalized using hamming2 distance
-    NormHamming2 = 7,
+    Hamming2 = 7,
     /// Normalized using relative distance
-    NormRelative = 8,
+    Relative = 8,
     /// Normalized using minmax distance
-    NormMinMax = 32,
+    MinMax = 32,
 }
 
 impl Mat {
@@ -831,9 +828,9 @@ impl Mat {
     }
 
     /// Normalize the Mat according to the normalization type.
-    pub fn normalize(&self, alpha: f64, beta: f64, t: NormTypes) -> Mat {
+    pub fn normalize(&self, alpha: f64, beta: f64, t: NormType) -> Mat {
         let m = CMat::new();
-        unsafe { cv_normalize(self.inner, m, alpha, beta, t as c_int) }
+        unsafe { cv_normalize(self.inner, m, alpha, beta, t) }
         Mat::from_raw(m)
     }
 

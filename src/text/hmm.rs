@@ -20,7 +20,7 @@ extern "C" {
 }
 
 #[repr(C)]
-#[derive(Clone, Copy, Debug)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[allow(missing_docs)]
 pub enum ClassifierType {
     Knn,

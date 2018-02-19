@@ -19,4 +19,7 @@ pub enum CvError {
     #[fail(display = "Unknown error: {:?}", _0)]
     /// Indicates that error occurred in C++ code
     UnknownError(String),
+    #[fail(display = "Non ascii characters found in string: {:?}", _0)]
+    /// Indicates that string contains non ascii characters
+    UnicodeChars(String),
 }

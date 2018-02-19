@@ -10,16 +10,15 @@ struct SelectionStatus {
     status: bool,
 }
 
-fn on_mouse(e: i32, x: i32, y: i32, _: i32, data: MouseCallbackData) {
-    let event: MouseEventTypes = unsafe { std::mem::transmute(e as u8) };
+fn on_mouse(event: MouseEventType, x: i32, y: i32, _: i32, data: MouseCallbackData) {
     match event {
-        MouseEventTypes::LButtonDown => {
+        MouseEventType::LButtonDown => {
             let ss = data as *mut SelectionStatus;
             let mut selection = unsafe { &mut (*ss).selection };
             selection.x = x;
             selection.y = y;
         }
-        MouseEventTypes::LButtonUp => {
+        MouseEventType::LButtonUp => {
             let ss = data as *mut SelectionStatus;
             let mut selection = unsafe { &mut (*ss).selection };
             let mut status = unsafe { &mut (*ss).status };
@@ -44,8 +43,8 @@ fn main() {
     let cap = VideoCapture::new(0);
     assert!(cap.is_open());
 
-    highgui_named_window("Window", WindowFlags::WindowAutosize);
-    highgui_set_mouse_callback("Window", on_mouse, ss_ptr as MouseCallbackData);
+    highgui_named_window("Window", WindowFlag::Autosize).unwrap();
+    highgui_set_mouse_callback("Window", on_mouse, ss_ptr as MouseCallbackData).unwrap();
 
     let mut is_tracking = false;
 
@@ -58,7 +57,7 @@ fn main() {
     while let Some(mut m) = cap.read() {
         m.flip(FlipCode::YAxis);
 
-        let hsv = m.cvt_color(ColorConversionCodes::BGR2HSV);
+        let hsv = m.cvt_color(ColorConversion::BGR2HSV);
 
         let ch = [0, 0];
         let hue = hsv.mix_channels(1, 1, &ch[0] as *const i32, 1);
@@ -77,7 +76,7 @@ fn main() {
                 &hsize,
                 &phranges[0] as *const *const f32,
             );
-            hist = raw_hist.normalize(0.0, 255.0, NormTypes::NormMinMax);
+            hist = raw_hist.normalize(0.0, 255.0, NormType::MinMax);
 
             track_window = selection;
             m.rectangle(selection);

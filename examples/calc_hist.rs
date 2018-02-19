@@ -2,7 +2,7 @@ extern crate cv;
 
 use cv::*;
 use cv::highgui::*;
-use cv::imgcodecs::ImreadModes;
+use cv::imgcodecs::ImageReadMode;
 
 fn main() {
     ////////////////////////////////
@@ -17,7 +17,7 @@ fn main() {
         std::process::exit(-1);
     }
 
-    let mat = Mat::from_path(&args[1], ImreadModes::ImreadGrayscale).expect("Failed to read from path");
+    let mat = Mat::from_path(&args[1], ImageReadMode::Grayscale).expect("Failed to read from path");
 
     if !mat.is_valid() {
         println!("Could not open or find the image");
@@ -49,7 +49,7 @@ fn main() {
     let hist_image = Mat::with_size(hist_h, hist_w, CvType::Cv8UC3 as i32);
 
     // Normalize the histogram to the height of the histogram window
-    let b_hist = hist.normalize(0.0, hist_h as f64, NormTypes::NormMinMax);
+    let b_hist = hist.normalize(0.0, hist_h as f64, NormType::MinMax);
 
     // Plot each segment as a line element
     for i in 1..hsize {
@@ -59,6 +59,6 @@ fn main() {
     }
 
     // Show the histogram
-    highgui_named_window("Display window", WindowFlags::WindowNormal);
+    highgui_named_window("Display window", WindowFlag::Normal).unwrap();
     hist_image.show("Histogram", 0).unwrap();
 }

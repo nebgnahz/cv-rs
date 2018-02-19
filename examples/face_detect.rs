@@ -14,13 +14,13 @@ fn main() {
 
     let mut buf = Vec::new();
     File::open(d).unwrap().read_to_end(&mut buf).unwrap();
-    let mat = Mat::imdecode(&buf, ImreadModes::ImreadGrayscale);
+    let mat = Mat::image_decode(&buf, ImageReadMode::Grayscale);
 
     let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     d.push("assets/haarcascade_frontalface_default.xml");
     let cascade = CascadeClassifier::from_path(d).unwrap();
 
-    highgui_named_window("window", WindowFlags::WindowNormal);
+    highgui_named_window("window", WindowFlag::Normal).unwrap();
 
     // result is a vector of rectangles
     let result = cascade.detect_with_params(&mat, 1.1, 15, Size2i::new(80, 80), Size2i::default());
@@ -34,7 +34,7 @@ fn main() {
                 r.scale(1.2),
                 Scalar::new(255, 255, 0, 255),
                 10,
-                LineTypes::Line8,
+                LineType::Line8,
             )
         })
         .count();
