@@ -2,8 +2,8 @@ extern crate cv;
 
 use cv::*;
 use cv::highgui::*;
-use cv::imgcodecs::ImreadModes;
-use cv::imgproc::ColorConversionCodes;
+use cv::imgcodecs::ImreadMode;
+use cv::imgproc::ColorConversion;
 
 fn main() {
     ////////////////////////////////
@@ -18,14 +18,14 @@ fn main() {
         std::process::exit(-1);
     }
 
-    let mat = Mat::from_path(&args[1], ImreadModes::ImreadColor).expect("Failed to read from path");
+    let mat = Mat::from_path(&args[1], ImreadMode::Color).expect("Failed to read from path");
 
     if !mat.is_valid() {
         println!("Could not open or find the image");
         std::process::exit(-1);
     }
 
-    let hsv = mat.cvt_color(ColorConversionCodes::BGR2HSV);
+    let hsv = mat.cvt_color(ColorConversion::BGR2HSV);
 
     ////////////////////////////////
     //
@@ -73,12 +73,12 @@ fn main() {
             hist_image.rectangle_custom(
                 rect,
                 Scalar::all(intensity),
-                LineTypes::Filled as i32,
-                LineTypes::Line8,
+                LineType::Filled as i32,
+                LineType::Line8,
             );
         }
     }
 
-    highgui_named_window("Display window", WindowFlags::WindowNormal).unwrap();
+    highgui_named_window("Display window", WindowFlag::Normal).unwrap();
     hist_image.show("Histogram", 0).unwrap();
 }

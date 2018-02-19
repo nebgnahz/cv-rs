@@ -34,7 +34,7 @@ extern "C" {
         shift: c_int,
     );
 
-    fn cv_cvt_color(cmat: *const CMat, output: *mut CMat, code: ColorConversionCodes);
+    fn cv_cvt_color(cmat: *const CMat, output: *mut CMat, code: ColorConversion);
     fn cv_pyr_down(cmat: *const CMat, output: *mut CMat);
     fn cv_resize(
         from: *const CMat,
@@ -72,8 +72,8 @@ extern "C" {
 }
 
 /// Possible methods for histogram comparision method
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum HistogramComparisionMethod {
     /// HISTCMP_CORREL
     Correlation = 0,
@@ -94,7 +94,7 @@ pub enum HistogramComparisionMethod {
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[allow(non_camel_case_types, missing_docs)]
-pub enum ColorConversionCodes {
+pub enum ColorConversion {
     BGR2BGRA = 0,
     BGRA2BGR = 1,
     BGR2RGBA = 2,
@@ -346,7 +346,7 @@ impl Mat {
     }
 
     /// Convert an image from one color space to another.
-    pub fn cvt_color(&self, code: ColorConversionCodes) -> Mat {
+    pub fn cvt_color(&self, code: ColorConversion) -> Mat {
         let m = CMat::new();
         unsafe { cv_cvt_color(self.inner, m, code) }
         Mat::from_raw(m)

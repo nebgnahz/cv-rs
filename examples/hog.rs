@@ -51,7 +51,7 @@ fn run() -> Result<()> {
         .expect("You need to provide the directory");
 
     if show {
-        highgui_named_window("window", WindowFlags::WindowAutosize).unwrap();
+        highgui_named_window("window", WindowFlag::Autosize).unwrap();
     }
 
     let mut param = HogParams::default();
@@ -77,7 +77,7 @@ fn run_detect_for_image<P: AsRef<Path>, OD: ObjectDetect>(detector: &mut OD, pat
         .into_owned();
     let frame_num = filename.parse::<usize>().unwrap();
     File::open(path).unwrap().read_to_end(&mut buf).unwrap();
-    let mat = Mat::imdecode(&buf, ImreadModes::ImreadGrayscale);
+    let mat = Mat::imdecode(&buf, ImreadMode::Grayscale);
 
     let start = ::std::time::Instant::now();
     let results = detector.detect(&mat);

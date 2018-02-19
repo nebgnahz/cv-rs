@@ -238,16 +238,13 @@ impl Rect2f {
 /// Line type
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-pub enum LineTypes {
+pub enum LineType {
     /// Default type
     Filled = -1,
-
     /// 4-connected line
     Line4 = 4,
-
     /// 8-connected line
     Line8 = 8,
-
     /// antialiased line
     LineAA = 16,
 }
@@ -747,7 +744,7 @@ extern "C" {
         from_to: *const c_int,
         npairs: isize,
     );
-    fn cv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: NormTypes);
+    fn cv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: NormType);
 
     fn cv_bitwise_and(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
     fn cv_bitwise_not(src: *const CMat, dst: *mut CMat);
@@ -760,7 +757,7 @@ extern "C" {
 /// documentation](http://docs.cv.org/trunk/d2/de8/group__core__array.html).
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-pub enum NormTypes {
+pub enum NormType {
     /// Normalized using `max`
     NormInf = 1,
     /// Normalized using L1 distance
@@ -831,7 +828,7 @@ impl Mat {
     }
 
     /// Normalize the Mat according to the normalization type.
-    pub fn normalize(&self, alpha: f64, beta: f64, t: NormTypes) -> Mat {
+    pub fn normalize(&self, alpha: f64, beta: f64, t: NormType) -> Mat {
         let m = CMat::new();
         unsafe { cv_normalize(self.inner, m, alpha, beta, t) }
         Mat::from_raw(m)

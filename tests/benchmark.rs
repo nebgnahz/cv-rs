@@ -18,7 +18,7 @@ fn bench_mat_new() {
 fn bench_decode_lenna() {
     let buf = load_lenna_as_buf();
     timed("decode lenna.png", || {
-        Mat::imdecode(&buf, ImreadModes::ImreadGrayscale);
+        Mat::imdecode(&buf, ImreadMode::Grayscale);
     });
 }
 

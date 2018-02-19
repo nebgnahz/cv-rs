@@ -3,7 +3,7 @@
 extern crate cv;
 use cv::*;
 use cv::highgui::*;
-use cv::imgcodecs::ImreadModes;
+use cv::imgcodecs::ImreadMode;
 
 fn main() {
     let args: Vec<_> = std::env::args().collect();
@@ -12,13 +12,13 @@ fn main() {
         std::process::exit(-1);
     }
 
-    let mat = Mat::from_path(&args[1], ImreadModes::ImreadColor).expect("Failed to read from path");
+    let mat = Mat::from_path(&args[1], ImreadMode::Color).expect("Failed to read from path");
 
     if !mat.is_valid() {
         println!("Could not open or find the image");
         std::process::exit(-1);
     }
 
-    highgui_named_window("Display window", WindowFlags::WindowNormal).unwrap();
+    highgui_named_window("Display window", WindowFlag::Normal).unwrap();
     mat.show("Display window", 0).unwrap();
 }

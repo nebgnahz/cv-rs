@@ -6,11 +6,11 @@ use std::os::raw::{c_char, c_int, c_void};
 use std::ptr;
 
 extern "C" {
-    fn cv_named_window(name: *const c_char, flags: WindowFlags);
+    fn cv_named_window(name: *const c_char, flags: WindowFlag);
     fn cv_destroy_window(name: *const c_char);
     fn cv_set_mouse_callback(
         name: *const c_char,
-        on_mouse: extern "C" fn(e: MouseEventTypes, x: c_int, y: c_int, f: c_int, data: *mut c_void),
+        on_mouse: extern "C" fn(e: MouseEventType, x: c_int, y: c_int, f: c_int, data: *mut c_void),
         userdata: *mut c_void,
     );
 }
@@ -18,7 +18,7 @@ extern "C" {
 /// Create a window that can be used as a placeholder for images and
 /// trackbars. All created windows are referred to by their names. If a window
 /// with the same name already exists, the function does nothing.
-pub fn highgui_named_window(name: &str, flags: WindowFlags) -> Result<(), Error> {
+pub fn highgui_named_window(name: &str, flags: WindowFlag) -> Result<(), Error> {
     let s = CString::new(name)?;
     unsafe {
         cv_named_window(s.as_ptr(), flags);
@@ -39,7 +39,7 @@ pub type MouseCallbackData = *mut c_void;
 
 /// Callback function for mouse events, primarily used in
 /// [highgui_set_mouse_callback](fn.highgui_set_mouse_callback.html)
-pub type MouseCallback = fn(MouseEventTypes, c_int, c_int, c_int, MouseCallbackData);
+pub type MouseCallback = fn(MouseEventType, c_int, c_int, c_int, MouseCallbackData);
 
 /// Set mouse handler for the specified window (identified by name). A callback
 /// handler should be provided and optional user_data can be passed around.
@@ -49,7 +49,7 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
         data: *mut c_void,
     }
 
-    extern "C" fn _mouse_callback(e: MouseEventTypes, x: c_int, y: c_int, f: c_int, ud: *mut c_void) {
+    extern "C" fn _mouse_callback(e: MouseEventType, x: c_int, y: c_int, f: c_int, ud: *mut c_void) {
         let cb_wrapper = unsafe { ptr::read(ud as *mut CallbackWrapper) };
         let true_callback = *(cb_wrapper.cb);
         true_callback(e, x, y, f, cb_wrapper.data);
@@ -74,21 +74,21 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
 /// same value but Rust is stricter.
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-pub enum WindowFlags {
+pub enum WindowFlag {
     /// the window can be resized (no constraint) or switched to fullscreen.
-    WindowNormal = 0x00000000,
+    Normal = 0x00000000,
     /// the window is constrained by the image displayed.
-    WindowAutosize = 0x00000001,
+    Autosize = 0x00000001,
     /// the window is with opengl support.
-    WindowOpengl = 0x00001000,
+    Opengl = 0x00001000,
     /// the window can be resized arbitrarily (no ratio constraint).
-    WindowFreeRatio = 0x00000100,
+    FreeRatio = 0x00000100,
 }
 
 /// Mouse Events
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-pub enum MouseEventTypes {
+pub enum MouseEventType {
     /// Indicates that the mouse has moved over the window.
     MouseMove = 0,
     /// Indicates that the left mouse button is pressed.

@@ -42,22 +42,22 @@ where
 
 pub fn load_physicists() -> Mat {
     let buf = load_image_as_buf("assets/Solvay_conference_1927.jpg");
-    Mat::imdecode(&buf, ImreadModes::ImreadGrayscale)
+    Mat::imdecode(&buf, ImreadMode::Grayscale)
 }
 
 pub fn load_avg_towncentre() -> Mat {
     let buf = load_image_as_buf("assets/AVG-TownCentre-test-000011.jpg");
-    Mat::imdecode(&buf, ImreadModes::ImreadGrayscale)
+    Mat::imdecode(&buf, ImreadMode::Grayscale)
 }
 
 pub fn load_lenna() -> Mat {
     let buf = load_lenna_as_buf();
-    Mat::imdecode(&buf, ImreadModes::ImreadGrayscale)
+    Mat::imdecode(&buf, ImreadMode::Grayscale)
 }
 
 pub fn load_messi_color() -> Mat {
     let buf = load_image_as_buf("assets/messi5.jpg");
-    Mat::imdecode(&buf, ImreadModes::ImreadColor)
+    Mat::imdecode(&buf, ImreadMode::Color)
 }
 
 pub fn load_lenna_as_buf() -> Vec<u8> {
