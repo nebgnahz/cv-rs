@@ -318,7 +318,7 @@ int cv_wait_key(int delay) {
     return cv::waitKey(delay);
 }
 
-void cv_set_mouse_callback(const char* const winname, MouseCallback on_mouse, void* userdata) {
+void cv_set_mouse_callback(const char* const winname, cv::MouseCallback on_mouse, void* userdata) {
     cv::setMouseCallback(winname, on_mouse, userdata);
 }
 

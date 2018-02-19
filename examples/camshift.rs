@@ -10,8 +10,7 @@ struct SelectionStatus {
     status: bool,
 }
 
-fn on_mouse(e: i32, x: i32, y: i32, _: i32, data: MouseCallbackData) {
-    let event: MouseEventTypes = unsafe { std::mem::transmute(e as u8) };
+fn on_mouse(event: MouseEventTypes, x: i32, y: i32, _: i32, data: MouseCallbackData) {
     match event {
         MouseEventTypes::LButtonDown => {
             let ss = data as *mut SelectionStatus;

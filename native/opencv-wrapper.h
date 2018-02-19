@@ -120,8 +120,7 @@ void cv_destroy_window(const char* const winname);
 void cv_imshow(const char* const winname, cv::Mat* mat);
 int cv_wait_key(int delay_in_millis);
 
-typedef void (*MouseCallback)(int e, int x, int y, int flags, void* data);
-void cv_set_mouse_callback(const char* const winname, MouseCallback onMouse, void* userdata);
+void cv_set_mouse_callback(const char* const winname, cv::MouseCallback onMouse, void* userdata);
 
 // =============================================================================
 //   VideoIO

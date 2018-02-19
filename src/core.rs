@@ -633,8 +633,8 @@ impl Drop for Mat {
 /// | CV_32S |  4 | 12 | 20 | 28 |   36 |   44 |   52 |   60 |
 /// | CV_32F |  5 | 13 | 21 | 29 |   37 |   45 |   53 |   61 |
 /// | CV_64F |  6 | 14 | 22 | 30 |   38 |   46 |   54 |   62 |
-#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum CvType {
     /// 8 bit unsigned (like `uchar`), single channel (grey image)
     Cv8UC1 = 0,
