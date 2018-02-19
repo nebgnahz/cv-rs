@@ -133,8 +133,6 @@ void cv_videocapture_drop(cv::VideoCapture* cap);
 bool cv_videocapture_set(cv::VideoCapture* cap, int property, double value);
 double cv_videocapture_get(cv::VideoCapture* cap, int property);
 
-int cv_fourcc(char c1, char c2, char c3, char c4);
-
 void* cv_videowriter_default();
 void* cv_videowriter_new(const char* const path, int fourcc, double fps, Size2i frame_size, bool is_color);
 void cv_videowriter_drop(cv::VideoWriter* writer);

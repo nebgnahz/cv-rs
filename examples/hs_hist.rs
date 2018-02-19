@@ -2,7 +2,7 @@ extern crate cv;
 
 use cv::*;
 use cv::highgui::*;
-use cv::imgcodecs::ImreadMode;
+use cv::imgcodecs::ImageReadMode;
 use cv::imgproc::ColorConversion;
 
 fn main() {
@@ -18,7 +18,7 @@ fn main() {
         std::process::exit(-1);
     }
 
-    let mat = Mat::from_path(&args[1], ImreadMode::Color).expect("Failed to read from path");
+    let mat = Mat::from_path(&args[1], ImageReadMode::Color).expect("Failed to read from path");
 
     if !mat.is_valid() {
         println!("Could not open or find the image");

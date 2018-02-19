@@ -2,6 +2,8 @@
 //! videoio](http://docs.opencv.org/3.1.0/dd/de7/group__videoio.html)
 
 use core::{CMat, Mat, Size2i};
+use errors::*;
+use failure::Error;
 use std::os::raw::{c_char, c_double, c_int};
 
 // =============================================================================
@@ -315,25 +317,26 @@ pub enum VideoWriterProperty {
 // =============================================================================
 //   Utility functions
 // =============================================================================
-extern "C" {
-    fn cv_fourcc(c1: c_char, c2: c_char, c3: c_char, c4: c_char) -> c_int;
+
+/// Converts from [four character code](https://www.fourcc.org/) to `u32`
+pub fn codec_name_from_4cc(value: &str) -> Result<u32, Error> {
+    if value.len() != 4 || value.chars().any(|c| !c.is_ascii()) {
+        Err(CvError::UnicodeChars(value.into()).into())
+    } else {
+        let bytes = value.as_bytes();
+        let result = ((bytes[0] as u32) & 0xFFu32) + (((bytes[1] as u32) & 0xFFu32) << 8)
+            + (((bytes[2] as u32) & 0xFFu32) << 16) + (((bytes[3] as u32) & 0xFFu32) << 24);
+        Ok(result)
+    }
 }
 
-/// Converts from [four character code](https://www.fourcc.org/) to `c_int` for
-/// OpenCV.
-pub fn fourcc(c1: char, c2: char, c3: char, c4: char) -> c_int {
-    unsafe { cv_fourcc(c1 as c_char, c2 as c_char, c3 as c_char, c4 as c_char) }
-}
-
-/// Converts from OpenCV's int to [four character
-/// code](https://www.fourcc.org/).
-pub fn codec_name(fourcc: c_int) -> Option<String> {
-    let ex = fourcc as u32;
+/// Converts to [four character code](https://www.fourcc.org/) from `u32`.
+pub fn codec_name_to_4cc(value: u32) -> String {
     let vec = vec![
-        (ex & 0xFFu32) as u8,
-        ((ex & 0xFF00u32) >> 8) as u8,
-        ((ex & 0xFF0000u32) >> 16) as u8,
-        ((ex & 0xFF000000u32) >> 24) as u8,
+        (value & 0xFFu32) as u8,
+        ((value & 0xFF00u32) >> 8) as u8,
+        ((value & 0xFF0000u32) >> 16) as u8,
+        ((value & 0xFF000000u32) >> 24) as u8,
     ];
-    String::from_utf8(vec).ok()
+    String::from_utf8(vec).unwrap()
 }

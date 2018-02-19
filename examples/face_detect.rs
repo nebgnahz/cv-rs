@@ -14,7 +14,7 @@ fn main() {
 
     let mut buf = Vec::new();
     File::open(d).unwrap().read_to_end(&mut buf).unwrap();
-    let mat = Mat::imdecode(&buf, ImreadMode::Grayscale);
+    let mat = Mat::image_decode(&buf, ImageReadMode::Grayscale);
 
     let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     d.push("assets/haarcascade_frontalface_default.xml");

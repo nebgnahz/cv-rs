@@ -2,6 +2,7 @@
 //! imgcodecs](http://docs.opencv.org/3.1.0/d4/da8/group__imgcodecs.html).
 
 use core::*;
+use errors::*;
 use std::ffi::CString;
 use std::os::raw::c_char;
 use std::path::Path;
@@ -13,7 +14,7 @@ use failure::Error;
 /// ImreadModes
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-pub enum ImreadMode {
+pub enum ImageReadMode {
     /// If set, return the loaded image as is (with alpha channel, otherwise it
     /// gets cropped
     Unchanged = -1,
@@ -51,7 +52,7 @@ pub enum ImreadMode {
 /// Imwrite flags
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-pub enum ImwriteFlag {
+pub enum ImageWriteMode {
     /// For JPEG, it can be a quality from 0 to 100 (the higher is the
     /// better). Default value is 95.
     JpegQuality = 1,
@@ -107,12 +108,12 @@ pub enum ImwritePngStrategy {
 }
 
 extern "C" {
-    fn cv_imread(input: *const c_char, flags: ImreadMode) -> *mut CMat;
-    fn cv_imdecode(buf: *const u8, l: usize, m: ImreadMode) -> *mut CMat;
+    fn cv_imread(input: *const c_char, flags: ImageReadMode) -> *mut CMat;
+    fn cv_imdecode(buf: *const u8, l: usize, m: ImageReadMode) -> *mut CMat;
     fn cv_imencode(
         ext: *const c_char,
         inner: *const CMat,
-        flag_ptr: *const ImwriteFlag,
+        flag_ptr: *const ImageWriteMode,
         flag_size: usize,
     ) -> ImencodeResult;
 
@@ -127,7 +128,7 @@ struct ImencodeResult {
 
 impl Mat {
     /// Creates a `Mat` from reading the image specified by the path.
-    pub fn from_path<P: AsRef<Path>>(path: P, flags: ImreadMode) -> Result<Mat, Error> {
+    pub fn from_path<P: AsRef<Path>>(path: P, flags: ImageReadMode) -> Result<Mat, Error> {
         let path = path_to_cstring(path)?;
         let path = path.as_ptr();
         let result = unsafe { cv_imread(path, flags) };
@@ -135,7 +136,7 @@ impl Mat {
     }
 
     /// Decodes an image from `buf` according to the specified mode.
-    pub fn imdecode(buf: &[u8], mode: ImreadMode) -> Mat {
+    pub fn image_decode(buf: &[u8], mode: ImageReadMode) -> Mat {
         let inner = unsafe { cv_imdecode(buf.as_ptr(), buf.len(), mode) };
         Mat::from_raw(inner)
     }
@@ -143,13 +144,13 @@ impl Mat {
     /// Encodes an image; the encoding scheme depends on the extension provided;
     /// additional write flags can be passed in using a vector. If successful,
     /// returns an owned vector of the encoded image.
-    pub fn imencode(&self, ext: &str, flags: Vec<ImwriteFlag>) -> Option<Vec<u8>> {
-        let ext = CString::new(ext).expect("invalid extension string");
+    pub fn image_encode(&self, ext: &str, flags: Vec<ImageWriteMode>) -> Result<Vec<u8>, Error> {
+        let ext = CString::new(ext)?;
         let r = unsafe { cv_imencode(ext.into_raw(), self.inner, flags.as_ptr(), flags.len()) };
         if r.status {
-            unsafe { Some(::std::slice::from_raw_parts(r.buf, r.size).to_vec()) }
+            unsafe { Ok(::std::slice::from_raw_parts(r.buf, r.size).to_vec()) }
         } else {
-            None
+            Err(CvError::UnknownError("Unable to convert this image to bytes".into()).into())
         }
     }
 }

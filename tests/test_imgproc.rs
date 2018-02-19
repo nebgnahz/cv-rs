@@ -3,7 +3,7 @@ extern crate float_cmp;
 mod utils;
 
 use cv::*;
-use cv::imgcodecs::ImreadMode;
+use cv::imgcodecs::ImageReadMode;
 use cv::imgproc::*;
 use float_cmp::ApproxEqRatio;
 
@@ -13,8 +13,8 @@ const SECOND_IMAGE_PATH: &str = "assets/Histogram_Comparison_Source_1.png";
 #[test]
 #[should_panic]
 fn compare_hist_different_dimensions_panic() {
-    let first_image = Mat::from_path(FIRST_IMAGE_PATH, ImreadMode::Color).unwrap();
-    let second_image = Mat::from_path(SECOND_IMAGE_PATH, ImreadMode::Color).unwrap();
+    let first_image = Mat::from_path(FIRST_IMAGE_PATH, ImageReadMode::Color).unwrap();
+    let second_image = Mat::from_path(SECOND_IMAGE_PATH, ImageReadMode::Color).unwrap();
     let _ = first_image
         .compare_hist(&second_image, HistogramComparisionMethod::Correlation)
         .unwrap();
@@ -58,7 +58,7 @@ fn compare_hist(method: HistogramComparisionMethod, expected_result: f64) {
 }
 
 fn get_image_histogram(path: &'static str) -> Mat {
-    let image = Mat::from_path(path, ImreadMode::Color).unwrap();
+    let image = Mat::from_path(path, ImageReadMode::Color).unwrap();
     let image = image.cvt_color(ColorConversion::BGR2HSV);
     let hsize = [50, 60];
     let h_ranges = [0_f32, 180_f32];

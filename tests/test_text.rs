@@ -2,7 +2,7 @@ extern crate cv;
 mod utils;
 
 use cv::*;
-use cv::imgcodecs::ImreadMode;
+use cv::imgcodecs::ImageReadMode;
 use cv::text::*;
 use utils::*;
 
@@ -16,7 +16,7 @@ mod tesseract {
     #[test]
     fn ocr_tesseract_test_line() {
         let image_path = get_asset_path("HelloWorld.png");
-        let image = Mat::from_path(image_path, ImreadMode::Color).unwrap();
+        let image = Mat::from_path(image_path, ImageReadMode::Color).unwrap();
         let path = Path::new("/usr/share/tesseract-ocr");
         let ocr = OcrTesseract::new(
             Some(&path),
@@ -32,7 +32,7 @@ mod tesseract {
     #[test]
     fn ocr_tesseract_test_word() {
         let image_path = get_asset_path("Ubuntu.png");
-        let image = Mat::from_path(&image_path, ImreadMode::Color).unwrap();
+        let image = Mat::from_path(&image_path, ImageReadMode::Color).unwrap();
         let path = Path::new("/usr/share/tesseract-ocr");
         let ocr = OcrTesseract::new(
             Some(&path),
@@ -56,7 +56,7 @@ fn ocr_hmm_test() {
     let classifier_name = get_asset_path("OCRHMM_knn_model_data.xml.gz");
     let transition_probability_path = get_asset_path("OCRHMM_transitions_table.xml");
 
-    let image = Mat::from_path(&image_path, ImreadMode::Grayscale).unwrap();
+    let image = Mat::from_path(&image_path, ImageReadMode::Grayscale).unwrap();
     let transition_probability_table =
         Mat::from_file_storage(&transition_probability_path, "transition_probabilities").unwrap();
     let emission_probability_table = Mat::eye(

@@ -357,11 +357,6 @@ double cv_videocapture_get(cv::VideoCapture* cap, int property) {
 // =============================================================================
 //   VideoWriter
 // =============================================================================
-/// http://www.fourcc.org/codecs.php
-int cv_fourcc(char c1, char c2, char c3, char c4) {
-    return (((c1) &255) + (((c2) &255) << 8) + (((c3) &255) << 16) + (((c4) &255) << 24));
-}
-
 void* cv_videowriter_default() {
     return new cv::VideoWriter();
 }

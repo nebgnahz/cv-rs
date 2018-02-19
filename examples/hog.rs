@@ -77,7 +77,7 @@ fn run_detect_for_image<P: AsRef<Path>, OD: ObjectDetect>(detector: &mut OD, pat
         .into_owned();
     let frame_num = filename.parse::<usize>().unwrap();
     File::open(path).unwrap().read_to_end(&mut buf).unwrap();
-    let mat = Mat::imdecode(&buf, ImreadMode::Grayscale);
+    let mat = Mat::image_decode(&buf, ImageReadMode::Grayscale);
 
     let start = ::std::time::Instant::now();
     let results = detector.detect(&mat);
