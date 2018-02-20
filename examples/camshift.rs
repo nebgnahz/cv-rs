@@ -51,7 +51,7 @@ fn main() {
     let mut hist = Mat::new();
     let hsize = [16];
     let hranges = [0_f32, 180_f32];
-    let phranges: [*const f32; 1] = [&hranges[0] as *const f32];
+    let pranges = [hranges];
     let mut track_window = Rect::default();
 
     while let Some(mut m) = cap.read() {
@@ -70,12 +70,7 @@ fn main() {
             let maskroi = mask.roi(selection);
             let channels = [0];
 
-            let raw_hist = roi.calc_hist(
-                &channels,
-                maskroi,
-                &hsize,
-                &phranges[0] as *const *const f32,
-            );
+            let raw_hist = roi.calc_hist(&channels, maskroi, &hsize, &pranges);
             hist = raw_hist.normalize(0.0, 255.0, NormType::MinMax);
 
             track_window = selection;
@@ -85,7 +80,6 @@ fn main() {
         }
 
         if is_tracking {
-            let pranges = [hranges];
             let mut back_project = hue.calc_back_project(std::ptr::null(), &hist, &pranges);
             back_project.logic_and(mask);
             let criteria = TermCriteria::new(TermType::Count, 10, 1.0);
