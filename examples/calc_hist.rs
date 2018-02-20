@@ -36,7 +36,7 @@ fn main() {
     let p_ranges = [ranges];
     let channels = [0];
     let hist_size = [hsize];
-    let hist = mat.calc_hist(&channels, Mat::new(), &hist_size, &p_ranges);
+    let hist = mat.calc_hist(&channels, &Mat::new(), &hist_size, &p_ranges);
 
     ////////////////////////////////
     //

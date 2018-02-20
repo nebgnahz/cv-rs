@@ -5,10 +5,10 @@ use errors::*;
 use failure::Error;
 use std::ffi::CString;
 use std::mem;
-use std::os::raw::{c_char, c_double, c_int, c_uchar};
+use std::os::raw::{c_char, c_double, c_int};
 use std::path::Path;
 use std::slice;
-use std::ops::BitAnd;
+use std::ops::{BitAnd, BitOr, BitXor, Not};
 
 /// Opaque data struct for C bindings
 #[derive(Clone, Copy, Debug)]
@@ -256,7 +256,7 @@ extern "C" {
     fn cv_from_file_storage(path: *const c_char, section: *const c_char) -> *mut CMat;
     fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
     fn cv_mat_zeros(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
-    fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: c_int, buffer: *const c_uchar) -> *mut CMat;
+    fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: c_int, buffer: *const u8) -> *mut CMat;
     fn cv_mat_is_valid(mat: *mut CMat) -> bool;
     fn cv_mat_rows(cmat: *const CMat) -> c_int;
     fn cv_mat_cols(cmat: *const CMat) -> c_int;
@@ -269,7 +269,6 @@ extern "C" {
     fn cv_mat_elem_size1(cmat: *const CMat) -> usize;
     fn cv_mat_type(cmat: *const CMat) -> CvType;
     fn cv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
-    fn cv_mat_logic_and(cimage: *const CMat, cmask: *const CMat) -> *mut CMat;
     fn cv_mat_flip(src: *mut CMat, code: c_int);
     fn cv_mat_drop(mat: *mut CMat);
     fn cv_mat_eye(rows: c_int, cols: c_int, cv_type: CvType) -> *mut CMat;
@@ -453,16 +452,6 @@ impl Mat {
     pub fn eye(rows: i32, cols: i32, cv_type: CvType) -> Mat {
         let result = unsafe { cv_mat_eye(rows, cols, cv_type) };
         Mat::from_raw(result)
-    }
-}
-
-impl BitAnd for Mat {
-    type Output = Self;
-
-    /// Apply a mask to image. See [OpenCV reference](https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html#bitwise-and)
-    fn bitand(self, rhs: Self) -> Self::Output {
-        let result = unsafe { cv_mat_logic_and(self.inner, rhs.inner) };
-        Self::from_raw(result)
     }
 }
 
@@ -837,37 +826,45 @@ impl Mat {
         Mat::from_raw(m)
     }
 
-    /// Computes bitwise conjunction between two Mat
-    pub fn and(&self, another: &Mat) -> Mat {
-        let m = CMat::new();
-        unsafe { cv_bitwise_and(self.inner, another.inner, m) }
-        Mat::from_raw(m)
-    }
-
-    /// Computes bitwise disjunction between two Mat
-    pub fn or(&self, another: &Mat) -> Mat {
-        let m = CMat::new();
-        unsafe { cv_bitwise_or(self.inner, another.inner, m) }
-        Mat::from_raw(m)
-    }
-
-    /// Computes bitwise "exclusive or" between two Mat
-    pub fn xor(&self, another: &Mat) -> Mat {
-        let m = CMat::new();
-        unsafe { cv_bitwise_xor(self.inner, another.inner, m) }
-        Mat::from_raw(m)
-    }
-
-    /// Computes bitwise "exclusive or" between two Mat
-    pub fn not(&self) -> Mat {
-        let m = CMat::new();
-        unsafe { cv_bitwise_not(self.inner, m) }
-        Mat::from_raw(m)
-    }
-
     /// Counts non-zero array elements.
     pub fn count_non_zero(&self) -> c_int {
         unsafe { cv_count_non_zero(self.inner) }
+    }
+}
+
+impl BitAnd for Mat {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_bitwise_and(self.inner, rhs.inner, m) }
+        Self::from_raw(m)
+    }
+}
+
+impl BitOr for Mat {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_bitwise_or(self.inner, rhs.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
+impl BitXor for Mat {
+    type Output = Self;
+    fn bitxor(self, rhs: Self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_bitwise_xor(self.inner, rhs.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
+impl Not for Mat {
+    type Output = Self;
+    fn not(self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_bitwise_not(self.inner, m) }
+        Mat::from_raw(m)
     }
 }
 

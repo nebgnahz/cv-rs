@@ -44,7 +44,7 @@ fn main() {
 
     let channels = [0, 1];
 
-    let hist = hsv.calc_hist(&channels, Mat::new(), &hist_size, &ranges);
+    let hist = hsv.calc_hist(&channels, &Mat::new(), &hist_size, &ranges);
 
     ////////////////////////////////
     //
@@ -52,7 +52,7 @@ fn main() {
     //
     ///////////////////////////////
 
-    let min_max = hist.min_max_loc(Mat::new());
+    let min_max = hist.min_max_loc(&Mat::new());
     let max_val = min_max.1 as f32;
 
     let scale = 10;

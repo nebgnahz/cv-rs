@@ -58,12 +58,6 @@ void* cv_mat_roi(cv::Mat* mat, Rect crect) {
     return (dst);
 }
 
-void* cv_mat_logic_and(cv::Mat* image, const cv::Mat* const mask) {
-    auto result = new cv::Mat();
-    *result = (*image) & (*mask);
-    return result;
-}
-
 void cv_mat_flip(cv::Mat* image, int code) {
     cv::flip(*image, *image, code);
 }
