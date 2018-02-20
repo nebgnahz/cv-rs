@@ -462,7 +462,6 @@ impl BitAnd for Mat {
     /// Apply a mask to image. See [OpenCV reference](https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html#bitwise-and)
     fn bitand(self, rhs: Self) -> Self::Output {
         let result = unsafe { cv_mat_logic_and(self.inner, rhs.inner) };
-
         Self::from_raw(result)
     }
 }
