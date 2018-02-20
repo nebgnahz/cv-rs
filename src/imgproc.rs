@@ -376,24 +376,25 @@ impl Mat {
     }
 
     /// Calculate a histogram of an image.
-    pub fn calc_hist(
+    pub fn calc_hist<T: AsRef<[c_int]>, U: AsRef<[c_int]>>(
         &self,
-        channels: *const c_int,
+        channels: T,
         mask: Mat,
-        dims: c_int,
-        hist_size: *const c_int,
+        hist_size: U,
         ranges: *const *const f32,
     ) -> Mat {
         let m = CMat::new();
+        let channels = channels.as_ref();
+        let hist_size = hist_size.as_ref();
         unsafe {
             cv_calc_hist(
                 self.inner,
                 1,
-                channels,
+                channels.as_ptr(),
                 mask.inner,
                 m,
-                dims,
-                hist_size,
+                channels.len() as c_int,
+                hist_size.as_ptr(),
                 ranges,
             );
         }

@@ -817,7 +817,6 @@ impl Mat {
 
     /// Copy specified channels from `self` to the specified channels of output
     /// `Mat`.
-    // TODO(benzh) Avoid using raw pointers but rather take a vec for `from_to`?
     // The usage (self.depth) here is buggy, it should actually be the type!
     pub fn mix_channels<T: AsRef<[(c_int, c_int)]>>(&self, nsrcs: usize, ndsts: usize, from_to: T) -> Mat {
         let m = Mat::with_size(self.rows, self.cols, self.depth);

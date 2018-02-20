@@ -49,7 +49,7 @@ fn main() {
     let mut is_tracking = false;
 
     let mut hist = Mat::new();
-    let hsize = 16;
+    let hsize = [16];
     let hranges = [0_f32, 180_f32];
     let phranges: [*const f32; 1] = [&hranges[0] as *const f32];
     let mut track_window = Rect::default();
@@ -60,7 +60,7 @@ fn main() {
         let hsv = m.cvt_color(ColorConversion::BGR2HSV);
 
         let ch = [(0, 0)];
-        let hue = hsv.mix_channels(1, 1, &ch[..]);
+        let hue = hsv.mix_channels(1, 1, &ch);
         let mask = hsv.in_range(Scalar::new(0, 30, 10, 0), Scalar::new(180, 256, 256, 0));
 
         if selection_status.status {
@@ -68,11 +68,11 @@ fn main() {
             let selection = selection_status.selection;
             let roi = hue.roi(selection);
             let maskroi = mask.roi(selection);
+            let channels = [0];
 
             let raw_hist = roi.calc_hist(
-                std::ptr::null(),
+                &channels,
                 maskroi,
-                1,
                 &hsize,
                 &phranges[0] as *const *const f32,
             );
