@@ -359,7 +359,7 @@ impl Mat {
         Mat::from_raw(m)
     }
 
-    /// Returns the raw data (as a uchar pointer)
+    /// Returns the raw data (as a `u8` pointer)
     pub fn data(&self) -> &[u8] {
         let bytes = unsafe { cv_mat_data(self.inner) };
         let len = self.total() * self.elem_size();
@@ -624,49 +624,49 @@ impl Drop for Mat {
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum CvType {
-    /// 8 bit unsigned (like `uchar`), single channel (grey image)
+    /// 8 bit unsigned, single channel (grey image)
     Cv8UC1 = 0,
 
-    /// 8 bit signed (like `schar`), single channel (grey image)
+    /// 8 bit signed, single channel (grey image)
     Cv8SC1 = 1,
 
-    /// 16 bit unsigned (like `ushort`), single channel (grey image)
+    /// 16 bit unsigned, single channel (grey image)
     Cv16UC1 = 2,
 
-    /// 16 bit signed (like `short`), single channel (grey image)
+    /// 16 bit signed, single channel (grey image)
     Cv16SC1 = 3,
 
-    /// 32 bit signed (like `int`), single channel (grey image)
+    /// 32 bit signed, single channel (grey image)
     Cv32SC1 = 4,
 
-    /// 32 bit float (like `float`), single channel (grey image)
+    /// 32 bit float, single channel (grey image)
     Cv32FC1 = 5,
 
-    /// 32 bit float (like `double`), single channel (grey image)
+    /// 32 bit float, single channel (grey image)
     Cv64FC1 = 6,
 
     /// 8 bit, two channel (rarelly seen)
     Cv8UC2 = 8,
 
-    /// 8 bit unsigned (like `uchar`), three channels (RGB image)
+    /// 8 bit unsigned, three channels (RGB image)
     Cv8UC3 = 16,
 
-    /// 8 bit signed (like `schar`), three channels (RGB image)
+    /// 8 bit signed, three channels (RGB image)
     Cv8SC3 = 17,
 
-    /// 16 bit unsigned (like `ushort`), three channels (RGB image)
+    /// 16 bit unsigned, three channels (RGB image)
     Cv16UC3 = 18,
 
-    /// 16 bit signed (like `short`), three channels (RGB image)
+    /// 16 bit signed, three channels (RGB image)
     Cv16SC3 = 19,
 
-    /// 32 bit signed (like `int`), three channels (RGB image)
+    /// 32 bit signed, three channels (RGB image)
     Cv32SC3 = 20,
 
-    /// 32 bit float (like `float`), three channels (RGB image)
+    /// 32 bit float, three channels (RGB image)
     Cv32FC3 = 21,
 
-    /// 32 bit float (like `double`), three channels (RGB image)
+    /// 32 bit float, three channels (RGB image)
     Cv64FC3 = 22,
 }
 
