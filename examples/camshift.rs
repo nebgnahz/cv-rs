@@ -62,13 +62,13 @@ fn main() {
         let ch = [(0, 0)];
         let hue = hsv.mix_channels(1, 1, &ch);
         let mask = hsv.in_range(Scalar::new(0, 30, 10, 0), Scalar::new(180, 256, 256, 0));
+        let channels = [0];
 
         if selection_status.status {
             println!("Initialize tracking, setting up CAMShift search");
             let selection = selection_status.selection;
             let roi = hue.roi(selection);
             let maskroi = mask.roi(selection);
-            let channels = [0];
 
             let raw_hist = roi.calc_hist(&channels, maskroi, &hsize, &pranges);
             hist = raw_hist.normalize(0.0, 255.0, NormType::MinMax);
@@ -80,7 +80,7 @@ fn main() {
         }
 
         if is_tracking {
-            let mut back_project = hue.calc_back_project(std::ptr::null(), &hist, &pranges);
+            let mut back_project = hue.calc_back_project(&channels, &hist, &pranges);
             back_project.logic_and(mask);
             let criteria = TermCriteria::new(TermType::Count, 10, 1.0);
             let track_box = back_project.camshift(track_window, &criteria);

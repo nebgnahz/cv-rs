@@ -404,16 +404,23 @@ impl Mat {
 
     /// Calculate the back projection of a histogram. The function calculates
     /// the back project of the histogram.
-    pub fn calc_back_project<MElem: AsRef<[f32]>, M: AsRef<[MElem]>>(
+    pub fn calc_back_project<T: AsRef<[c_int]>, MElem: AsRef<[f32]>, M: AsRef<[MElem]>>(
         &self,
-        channels: *const c_int,
+        channels: T,
         hist: &Mat,
         ranges: M,
     ) -> Mat {
         let m = CMat::new();
         let ranges = Self::matrix_to_vec(ranges);
         unsafe {
-            cv_calc_back_project(self.inner, 1, channels, (*hist).inner, m, ranges.as_ptr());
+            cv_calc_back_project(
+                self.inner,
+                1,
+                channels.as_ref().as_ptr(),
+                (*hist).inner,
+                m,
+                ranges.as_ptr(),
+            );
         }
         Mat::from_raw(m)
     }

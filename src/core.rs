@@ -13,8 +13,9 @@ use std::slice;
 #[derive(Clone, Copy, Debug)]
 pub enum CMat {}
 unsafe impl Send for CMat {}
+
 impl CMat {
-    pub fn new() -> *mut CMat {
+    pub(crate) fn new() -> *mut CMat {
         unsafe { cv_mat_new() }
     }
 }
@@ -25,7 +26,7 @@ impl CMat {
 #[derive(Debug)]
 pub struct Mat {
     /// Pointer to the actual C/C++ data structure
-    pub inner: *mut CMat,
+    pub(crate) inner: *mut CMat,
 
     /// Number of columns
     pub cols: c_int,
@@ -250,7 +251,7 @@ pub enum LineType {
 }
 
 extern "C" {
-    pub(crate) fn cv_mat_new() -> *mut CMat;
+    fn cv_mat_new() -> *mut CMat;
     fn cv_from_file_storage(path: *const c_char, section: *const c_char) -> *mut CMat;
     fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
     fn cv_mat_zeros(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
@@ -300,7 +301,7 @@ impl Mat {
     #[inline]
     /// Creates a `Mat` object from raw `CMat` pointer. This will read the rows
     /// and cols of the image.
-    pub fn from_raw(raw: *mut CMat) -> Mat {
+    pub(crate) fn from_raw(raw: *mut CMat) -> Mat {
         Mat {
             inner: raw,
             rows: unsafe { cv_mat_rows(raw) },
@@ -312,7 +313,7 @@ impl Mat {
 
     /// Creates an empty `Mat` struct.
     pub fn new() -> Mat {
-        let m = unsafe { cv_mat_new() };
+        let m = CMat::new();
         Mat::from_raw(m)
     }
 

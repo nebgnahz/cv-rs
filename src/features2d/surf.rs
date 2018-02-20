@@ -104,7 +104,7 @@ impl Into<SURF> for SURFBuilder {
 impl Feature2D for SURF {
     fn detect_and_compute(&self, image: &Mat, mask: &Mat) -> (Vec<KeyPoint>, Mat) {
         let mut keypoints = CVec::<KeyPoint>::default();
-        let descriptors = unsafe { cv_mat_new() };
+        let descriptors = CMat::new();
         unsafe {
             cv_surf_detect_and_compute(
                 self.value,

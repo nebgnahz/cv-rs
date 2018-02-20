@@ -18,7 +18,7 @@ pub enum CGpuMat {}
 #[derive(Debug)]
 pub struct GpuMat {
     /// The pointer to the opaque C/C++ data structure
-    pub inner: *mut CGpuMat,
+    pub(crate) inner: *mut CGpuMat,
 
     /// Number of columns
     pub cols: c_int,
@@ -50,7 +50,7 @@ impl GpuMat {
     }
 
     /// Creates a `GpuMat` from raw pointer.
-    pub fn from_raw(inner: *mut CGpuMat) -> GpuMat {
+    pub(crate) fn from_raw(inner: *mut CGpuMat) -> GpuMat {
         GpuMat {
             inner: inner,
             cols: 0,
