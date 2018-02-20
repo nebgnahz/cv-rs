@@ -799,7 +799,7 @@ impl Mat {
     /// Mat::reshape first to reinterpret the array as single-channel. Or you
     /// may extract the particular channel using either extractImageCOI , or
     /// mixChannels, or split.
-    pub fn min_max_loc(&self, mask: Mat) -> (f64, f64, Point2i, Point2i) {
+    pub fn min_max_loc(&self, mask: &Mat) -> (f64, f64, Point2i, Point2i) {
         let mut min = 0.0;
         let mut max = 0.0;
         let mut min_loc = Point2i::new(0, 0);

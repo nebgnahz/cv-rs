@@ -379,7 +379,7 @@ impl Mat {
     pub fn calc_hist<T: AsRef<[c_int]>, U: AsRef<[c_int]>, MElem: AsRef<[f32]>, M: AsRef<[MElem]>>(
         &self,
         channels: T,
-        mask: Mat,
+        mask: &Mat,
         hist_size: U,
         ranges: M,
     ) -> Mat {

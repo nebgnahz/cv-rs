@@ -70,7 +70,7 @@ fn main() {
             let roi = hue.roi(selection);
             let maskroi = mask.roi(selection);
 
-            let raw_hist = roi.calc_hist(&channels, maskroi, &hsize, &pranges);
+            let raw_hist = roi.calc_hist(&channels, &maskroi, &hsize, &pranges);
             hist = raw_hist.normalize(0.0, 255.0, NormType::MinMax);
 
             track_window = selection;
