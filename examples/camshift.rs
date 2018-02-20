@@ -59,8 +59,8 @@ fn main() {
 
         let hsv = m.cvt_color(ColorConversion::BGR2HSV);
 
-        let ch = [0, 0];
-        let hue = hsv.mix_channels(1, 1, &ch[0] as *const i32, 1);
+        let ch = [(0, 0)];
+        let hue = hsv.mix_channels(1, 1, &ch[..]);
         let mask = hsv.in_range(Scalar::new(0, 30, 10, 0), Scalar::new(180, 256, 256, 0));
 
         if selection_status.status {

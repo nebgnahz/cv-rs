@@ -738,11 +738,11 @@ extern "C" {
     );
     fn cv_mix_channels(
         cmat: *const CMat,
-        nsrcs: isize,
+        nsrcs: usize,
         dst: *mut CMat,
-        ndsts: isize,
+        ndsts: usize,
         from_to: *const c_int,
-        npairs: isize,
+        npairs: usize,
     );
     fn cv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: NormType);
 
@@ -819,10 +819,12 @@ impl Mat {
     /// `Mat`.
     // TODO(benzh) Avoid using raw pointers but rather take a vec for `from_to`?
     // The usage (self.depth) here is buggy, it should actually be the type!
-    pub fn mix_channels(&self, nsrcs: isize, ndsts: isize, from_to: *const c_int, npairs: isize) -> Mat {
+    pub fn mix_channels<T: AsRef<[(c_int, c_int)]>>(&self, nsrcs: usize, ndsts: usize, from_to: T) -> Mat {
         let m = Mat::with_size(self.rows, self.cols, self.depth);
+        let slice = from_to.as_ref();
+        let ptr = slice.as_ptr() as *const c_int;
         unsafe {
-            cv_mix_channels(self.inner, nsrcs, m.inner, ndsts, from_to, npairs);
+            cv_mix_channels(self.inner, nsrcs, m.inner, ndsts, ptr, slice.len());
         }
         m
     }
