@@ -8,6 +8,7 @@ use std::mem;
 use std::os::raw::{c_char, c_double, c_int, c_uchar};
 use std::path::Path;
 use std::slice;
+use std::ops::BitAnd;
 
 /// Opaque data struct for C bindings
 #[derive(Clone, Copy, Debug)]
@@ -268,7 +269,7 @@ extern "C" {
     fn cv_mat_elem_size1(cmat: *const CMat) -> usize;
     fn cv_mat_type(cmat: *const CMat) -> CvType;
     fn cv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
-    fn cv_mat_logic_and(cimage: *mut CMat, cmask: *const CMat);
+    fn cv_mat_logic_and(cimage: *const CMat, cmask: *const CMat) -> *mut CMat;
     fn cv_mat_flip(src: *mut CMat, code: c_int);
     fn cv_mat_drop(mat: *mut CMat);
     fn cv_mat_eye(rows: c_int, cols: c_int, cv_type: CvType) -> *mut CMat;
@@ -414,15 +415,6 @@ impl Mat {
         Mat::from_raw(cmat)
     }
 
-    /// Apply a mask to myself.
-    // TODO(benzh): Find the right reference in OpenCV for this one. Provide a
-    // shortcut for `image &= mask`
-    pub fn logic_and(&mut self, mask: Mat) {
-        unsafe {
-            cv_mat_logic_and(self.inner, mask.inner);
-        }
-    }
-
     /// Flips an image around vertical, horizontal, or both axes.
     pub fn flip(&mut self, code: FlipCode) {
         let code = match code {
@@ -461,6 +453,17 @@ impl Mat {
     pub fn eye(rows: i32, cols: i32, cv_type: CvType) -> Mat {
         let result = unsafe { cv_mat_eye(rows, cols, cv_type) };
         Mat::from_raw(result)
+    }
+}
+
+impl BitAnd for Mat {
+    type Output = Self;
+
+    /// Apply a mask to image. See [OpenCV reference](https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html#bitwise-and)
+    fn bitand(self, rhs: Self) -> Self::Output {
+        let result = unsafe { cv_mat_logic_and(self.inner, rhs.inner) };
+
+        Self::from_raw(result)
     }
 }
 

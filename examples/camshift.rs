@@ -80,8 +80,7 @@ fn main() {
         }
 
         if is_tracking {
-            let mut back_project = hue.calc_back_project(&channels, &hist, &pranges);
-            back_project.logic_and(mask);
+            let back_project = hue.calc_back_project(&channels, &hist, &pranges) & mask;
             let criteria = TermCriteria::new(TermType::Count, 10, 1.0);
             let track_box = back_project.camshift(track_window, &criteria);
 
