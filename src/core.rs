@@ -260,7 +260,7 @@ extern "C" {
     fn cv_mat_cols(cmat: *const CMat) -> c_int;
     fn cv_mat_depth(cmat: *const CMat) -> c_int;
     fn cv_mat_channels(cmat: *const CMat) -> c_int;
-    fn cv_mat_data(cmat: *const CMat) -> *const c_uchar;
+    fn cv_mat_data(cmat: *const CMat) -> *const u8;
     fn cv_mat_total(cmat: *const CMat) -> usize;
     fn cv_mat_step1(cmat: *const CMat, i: c_int) -> usize;
     fn cv_mat_elem_size(cmat: *const CMat) -> usize;
@@ -359,8 +359,10 @@ impl Mat {
     }
 
     /// Returns the raw data (as a uchar pointer)
-    pub fn data(&self) -> *const u8 {
-        unsafe { cv_mat_data(self.inner) }
+    pub fn data(&self) -> &[u8] {
+        let bytes = unsafe { cv_mat_data(self.inner) };
+        let len = self.total() * self.elem_size();
+        unsafe { slice::from_raw_parts(bytes, len) }
     }
 
     /// Returns the total number of array elements. The method returns the
@@ -560,22 +562,22 @@ impl Mat {
     /// - If matrix is of type `CV_32F`  then use `Mat.at<f32>(y,x)`.
     /// - If matrix is of type `CV_64F` then use `Mat.at<f64>(y,x)`.
     pub fn at<T: FromBytes>(&self, i0: i32) -> T {
-        let data: *const u8 = self.data();
+        let data = self.data();
         let size = self.size();
         let pos = {
             if size.height == 1 {
-                i0
+                i0 as usize
             } else if size.width == 1 {
-                i0 * (self.step1(1) * self.elem_size1()) as i32
+                i0 as usize * (self.step1(1) * self.elem_size1())
             } else {
                 unimplemented!{};
             }
-        } as isize;
-        unsafe {
-            let ptr: *const u8 = data.offset(pos);
-            let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
-            T::from_bytes(slice)
-        }
+        };
+
+        let byte = &data[pos];
+        let ptr: *const _ = byte;
+        let slice = unsafe { slice::from_raw_parts(ptr, mem::size_of::<T>()) };
+        T::from_bytes(slice)
     }
 
     /// Returns individual pixel (element) information within the Mat. This
@@ -584,14 +586,12 @@ impl Mat {
     /// See [Mat::at](struct.Mat.html#method.at) and
     /// [Mat::at3](struct.Mat.html#method.at3).
     pub fn at2<T: FromBytes>(&self, i0: i32, i1: i32) -> T {
-        let data: *const u8 = self.data();
-        let pos = (i0 as isize) * ((self.step1(0) * self.elem_size1()) as isize)
-            + (i1 as isize) * ((self.step1(1) * self.elem_size1()) as isize);
-        unsafe {
-            let ptr: *const u8 = data.offset(pos);
-            let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
-            T::from_bytes(slice)
-        }
+        let data = self.data();
+        let pos = i0 as usize * self.step1(0) * self.elem_size1() + i1 as usize * self.step1(1) * self.elem_size1();
+        let byte = &data[pos];
+        let ptr: *const _ = byte;
+        let slice = unsafe { slice::from_raw_parts(ptr, mem::size_of::<T>()) };
+        T::from_bytes(slice)
     }
 
     /// Returns individual pixel (element) information within the Mat. This
@@ -600,14 +600,13 @@ impl Mat {
     /// See [Mat::at](struct.Mat.html#method.at) and
     /// [Mat::at2](struct.Mat.html#method.at2).
     pub fn at3<T: FromBytes>(&self, i0: i32, i1: i32, i2: i32) -> T {
-        let data: *const u8 = self.data();
-        let pos = (i0 as isize) * ((self.step1(0) * self.elem_size1()) as isize)
-            + (i1 as isize) * ((self.step1(1) * self.elem_size1()) as isize) + i2 as isize;
-        unsafe {
-            let ptr: *const u8 = data.offset(pos);
-            let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
-            T::from_bytes(slice)
-        }
+        let data = self.data();
+        let pos = i0 as usize * self.step1(0) * self.elem_size1() + i1 as usize * self.step1(1) * self.elem_size1()
+            + i2 as usize;
+        let byte = &data[pos];
+        let ptr: *const _ = byte;
+        let slice = unsafe { slice::from_raw_parts(ptr, mem::size_of::<T>()) };
+        T::from_bytes(slice)
     }
 }
 
