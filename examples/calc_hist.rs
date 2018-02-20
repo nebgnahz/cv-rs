@@ -33,9 +33,10 @@ fn main() {
 
     let hsize = 256;
     let ranges = [0_f32, 256_f32];
-    let p_ranges: [*const f32; 1] = [ranges.as_ptr() as *const f32];
+    let p_ranges = [ranges];
     let channels = [0];
-    let hist = mat.calc_hist(channels.as_ptr(), Mat::new(), 1, &hsize, p_ranges.as_ptr());
+    let hist_size = [hsize];
+    let hist = mat.calc_hist(&channels, Mat::new(), &hist_size, &p_ranges);
 
     ////////////////////////////////
     //

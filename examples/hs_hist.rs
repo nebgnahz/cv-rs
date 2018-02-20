@@ -40,17 +40,11 @@ fn main() {
 
     let hranges = [0.0, 180.0];
     let sranges = [0.0, 256.0];
-    let ranges = [hranges.as_ptr(), sranges.as_ptr()];
+    let ranges = [hranges, sranges];
 
     let channels = [0, 1];
 
-    let hist = hsv.calc_hist(
-        channels.as_ptr(),
-        Mat::new(),
-        2,
-        hist_size.as_ptr(),
-        ranges.as_ptr(),
-    );
+    let hist = hsv.calc_hist(&channels, Mat::new(), &hist_size, &ranges);
 
     ////////////////////////////////
     //

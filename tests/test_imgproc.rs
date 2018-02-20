@@ -63,18 +63,9 @@ fn get_image_histogram(path: &'static str) -> Mat {
     let hsize = [50, 60];
     let h_ranges = [0_f32, 180_f32];
     let s_ranges = [0_f32, 256_f32];
-    let ranges = [
-        h_ranges.as_ptr() as *const f32,
-        s_ranges.as_ptr() as *const f32,
-    ];
+    let ranges = [h_ranges, s_ranges];
     let channels = [0, 1];
-    let image = image.calc_hist(
-        channels.as_ptr(),
-        Mat::new(),
-        2,
-        hsize.as_ptr(),
-        ranges.as_ptr(),
-    );
+    let image = image.calc_hist(&channels, Mat::new(), &hsize, &ranges);
     let image = image.normalize(0.0, 1.0, NormType::MinMax);
     image
 }
