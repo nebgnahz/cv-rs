@@ -1,8 +1,7 @@
 #include <opencv2/cudaobjdetect.hpp>
 
-#include "../opencv-wrapper.h"
 #include "../utils.h"
-#include "opencv-gpu.h"
+#include "main.h"
 
 EXTERN_C_BEGIN
 

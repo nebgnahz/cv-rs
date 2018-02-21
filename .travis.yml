@@ -42,10 +42,10 @@ before_install:
 script:
   - cargo build --no-default-features
   - cargo test -v --no-default-features
-  - cargo build --features gpu
+  - cargo build --features cuda
   - cargo build --features tesseract
   - cargo test -v --features tesseract
-  - cargo doc --features gpu --no-deps
+  - cargo doc --features cuda --no-deps
   - find src/*.rs | xargs rustfmt --write-mode=diff
   # Available until `cargo fmt` landed in stable rust 1.24
   # - cargo fmt -- --write-mode=diff;

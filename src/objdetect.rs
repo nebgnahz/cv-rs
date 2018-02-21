@@ -255,7 +255,7 @@ const DEFAULT_NLEVELS: usize = 64;
 impl Default for HogParams {
     fn default() -> HogParams {
         let win_sigma = {
-            if cfg!(feature = "gpu") {
+            if cfg!(feature = "cuda") {
                 4.0
             } else {
                 DEFAULT_WIN_SIGMA

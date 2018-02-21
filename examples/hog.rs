@@ -6,10 +6,10 @@ use cv::highgui::*;
 use cv::imgcodecs::*;
 use cv::objdetect::*;
 
-#[cfg(feature = "gpu")]
+#[cfg(feature = "cuda")]
 use cv::cuda::GpuHog as Hog;
 
-#[cfg(not(feature = "gpu"))]
+#[cfg(not(feature = "cuda"))]
 use cv::objdetect::HogDescriptor as Hog;
 
 use std::fs;

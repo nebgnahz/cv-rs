@@ -65,11 +65,11 @@ with the following code in `Cargo.toml`:
 ```
 [dependencies.cv]
 git = "https://github.com/nebgnahz/cv-rs"
-features = [ "gpu" ]
+features = [ "cuda" ]
 ```
 
 All possible features are listed below:
-- `gpu` - for CUDA support, requires installed CUDA
+- `cuda` - for CUDA support, requires installed CUDA
 - `tesseract` - for Tesseract OCR support, requires installed Tesseract
 
 ### Windows

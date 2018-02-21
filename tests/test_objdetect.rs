@@ -2,14 +2,14 @@
 /// cuda`, it will use CUDA-enabled `HOG` and `CascadeClassifier`.
 extern crate cv;
 
-#[cfg(feature = "gpu")]
+#[cfg(feature = "cuda")]
 use cv::cuda::GpuHog as Hog;
-#[cfg(not(feature = "gpu"))]
+#[cfg(not(feature = "cuda"))]
 use cv::objdetect::HogDescriptor as Hog;
 
-#[cfg(feature = "gpu")]
+#[cfg(feature = "cuda")]
 use cv::cuda::GpuCascade as CascadeClassifier;
-#[cfg(not(feature = "gpu"))]
+#[cfg(not(feature = "cuda"))]
 use cv::objdetect::CascadeClassifier;
 
 use cv::objdetect::HogParams;
@@ -49,7 +49,7 @@ fn test_cascade_lenna() {
     ));
 }
 
-#[cfg(feature = "gpu")]
+#[cfg(feature = "cuda")]
 fn cascade_model_path() -> &'static str {
     concat!(
         env!("CARGO_MANIFEST_DIR"),
@@ -57,7 +57,7 @@ fn cascade_model_path() -> &'static str {
     )
 }
 
-#[cfg(not(feature = "gpu"))]
+#[cfg(not(feature = "cuda"))]
 fn cascade_model_path() -> &'static str {
     concat!(
         env!("CARGO_MANIFEST_DIR"),

@@ -41,7 +41,7 @@ use std::path::Path;
 use failure::Error;
 use errors::*;
 
-#[cfg(feature = "gpu")]
+#[cfg(feature = "cuda")]
 pub mod cuda;
 
 extern "C" {

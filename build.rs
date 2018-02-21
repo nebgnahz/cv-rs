@@ -60,18 +60,13 @@ fn opencv_link() {
     println!("cargo:rustc-link-lib=opencv_text");
     println!("cargo:rustc-link-lib=opencv_videoio");
     println!("cargo:rustc-link-lib=opencv_video");
-    if cfg!(feature = "gpu") {
+    if cfg!(feature = "cuda") {
         println!("cargo:rustc-link-lib=opencv_cudaobjdetect");
     }
 }
 
 fn main() {
-    let files = std::fs::read_dir("native")
-        .unwrap()
-        .into_iter()
-        .filter_map(|x| x.ok().map(|x| x.path()))
-        .filter(|x| x.extension().map(|e| e == "cc").unwrap_or(false))
-        .collect::<Vec<_>>();
+    let files = get_files("native");
 
     let mut opencv_config = gcc::Build::new();
     opencv_config
@@ -84,8 +79,9 @@ fn main() {
         opencv_config.flag("--std=c++11");
     }
 
-    if cfg!(feature = "gpu") {
-        opencv_config.file("native/gpu/opencv-gpu.cc");
+    if cfg!(feature = "cuda") {
+        let cuda_files = get_files("native/cuda");
+        opencv_config.files(cuda_files);
     }
 
     opencv_config.compile("libopencv-wrapper.a");
@@ -110,4 +106,13 @@ impl std::fmt::Display for BuildError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", self.details)
     }
+}
+
+fn get_files(path: &str) -> Vec<std::path::PathBuf> {
+    std::fs::read_dir(path)
+        .unwrap()
+        .into_iter()
+        .filter_map(|x| x.ok().map(|x| x.path()))
+        .filter(|x| x.extension().map(|e| e == "cc").unwrap_or(false))
+        .collect::<Vec<_>>()
 }
