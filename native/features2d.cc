@@ -2,6 +2,7 @@
 #include "utils.h"
 
 extern "C" {
+
 void* cv_mser_new(int delta,
                   int min_area,
                   int max_area,

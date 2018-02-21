@@ -1,6 +1,7 @@
 #include "highgui.h"
 
 extern "C" {
+
 void cv_named_window(const char* const winname, int flags) {
     cv::namedWindow(winname, flags);
 }

@@ -35,7 +35,6 @@ void* cv_mat_roi(cv::Mat* mat, Rect crect);
 void cv_mat_flip(cv::Mat* image, int code);
 
 // The caller owns the returned data cv::Mat
-void* cv_imread(const char* const filename, int flags);
 
 int cv_mat_rows(const cv::Mat* const mat);
 int cv_mat_cols(const cv::Mat* const mat);
@@ -106,9 +105,6 @@ void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Re
 // =============================================================================
 //  Imgcodecs
 // =============================================================================
-void* cv_imdecode(const uint8_t* const buffer, size_t len, int flag);
-ImencodeResult
-cv_imencode(const char* const ext, const cv::Mat* const mat, const int* const flag_ptr, size_t flag_size);
 
 // =============================================================================
 //   Highgui: high-level GUI

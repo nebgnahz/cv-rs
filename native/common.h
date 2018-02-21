@@ -46,12 +46,6 @@ typedef struct {
 } Scalar;
 
 typedef struct {
-    bool status;
-    uint8_t* buf;
-    size_t size;
-} ImencodeResult;
-
-typedef struct {
     Point2f pt;
     float size;
     float angle;
