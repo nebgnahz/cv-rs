@@ -113,12 +113,9 @@ cv_imencode(const char* const ext, const cv::Mat* const mat, const int* const fl
 // =============================================================================
 //   Highgui: high-level GUI
 // =============================================================================
-void cv_named_window(const char* const winname, int flags);
-void cv_destroy_window(const char* const winname);
+
 void cv_imshow(const char* const winname, cv::Mat* mat);
 int cv_wait_key(int delay_in_millis);
-
-void cv_set_mouse_callback(const char* const winname, cv::MouseCallback onMouse, void* userdata);
 
 // =============================================================================
 //   VideoIO
@@ -184,100 +181,8 @@ void cv_term_criteria_drop(cv::TermCriteria* criteria);
 RotatedRect cv_camshift(cv::Mat* back_project_image, Rect window, cv::TermCriteria* criteria);
 
 // =============================================================================
-//   MSER
-// =============================================================================
-void* cv_mser_new(int delta,
-                  int min_area,
-                  int max_area,
-                  double max_variation,
-                  double min_diversity,
-                  int max_evolution,
-                  double area_threshold,
-                  double min_margin,
-                  int edge_blur_size);
-void cv_mser_drop(cv::Ptr<cv::MSER>* detector);
-void cv_mser_detect_regions(cv::Ptr<cv::MSER>* detector,
-                            cv::Mat* image,
-                            CVec<CVec<Point2i>>* msers,
-                            CVec<Rect>* bboxes);
-void cv_mser_detect_and_compute(cv::Ptr<cv::MSER>* detector,
-                                cv::Mat* image,
-                                cv::Mat* mask,
-                                CVec<KeyPoint>* keypoints,
-                                cv::Mat* descriptors,
-                                bool useProvidedKeypoints);
-
-// =============================================================================
-//   SURF
-// =============================================================================
-
-void* cv_surf_new(double hessianThreshold, int nOctaves, int nOctaveLayers, bool extended, bool upright);
-void cv_surf_drop(cv::Ptr<cv::xfeatures2d::SURF>* detector);
-void cv_surf_detect_and_compute(cv::Ptr<cv::xfeatures2d::SURF>* detector,
-                                cv::Mat* image,
-                                cv::Mat* mask,
-                                CVec<KeyPoint>* keypoints,
-                                cv::Mat* descriptors,
-                                bool useProvidedKeypoints);
-
-// =============================================================================
-//   SIFT
-// =============================================================================
-
-void* cv_sift_new(int nfeatures, int nOctaveLayers, double contrastThreshold, double edgeThreshold, double sigma);
-void cv_sift_drop(cv::Ptr<cv::xfeatures2d::SIFT>* detector);
-void cv_sift_detect_and_compute(cv::Ptr<cv::xfeatures2d::SIFT>* detector,
-                                cv::Mat* image,
-                                cv::Mat* mask,
-                                CVec<KeyPoint>* keypoints,
-                                cv::Mat* descriptors,
-                                bool useProvidedKeypoints);
-
-// =============================================================================
-//   DESCRIPTOR MATCHER
-// =============================================================================
-
-void* cv_matcher_new(const char* descriptorMatcherType);
-void cv_matcher_drop(cv::Ptr<cv::DescriptorMatcher>* descriptorMatcher);
-void cv_matcher_add(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher, CVec<cv::Mat*>& descriptors);
-void cv_matcher_train(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher);
-bool cv_matcher_is_empty(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher);
-void cv_matcher_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
-                      cv::Mat& queryDescriptors,
-                      CVec<DMatch>* matches);
-void cv_matcher_match_two(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
-                          cv::Mat& queryDescriptors,
-                          cv::Mat& trainDescriptors,
-                          CVec<DMatch>* matches);
-void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
-                          cv::Mat& queryDescriptors,
-                          int k,
-                          CVec<CVec<DMatch>>* matches);
-
-// =============================================================================
 //   Text
 // =============================================================================
-
-void cv_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
-                cv::Mat& image,
-                CDisposableString* output_text,
-                CVec<Rect>* component_rects,
-                CVec<CDisposableString>* component_texts,
-                CVec<float>* component_confidences,
-                int component_level);
-
-void cv_tesseract_new(
-    const char* datapath, const char* language, const char* char_whitelist, int oem, int psmode, Result<void*>* result);
-void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr);
-void cv_hmm_new(const char* classifier_filename,
-                const char* vocabulary,
-                cv::Mat& transition_probabilities_table,
-                cv::Mat& emission_probabilities_table,
-                cv::text::classifier_type classifier_type,
-                Result<void*>* result);
-void cv_hmm_drop(cv::Ptr<cv::text::OCRHMMDecoder>* ocr);
-void cv_holistic_new(const char* archive_file, const char* weights_file, const char* words_file, Result<void*>* result);
-void cv_holistic_drop(cv::Ptr<cv::text::OCRHolisticWordRecognizer>* ocr);
 
 EXTERN_C_END
 
