@@ -1,4 +1,5 @@
 #include "objdetect.h"
+#include "utils.h"
 
 extern "C" {
 
@@ -42,5 +43,56 @@ void cv_cascade_classifier_detect(cv::CascadeClassifier* cascade,
         vec_of_rect->array[i].width = objects[i].width;
         vec_of_rect->array[i].height = objects[i].height;
     }
+}
+
+void* cv_hog_new() {
+    return new cv::HOGDescriptor();
+}
+
+void cv_hog_drop(cv::HOGDescriptor* hog) {
+    delete hog;
+    hog = nullptr;
+}
+
+void* cv_hog_default_people_detector() {
+    return new std::vector<float>(cv::HOGDescriptor::getDefaultPeopleDetector());
+}
+
+void* cv_hog_daimler_people_detector() {
+    return new std::vector<float>(cv::HOGDescriptor::getDaimlerPeopleDetector());
+}
+
+void cv_hog_detector_drop(std::vector<float>* detector) {
+    delete detector;
+    detector = nullptr;
+}
+
+void cv_hog_set_svm_detector(cv::HOGDescriptor* hog, std::vector<float>* detector) {
+    hog->setSVMDetector(*detector);
+}
+
+void cv_hog_detect(cv::HOGDescriptor* hog,
+                   cv::Mat* image,
+                   CVec<Rect>* vec_rect,
+                   CVec<double>* vec_weight,
+                   Size2i win_stride,
+                   Size2i padding,
+                   double scale,
+                   double final_threshold,
+                   bool use_means_shift) {
+    // convert all types
+
+    std::vector<cv::Rect> objects;
+    std::vector<double> weights;
+    cv::Size cv_win_stride(win_stride.width, win_stride.height);
+    cv::Size cv_padding(padding.width, padding.height);
+
+    // Call the function
+    hog->detectMultiScale(
+        *image, objects, weights, 0.1, cv_win_stride, cv_padding, scale, final_threshold, use_means_shift);
+
+    // Prepare the results
+    cv_to_ffi(objects, vec_rect);
+    cv_to_ffi(weights, vec_weight);
 }
 }

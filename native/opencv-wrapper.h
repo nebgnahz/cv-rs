@@ -49,23 +49,6 @@ void c_drop(void* value);
 //   CascadeClassifier
 // =============================================================================
 
-void* cv_hog_default_people_detector();
-void* cv_hog_daimler_people_detector();
-void cv_hog_detector_drop(std::vector<float>*);
-
-void* cv_hog_new();
-void cv_hog_drop(cv::HOGDescriptor*);
-void cv_hog_set_svm_detector(cv::HOGDescriptor*, std::vector<float>*);
-void cv_hog_detect(cv::HOGDescriptor*,
-                   cv::Mat*,
-                   CVec<Rect>* vec_detected,
-                   CVec<double>* vec_weight,
-                   Size2i win_stride,
-                   Size2i padding,
-                   double scale,
-                   double final_threshold,
-                   bool use_means_shift);
-
 // =============================================================================
 //   VideoTrack
 // =============================================================================
