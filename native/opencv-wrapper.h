@@ -45,15 +45,8 @@ void cv_imshow(const char* const winname, cv::Mat* mat);
 int cv_wait_key(int delay_in_millis);
 
 // =============================================================================
-//   VideoIO
+//
 // =============================================================================
-void* cv_videocapture_new(int index);
-void* cv_videocapture_from_file(const char* const filename);
-bool cv_videocapture_is_opened(const cv::VideoCapture* const cap);
-bool cv_videocapture_read(cv::VideoCapture* cap, cv::Mat* mat);
-void cv_videocapture_drop(cv::VideoCapture* cap);
-bool cv_videocapture_set(cv::VideoCapture* cap, int property, double value);
-double cv_videocapture_get(cv::VideoCapture* cap, int property);
 
 void* cv_videowriter_default();
 void* cv_videowriter_new(const char* const path, int fourcc, double fps, Size2i frame_size, bool is_color);
