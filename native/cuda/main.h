@@ -1,10 +1,9 @@
 #ifndef OPENCV_GPU_H_
 #define OPENCV_GPU_H_
 
+#include "../common.h"
 #include <opencv2/cudaobjdetect.hpp>
 #include <stddef.h>
-
-#include "../common.h"
 
 extern "C" {
 
