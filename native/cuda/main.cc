@@ -3,7 +3,7 @@
 #include "../utils.h"
 #include "main.h"
 
-EXTERN_C_BEGIN
+extern "C" {
 
 // =============================================================================
 //   Basic
@@ -227,5 +227,4 @@ Size2i cv_gpu_cascade_get_min_object_size(cv::Ptr<cv::cuda::CascadeClassifier>* 
 double cv_gpu_cascade_get_scale_factor(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
     return (*cascade)->getScaleFactor();
 }
-
-EXTERN_C_END
+}
