@@ -65,9 +65,9 @@ extern "C" {
     fn cv_mat_count_non_zero(src: *const CMat) -> c_int;
 }
 
-/// This wraps OpenCV's `Mat` class which is designed for n-dimensional dense
-/// array. It's the most widely used data structure in image/video processing
-/// since images are often stored as `Mat`.
+/// The class `Mat` represents an n-dimensional dense numerical single-channel or multi-channel array.
+/// It can be used to store real or complex-valued vectors and matrices, grayscale or color images,
+/// voxel volumes, vector fields, point clouds, tensors, histograms
 #[derive(Debug)]
 pub struct Mat {
     /// Pointer to the actual C/C++ data structure

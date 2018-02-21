@@ -18,7 +18,6 @@ extern "C" {
         flag_ptr: *const ImageWriteMode,
         flag_size: usize,
     ) -> ImencodeResult;
-
 }
 
 // =============================================================================

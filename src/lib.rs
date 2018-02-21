@@ -30,6 +30,8 @@ pub mod video;
 pub mod objdetect;
 pub mod features2d;
 pub mod text;
+#[cfg(feature = "cuda")]
+pub mod cuda;
 
 pub use core::*;
 pub use mat::*;
@@ -40,9 +42,6 @@ use std::os::raw::{c_char, c_void};
 use std::path::Path;
 use failure::Error;
 use errors::*;
-
-#[cfg(feature = "cuda")]
-pub mod cuda;
 
 extern "C" {
     fn c_drop(value: *mut c_void);
