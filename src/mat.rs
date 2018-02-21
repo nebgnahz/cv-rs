@@ -229,22 +229,6 @@ impl Mat {
         }
     }
 
-    /// Calls out to highgui to show the image, the duration is specified by
-    /// `delay`.
-    pub fn show(&self, name: &str, delay: c_int) -> Result<(), Error> {
-        extern "C" {
-            fn cv_imshow(name: *const c_char, cmat: *mut CMat);
-            fn cv_wait_key(delay_ms: c_int) -> c_int;
-        }
-
-        let s = CString::new(name)?;
-        unsafe {
-            cv_imshow((&s).as_ptr(), self.inner);
-            cv_wait_key(delay);
-        }
-        Ok(())
-    }
-
     /// Returns the images type. For supported types, please see
     /// [CvType](enum.CvType).
     pub fn cv_type(&self) -> CvType {

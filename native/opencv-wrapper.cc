@@ -51,16 +51,6 @@ void c_drop(void* value) {
 //   Highgui: high-level GUI
 // =============================================================================
 
-void cv_imshow(const char* const winname, cv::Mat* mat) {
-    if (mat != NULL) {
-        cv::imshow(winname, *mat);
-    }
-}
-
-int cv_wait_key(int delay) {
-    return cv::waitKey(delay);
-}
-
 // =============================================================================
 //   VideoCapture
 // =============================================================================

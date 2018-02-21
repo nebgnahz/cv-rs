@@ -4,6 +4,7 @@ use std::ffi::CString;
 use std::mem;
 use std::os::raw::{c_char, c_int, c_void};
 use std::ptr;
+use mat::*;
 
 extern "C" {
     fn cv_named_window(name: *const c_char, flags: WindowFlag);
@@ -13,6 +14,8 @@ extern "C" {
         on_mouse: extern "C" fn(e: MouseEventType, x: c_int, y: c_int, f: c_int, data: *mut c_void),
         userdata: *mut c_void,
     );
+    fn cv_imshow(name: *const c_char, cmat: *mut CMat);
+    fn cv_wait_key(delay_ms: c_int) -> c_int;
 }
 
 /// Create a window that can be used as a placeholder for images and
@@ -113,4 +116,21 @@ pub enum MouseEventType {
     MouseWheel = 10,
     /// Positive/negative means right and left scrolling.
     MouseHWheel = 11,
+}
+
+/// Provides some highgui functionallity
+pub trait Shower {
+    /// Calls out to highgui to show the image, the duration is specified by `delay`.
+    fn show(&self, name: &str, delay: c_int) -> Result<(), Error>;
+}
+
+impl Shower for Mat {
+    fn show(&self, name: &str, delay: c_int) -> Result<(), Error> {
+        let s = CString::new(name)?;
+        unsafe {
+            cv_imshow((&s).as_ptr(), self.inner);
+            cv_wait_key(delay);
+        }
+        Ok(())
+    }
 }
