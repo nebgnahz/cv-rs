@@ -66,11 +66,17 @@ fn opencv_link() {
 }
 
 fn main() {
+    let files = std::fs::read_dir("native")
+        .unwrap()
+        .into_iter()
+        .filter_map(|x| x.ok().map(|x| x.path()))
+        .filter(|x| x.extension().map(|e| e == "cc").unwrap_or(false))
+        .collect::<Vec<_>>();
+
     let mut opencv_config = gcc::Build::new();
     opencv_config
         .cpp(true)
-        .file("native/opencv-wrapper.cc")
-        .file("native/utils.cc")
+        .files(files)
         .include("native")
         .include(opencv_include());
 
@@ -79,7 +85,7 @@ fn main() {
     }
 
     if cfg!(feature = "gpu") {
-        opencv_config.file("native/opencv-gpu.cc");
+        opencv_config.file("native/gpu/opencv-gpu.cc");
     }
 
     opencv_config.compile("libopencv-wrapper.a");

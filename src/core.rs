@@ -331,46 +331,32 @@ impl FromBytes for f64 {
 pub enum CvType {
     /// 8 bit unsigned, single channel (grey image)
     Cv8UC1 = 0,
-
     /// 8 bit signed, single channel (grey image)
     Cv8SC1 = 1,
-
     /// 16 bit unsigned, single channel (grey image)
     Cv16UC1 = 2,
-
     /// 16 bit signed, single channel (grey image)
     Cv16SC1 = 3,
-
     /// 32 bit signed, single channel (grey image)
     Cv32SC1 = 4,
-
     /// 32 bit float, single channel (grey image)
     Cv32FC1 = 5,
-
     /// 32 bit float, single channel (grey image)
     Cv64FC1 = 6,
-
     /// 8 bit, two channel (rarelly seen)
     Cv8UC2 = 8,
-
     /// 8 bit unsigned, three channels (RGB image)
     Cv8UC3 = 16,
-
     /// 8 bit signed, three channels (RGB image)
     Cv8SC3 = 17,
-
     /// 16 bit unsigned, three channels (RGB image)
     Cv16UC3 = 18,
-
     /// 16 bit signed, three channels (RGB image)
     Cv16SC3 = 19,
-
     /// 32 bit signed, three channels (RGB image)
     Cv32SC3 = 20,
-
     /// 32 bit float, three channels (RGB image)
     Cv32FC3 = 21,
-
     /// 32 bit float, three channels (RGB image)
     Cv64FC3 = 22,
 }
