@@ -68,20 +68,6 @@ double cv_videowriter_get(cv::VideoWriter* writer, int property);
 // =============================================================================
 //   CascadeClassifier
 // =============================================================================
-void* cv_cascade_classifier_new();
-void* cv_cascade_classifier_from_path(const char* const path);
-bool cv_cascade_classifier_load(cv::CascadeClassifier* cc, const char* const path);
-void cv_cascade_classifier_drop(cv::CascadeClassifier* cc);
-
-// vec_of_rect is dynamically allocated, the caller should take ownership of it.
-void cv_cascade_classifier_detect(cv::CascadeClassifier* cascade,
-                                  cv::Mat* mat,
-                                  CVec<Rect>* vec_of_rect,
-                                  double scale_factor,
-                                  int min_neighbors,
-                                  int flags,
-                                  Size2i min_size,
-                                  Size2i max_size);
 
 void* cv_hog_default_people_detector();
 void* cv_hog_daimler_people_detector();

@@ -10,24 +10,7 @@ use std::os::raw::{c_char, c_double, c_int};
 use std::path::Path;
 use std::vec::Vec;
 
-/// An object detect trait.
-pub trait ObjectDetect {
-    /// Detects the object inside this image and returns a list of detections
-    /// with their confidence.
-    fn detect(&self, image: &Mat) -> Vec<(Rect, f64)>;
-}
-
-/// The opaque type for C
 enum CCascadeClassifier {}
-
-/// Cascade classifier class for object detection.
-#[derive(Debug)]
-pub struct CascadeClassifier {
-    inner: *mut CCascadeClassifier,
-}
-
-/// We can safely send the classifier (a mutable pointer) to a different thread
-unsafe impl Send for CascadeClassifier {}
 
 extern "C" {
     fn cv_cascade_classifier_new() -> *mut CCascadeClassifier;
@@ -43,6 +26,22 @@ extern "C" {
         min_size: Size2i,
         max_size: Size2i,
     );
+}
+
+/// We can safely send the classifier (a mutable pointer) to a different thread
+unsafe impl Send for CascadeClassifier {}
+
+/// An object detect trait.
+pub trait ObjectDetect {
+    /// Detects the object inside this image and returns a list of detections
+    /// with their confidence.
+    fn detect(&self, image: &Mat) -> Vec<(Rect, f64)>;
+}
+
+/// Cascade classifier class for object detection.
+#[derive(Debug)]
+pub struct CascadeClassifier {
+    inner: *mut CCascadeClassifier,
 }
 
 impl ObjectDetect for CascadeClassifier {
