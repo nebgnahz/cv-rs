@@ -376,25 +376,27 @@ impl Mat {
     }
 
     /// Calculate a histogram of an image.
-    pub fn calc_hist(
+    pub fn calc_hist<T: AsRef<[c_int]>, U: AsRef<[c_int]>, MElem: AsRef<[f32]>, M: AsRef<[MElem]>>(
         &self,
-        channels: *const c_int,
-        mask: Mat,
-        dims: c_int,
-        hist_size: *const c_int,
-        ranges: *const *const f32,
+        channels: T,
+        mask: &Mat,
+        hist_size: U,
+        ranges: M,
     ) -> Mat {
         let m = CMat::new();
+        let channels = channels.as_ref();
+        let hist_size = hist_size.as_ref();
+        let ranges = Self::matrix_to_vec(ranges);
         unsafe {
             cv_calc_hist(
                 self.inner,
                 1,
-                channels,
+                channels.as_ptr(),
                 mask.inner,
                 m,
-                dims,
-                hist_size,
-                ranges,
+                channels.len() as c_int,
+                hist_size.as_ptr(),
+                ranges.as_ptr(),
             );
         }
         Mat::from_raw(m)
@@ -402,10 +404,23 @@ impl Mat {
 
     /// Calculate the back projection of a histogram. The function calculates
     /// the back project of the histogram.
-    pub fn calc_back_project(&self, channels: *const c_int, hist: &Mat, ranges: *const *const f32) -> Mat {
+    pub fn calc_back_project<T: AsRef<[c_int]>, MElem: AsRef<[f32]>, M: AsRef<[MElem]>>(
+        &self,
+        channels: T,
+        hist: &Mat,
+        ranges: M,
+    ) -> Mat {
         let m = CMat::new();
+        let ranges = Self::matrix_to_vec(ranges);
         unsafe {
-            cv_calc_back_project(self.inner, 1, channels, (*hist).inner, m, ranges);
+            cv_calc_back_project(
+                self.inner,
+                1,
+                channels.as_ref().as_ptr(),
+                (*hist).inner,
+                m,
+                ranges.as_ptr(),
+            );
         }
         Mat::from_raw(m)
     }
@@ -422,5 +437,13 @@ impl Mat {
     pub fn compare_hist(&self, other: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
         let result = CResult::<f64>::from_callback(|r| unsafe { cv_compare_hist(self.inner, other.inner, method, r) });
         result.into()
+    }
+
+    fn matrix_to_vec<T, MElem: AsRef<[T]>, M: AsRef<[MElem]>>(value: M) -> Vec<*const T> {
+        value
+            .as_ref()
+            .iter()
+            .map(|x| x.as_ref().as_ptr())
+            .collect::<Vec<_>>()
     }
 }

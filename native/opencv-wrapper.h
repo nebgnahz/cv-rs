@@ -32,8 +32,6 @@ bool cv_mat_valid(cv::Mat* mat);
 
 // The caller owns the returned cv::Mat
 void* cv_mat_roi(cv::Mat* mat, Rect crect);
-
-void cv_mat_logic_and(cv::Mat* image, const cv::Mat* const mask);
 void cv_mat_flip(cv::Mat* image, int code);
 
 // The caller owns the returned data cv::Mat

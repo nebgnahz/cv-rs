@@ -118,7 +118,7 @@ impl Into<SIFT> for SIFTBuilder {
 impl Feature2D for SIFT {
     fn detect_and_compute(&self, image: &Mat, mask: &Mat) -> (Vec<KeyPoint>, Mat) {
         let mut keypoints = CVec::<KeyPoint>::default();
-        let descriptors = unsafe { cv_mat_new() };
+        let descriptors = CMat::new();
         unsafe {
             cv_sift_detect_and_compute(
                 self.value,

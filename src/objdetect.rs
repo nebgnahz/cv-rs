@@ -142,7 +142,7 @@ pub enum CSvmDetector {}
 #[derive(Debug)]
 pub struct SvmDetector {
     /// Pointer to the inner data structure
-    pub inner: *mut CSvmDetector,
+    pub(crate) inner: *mut CSvmDetector,
 }
 
 extern "C" {

@@ -5,16 +5,18 @@ use errors::*;
 use failure::Error;
 use std::ffi::CString;
 use std::mem;
-use std::os::raw::{c_char, c_double, c_int, c_uchar};
+use std::os::raw::{c_char, c_double, c_int};
 use std::path::Path;
 use std::slice;
+use std::ops::{BitAnd, BitOr, BitXor, Not};
 
 /// Opaque data struct for C bindings
 #[derive(Clone, Copy, Debug)]
 pub enum CMat {}
 unsafe impl Send for CMat {}
+
 impl CMat {
-    pub fn new() -> *mut CMat {
+    pub(crate) fn new() -> *mut CMat {
         unsafe { cv_mat_new() }
     }
 }
@@ -25,7 +27,7 @@ impl CMat {
 #[derive(Debug)]
 pub struct Mat {
     /// Pointer to the actual C/C++ data structure
-    pub inner: *mut CMat,
+    pub(crate) inner: *mut CMat,
 
     /// Number of columns
     pub cols: c_int,
@@ -250,24 +252,23 @@ pub enum LineType {
 }
 
 extern "C" {
-    pub(crate) fn cv_mat_new() -> *mut CMat;
+    fn cv_mat_new() -> *mut CMat;
     fn cv_from_file_storage(path: *const c_char, section: *const c_char) -> *mut CMat;
     fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
     fn cv_mat_zeros(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
-    fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: c_int, buffer: *const c_uchar) -> *mut CMat;
+    fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: c_int, buffer: *const u8) -> *mut CMat;
     fn cv_mat_is_valid(mat: *mut CMat) -> bool;
     fn cv_mat_rows(cmat: *const CMat) -> c_int;
     fn cv_mat_cols(cmat: *const CMat) -> c_int;
     fn cv_mat_depth(cmat: *const CMat) -> c_int;
     fn cv_mat_channels(cmat: *const CMat) -> c_int;
-    fn cv_mat_data(cmat: *const CMat) -> *const c_uchar;
+    fn cv_mat_data(cmat: *const CMat) -> *const u8;
     fn cv_mat_total(cmat: *const CMat) -> usize;
     fn cv_mat_step1(cmat: *const CMat, i: c_int) -> usize;
     fn cv_mat_elem_size(cmat: *const CMat) -> usize;
     fn cv_mat_elem_size1(cmat: *const CMat) -> usize;
     fn cv_mat_type(cmat: *const CMat) -> CvType;
     fn cv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
-    fn cv_mat_logic_and(cimage: *mut CMat, cmask: *const CMat);
     fn cv_mat_flip(src: *mut CMat, code: c_int);
     fn cv_mat_drop(mat: *mut CMat);
     fn cv_mat_eye(rows: c_int, cols: c_int, cv_type: CvType) -> *mut CMat;
@@ -300,7 +301,7 @@ impl Mat {
     #[inline]
     /// Creates a `Mat` object from raw `CMat` pointer. This will read the rows
     /// and cols of the image.
-    pub fn from_raw(raw: *mut CMat) -> Mat {
+    pub(crate) fn from_raw(raw: *mut CMat) -> Mat {
         Mat {
             inner: raw,
             rows: unsafe { cv_mat_rows(raw) },
@@ -312,7 +313,7 @@ impl Mat {
 
     /// Creates an empty `Mat` struct.
     pub fn new() -> Mat {
-        let m = unsafe { cv_mat_new() };
+        let m = CMat::new();
         Mat::from_raw(m)
     }
 
@@ -358,9 +359,11 @@ impl Mat {
         Mat::from_raw(m)
     }
 
-    /// Returns the raw data (as a uchar pointer)
-    pub fn data(&self) -> *const u8 {
-        unsafe { cv_mat_data(self.inner) }
+    /// Returns the raw data (as a `u8` pointer)
+    pub fn data(&self) -> &[u8] {
+        let bytes = unsafe { cv_mat_data(self.inner) };
+        let len = self.total() * self.elem_size();
+        unsafe { slice::from_raw_parts(bytes, len) }
     }
 
     /// Returns the total number of array elements. The method returns the
@@ -409,15 +412,6 @@ impl Mat {
     pub fn roi(&self, rect: Rect) -> Mat {
         let cmat = unsafe { cv_mat_roi(self.inner, rect) };
         Mat::from_raw(cmat)
-    }
-
-    /// Apply a mask to myself.
-    // TODO(benzh): Find the right reference in OpenCV for this one. Provide a
-    // shortcut for `image &= mask`
-    pub fn logic_and(&mut self, mask: Mat) {
-        unsafe {
-            cv_mat_logic_and(self.inner, mask.inner);
-        }
     }
 
     /// Flips an image around vertical, horizontal, or both axes.
@@ -560,22 +554,22 @@ impl Mat {
     /// - If matrix is of type `CV_32F`  then use `Mat.at<f32>(y,x)`.
     /// - If matrix is of type `CV_64F` then use `Mat.at<f64>(y,x)`.
     pub fn at<T: FromBytes>(&self, i0: i32) -> T {
-        let data: *const u8 = self.data();
+        let data = self.data();
         let size = self.size();
         let pos = {
             if size.height == 1 {
-                i0
+                i0 as usize
             } else if size.width == 1 {
-                i0 * (self.step1(1) * self.elem_size1()) as i32
+                i0 as usize * (self.step1(1) * self.elem_size1())
             } else {
                 unimplemented!{};
             }
-        } as isize;
-        unsafe {
-            let ptr: *const u8 = data.offset(pos);
-            let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
-            T::from_bytes(slice)
-        }
+        };
+
+        let byte = &data[pos];
+        let ptr: *const _ = byte;
+        let slice = unsafe { slice::from_raw_parts(ptr, mem::size_of::<T>()) };
+        T::from_bytes(slice)
     }
 
     /// Returns individual pixel (element) information within the Mat. This
@@ -584,14 +578,12 @@ impl Mat {
     /// See [Mat::at](struct.Mat.html#method.at) and
     /// [Mat::at3](struct.Mat.html#method.at3).
     pub fn at2<T: FromBytes>(&self, i0: i32, i1: i32) -> T {
-        let data: *const u8 = self.data();
-        let pos = (i0 as isize) * ((self.step1(0) * self.elem_size1()) as isize)
-            + (i1 as isize) * ((self.step1(1) * self.elem_size1()) as isize);
-        unsafe {
-            let ptr: *const u8 = data.offset(pos);
-            let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
-            T::from_bytes(slice)
-        }
+        let data = self.data();
+        let pos = i0 as usize * self.step1(0) * self.elem_size1() + i1 as usize * self.step1(1) * self.elem_size1();
+        let byte = &data[pos];
+        let ptr: *const _ = byte;
+        let slice = unsafe { slice::from_raw_parts(ptr, mem::size_of::<T>()) };
+        T::from_bytes(slice)
     }
 
     /// Returns individual pixel (element) information within the Mat. This
@@ -600,14 +592,13 @@ impl Mat {
     /// See [Mat::at](struct.Mat.html#method.at) and
     /// [Mat::at2](struct.Mat.html#method.at2).
     pub fn at3<T: FromBytes>(&self, i0: i32, i1: i32, i2: i32) -> T {
-        let data: *const u8 = self.data();
-        let pos = (i0 as isize) * ((self.step1(0) * self.elem_size1()) as isize)
-            + (i1 as isize) * ((self.step1(1) * self.elem_size1()) as isize) + i2 as isize;
-        unsafe {
-            let ptr: *const u8 = data.offset(pos);
-            let slice = slice::from_raw_parts(ptr, mem::size_of::<T>());
-            T::from_bytes(slice)
-        }
+        let data = self.data();
+        let pos = i0 as usize * self.step1(0) * self.elem_size1() + i1 as usize * self.step1(1) * self.elem_size1()
+            + i2 as usize;
+        let byte = &data[pos];
+        let ptr: *const _ = byte;
+        let slice = unsafe { slice::from_raw_parts(ptr, mem::size_of::<T>()) };
+        T::from_bytes(slice)
     }
 }
 
@@ -633,49 +624,49 @@ impl Drop for Mat {
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum CvType {
-    /// 8 bit unsigned (like `uchar`), single channel (grey image)
+    /// 8 bit unsigned, single channel (grey image)
     Cv8UC1 = 0,
 
-    /// 8 bit signed (like `schar`), single channel (grey image)
+    /// 8 bit signed, single channel (grey image)
     Cv8SC1 = 1,
 
-    /// 16 bit unsigned (like `ushort`), single channel (grey image)
+    /// 16 bit unsigned, single channel (grey image)
     Cv16UC1 = 2,
 
-    /// 16 bit signed (like `short`), single channel (grey image)
+    /// 16 bit signed, single channel (grey image)
     Cv16SC1 = 3,
 
-    /// 32 bit signed (like `int`), single channel (grey image)
+    /// 32 bit signed, single channel (grey image)
     Cv32SC1 = 4,
 
-    /// 32 bit float (like `float`), single channel (grey image)
+    /// 32 bit float, single channel (grey image)
     Cv32FC1 = 5,
 
-    /// 32 bit float (like `double`), single channel (grey image)
+    /// 32 bit float, single channel (grey image)
     Cv64FC1 = 6,
 
     /// 8 bit, two channel (rarelly seen)
     Cv8UC2 = 8,
 
-    /// 8 bit unsigned (like `uchar`), three channels (RGB image)
+    /// 8 bit unsigned, three channels (RGB image)
     Cv8UC3 = 16,
 
-    /// 8 bit signed (like `schar`), three channels (RGB image)
+    /// 8 bit signed, three channels (RGB image)
     Cv8SC3 = 17,
 
-    /// 16 bit unsigned (like `ushort`), three channels (RGB image)
+    /// 16 bit unsigned, three channels (RGB image)
     Cv16UC3 = 18,
 
-    /// 16 bit signed (like `short`), three channels (RGB image)
+    /// 16 bit signed, three channels (RGB image)
     Cv16SC3 = 19,
 
-    /// 32 bit signed (like `int`), three channels (RGB image)
+    /// 32 bit signed, three channels (RGB image)
     Cv32SC3 = 20,
 
-    /// 32 bit float (like `float`), three channels (RGB image)
+    /// 32 bit float, three channels (RGB image)
     Cv32FC3 = 21,
 
-    /// 32 bit float (like `double`), three channels (RGB image)
+    /// 32 bit float, three channels (RGB image)
     Cv64FC3 = 22,
 }
 
@@ -738,11 +729,11 @@ extern "C" {
     );
     fn cv_mix_channels(
         cmat: *const CMat,
-        nsrcs: isize,
+        nsrcs: usize,
         dst: *mut CMat,
-        ndsts: isize,
+        ndsts: usize,
         from_to: *const c_int,
-        npairs: isize,
+        npairs: usize,
     );
     fn cv_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: NormType);
 
@@ -797,7 +788,7 @@ impl Mat {
     /// Mat::reshape first to reinterpret the array as single-channel. Or you
     /// may extract the particular channel using either extractImageCOI , or
     /// mixChannels, or split.
-    pub fn min_max_loc(&self, mask: Mat) -> (f64, f64, Point2i, Point2i) {
+    pub fn min_max_loc(&self, mask: &Mat) -> (f64, f64, Point2i, Point2i) {
         let mut min = 0.0;
         let mut max = 0.0;
         let mut min_loc = Point2i::new(0, 0);
@@ -817,12 +808,13 @@ impl Mat {
 
     /// Copy specified channels from `self` to the specified channels of output
     /// `Mat`.
-    // TODO(benzh) Avoid using raw pointers but rather take a vec for `from_to`?
     // The usage (self.depth) here is buggy, it should actually be the type!
-    pub fn mix_channels(&self, nsrcs: isize, ndsts: isize, from_to: *const c_int, npairs: isize) -> Mat {
+    pub fn mix_channels<T: AsRef<[(c_int, c_int)]>>(&self, nsrcs: usize, ndsts: usize, from_to: T) -> Mat {
         let m = Mat::with_size(self.rows, self.cols, self.depth);
+        let slice = from_to.as_ref();
+        let ptr = slice.as_ptr() as *const c_int;
         unsafe {
-            cv_mix_channels(self.inner, nsrcs, m.inner, ndsts, from_to, npairs);
+            cv_mix_channels(self.inner, nsrcs, m.inner, ndsts, ptr, slice.len());
         }
         m
     }
@@ -834,37 +826,45 @@ impl Mat {
         Mat::from_raw(m)
     }
 
-    /// Computes bitwise conjunction between two Mat
-    pub fn and(&self, another: &Mat) -> Mat {
-        let m = CMat::new();
-        unsafe { cv_bitwise_and(self.inner, another.inner, m) }
-        Mat::from_raw(m)
-    }
-
-    /// Computes bitwise disjunction between two Mat
-    pub fn or(&self, another: &Mat) -> Mat {
-        let m = CMat::new();
-        unsafe { cv_bitwise_or(self.inner, another.inner, m) }
-        Mat::from_raw(m)
-    }
-
-    /// Computes bitwise "exclusive or" between two Mat
-    pub fn xor(&self, another: &Mat) -> Mat {
-        let m = CMat::new();
-        unsafe { cv_bitwise_xor(self.inner, another.inner, m) }
-        Mat::from_raw(m)
-    }
-
-    /// Computes bitwise "exclusive or" between two Mat
-    pub fn not(&self) -> Mat {
-        let m = CMat::new();
-        unsafe { cv_bitwise_not(self.inner, m) }
-        Mat::from_raw(m)
-    }
-
     /// Counts non-zero array elements.
     pub fn count_non_zero(&self) -> c_int {
         unsafe { cv_count_non_zero(self.inner) }
+    }
+}
+
+impl BitAnd for Mat {
+    type Output = Self;
+    fn bitand(self, rhs: Self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_bitwise_and(self.inner, rhs.inner, m) }
+        Self::from_raw(m)
+    }
+}
+
+impl BitOr for Mat {
+    type Output = Self;
+    fn bitor(self, rhs: Self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_bitwise_or(self.inner, rhs.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
+impl BitXor for Mat {
+    type Output = Self;
+    fn bitxor(self, rhs: Self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_bitwise_xor(self.inner, rhs.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
+impl Not for Mat {
+    type Output = Self;
+    fn not(self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_bitwise_not(self.inner, m) }
+        Mat::from_raw(m)
     }
 }
 
