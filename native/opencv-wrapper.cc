@@ -15,7 +15,7 @@ EXTERN_C_BEGIN
 // =============================================================================
 //   Core
 // =============================================================================
-void* cv_from_file_storage(const char* path, const char* section) {
+void* cv_mat_from_file_storage(const char* path, const char* section) {
     auto result = new cv::Mat();
     cv::FileStorage fs(path, cv::FileStorage::READ);
     fs[section] >> *result;
@@ -135,13 +135,13 @@ void c_drop(void* value) {
 // =============================================================================
 //  core array
 // =============================================================================
-void cv_in_range(cv::Mat* mat, Scalar lowerb, Scalar upperb, cv::Mat* dst) {
+void cv_mat_in_range(cv::Mat* mat, Scalar lowerb, Scalar upperb, cv::Mat* dst) {
     cv::Scalar lb(lowerb.v0, lowerb.v1, lowerb.v2);
     cv::Scalar ub(upperb.v0, upperb.v1, upperb.v2);
     cv::inRange(*mat, lb, ub, *dst);
 }
 
-void cv_min_max_loc(
+void cv_mat_min_max_loc(
     const cv::Mat* const mat, double* min, double* max, Point2i* minLoc, Point2i* maxLoc, const cv::Mat* const mask) {
     if (minLoc == NULL && maxLoc == NULL) {
         cv::minMaxLoc(*mat, min, max, NULL, NULL, *mask);
@@ -166,31 +166,31 @@ void cv_min_max_loc(
     }
 }
 
-void cv_mix_channels(cv::Mat* src, size_t nsrcs, cv::Mat* dst, size_t ndsts, const int* from_to, size_t npairs) {
+void cv_mat_mix_channels(cv::Mat* src, size_t nsrcs, cv::Mat* dst, size_t ndsts, const int* from_to, size_t npairs) {
     cv::mixChannels(src, nsrcs, dst, ndsts, from_to, npairs);
 }
 
-void cv_normalize(cv::Mat* src, cv::Mat* dst, double alpha, double beta, int norm_type) {
+void cv_mat_normalize(cv::Mat* src, cv::Mat* dst, double alpha, double beta, int norm_type) {
     cv::normalize(*src, *dst, alpha, beta, norm_type);
 }
 
-void cv_bitwise_and(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst) {
+void cv_mat_bitwise_and(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst) {
     cv::bitwise_and(*src1, *src2, *dst);
 }
 
-void cv_bitwise_not(const cv::Mat* const src, cv::Mat* const dst) {
+void cv_mat_bitwise_not(const cv::Mat* const src, cv::Mat* const dst) {
     cv::bitwise_not(*src, *dst);
 }
 
-void cv_bitwise_or(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst) {
+void cv_mat_bitwise_or(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst) {
     cv::bitwise_or(*src1, *src2, *dst);
 }
 
-void cv_bitwise_xor(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst) {
+void cv_mat_bitwise_xor(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst) {
     cv::bitwise_xor(*src1, *src2, *dst);
 }
 
-int cv_count_non_zero(const cv::Mat* const src) {
+int cv_mat_count_non_zero(const cv::Mat* const src) {
     return cv::countNonZero(*src);
 }
 

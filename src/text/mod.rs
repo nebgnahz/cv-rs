@@ -11,7 +11,7 @@ pub use self::holisticword::*;
 pub use self::tesseract::*;
 
 use ::*;
-use core::CMat;
+use mat::CMat;
 use failure::Error;
 
 extern "C" {

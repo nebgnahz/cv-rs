@@ -4,8 +4,10 @@ pub mod tracking {
     //! Object Tracking, see [OpenCV video
     //! track](http://docs.opencv.org/3.1.0/dc/d6b/group__video__track.html)
 
-    use super::super::core::*;
+    use core::*;
+    use mat::*;
     use std::os::raw::c_int;
+
     // =========================================================================
     //   VideoTrack
     // =========================================================================

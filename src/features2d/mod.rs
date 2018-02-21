@@ -4,12 +4,13 @@ mod mser;
 mod sift;
 mod surf;
 
-use core::*;
-
 pub use self::descriptor_matcher::*;
 pub use self::mser::*;
 pub use self::sift::*;
 pub use self::surf::*;
+
+use core::*;
+use mat::*;
 
 /// Basic trait for 2D image feature detectors and descriptor extractors
 pub trait Feature2D {

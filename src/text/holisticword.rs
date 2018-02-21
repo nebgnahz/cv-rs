@@ -5,7 +5,6 @@ use ::*;
 use errors::*;
 use std::os::raw::c_char;
 use std::path::Path;
-use core::path_to_cstring;
 
 extern "C" {
     fn cv_holistic_new(

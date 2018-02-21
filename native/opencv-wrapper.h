@@ -21,7 +21,7 @@
 EXTERN_C_BEGIN
 
 // The caller owns the returned data cv::Mat
-void* cv_from_file_storage(const char* path, const char* section);
+void* cv_mat_from_file_storage(const char* path, const char* section);
 void* cv_mat_new();
 void* cv_mat_new_with_size(int rows, int cols, int type);
 void* cv_mat_zeros(int rows, int cols, int type);
@@ -57,16 +57,16 @@ void c_drop(void* value);
 // =============================================================================
 //  core array
 // =============================================================================
-void cv_in_range(cv::Mat* mat, Scalar lowerb, Scalar upperb, cv::Mat* dst);
-void cv_min_max_loc(
+void cv_mat_in_range(cv::Mat* mat, Scalar lowerb, Scalar upperb, cv::Mat* dst);
+void cv_mat_min_max_loc(
     const cv::Mat* const mat, double* min, double* max, Point2i* minLoc, Point2i* maxLoc, const cv::Mat* const cmask);
-void cv_mix_channels(cv::Mat* mat, size_t nsrcs, cv::Mat* dst, size_t ndsts, const int* from_to, size_t npairs);
-void cv_normalize(cv::Mat* csrc, cv::Mat* cdst, double alpha, double beta, int norm_type);
-void cv_bitwise_and(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst);
-void cv_bitwise_not(const cv::Mat* const src, cv::Mat* const dst);
-void cv_bitwise_or(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst);
-void cv_bitwise_xor(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst);
-int cv_count_non_zero(const cv::Mat* const src);
+void cv_mat_mix_channels(cv::Mat* mat, size_t nsrcs, cv::Mat* dst, size_t ndsts, const int* from_to, size_t npairs);
+void cv_mat_normalize(cv::Mat* csrc, cv::Mat* cdst, double alpha, double beta, int norm_type);
+void cv_mat_bitwise_and(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst);
+void cv_mat_bitwise_not(const cv::Mat* const src, cv::Mat* const dst);
+void cv_mat_bitwise_or(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst);
+void cv_mat_bitwise_xor(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst);
+int cv_mat_count_non_zero(const cv::Mat* const src);
 
 // =============================================================================
 //  Imgproc
