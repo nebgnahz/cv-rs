@@ -13,6 +13,12 @@ pub mod tracking {
     // =========================================================================
     enum CTermCriteria {}
 
+    extern "C" {
+        fn cv_term_criteria_new(t: TermType, count: c_int, epsilon: f64) -> *mut CTermCriteria;
+        fn cv_term_criteria_drop(criteria: *mut CTermCriteria);
+        fn cv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
+    }
+
     #[repr(C)]
     #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
     /// Term criteria type, can be one of: Count, Eps or Count + Eps
@@ -23,12 +29,6 @@ pub mod tracking {
         /// the desired accuracy or change in parameters at which the iterative
         /// algorithm stops.
         EPS = 2,
-    }
-
-    extern "C" {
-        fn cv_term_criteria_new(t: TermType, count: c_int, epsilon: f64) -> *mut CTermCriteria;
-        fn cv_term_criteria_drop(criteria: *mut CTermCriteria);
-        fn cv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
     }
 
     /// Termination criteria for iterative algorithms.

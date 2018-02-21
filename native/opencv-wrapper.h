@@ -82,9 +82,6 @@ void cv_hog_detect(cv::HOGDescriptor*,
 // =============================================================================
 //   VideoTrack
 // =============================================================================
-void* cv_term_criteria_new(int type, int count, double epsilon);
-void cv_term_criteria_drop(cv::TermCriteria* criteria);
-RotatedRect cv_camshift(cv::Mat* back_project_image, Rect window, cv::TermCriteria* criteria);
 
 // =============================================================================
 //   Text
