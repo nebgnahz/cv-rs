@@ -58,42 +58,6 @@ void c_drop(void* value) {
 // =============================================================================
 //   VideoWriter
 // =============================================================================
-void* cv_videowriter_default() {
-    return new cv::VideoWriter();
-}
-
-void* cv_videowriter_new(const char* const path, int fourcc, double fps, Size2i frame_size, bool is_color) {
-    cv::Size cv_frame_size(frame_size.width, frame_size.height);
-    cv::VideoWriter* writer = new cv::VideoWriter(path, fourcc, fps, cv_frame_size, is_color);
-    return writer;
-}
-
-void cv_videowriter_drop(cv::VideoWriter* writer) {
-    delete writer;
-    writer = nullptr;
-}
-
-bool cv_videowriter_open(
-    cv::VideoWriter* writer, const char* const path, int fourcc, double fps, Size2i frame_size, bool is_color) {
-    cv::Size cv_frame_size(frame_size.width, frame_size.height);
-    return writer->open(path, fourcc, fps, cv_frame_size, is_color);
-}
-
-bool cv_videowriter_is_opened(cv::VideoWriter* writer) {
-    return writer->isOpened();
-}
-
-void cv_videowriter_write(cv::VideoWriter* writer, cv::Mat* mat) {
-    (*writer) << (*mat);
-}
-
-bool cv_videowriter_set(cv::VideoWriter* writer, int property, double value) {
-    return writer->set(property, value);
-}
-
-double cv_videowriter_get(cv::VideoWriter* writer, int property) {
-    return writer->get(property);
-}
 
 // =============================================================================
 //   CascadeClassifier
