@@ -1,12 +1,24 @@
 //! Image file reading and writing, see [OpenCV
 //! imgcodecs](http://docs.opencv.org/3.1.0/d4/da8/group__imgcodecs.html).
 
-use core::*;
+use ::*;
 use errors::*;
+use mat::*;
 use std::ffi::CString;
 use std::os::raw::c_char;
 use std::path::Path;
 use failure::Error;
+
+extern "C" {
+    fn cv_imread(input: *const c_char, flags: ImageReadMode) -> *mut CMat;
+    fn cv_imdecode(buf: *const u8, l: usize, m: ImageReadMode) -> *mut CMat;
+    fn cv_imencode(
+        ext: *const c_char,
+        inner: *const CMat,
+        flag_ptr: *const ImageWriteMode,
+        flag_size: usize,
+    ) -> ImencodeResult;
+}
 
 // =============================================================================
 //  Imgproc
@@ -107,18 +119,6 @@ pub enum ImageWritePngStrategy {
     Fixed = 4,
 }
 
-extern "C" {
-    fn cv_imread(input: *const c_char, flags: ImageReadMode) -> *mut CMat;
-    fn cv_imdecode(buf: *const u8, l: usize, m: ImageReadMode) -> *mut CMat;
-    fn cv_imencode(
-        ext: *const c_char,
-        inner: *const CMat,
-        flag_ptr: *const ImageWriteMode,
-        flag_size: usize,
-    ) -> ImencodeResult;
-
-}
-
 #[repr(C)]
 struct ImencodeResult {
     status: bool,
@@ -127,18 +127,10 @@ struct ImencodeResult {
 }
 
 impl Mat {
-    /// Creates a `Mat` from reading the image specified by the path.
-    pub fn from_path<P: AsRef<Path>>(path: P, flags: ImageReadMode) -> Result<Mat, Error> {
-        let path = path_to_cstring(path)?;
-        let path = path.as_ptr();
-        let result = unsafe { cv_imread(path, flags) };
-        Ok(Mat::from_raw(result))
-    }
-
     /// Decodes an image from `buf` according to the specified mode.
     pub fn image_decode(buf: &[u8], mode: ImageReadMode) -> Mat {
         let inner = unsafe { cv_imdecode(buf.as_ptr(), buf.len(), mode) };
-        Mat::from_raw(inner)
+        Self::from_raw(inner)
     }
 
     /// Encodes an image; the encoding scheme depends on the extension provided;
@@ -152,5 +144,13 @@ impl Mat {
         } else {
             Err(CvError::UnknownError("Unable to convert this image to bytes".into()).into())
         }
+    }
+
+    /// Creates a `Mat` from reading the image specified by the path.
+    pub fn from_path<P: AsRef<Path>>(path: P, flags: ImageReadMode) -> Result<Mat, Error> {
+        let path = path_to_cstring(path)?;
+        let path = path.as_ptr();
+        let result = unsafe { cv_imread(path, flags) };
+        Ok(Mat::from_raw(result))
     }
 }

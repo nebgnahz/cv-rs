@@ -19,35 +19,29 @@ extern crate bytes;
 #[macro_use]
 extern crate failure;
 
-mod core;
-pub use core::CvType;
-pub use core::FlipCode;
-pub use core::LineType;
-pub use core::Mat;
-pub use core::NormType;
-pub use core::Point2f;
-pub use core::Point2i;
-pub use core::Rect;
-pub use core::Scalar;
-pub use core::Size2f;
-pub use core::Size2i;
-
-use std::ffi::{CStr, CString};
-use std::mem;
-use std::os::raw::{c_char, c_void};
-
+pub mod core;
 pub mod errors;
 pub mod imgproc;
 pub mod imgcodecs;
+pub mod mat;
 pub mod videoio;
 pub mod highgui;
 pub mod video;
 pub mod objdetect;
 pub mod features2d;
 pub mod text;
-
-#[cfg(feature = "gpu")]
+#[cfg(feature = "cuda")]
 pub mod cuda;
+
+pub use core::*;
+pub use mat::*;
+
+use std::ffi::{CStr, CString};
+use std::mem;
+use std::os::raw::{c_char, c_void};
+use std::path::Path;
+use failure::Error;
+use errors::*;
 
 extern "C" {
     fn c_drop(value: *mut c_void);
@@ -236,4 +230,11 @@ impl Unpack for CDisposableString {
             .to_string_lossy()
             .into_owned()
     }
+}
+
+fn path_to_cstring<P: AsRef<Path>>(path: P) -> Result<CString, Error> {
+    let path = path.as_ref();
+    let x = path.to_str().ok_or(CvError::InvalidPath(path.into()))?;
+    let result = CString::new(x)?;
+    Ok(result)
 }

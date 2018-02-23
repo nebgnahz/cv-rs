@@ -2,7 +2,7 @@
 use super::*;
 use super::private::*;
 use ::*;
-use core::CMat;
+use mat::CMat;
 use errors::*;
 use std::os::raw::c_char;
 use std::path::Path;

@@ -22,5 +22,5 @@ float-cmp = "0"
 gcc = "0"
 
 [features]
-gpu = []
+cuda = []
 tesseract = []

@@ -2,6 +2,7 @@
 //! videoio](http://docs.opencv.org/3.1.0/dd/de7/group__videoio.html)
 
 use core::*;
+use mat::*;
 use errors::*;
 use failure::Error;
 use std::os::raw::{c_char, c_double, c_int};
@@ -9,27 +10,26 @@ use std::os::raw::{c_char, c_double, c_int};
 // =============================================================================
 //   VideoCapture
 // =============================================================================
-enum CvVideoCapture {}
+enum CVideoCapture {}
 
-unsafe impl Send for CvVideoCapture {}
+extern "C" {
+    fn cv_videocapture_new(index: c_int) -> *mut CVideoCapture;
+    fn cv_videocapture_from_file(path: *const c_char) -> *mut CVideoCapture;
+    fn cv_videocapture_is_opened(ccap: *const CVideoCapture) -> bool;
+    fn cv_videocapture_read(v: *mut CVideoCapture, m: *mut CMat) -> bool;
+    fn cv_videocapture_drop(cap: *mut CVideoCapture);
+    fn cv_videocapture_set(cap: *mut CVideoCapture, property: CapProp, value: c_double) -> bool;
+    fn cv_videocapture_get(cap: *mut CVideoCapture, property: CapProp) -> c_double;
+}
 
 /// Video capturing from video files, image sequences or cameras.
 #[derive(Debug)]
 pub struct VideoCapture {
-    inner: *mut CvVideoCapture,
+    inner: *mut CVideoCapture,
 }
 
+unsafe impl Send for CVideoCapture {}
 unsafe impl Send for VideoCapture {}
-
-extern "C" {
-    fn cv_videocapture_new(index: c_int) -> *mut CvVideoCapture;
-    fn cv_videocapture_from_file(path: *const c_char) -> *mut CvVideoCapture;
-    fn cv_videocapture_is_opened(ccap: *const CvVideoCapture) -> bool;
-    fn cv_videocapture_read(v: *mut CvVideoCapture, m: *mut CMat) -> bool;
-    fn cv_videocapture_drop(cap: *mut CvVideoCapture);
-    fn cv_videocapture_set(cap: *mut CvVideoCapture, property: CapProp, value: c_double) -> bool;
-    fn cv_videocapture_get(cap: *mut CvVideoCapture, property: CapProp) -> c_double;
-}
 
 /// Video capture's property identifier.
 #[repr(C)]

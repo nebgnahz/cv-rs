@@ -4,12 +4,20 @@ pub mod tracking {
     //! Object Tracking, see [OpenCV video
     //! track](http://docs.opencv.org/3.1.0/dc/d6b/group__video__track.html)
 
-    use super::super::core::*;
+    use core::*;
+    use mat::*;
     use std::os::raw::c_int;
+
     // =========================================================================
     //   VideoTrack
     // =========================================================================
     enum CTermCriteria {}
+
+    extern "C" {
+        fn cv_term_criteria_new(t: TermType, count: c_int, epsilon: f64) -> *mut CTermCriteria;
+        fn cv_term_criteria_drop(criteria: *mut CTermCriteria);
+        fn cv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
+    }
 
     #[repr(C)]
     #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
@@ -21,12 +29,6 @@ pub mod tracking {
         /// the desired accuracy or change in parameters at which the iterative
         /// algorithm stops.
         EPS = 2,
-    }
-
-    extern "C" {
-        fn cv_term_criteria_new(t: TermType, count: c_int, epsilon: f64) -> *mut CTermCriteria;
-        fn cv_term_criteria_drop(criteria: *mut CTermCriteria);
-        fn cv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
     }
 
     /// Termination criteria for iterative algorithms.
