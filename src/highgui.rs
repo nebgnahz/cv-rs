@@ -119,12 +119,12 @@ pub enum MouseEventType {
 }
 
 /// Provides some highgui functionallity
-pub trait Shower {
+pub trait Show {
     /// Calls out to highgui to show the image, the duration is specified by `delay`.
     fn show(&self, name: &str, delay: c_int) -> Result<(), Error>;
 }
 
-impl Shower for Mat {
+impl Show for Mat {
     fn show(&self, name: &str, delay: c_int) -> Result<(), Error> {
         let s = CString::new(name)?;
         unsafe {
