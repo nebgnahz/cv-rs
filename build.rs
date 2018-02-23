@@ -1,21 +1,19 @@
-extern crate gcc;
+extern crate cc;
+extern crate cmake;
+extern crate num_cpus;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate toml;
+extern crate winreg;
 
 use std::fs::File;
 use std::io::Read;
+use std::path::*;
+use std::env;
+use std::process::Command;
 
-#[cfg(windows)]
-fn opencv_include() -> String {
-    if let Ok(dir) = std::env::var("OPENCV_DIR") {
-        format!("{}\\include", dir)
-    } else {
-        eprint!("%OPENCV_DIR% is not set.");
-        std::process::exit(0x0100);
-    }
-}
+const IS_CUDA_ENABLED: bool = cfg!(feature = "cuda");
 
 #[cfg(windows)]
 fn opencv_link() {
@@ -27,7 +25,7 @@ fn opencv_link() {
 
 #[cfg(windows)]
 fn try_opencv_link() -> Result<(), Box<std::error::Error>> {
-    let opencv_dir = std::env::var("OPENCV_LIB")?;
+    let opencv_dir = "C:\\Users\\Alex\\Documents\\Rust\\cv-rs\\artifacts\\mingw\\x64\\mingw\\lib";
     let files = std::fs::read_dir(&opencv_dir)?;
     let opencv_world_entry = files.filter_map(|entry| entry.ok()).find(|entry| {
         let file_name = entry.file_name().to_string_lossy().into_owned();
@@ -50,11 +48,6 @@ fn try_opencv_link() -> Result<(), Box<std::error::Error>> {
 }
 
 #[cfg(unix)]
-fn opencv_include() -> &'static str {
-    "/usr/local/include"
-}
-
-#[cfg(unix)]
 fn opencv_link() {
     println!("cargo:rustc-link-search=native=/usr/local/lib");
     println!("cargo:rustc-link-lib=opencv_core");
@@ -67,7 +60,7 @@ fn opencv_link() {
     println!("cargo:rustc-link-lib=opencv_text");
     println!("cargo:rustc-link-lib=opencv_videoio");
     println!("cargo:rustc-link-lib=opencv_video");
-    if cfg!(feature = "cuda") {
+    if IS_CUDA_ENABLED {
         println!("cargo:rustc-link-lib=opencv_cudaobjdetect");
     }
 }
@@ -75,20 +68,23 @@ fn opencv_link() {
 fn main() {
     let config = read_file("build.toml");
     let config: BuildConfig = toml::from_str(&config).unwrap();
+
+    let intall_path = build_opencv_and_get_path(&config);
+
     let files = get_files("native");
 
-    let mut opencv_config = gcc::Build::new();
+    let mut opencv_config = cc::Build::new();
     opencv_config
         .cpp(true)
         .files(files)
         .include("native")
-        .include(opencv_include());
+        .include(intall_path.join("include"));
 
     if cfg!(not(target_env = "msvc")) {
         opencv_config.flag("--std=c++11");
     }
 
-    if cfg!(feature = "cuda") {
+    if IS_CUDA_ENABLED {
         let cuda_files = get_files("native/cuda");
         opencv_config.files(cuda_files);
     }
@@ -128,13 +124,11 @@ fn get_files(path: &str) -> Vec<std::path::PathBuf> {
 
 #[derive(Debug, Clone, Copy, Deserialize)]
 struct BuildConfig {
-    is_cuda_enabled: bool,
-    windows_compiler: Compiler,
+    #[cfg(target_env = "msvc")] vc_compiler: Compiler,
 }
 
 #[derive(Debug, Clone, Copy, Deserialize)]
 enum Compiler {
-    MinGW,
     VC14,
     VC15,
 }
@@ -144,4 +138,121 @@ fn read_file(filename: &str) -> String {
     let mut contents = String::new();
     file.read_to_string(&mut contents).unwrap();
     contents
+}
+
+fn build_opencv_and_get_path(config: &BuildConfig) -> PathBuf {
+    let current_dir = env::current_dir().unwrap();
+    let compiler = get_compiler(&config);
+    let compiler_prefix = get_prefix(&config);
+
+    let install_prefix = current_dir.join("artifacts").join(compiler_prefix);
+
+    let opencv_version = install_prefix
+        .join("x64")
+        .join(&compiler_prefix)
+        .join("bin")
+        .join("opencv_version.exe");
+
+    if !opencv_version.exists() {
+        let extra_modules_path = current_dir.join("opencv_contrib").join("modules");
+
+        std::fs::create_dir_all(&install_prefix).unwrap();
+
+        let arguments = [
+            ("WITH_CUDA", if IS_CUDA_ENABLED { "ON" } else { "OFF" }),
+            ("CUDA_ARCH_BIN", "5.2"),
+            ("CUDA_ARCH_PTX", ""),
+            ("BUILD_opencv_java", "OFF"),
+            ("BUILD_opencv_python", "OFF"),
+            ("BUILD_opencv_python2", "OFF"),
+            ("BUILD_opencv_python3", "OFF"),
+            ("BUILD_TESTS", "OFF"),
+            ("BUILD_PERF_TESTS", "OFF"),
+            ("BUILD_DOCS", "OFF"),
+            ("BUILD_EXAMPLES", "OFF"),
+            ("INSTALL_CREATE_DISTRIB", "ON"),
+            ("CMAKE_BUILD_TYPE", "Release"),
+            (
+                "OPENCV_EXTRA_MODULES_PATH",
+                extra_modules_path.to_str().unwrap(),
+            ),
+            ("CMAKE_SH", "CMAKE_SH-NOTFOUND"),
+        ];
+
+        let cpu_count = num_cpus::get();
+        let mut config = cmake::Config::new("opencv");
+        config
+            .generator(compiler)
+            .out_dir(&install_prefix)
+            .env("NUM_JOBS", cpu_count.to_string());
+        for &(k, v) in arguments.iter() {
+            config.define(k, v);
+        }
+
+        config.build();
+    } else {
+        let bin_path = install_prefix
+            .join("x64")
+            .join(&compiler_prefix)
+            .join("bin");
+        let bin_path = bin_path.to_str().unwrap();
+        let path = std::env::var("PATH").unwrap();
+        if !path.contains(bin_path) {
+            let hkcu = winreg::RegKey::predef(winreg::enums::HKEY_CURRENT_USER);
+            let environment = hkcu.open_subkey("Environment").unwrap();
+            let path: String = environment.get_value("Path").unwrap();
+            let new_path = format!("{};{}", path, bin_path);
+            let output = Command::new("setx")
+                .args(&["PATH", &new_path])
+                .output()
+                .unwrap();
+            if !output.status.success() {
+                unsafe {
+                    eprint!(
+                        "Error: {}",
+                        std::str::from_utf8_unchecked(&output.stderr[..])
+                    );
+                }
+                std::process::exit(output.status.code().unwrap_or(-1));
+            }
+        }
+    }
+    install_prefix
+}
+
+#[cfg(all(windows, target_env = "msvc"))]
+fn get_compiler(config: &BuildConfig) -> &'static str {
+    match config.windows_compiler.unwrap() {
+        Compiler::VC14 => "Visual Studio 14 2015 Win64",
+        Compiler::VC15 => {
+            if (IS_CUDA_ENABLED) {
+                eprint!("Cuda is compatible with VC14 only. Please, change compiler");
+                std::process::exit(0x0100);
+            }
+            "Visual Studio 15 2017 Win64"
+        }
+        _ => {
+            eprint!("Unknown compiler");
+            std::process::exit(0x0100);
+        }
+    }
+}
+
+#[cfg(all(windows, target_env = "gnu"))]
+fn get_compiler(_: &BuildConfig) -> &'static str {
+    "MinGW Makefiles"
+}
+
+#[cfg(all(windows, target_env = "msvc"))]
+fn get_prefix(config: &BuildConfig) -> &'static str {
+    match config.windows_compiler.unwrap() {
+        Compiler::VC14 if IS_CUDA_ENABLED => "vc14_cuda",
+        Compiler::VC14 => "vc14",
+        Compiler::VC15 => "vc15",
+    }
+}
+
+#[cfg(all(windows, target_env = "gnu"))]
+fn get_prefix(_: &BuildConfig) -> &'static str {
+    "mingw"
 }

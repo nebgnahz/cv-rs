@@ -19,10 +19,13 @@ getopts = "0"
 float-cmp = "0"
 
 [build-dependencies]
-gcc = "0"
-toml = "0.4"
+cc = "1"
+cmake = "0"
+num_cpus = "1"
 serde_derive = "1"
 serde = "1"
+toml = "0.4"
+winreg = "0.5"
 
 [features]
 cuda = []
