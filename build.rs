@@ -1,4 +1,11 @@
 extern crate gcc;
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
+extern crate toml;
+
+use std::fs::File;
+use std::io::Read;
 
 #[cfg(windows)]
 fn opencv_include() -> String {
@@ -66,6 +73,8 @@ fn opencv_link() {
 }
 
 fn main() {
+    let config = read_file("build.toml");
+    let config: BuildConfig = toml::from_str(&config).unwrap();
     let files = get_files("native");
 
     let mut opencv_config = gcc::Build::new();
@@ -115,4 +124,24 @@ fn get_files(path: &str) -> Vec<std::path::PathBuf> {
         .filter_map(|x| x.ok().map(|x| x.path()))
         .filter(|x| x.extension().map(|e| e == "cc").unwrap_or(false))
         .collect::<Vec<_>>()
+}
+
+#[derive(Debug, Clone, Copy, Deserialize)]
+struct BuildConfig {
+    is_cuda_enabled: bool,
+    windows_compiler: Compiler,
+}
+
+#[derive(Debug, Clone, Copy, Deserialize)]
+enum Compiler {
+    MinGW,
+    VC14,
+    VC15,
+}
+
+fn read_file(filename: &str) -> String {
+    let mut file = File::open(filename).unwrap();
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
+    contents
 }

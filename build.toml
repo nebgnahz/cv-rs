@@ -1,0 +1,2 @@
+is_cuda_enabled = true
+windows_compiler = "MinGW" #MinGW, VC14, VC15
