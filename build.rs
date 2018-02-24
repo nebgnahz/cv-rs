@@ -20,6 +20,13 @@ const BINARY_NAME: &str = "libopencv_world340.dll";
 const BINARY_NAME: &str = "opencv_world340.dll";
 
 fn main() {
+    if !Path::new("opencv/.git").exists() || !Path::new("opencv_contrib/.git").exists() {
+        Command::new("git")
+            .args(&["submodule", "update", "--init", "--recursive"])
+            .status()
+            .unwrap();
+    }
+
     let config = read_file("build.toml");
     let config: BuildConfig = toml::from_str(&config).unwrap();
 
@@ -103,17 +110,8 @@ fn build_opencv_and_get_path(config: &BuildConfig) -> PathBuf {
         let new_path = format!("{};{}", bin_path, path);
         let output = Command::new("setx")
             .args(&["PATH", &new_path])
-            .output()
+            .status()
             .unwrap();
-        if !output.status.success() {
-            unsafe {
-                eprint!(
-                    "Error: {}",
-                    std::str::from_utf8_unchecked(&output.stderr[..])
-                );
-            }
-            std::process::exit(output.status.code().unwrap_or(-1));
-        }
     }
     install_prefix
 }
