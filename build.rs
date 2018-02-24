@@ -14,62 +14,16 @@ use std::env;
 use std::process::Command;
 
 const IS_CUDA_ENABLED: bool = cfg!(feature = "cuda");
-
-#[cfg(windows)]
-fn opencv_link() {
-    if let Err(e) = try_opencv_link() {
-        eprint!("Error while building cv-rs: {:?}.", e);
-        std::process::exit(0x0100);
-    }
-}
-
-#[cfg(windows)]
-fn try_opencv_link() -> Result<(), Box<std::error::Error>> {
-    let opencv_dir = "C:\\Users\\Alex\\Documents\\Rust\\cv-rs\\artifacts\\mingw\\x64\\mingw\\lib";
-    let files = std::fs::read_dir(&opencv_dir)?;
-    let opencv_world_entry = files.filter_map(|entry| entry.ok()).find(|entry| {
-        let file_name = entry.file_name().to_string_lossy().into_owned();
-        (file_name.starts_with("opencv_world") || file_name.starts_with("libopencv_world"))
-            && !file_name.ends_with("d.lib")
-    });
-    match opencv_world_entry {
-        Some(opencv_world) => {
-            let opencv_world = opencv_world.file_name();
-            let opencv_world = opencv_world.into_string().unwrap();
-            let opencv_world_without_extension = opencv_world.trim_right_matches(|c: char| !c.is_numeric()); // we expect filename to be something like 'open_world340.lib' or 'open_world.340.dll.a', so we just consider everything after the version number is an extension
-            println!("cargo:rustc-link-search=native={}", opencv_dir);
-            println!("cargo:rustc-link-lib={}", opencv_world_without_extension);
-            Ok(())
-        }
-        None => Err(Box::new(BuildError {
-            details: "Cannot find opencv_world file in provided %OPENCV_LIB% directory",
-        })),
-    }
-}
-
-#[cfg(unix)]
-fn opencv_link() {
-    println!("cargo:rustc-link-search=native=/usr/local/lib");
-    println!("cargo:rustc-link-lib=opencv_core");
-    println!("cargo:rustc-link-lib=opencv_features2d");
-    println!("cargo:rustc-link-lib=opencv_xfeatures2d");
-    println!("cargo:rustc-link-lib=opencv_highgui");
-    println!("cargo:rustc-link-lib=opencv_imgcodecs");
-    println!("cargo:rustc-link-lib=opencv_imgproc");
-    println!("cargo:rustc-link-lib=opencv_objdetect");
-    println!("cargo:rustc-link-lib=opencv_text");
-    println!("cargo:rustc-link-lib=opencv_videoio");
-    println!("cargo:rustc-link-lib=opencv_video");
-    if IS_CUDA_ENABLED {
-        println!("cargo:rustc-link-lib=opencv_cudaobjdetect");
-    }
-}
+#[cfg(all(windows, target_env = "gnu"))]
+const BINARY_NAME: &str = "libopencv_world340.dll";
+#[cfg(all(windows, target_env = "msvc"))]
+const BINARY_NAME: &str = "opencv_world340.dll";
 
 fn main() {
     let config = read_file("build.toml");
     let config: BuildConfig = toml::from_str(&config).unwrap();
 
-    let intall_path = build_opencv_and_get_path(&config);
+    let install_path = build_opencv_and_get_path(&config);
 
     let files = get_files("native");
 
@@ -78,7 +32,7 @@ fn main() {
         .cpp(true)
         .files(files)
         .include("native")
-        .include(intall_path.join("include"));
+        .include(install_path.join("include"));
 
     if cfg!(not(target_env = "msvc")) {
         opencv_config.flag("--std=c++11");
@@ -90,54 +44,7 @@ fn main() {
     }
 
     opencv_config.compile("libopencv-wrapper.a");
-    opencv_link();
-}
-
-#[cfg(windows)]
-#[derive(Debug)]
-struct BuildError {
-    details: &'static str,
-}
-
-#[cfg(windows)]
-impl std::error::Error for BuildError {
-    fn description(&self) -> &str {
-        self.details
-    }
-}
-
-#[cfg(windows)]
-impl std::fmt::Display for BuildError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{}", self.details)
-    }
-}
-
-fn get_files(path: &str) -> Vec<std::path::PathBuf> {
-    std::fs::read_dir(path)
-        .unwrap()
-        .into_iter()
-        .filter_map(|x| x.ok().map(|x| x.path()))
-        .filter(|x| x.extension().map(|e| e == "cc").unwrap_or(false))
-        .collect::<Vec<_>>()
-}
-
-#[derive(Debug, Clone, Copy, Deserialize)]
-struct BuildConfig {
-    #[cfg(target_env = "msvc")] vc_compiler: Compiler,
-}
-
-#[derive(Debug, Clone, Copy, Deserialize)]
-enum Compiler {
-    VC14,
-    VC15,
-}
-
-fn read_file(filename: &str) -> String {
-    let mut file = File::open(filename).unwrap();
-    let mut contents = String::new();
-    file.read_to_string(&mut contents).unwrap();
-    contents
+    opencv_link(&config);
 }
 
 fn build_opencv_and_get_path(config: &BuildConfig) -> PathBuf {
@@ -147,13 +54,11 @@ fn build_opencv_and_get_path(config: &BuildConfig) -> PathBuf {
 
     let install_prefix = current_dir.join("artifacts").join(compiler_prefix);
 
-    let opencv_version = install_prefix
-        .join("x64")
-        .join(&compiler_prefix)
-        .join("bin")
-        .join("opencv_version.exe");
+    let (opencv_binary, _) = get_bin_and_lib(config);
 
-    if !opencv_version.exists() {
+    if !opencv_binary.exists() {
+        eprint!("Path not found: {:?}", opencv_binary);
+        std::process::exit(-100);
         let extra_modules_path = current_dir.join("opencv_contrib").join("modules");
 
         std::fs::create_dir_all(&install_prefix).unwrap();
@@ -251,4 +156,74 @@ fn get_prefix(config: &BuildConfig) -> &'static str {
 #[cfg(all(windows, target_env = "gnu"))]
 fn get_prefix(_: &BuildConfig) -> &'static str {
     "mingw"
+}
+
+#[cfg(windows)]
+fn get_bin_and_lib(config: &BuildConfig) -> (PathBuf, PathBuf) {
+    let prefix = get_prefix(config);
+    let target_dir = env::current_dir()
+        .unwrap()
+        .join("artifacts")
+        .join(prefix)
+        .join("x64")
+        .join(prefix);
+    (
+        target_dir.join("bin").join(BINARY_NAME),
+        target_dir.join("lib"),
+    )
+}
+
+#[cfg(windows)]
+fn opencv_link(config: &BuildConfig) {
+    let (opencv_binary, opencv_lib) = get_bin_and_lib(config);
+    println!(
+        "cargo:rustc-link-search=native={}",
+        opencv_lib.to_str().unwrap()
+    );
+    println!("cargo:rustc-link-lib={}", opencv_binary.to_str().unwrap());
+}
+
+#[cfg(unix)]
+fn opencv_link() {
+    println!("cargo:rustc-link-search=native=/usr/local/lib");
+    println!("cargo:rustc-link-lib=opencv_core");
+    println!("cargo:rustc-link-lib=opencv_features2d");
+    println!("cargo:rustc-link-lib=opencv_xfeatures2d");
+    println!("cargo:rustc-link-lib=opencv_highgui");
+    println!("cargo:rustc-link-lib=opencv_imgcodecs");
+    println!("cargo:rustc-link-lib=opencv_imgproc");
+    println!("cargo:rustc-link-lib=opencv_objdetect");
+    println!("cargo:rustc-link-lib=opencv_text");
+    println!("cargo:rustc-link-lib=opencv_videoio");
+    println!("cargo:rustc-link-lib=opencv_video");
+    if IS_CUDA_ENABLED {
+        println!("cargo:rustc-link-lib=opencv_cudaobjdetect");
+    }
+}
+
+#[derive(Debug, Clone, Copy, Deserialize)]
+struct BuildConfig {
+    #[cfg(target_env = "msvc")] vc_compiler: Compiler,
+}
+
+#[derive(Debug, Clone, Copy, Deserialize)]
+enum Compiler {
+    VC14,
+    VC15,
+}
+
+fn read_file(filename: &str) -> String {
+    let mut file = File::open(filename).unwrap();
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).unwrap();
+    contents
+}
+
+fn get_files(path: &str) -> Vec<std::path::PathBuf> {
+    std::fs::read_dir(path)
+        .unwrap()
+        .into_iter()
+        .filter_map(|x| x.ok().map(|x| x.path()))
+        .filter(|x| x.extension().map(|e| e == "cc").unwrap_or(false))
+        .collect::<Vec<_>>()
 }
