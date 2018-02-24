@@ -57,8 +57,9 @@ fn build_opencv_and_get_path(config: &BuildConfig) -> PathBuf {
     let (opencv_binary, _) = get_bin_and_lib(config);
 
     if !opencv_binary.exists() {
-        eprint!("Path not found: {:?}", opencv_binary);
+        eprint!("Does not exist: {:?}", opencv_binary);
         std::process::exit(-100);
+
         let extra_modules_path = current_dir.join("opencv_contrib").join("modules");
 
         std::fs::create_dir_all(&install_prefix).unwrap();
@@ -76,7 +77,6 @@ fn build_opencv_and_get_path(config: &BuildConfig) -> PathBuf {
             ("BUILD_DOCS", "OFF"),
             ("BUILD_EXAMPLES", "OFF"),
             ("INSTALL_CREATE_DISTRIB", "ON"),
-            ("CMAKE_BUILD_TYPE", "Release"),
             (
                 "OPENCV_EXTRA_MODULES_PATH",
                 extra_modules_path.to_str().unwrap(),
@@ -89,37 +89,33 @@ fn build_opencv_and_get_path(config: &BuildConfig) -> PathBuf {
         config
             .generator(compiler)
             .out_dir(&install_prefix)
-            .env("NUM_JOBS", cpu_count.to_string());
+            .env("NUM_JOBS", cpu_count.to_string())
+            .profile("Release");
         for &(k, v) in arguments.iter() {
             config.define(k, v);
         }
 
         config.build();
-    } else {
-        let bin_path = install_prefix
-            .join("x64")
-            .join(&compiler_prefix)
-            .join("bin");
-        let bin_path = bin_path.to_str().unwrap();
-        let path = std::env::var("PATH").unwrap();
-        if !path.contains(bin_path) {
-            let hkcu = winreg::RegKey::predef(winreg::enums::HKEY_CURRENT_USER);
-            let environment = hkcu.open_subkey("Environment").unwrap();
-            let path: String = environment.get_value("Path").unwrap();
-            let new_path = format!("{};{}", path, bin_path);
-            let output = Command::new("setx")
-                .args(&["PATH", &new_path])
-                .output()
-                .unwrap();
-            if !output.status.success() {
-                unsafe {
-                    eprint!(
-                        "Error: {}",
-                        std::str::from_utf8_unchecked(&output.stderr[..])
-                    );
-                }
-                std::process::exit(output.status.code().unwrap_or(-1));
+    }
+    let bin_path = opencv_binary.parent().unwrap();
+    let bin_path = bin_path.to_str().unwrap();
+    let hkcu = winreg::RegKey::predef(winreg::enums::HKEY_CURRENT_USER);
+    let environment = hkcu.open_subkey("Environment").unwrap();
+    let path: String = environment.get_value("Path").unwrap();
+    if !path.contains(bin_path) {
+        let new_path = format!("{};{}", bin_path, path);
+        let output = Command::new("setx")
+            .args(&["PATH", &new_path])
+            .output()
+            .unwrap();
+        if !output.status.success() {
+            unsafe {
+                eprint!(
+                    "Error: {}",
+                    std::str::from_utf8_unchecked(&output.stderr[..])
+                );
             }
+            std::process::exit(output.status.code().unwrap_or(-1));
         }
     }
     install_prefix
