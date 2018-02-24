@@ -57,9 +57,6 @@ fn build_opencv_and_get_path(config: &BuildConfig) -> PathBuf {
     let (opencv_binary, _) = get_bin_and_lib(config);
 
     if !opencv_binary.exists() {
-        eprint!("Does not exist: {:?}", opencv_binary);
-        std::process::exit(-100);
-
         let extra_modules_path = current_dir.join("opencv_contrib").join("modules");
 
         std::fs::create_dir_all(&install_prefix).unwrap();
@@ -171,12 +168,11 @@ fn get_bin_and_lib(config: &BuildConfig) -> (PathBuf, PathBuf) {
 
 #[cfg(windows)]
 fn opencv_link(config: &BuildConfig) {
-    let (opencv_binary, opencv_lib) = get_bin_and_lib(config);
-    println!(
-        "cargo:rustc-link-search=native={}",
-        opencv_lib.to_str().unwrap()
-    );
-    println!("cargo:rustc-link-lib={}", opencv_binary.to_str().unwrap());
+    let (_, lib) = get_bin_and_lib(config);
+    if let Err(e) = try_opencv_link(&lib) {
+        eprint!("Error while building cv-rs: {:?}.", e);
+        std::process::exit(0x0100);
+    }
 }
 
 #[cfg(unix)]
@@ -222,4 +218,31 @@ fn get_files(path: &str) -> Vec<std::path::PathBuf> {
         .filter_map(|x| x.ok().map(|x| x.path()))
         .filter(|x| x.extension().map(|e| e == "cc").unwrap_or(false))
         .collect::<Vec<_>>()
+}
+
+#[cfg(windows)]
+fn try_opencv_link(opencv_dir: &PathBuf) -> Result<(), Box<std::error::Error>> {
+    let files = std::fs::read_dir(opencv_dir)?;
+    let opencv_world_entry = files.filter_map(|entry| entry.ok()).find(|entry| {
+        let file_name = entry.file_name().to_string_lossy().into_owned();
+        (file_name.starts_with("opencv_world") || file_name.starts_with("libopencv_world"))
+            && !file_name.ends_with("d.lib")
+    });
+    match opencv_world_entry {
+        Some(opencv_world) => {
+            let opencv_world = opencv_world.file_name();
+            let opencv_world = opencv_world.into_string().unwrap();
+            let opencv_world_without_extension = opencv_world.trim_right_matches(|c: char| !c.is_numeric()); // we expect filename to be something like 'open_world340.lib' or 'open_world.340.dll.a', so we just consider everything after the version number is an extension
+            println!(
+                "cargo:rustc-link-search=native={}",
+                opencv_dir.to_str().unwrap()
+            );
+            println!("cargo:rustc-link-lib={}", opencv_world_without_extension);
+            Ok(())
+        }
+        None => panic!(format!(
+            "Cannot find opencv_world file in '{:?}'",
+            opencv_dir
+        )),
+    }
 }
