@@ -222,18 +222,14 @@ fn build_opencv_and_get_path(config: &BuildConfig) -> PathBuf {
 
 #[cfg(all(windows, target_env = "msvc"))]
 fn get_compiler(config: &BuildConfig) -> &'static str {
-    match config.windows_compiler.unwrap() {
+    match config.vc_compiler {
         Compiler::VC14 => "Visual Studio 14 2015 Win64",
         Compiler::VC15 => {
-            if (IS_CUDA_ENABLED) {
+            if IS_CUDA_ENABLED {
                 eprint!("Cuda is compatible with VC14 only. Please, change compiler");
                 std::process::exit(0x0100);
             }
             "Visual Studio 15 2017 Win64"
-        }
-        _ => {
-            eprint!("Unknown compiler");
-            std::process::exit(0x0100);
         }
     }
 }
@@ -245,7 +241,7 @@ fn get_compiler(_: &BuildConfig) -> &'static str {
 
 #[cfg(all(windows, target_env = "msvc"))]
 fn get_prefix(config: &BuildConfig) -> &'static str {
-    match config.windows_compiler.unwrap() {
+    match config.vc_compiler {
         Compiler::VC14 if IS_CUDA_ENABLED => "vc14_cuda",
         Compiler::VC14 => "vc14",
         Compiler::VC15 => "vc15",
