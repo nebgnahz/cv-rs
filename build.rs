@@ -150,7 +150,7 @@ fn get_prefix(_: &BuildConfig) -> &'static str {
 
 #[cfg(unix)]
 fn get_prefix(_: &BuildConfig) -> &'static str {
-    "default"
+    if IS_CUDA_ENABLED {"default_cuda"} else {"default"}
 }
 
 fn get_bin_and_lib(config: &BuildConfig) -> (PathBuf, PathBuf) {
