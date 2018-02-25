@@ -42,7 +42,7 @@ before_install:
 script:
   - cargo build -vv --no-default-features
   - cargo test  -vv --no-default-features
-  - cargo build --features cuda
+  #- cargo build --features cuda #disable cuda for a while
   - cargo build --features tesseract
   - cargo test -vv --features tesseract
   - cargo doc --features cuda --no-deps
@@ -59,9 +59,8 @@ cache:
   timeout: 1000
   cargo: true
   directories:
-    - $HOME/usr/installed-version
-    - $HOME/usr/include
-    - $HOME/usr/lib
+    - artifacts/default/include
+    - artifacts/default/lib
 
 deploy:
   provider: pages
