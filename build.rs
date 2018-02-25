@@ -111,8 +111,8 @@ fn build_opencv_and_get_path(config: &BuildConfig) -> PathBuf {
 }
 
 #[cfg(all(windows, target_env = "msvc"))]
-fn get_compiler(config: &BuildConfig) -> &'static str {
-    match config.vc_compiler {
+fn get_compiler(config: &BuildConfig) -> Option<&'static str> {
+    let result = match config.vc_compiler {
         Compiler::VC14 => "Visual Studio 14 2015 Win64",
         Compiler::VC15 => {
             if IS_CUDA_ENABLED {
@@ -121,12 +121,13 @@ fn get_compiler(config: &BuildConfig) -> &'static str {
             }
             "Visual Studio 15 2017 Win64"
         }
-    }
+    };
+    Some(result)
 }
 
 #[cfg(all(windows, target_env = "gnu"))]
-fn get_compiler(_: &BuildConfig) -> &'static str {
-    "MinGW Makefiles"
+fn get_compiler(_: &BuildConfig) -> Option<&'static str> {
+    Some("MinGW Makefiles")
 }
 
 #[cfg(unix)]
@@ -150,19 +151,22 @@ fn get_prefix(_: &BuildConfig) -> &'static str {
 
 #[cfg(unix)]
 fn get_prefix(_: &BuildConfig) -> &'static str {
-    if IS_CUDA_ENABLED {"default_cuda"} else {"default"}
+    if IS_CUDA_ENABLED {
+        "default_cuda"
+    } else {
+        "default"
+    }
 }
 
 fn get_bin_and_lib(config: &BuildConfig) -> (PathBuf, PathBuf) {
     let prefix = get_prefix(config);
-    let target_dir = env::current_dir()
-        .unwrap()
-        .join("artifacts")
-        .join(prefix);
+    let target_dir = env::current_dir().unwrap().join("artifacts").join(prefix);
 
     let target_dir = if cfg!(windows) {
         target_dir.join("x64").join(prefix)
-    } else {target_dir};
+    } else {
+        target_dir
+    };
 
     (
         target_dir.join("bin").join(BINARY_NAME),
@@ -261,7 +265,7 @@ fn post_build(opencv_binary: &PathBuf) {
     let path: String = environment.get_value("Path").unwrap();
     if !path.contains(bin_path) {
         let new_path = format!("{};{}", bin_path, path);
-        let output = Command::new("setx")
+        let _output = Command::new("setx")
             .args(&["PATH", &new_path])
             .status()
             .unwrap();
@@ -270,10 +274,10 @@ fn post_build(opencv_binary: &PathBuf) {
 
 #[cfg(unix)]
 fn post_build(_: &PathBuf) {
-//    let bin_path = Path::new("~/Documents/cv-rs/artifacts/default");
-//    let lib = bin_path.join("lib");
-//    let include = bin_path.join("include");
-//    run_command("cp", &["-r", ])
+    //    let bin_path = Path::new("~/Documents/cv-rs/artifacts/default");
+    //    let lib = bin_path.join("lib");
+    //    let include = bin_path.join("include");
+    //    run_command("cp", &["-r", ])
 
 }
 //
@@ -283,4 +287,3 @@ fn post_build(_: &PathBuf) {
 //        .status()
 //        .unwrap();
 //}
-

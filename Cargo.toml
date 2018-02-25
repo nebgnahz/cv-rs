@@ -25,7 +25,9 @@ num_cpus = "1"
 serde_derive = "1"
 serde = "1"
 toml = "0.4"
-winreg = {version = "0.5", optional = true}
+
+[target.'cfg(windows)'.build-dependencies]
+winreg = "0.5"
 
 [features]
 cuda = []
