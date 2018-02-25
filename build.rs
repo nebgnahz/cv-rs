@@ -5,6 +5,7 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate toml;
+#[cfg(windows)]
 extern crate winreg;
 
 use std::fs::File;
@@ -18,6 +19,8 @@ const IS_CUDA_ENABLED: bool = cfg!(feature = "cuda");
 const BINARY_NAME: &str = "libopencv_world340.dll";
 #[cfg(all(windows, target_env = "msvc"))]
 const BINARY_NAME: &str = "opencv_world340.dll";
+#[cfg(unix)]
+const BINARY_NAME: &str = "opencv_version";
 
 fn main() {
     if !Path::new("opencv/.git").exists() || !Path::new("opencv_contrib/.git").exists() {
@@ -62,7 +65,6 @@ fn build_opencv_and_get_path(config: &BuildConfig) -> PathBuf {
     let install_prefix = current_dir.join("artifacts").join(compiler_prefix);
 
     let (opencv_binary, _) = get_bin_and_lib(config);
-
     if !opencv_binary.exists() {
         let extra_modules_path = current_dir.join("opencv_contrib").join("modules");
 
@@ -91,28 +93,20 @@ fn build_opencv_and_get_path(config: &BuildConfig) -> PathBuf {
         let cpu_count = num_cpus::get();
         let mut config = cmake::Config::new("opencv");
         config
-            .generator(compiler)
             .out_dir(&install_prefix)
             .env("NUM_JOBS", cpu_count.to_string())
             .profile("Release");
+
+        if let Some(compiler) = compiler {
+            config.generator(compiler);
+        }
         for &(k, v) in arguments.iter() {
             config.define(k, v);
         }
 
         config.build();
     }
-    let bin_path = opencv_binary.parent().unwrap();
-    let bin_path = bin_path.to_str().unwrap();
-    let hkcu = winreg::RegKey::predef(winreg::enums::HKEY_CURRENT_USER);
-    let environment = hkcu.open_subkey("Environment").unwrap();
-    let path: String = environment.get_value("Path").unwrap();
-    if !path.contains(bin_path) {
-        let new_path = format!("{};{}", bin_path, path);
-        let output = Command::new("setx")
-            .args(&["PATH", &new_path])
-            .status()
-            .unwrap();
-    }
+    post_build(&opencv_binary);
     install_prefix
 }
 
@@ -135,6 +129,11 @@ fn get_compiler(_: &BuildConfig) -> &'static str {
     "MinGW Makefiles"
 }
 
+#[cfg(unix)]
+fn get_compiler(_: &BuildConfig) -> Option<&'static str> {
+    None
+}
+
 #[cfg(all(windows, target_env = "msvc"))]
 fn get_prefix(config: &BuildConfig) -> &'static str {
     match config.vc_compiler {
@@ -149,15 +148,22 @@ fn get_prefix(_: &BuildConfig) -> &'static str {
     "mingw"
 }
 
-#[cfg(windows)]
+#[cfg(unix)]
+fn get_prefix(_: &BuildConfig) -> &'static str {
+    "default"
+}
+
 fn get_bin_and_lib(config: &BuildConfig) -> (PathBuf, PathBuf) {
     let prefix = get_prefix(config);
     let target_dir = env::current_dir()
         .unwrap()
         .join("artifacts")
-        .join(prefix)
-        .join("x64")
         .join(prefix);
+
+    let target_dir = if cfg!(windows) {
+        target_dir.join("x64").join(prefix)
+    } else {target_dir};
+
     (
         target_dir.join("bin").join(BINARY_NAME),
         target_dir.join("lib"),
@@ -174,8 +180,9 @@ fn opencv_link(config: &BuildConfig) {
 }
 
 #[cfg(unix)]
-fn opencv_link() {
-    println!("cargo:rustc-link-search=native=/usr/local/lib");
+fn opencv_link(config: &BuildConfig) {
+    let (_, lib) = get_bin_and_lib(config);
+    println!("cargo:rustc-link-search=native={}", lib.to_str().unwrap());
     println!("cargo:rustc-link-lib=opencv_core");
     println!("cargo:rustc-link-lib=opencv_features2d");
     println!("cargo:rustc-link-lib=opencv_xfeatures2d");
@@ -244,3 +251,36 @@ fn try_opencv_link(opencv_dir: &PathBuf) -> Result<(), Box<std::error::Error>> {
         )),
     }
 }
+
+#[cfg(windows)]
+fn post_build(opencv_binary: &PathBuf) {
+    let bin_path = opencv_binary.parent().unwrap();
+    let bin_path = bin_path.to_str().unwrap();
+    let hkcu = winreg::RegKey::predef(winreg::enums::HKEY_CURRENT_USER);
+    let environment = hkcu.open_subkey("Environment").unwrap();
+    let path: String = environment.get_value("Path").unwrap();
+    if !path.contains(bin_path) {
+        let new_path = format!("{};{}", bin_path, path);
+        let output = Command::new("setx")
+            .args(&["PATH", &new_path])
+            .status()
+            .unwrap();
+    }
+}
+
+#[cfg(unix)]
+fn post_build(_: &PathBuf) {
+//    let bin_path = Path::new("~/Documents/cv-rs/artifacts/default");
+//    let lib = bin_path.join("lib");
+//    let include = bin_path.join("include");
+//    run_command("cp", &["-r", ])
+
+}
+//
+//fn run_command(name: &str, args: &[&str]) {
+//    Command::new(name)
+//        .args(args)
+//        .status()
+//        .unwrap();
+//}
+

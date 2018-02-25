@@ -25,7 +25,7 @@ num_cpus = "1"
 serde_derive = "1"
 serde = "1"
 toml = "0.4"
-winreg = "0.5"
+winreg = {version = "0.5", optional = true}
 
 [features]
 cuda = []
