@@ -40,11 +40,11 @@ before_install:
   - rustup component add rustfmt-preview
 
 script:
-  - cargo build --no-default-features
-  - cargo test -v --no-default-features
+  - cargo build -vv --no-default-features
+  - cargo test  -vv --no-default-features
   - cargo build --features cuda
   - cargo build --features tesseract
-  - cargo test -v --features tesseract
+  - cargo test -vv --features tesseract
   - cargo doc --features cuda --no-deps
   - find src/*.rs | xargs rustfmt --write-mode=diff
   # Available until `cargo fmt` landed in stable rust 1.24
