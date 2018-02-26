@@ -187,19 +187,7 @@ fn opencv_link(config: &BuildConfig) {
 fn opencv_link(config: &BuildConfig) {
     let (_, lib) = get_bin_and_lib(config);
     println!("cargo:rustc-link-search=native={}", lib.to_str().unwrap());
-    println!("cargo:rustc-link-lib=opencv_core");
-    println!("cargo:rustc-link-lib=opencv_features2d");
-    println!("cargo:rustc-link-lib=opencv_xfeatures2d");
-    println!("cargo:rustc-link-lib=opencv_highgui");
-    println!("cargo:rustc-link-lib=opencv_imgcodecs");
-    println!("cargo:rustc-link-lib=opencv_imgproc");
-    println!("cargo:rustc-link-lib=opencv_objdetect");
-    println!("cargo:rustc-link-lib=opencv_text");
-    println!("cargo:rustc-link-lib=opencv_videoio");
-    println!("cargo:rustc-link-lib=opencv_video");
-    if IS_CUDA_ENABLED {
-        println!("cargo:rustc-link-lib=opencv_cudaobjdetect");
-    }
+    println!("cargo:rustc-link-lib=libopencv_world");
 }
 
 #[derive(Debug, Clone, Copy, Deserialize)]

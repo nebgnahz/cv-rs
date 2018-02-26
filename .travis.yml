@@ -35,7 +35,7 @@ addons:
 before_install:
   - export PATH="$PATH:$HOME/.cargo/bin"
   - sudo -E ./.ci/install_cuda.sh
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/usr/local/lib/x86_64-linux-gnu
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TRAVIS_BUILD_DIR/artifacts/default/lib
   - rustup component add rustfmt-preview
 
 script:
