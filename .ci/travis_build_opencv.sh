@@ -12,14 +12,7 @@ INSTALL_PREFIX=$HOME/usr
 if [[ ! -e $INSTALL_FLAG ]]; then
     TMP=$(mktemp -d)
     if [[ ! -d $OPENCV_BUILD ]]; then
-        curl -sL ${URL}  > ${TMP}/opencv.zip
-        unzip -q ${TMP}/opencv.zip
-        rm ${TMP}/opencv.zip
-
-        curl -sL ${URL_CONTRIB}  > ${TMP}/opencv_contrib.zip
-        unzip -q ${TMP}/opencv_contrib.zip
-        rm ${TMP}/opencv_contrib.zip
-
+		git submodule update --init --recursive
         mkdir $OPENCV_BUILD
     fi
 
