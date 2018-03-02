@@ -29,6 +29,14 @@ fn test_mat_type() {
     assert_eq!(res, CvType::Cv8UC1);
 }
 
+#[test]
+fn test_mat_clone() {
+    let img = utils::load_lenna();
+    let img2 = img.clone();
+    assert_eq!(img.rows, img2.rows);
+    assert_eq!(img.cols, img2.cols);
+}
+
 fn pixel_eq(a: u8, b: u8) -> bool {
     (a - b) <= 1
 }
