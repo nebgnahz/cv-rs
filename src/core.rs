@@ -427,3 +427,20 @@ pub enum NormType {
     /// Normalized using minmax distance
     MinMax = 32,
 }
+
+/// Threshold type. Please refer to [OpenCV's
+/// documentation] (https://docs.opencv.org/3.4.0/d7/d1b/group__imgproc__misc.html#gaa9e58d2860d4afa658ef70a9b1115576)
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+pub enum ThreshType {
+    /// THRESH_BINARY
+    ThreshBinary = 1,
+    /// THREST_BINARY_INV
+    ThreshBinaryInv = 2,
+    /// THRESH_TRUNC
+    ThreshTrunc = 3,
+    /// THRESH_TO_ZERO
+    ThreshToZero = 4,
+    /// THRESH_TO_ZERO_INV
+    ThreshToZeroInv = 5,
+}

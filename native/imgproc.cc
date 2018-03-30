@@ -69,4 +69,8 @@ void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Re
     *result = Result<double>::FromFunction(
         [first_image, second_image, method]() { return cv::compareHist(*first_image, *second_image, method); });
 }
+
+void cv_mat_threshold(const cv::Mat* const src, cv::Mat* const dst, double thresh, double maxval, int thresh_type) {
+    cv::threshold(*src, *dst, thresh, maxval, thresh_type);
+}
 }
