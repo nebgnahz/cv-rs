@@ -380,9 +380,27 @@ impl BitAnd for Mat {
     }
 }
 
+impl<'a> BitAnd for &'a Mat {
+    type Output = Mat;
+    fn bitand(self, rhs: &'a Mat) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_mat_bitwise_and(self.inner, rhs.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
 impl BitOr for Mat {
     type Output = Self;
     fn bitor(self, rhs: Self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_mat_bitwise_or(self.inner, rhs.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
+impl<'a> BitOr for &'a Mat {
+    type Output = Mat;
+    fn bitor(self, rhs: &'a Mat) -> Self::Output {
         let m = CMat::new();
         unsafe { cv_mat_bitwise_or(self.inner, rhs.inner, m) }
         Mat::from_raw(m)
@@ -398,8 +416,26 @@ impl BitXor for Mat {
     }
 }
 
+impl<'a> BitXor for &'a Mat {
+    type Output = Mat;
+    fn bitxor(self, rhs: &'a Mat) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_mat_bitwise_xor(self.inner, rhs.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
 impl Not for Mat {
     type Output = Self;
+    fn not(self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_mat_bitwise_not(self.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
+impl<'a> Not for &'a Mat {
+    type Output = Mat;
     fn not(self) -> Self::Output {
         let m = CMat::new();
         unsafe { cv_mat_bitwise_not(self.inner, m) }
