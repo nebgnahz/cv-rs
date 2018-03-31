@@ -31,7 +31,10 @@ fn try_opencv_link() -> Result<(), Box<std::error::Error>> {
         Some(opencv_world) => {
             let opencv_world = opencv_world.file_name();
             let opencv_world = opencv_world.into_string().unwrap();
-            let opencv_world_without_extension = opencv_world.trim_right_matches(|c: char| !c.is_numeric()); // we expect filename to be something like 'open_world340.lib' or 'open_world.340.dll.a', so we just consider everything after the version number is an extension
+            // we expect filename to be something like 'open_world340.lib' or
+            // 'open_world.340.dll.a', so we just consider everything after the
+            // version number is an extension
+            let opencv_world_without_extension = opencv_world.trim_right_matches(|c: char| !c.is_numeric());
             println!("cargo:rustc-link-search=native={}", opencv_dir);
             println!("cargo:rustc-link-lib={}", opencv_world_without_extension);
             Ok(())
