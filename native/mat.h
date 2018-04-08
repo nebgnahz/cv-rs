@@ -38,6 +38,14 @@ void cv_mat_bitwise_not(const cv::Mat* const src, cv::Mat* const dst);
 void cv_mat_bitwise_or(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst);
 void cv_mat_bitwise_xor(const cv::Mat* const src1, const cv::Mat* const src2, cv::Mat* dst);
 int cv_mat_count_non_zero(const cv::Mat* const src);
+void cv_mat_copy_make_border(const cv::Mat* const src1,
+                             cv::Mat* const dst,
+                             int top,
+                             int bottom,
+                             int left,
+                             int right,
+                             int borderType,
+                             Scalar value);
 }
 
 #endif  // CV_RS_MAT_H
