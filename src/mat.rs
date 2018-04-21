@@ -1,3 +1,10 @@
+// @Author: urban
+// @Date:   2018-04-21T22:17:18+02:00
+// @Last modified by:   urban
+// @Last modified time: 2018-04-21T22:18:57+02:00
+
+
+
 //! Mat
 
 use ::*;
@@ -63,7 +70,24 @@ extern "C" {
     fn cv_mat_bitwise_or(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
     fn cv_mat_bitwise_xor(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
     fn cv_mat_count_non_zero(src: *const CMat) -> c_int;
-    fn cv_mat_threshold(src: *const CMat, dst: *mut CMat, thresh: c_double, max_val: c_double, thresh_type: ThreshType);
+    fn cv_mat_threshold(
+        src: *const CMat,
+        dst: *mut CMat,
+        thresh: c_double,
+        max_val: c_double,
+        thresh_type: ThresholdType,
+    );
+    fn cv_mat_copy_make_border(
+        src: *const CMat,
+        dst: *mut CMat,
+        top: c_int,
+        bottom: c_int,
+        left: c_int,
+        right: c_int,
+        border_type: c_int,
+        color: Scalar,
+    ) -> c_int;
+>>>>>>> f832f0dbb99b24eee528b0a6daf243ed8e614954
 }
 
 /// The class `Mat` represents an n-dimensional dense numerical single-channel or multi-channel array.
@@ -363,12 +387,61 @@ impl Mat {
         unsafe { cv_mat_count_non_zero(self.inner) }
     }
 
+
     /// Threshold apples fixed-level threshold for each array element.
-    pub fn threshold(&self, thresh: f64, max_val: f64, t: ThreshType) -> Mat {
+    pub fn threshold(&self, thresh: f64, max_val: f64, t: ThresholdType) -> Mat {
         let m = CMat::new();
         unsafe { cv_mat_threshold(self.inner, m, thresh, max_val, t) }
         Mat::from_raw(m)
     }
+    /// Forms a border around an image.
+    ///
+    /// The function copies the source image into the middle of the destination
+    /// image. The areas to the left, to the right, above and below the copied
+    /// source image will be filled with extrapolated pixels. This is not what
+    /// filtering functions based on it do (they extrapolate pixels on-fly), but
+    /// what other more complex functions, including your own, may do to
+    /// simplify image boundary handling.
+    pub fn copy_make_border(
+        &self,
+        top: i32,
+        bottom: i32,
+        left: i32,
+        right: i32,
+        type_: BorderType,
+        color: Scalar,
+    ) -> Mat {
+        let m = CMat::new();
+        unsafe {
+            cv_mat_copy_make_border(self.inner, m, top, bottom, left, right, type_ as i32, color);
+        }
+        Mat::from_raw(m)
+    }
+}
+
+/// Various border types, image boundaries are denoted with `|`.
+#[derive(Debug, Copy, Clone)]
+pub enum BorderType {
+    /// `iiiiii|abcdefgh|iiiiiii`  with some specified `i`
+    Constant = 0,
+    /// `aaaaaa|abcdefgh|hhhhhhh`
+    Replicate = 1,
+    /// `fedcba|abcdefgh|hgfedcb`
+    Reflect = 2,
+    /// `cdefgh|abcdefgh|abcdefg`
+    Wrap = 3,
+    /// `gfedcb|abcdefgh|gfedcba`
+    Reflect101 = 4,
+    /// `uvwxyz|abcdefgh|ijklmno`
+    Transparent = 5,
+    /// Do not look outside of ROI.
+    Isolated = 16,
+}
+
+impl BorderType {
+    #[allow(non_upper_case_globals)]
+    /// same as Reflect101
+    pub const Default: BorderType = BorderType::Reflect101;
 }
 
 impl Drop for Mat {
@@ -388,9 +461,27 @@ impl BitAnd for Mat {
     }
 }
 
+impl<'a> BitAnd for &'a Mat {
+    type Output = Mat;
+    fn bitand(self, rhs: &'a Mat) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_mat_bitwise_and(self.inner, rhs.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
 impl BitOr for Mat {
     type Output = Self;
     fn bitor(self, rhs: Self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_mat_bitwise_or(self.inner, rhs.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
+impl<'a> BitOr for &'a Mat {
+    type Output = Mat;
+    fn bitor(self, rhs: &'a Mat) -> Self::Output {
         let m = CMat::new();
         unsafe { cv_mat_bitwise_or(self.inner, rhs.inner, m) }
         Mat::from_raw(m)
@@ -406,8 +497,26 @@ impl BitXor for Mat {
     }
 }
 
+impl<'a> BitXor for &'a Mat {
+    type Output = Mat;
+    fn bitxor(self, rhs: &'a Mat) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_mat_bitwise_xor(self.inner, rhs.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
 impl Not for Mat {
     type Output = Self;
+    fn not(self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_mat_bitwise_not(self.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
+impl<'a> Not for &'a Mat {
+    type Output = Mat;
     fn not(self) -> Self::Output {
         let m = CMat::new();
         unsafe { cv_mat_bitwise_not(self.inner, m) }
