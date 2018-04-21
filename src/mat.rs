@@ -77,6 +77,7 @@ extern "C" {
         max_val: c_double,
         thresh_type: ThresholdType,
     );
+
     fn cv_mat_copy_make_border(
         src: *const CMat,
         dst: *mut CMat,
@@ -87,7 +88,7 @@ extern "C" {
         border_type: c_int,
         color: Scalar,
     ) -> c_int;
->>>>>>> f832f0dbb99b24eee528b0a6daf243ed8e614954
+
 }
 
 /// The class `Mat` represents an n-dimensional dense numerical single-channel or multi-channel array.
@@ -388,12 +389,14 @@ impl Mat {
     }
 
 
+
     /// Threshold apples fixed-level threshold for each array element.
     pub fn threshold(&self, thresh: f64, max_val: f64, t: ThresholdType) -> Mat {
         let m = CMat::new();
         unsafe { cv_mat_threshold(self.inner, m, thresh, max_val, t) }
         Mat::from_raw(m)
     }
+
     /// Forms a border around an image.
     ///
     /// The function copies the source image into the middle of the destination
