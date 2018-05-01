@@ -40,6 +40,29 @@ void cv_pyr_down(cv::Mat* mat, cv::Mat* out) {
     cv::pyrDown(*mat, *out);
 }
 
+void cv_threshold(cv::Mat* mat, cv::Mat* out, double thresh, double maxval, int ttype) {
+    cv::threshold(*mat, *out, thresh, maxval, ttype);
+}
+
+void cv_erode(
+    cv::Mat* mat, cv::Mat* out, cv::Mat* kernel, Point2i anchor, int iterations, int borderType, Scalar borderValue) {
+    cv::Point pta(anchor.x, anchor.y);
+    cv::Scalar bv(borderValue.v0, borderValue.v1, borderValue.v2, borderValue.v3);
+    cv::erode(*mat, *out, *kernel, pta, iterations, borderType, bv);
+}
+
+void cv_dilate(
+    cv::Mat* mat, cv::Mat* out, cv::Mat* kernel, Point2i anchor, int iterations, int borderType, Scalar borderValue) {
+    cv::Point pta(anchor.x, anchor.y);
+    cv::Scalar bv(borderValue.v0, borderValue.v1, borderValue.v2, borderValue.v3);
+    cv::dilate(*mat, *out, *kernel, pta, iterations, borderType, bv);
+}
+
+void cv_gaussian_blur(cv::Mat* mat, cv::Mat* out, Size2i ksize, double sigma_x, double sigma_y, int bordertype) {
+    cv::Size cv_ksize(ksize.width, ksize.height);
+    cv::GaussianBlur(*mat, *out, cv_ksize, sigma_x, sigma_y, bordertype);
+}
+
 void cv_resize(cv::Mat* from, cv::Mat* to, Size2i dsize, double fx, double fy, int interpolation) {
     cv::Size cv_dsize(dsize.width, dsize.height);
     cv::resize(*from, *to, cv_dsize, fx, fy, interpolation);
