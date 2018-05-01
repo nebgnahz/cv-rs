@@ -24,3 +24,4 @@ gcc = "0"
 [features]
 cuda = []
 tesseract = []
+nonfree = []

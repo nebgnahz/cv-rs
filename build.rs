@@ -55,16 +55,18 @@ fn opencv_link() {
     println!("cargo:rustc-link-search=native=/usr/local/lib");
     println!("cargo:rustc-link-lib=opencv_core");
     println!("cargo:rustc-link-lib=opencv_features2d");
-    println!("cargo:rustc-link-lib=opencv_xfeatures2d");
     println!("cargo:rustc-link-lib=opencv_highgui");
     println!("cargo:rustc-link-lib=opencv_imgcodecs");
     println!("cargo:rustc-link-lib=opencv_imgproc");
     println!("cargo:rustc-link-lib=opencv_objdetect");
-    println!("cargo:rustc-link-lib=opencv_text");
     println!("cargo:rustc-link-lib=opencv_videoio");
     println!("cargo:rustc-link-lib=opencv_video");
     if cfg!(feature = "cuda") {
         println!("cargo:rustc-link-lib=opencv_cudaobjdetect");
+    }
+    if cfg!(feature = "nonfree") {
+        println!("cargo:rustc-link-lib=opencv_xfeatures2d");
+        println!("cargo:rustc-link-lib=opencv_text");
     }
 }
 
@@ -85,6 +87,10 @@ fn main() {
     if cfg!(feature = "cuda") {
         let cuda_files = get_files("native/cuda");
         opencv_config.files(cuda_files);
+    }
+    if cfg!(feature = "nonfree") {
+        let nonfree_files = get_files("native/nonfree");
+        opencv_config.files(nonfree_files);
     }
 
     opencv_config.compile("libopencv-wrapper.a");
