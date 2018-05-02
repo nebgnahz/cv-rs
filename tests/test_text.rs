@@ -50,6 +50,7 @@ mod tesseract {
     }
 }
 
+#[cfg(feature = "nonfree")]
 #[test]
 fn ocr_hmm_test() {
     let image_path = get_asset_path("Ubuntu.png");
@@ -77,6 +78,7 @@ fn ocr_hmm_test() {
     assert_ne!(reslen, 0); // do not check actual recognized text, waiting for fix: https://github.com/opencv/opencv_contrib/issues/1557
 }
 
+#[cfg(feature = "nonfree")]
 #[test]
 #[should_panic]
 fn ocr_holistic_word_panic() {

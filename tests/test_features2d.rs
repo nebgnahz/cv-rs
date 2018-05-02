@@ -5,6 +5,7 @@ use cv::*;
 use cv::features2d::*;
 use utils::*;
 
+#[cfg(feature = "nonfree")]
 #[test]
 fn mser_lenna_detect() {
     let lenna = load_lenna();
@@ -14,6 +15,7 @@ fn mser_lenna_detect() {
     assert_ne!(boxes.len(), 0);
 }
 
+#[cfg(feature = "nonfree")]
 #[test]
 fn surf_lenna_detect_and_compute() {
     let lenna = load_lenna();
@@ -26,6 +28,7 @@ fn surf_lenna_detect_and_compute() {
     assert_eq!(keypoints.len() as i32, descriptors.rows);
 }
 
+#[cfg(feature = "nonfree")]
 #[test]
 fn sift_lenna_detect_and_compute() {
     let lenna = load_lenna();
@@ -38,6 +41,7 @@ fn sift_lenna_detect_and_compute() {
     assert_eq!(keypoints.len() as i32, descriptors.rows);
 }
 
+#[cfg(feature = "nonfree")]
 #[test]
 fn flann_based_matcher() {
     let lenna = load_lenna();
@@ -53,6 +57,7 @@ fn flann_based_matcher() {
     assert_ne!(result.len(), 0);
 }
 
+#[cfg(feature = "nonfree")]
 #[test]
 fn flann_based_matcher_two() {
     let lenna = load_lenna();
@@ -65,6 +70,7 @@ fn flann_based_matcher_two() {
     assert_ne!(result.len(), 0);
 }
 
+#[cfg(feature = "nonfree")]
 #[test]
 fn flann_based_matcher_knn() {
     const K: usize = 3;
