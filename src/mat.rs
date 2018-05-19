@@ -10,10 +10,12 @@ use std::path::Path;
 use std::slice;
 use std::ops::{BitAnd, BitOr, BitXor, Not};
 
+/// The class `CMat` is used as a pointer to represent the Mat opencv structure
 #[derive(Clone, Copy, Debug)]
-pub(crate) enum CMat {}
+pub enum CMat {}
 
 impl CMat {
+    /// Create a new, empty CMat
     pub fn new() -> *mut CMat {
         unsafe { cv_mat_new() }
     }
@@ -81,7 +83,7 @@ extern "C" {
 #[derive(Debug)]
 pub struct Mat {
     /// Pointer to the actual C/C++ data structure
-    pub(crate) inner: *mut CMat,
+    pub inner: *mut CMat,
 
     /// Number of columns
     pub cols: c_int,
