@@ -1,7 +1,7 @@
 //! Provide the type that encapsulates all the parameters of the MSER extraction algorithm
-use ::*;
 use core::*;
 use std::os::raw::*;
+use *;
 
 enum CMSER {}
 

@@ -1,13 +1,13 @@
 //! Image file reading and writing, see [OpenCV
 //! imgcodecs](http://docs.opencv.org/3.1.0/d4/da8/group__imgcodecs.html).
 
-use ::*;
 use errors::*;
+use failure::Error;
 use mat::*;
 use std::ffi::CString;
 use std::os::raw::c_char;
 use std::path::Path;
-use failure::Error;
+use *;
 
 extern "C" {
     fn cv_imread(input: *const c_char, flags: ImageReadMode) -> *mut CMat;

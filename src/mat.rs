@@ -1,14 +1,14 @@
 //! Mat
 
-use ::*;
 use core::*;
 use failure::Error;
 use std::ffi::CString;
 use std::mem;
+use std::ops::{BitAnd, BitOr, BitXor, Not};
 use std::os::raw::{c_char, c_double, c_int};
 use std::path::Path;
 use std::slice;
-use std::ops::{BitAnd, BitOr, BitXor, Not};
+use *;
 
 #[derive(Clone, Copy, Debug)]
 pub(crate) enum CMat {}
@@ -334,16 +334,7 @@ impl Mat {
         let mut max = 0.0;
         let mut min_loc = Point2i::new(0, 0);
         let mut max_loc = Point2i::new(0, 0);
-        unsafe {
-            cv_mat_min_max_loc(
-                self.inner,
-                &mut min,
-                &mut max,
-                &mut min_loc,
-                &mut max_loc,
-                mask.inner,
-            )
-        }
+        unsafe { cv_mat_min_max_loc(self.inner, &mut min, &mut max, &mut min_loc, &mut max_loc, mask.inner) }
         (min, max, min_loc, max_loc)
     }
 

@@ -4,11 +4,11 @@
 use super::core::*;
 use super::errors::*;
 use super::objdetect::{CSvmDetector, HogParams, ObjectDetect, SvmDetector};
-use ::*;
 use failure::Error;
 use std::ffi::CString;
 use std::os::raw::{c_char, c_double, c_int};
 use std::path::Path;
+use *;
 
 /// Opaque data struct for C/C++ cv::cuda::GpuMat bindings
 #[derive(Clone, Copy, Debug)]
@@ -239,11 +239,7 @@ impl GpuHog {
         unsafe {
             cv_cuda_hog_detect(self.inner, mat.inner, &mut found);
         }
-        found
-            .unpack()
-            .into_iter()
-            .map(|r| (r, 0f64))
-            .collect::<Vec<_>>()
+        found.unpack().into_iter().map(|r| (r, 0f64)).collect::<Vec<_>>()
     }
 
     /// Detects and returns the results with confidence (scores)
@@ -409,10 +405,7 @@ impl ObjectDetect for GpuCascade {
     fn detect(&self, image: &Mat) -> Vec<(Rect, f64)> {
         let mut gpu_mat = GpuMat::default();
         gpu_mat.upload(image);
-        self.detect_multiscale(&gpu_mat)
-            .into_iter()
-            .map(|r| (r, 0.0))
-            .collect()
+        self.detect_multiscale(&gpu_mat).into_iter().map(|r| (r, 0.0)).collect()
     }
 }
 

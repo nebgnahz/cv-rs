@@ -20,28 +20,28 @@ extern crate bytes;
 extern crate failure;
 
 pub mod core;
-pub mod errors;
-pub mod imgproc;
-pub mod imgcodecs;
-pub mod mat;
-pub mod videoio;
-pub mod highgui;
-pub mod video;
-pub mod objdetect;
-pub mod features2d;
-pub mod text;
 #[cfg(feature = "cuda")]
 pub mod cuda;
+pub mod errors;
+pub mod features2d;
+pub mod highgui;
+pub mod imgcodecs;
+pub mod imgproc;
+pub mod mat;
+pub mod objdetect;
+pub mod text;
+pub mod video;
+pub mod videoio;
 
 pub use core::*;
 pub use mat::*;
 
+use errors::*;
+use failure::Error;
 use std::ffi::{CStr, CString};
 use std::mem;
 use std::os::raw::{c_char, c_void};
 use std::path::Path;
-use failure::Error;
-use errors::*;
 
 extern "C" {
     fn c_drop(value: *mut c_void);
@@ -159,9 +159,7 @@ unsafe fn unpack<T: NestedVec, U, F>(v: &CVec<T>, mut f: F) -> Vec<U>
 where
     F: FnMut(&T) -> U,
 {
-    (0..v.size)
-        .map(|i| f(&*v.array.offset(i as isize)))
-        .collect()
+    (0..v.size).map(|i| f(&*v.array.offset(i as isize))).collect()
 }
 
 pub(crate) trait Unpack {
@@ -226,9 +224,7 @@ impl Unpack for CDisposableString {
     type Out = String;
 
     fn unpack(&self) -> Self::Out {
-        unsafe { CStr::from_ptr(self.value) }
-            .to_string_lossy()
-            .into_owned()
+        unsafe { CStr::from_ptr(self.value) }.to_string_lossy().into_owned()
     }
 }
 

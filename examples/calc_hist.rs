@@ -1,8 +1,8 @@
 extern crate cv;
 
-use cv::*;
 use cv::highgui::*;
 use cv::imgcodecs::ImageReadMode;
+use cv::*;
 
 fn main() {
     ////////////////////////////////

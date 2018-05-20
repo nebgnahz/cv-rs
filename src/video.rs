@@ -41,9 +41,7 @@ pub mod tracking {
         /// Creates a new termination criteria.
         pub fn new(t: TermType, max_count: c_int, epsilon: f64) -> Self {
             let c_criteria = unsafe { cv_term_criteria_new(t, max_count, epsilon) };
-            TermCriteria {
-                c_criteria: c_criteria,
-            }
+            TermCriteria { c_criteria: c_criteria }
         }
     }
 

@@ -1,8 +1,8 @@
 //! Provide the type that encapsulates all the parameters of the SURF extraction algorithm
 use super::*;
-use ::*;
 use core::*;
 use std::os::raw::*;
+use *;
 
 enum CSURF {}
 
@@ -106,14 +106,7 @@ impl Feature2D for SURF {
         let mut keypoints = CVec::<KeyPoint>::default();
         let descriptors = CMat::new();
         unsafe {
-            cv_surf_detect_and_compute(
-                self.value,
-                image.inner,
-                mask.inner,
-                &mut keypoints,
-                descriptors,
-                false,
-            );
+            cv_surf_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
         }
         (keypoints.unpack(), Mat::from_raw(descriptors))
     }

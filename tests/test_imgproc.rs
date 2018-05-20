@@ -2,9 +2,9 @@ extern crate cv;
 extern crate float_cmp;
 mod utils;
 
-use cv::*;
 use cv::imgcodecs::ImageReadMode;
 use cv::imgproc::*;
+use cv::*;
 use float_cmp::ApproxEqRatio;
 
 const FIRST_IMAGE_PATH: &str = "assets/Histogram_Comparison_Source_0.png";

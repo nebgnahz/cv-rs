@@ -1,8 +1,8 @@
 extern crate cv;
 mod utils;
 
-use cv::*;
 use cv::features2d::*;
+use cv::*;
 use utils::*;
 
 #[test]

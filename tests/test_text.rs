@@ -1,9 +1,9 @@
 extern crate cv;
 mod utils;
 
-use cv::*;
 use cv::imgcodecs::ImageReadMode;
 use cv::text::*;
+use cv::*;
 use utils::*;
 
 const VOCABULARY: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -59,11 +59,7 @@ fn ocr_hmm_test() {
     let image = Mat::from_path(&image_path, ImageReadMode::Grayscale).unwrap();
     let transition_probability_table =
         Mat::from_file_storage(&transition_probability_path, "transition_probabilities").unwrap();
-    let emission_probability_table = Mat::eye(
-        VOCABULARY.len() as i32,
-        VOCABULARY.len() as i32,
-        CvType::Cv64FC1,
-    );
+    let emission_probability_table = Mat::eye(VOCABULARY.len() as i32, VOCABULARY.len() as i32, CvType::Cv64FC1);
     let ocr = OcrHmmDecoder::new(
         &classifier_name,
         VOCABULARY,

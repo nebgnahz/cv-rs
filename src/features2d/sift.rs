@@ -1,8 +1,8 @@
 //! Provide the type that encapsulates all the parameters of the SIFT extraction algorithm
 use super::*;
-use ::*;
 use core::*;
 use std::os::raw::*;
+use *;
 
 enum CSIFT {}
 
@@ -40,15 +40,7 @@ impl SIFT {
         edge_threshold: f64,
         sigma: f64,
     ) -> Self {
-        let sift = unsafe {
-            cv_sift_new(
-                features,
-                octave_layers,
-                contrast_threshold,
-                edge_threshold,
-                sigma,
-            )
-        };
+        let sift = unsafe { cv_sift_new(features, octave_layers, contrast_threshold, edge_threshold, sigma) };
         SIFT { value: sift }
     }
 }
@@ -120,14 +112,7 @@ impl Feature2D for SIFT {
         let mut keypoints = CVec::<KeyPoint>::default();
         let descriptors = CMat::new();
         unsafe {
-            cv_sift_detect_and_compute(
-                self.value,
-                image.inner,
-                mask.inner,
-                &mut keypoints,
-                descriptors,
-                false,
-            );
+            cv_sift_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
         }
         (keypoints.unpack(), Mat::from_raw(descriptors))
     }

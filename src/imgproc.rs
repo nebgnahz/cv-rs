@@ -1,8 +1,8 @@
 //! Image processing, see [OpenCV
 //! imgproc](http://docs.opencv.org/3.1.0/d7/dbd/group__imgproc.html).
 
-use super::*;
 use super::core::*;
+use super::*;
 use std::os::raw::{c_double, c_float, c_int};
 
 // =============================================================================
@@ -120,7 +120,7 @@ pub enum HistogramComparisionMethod {
 /// [threshold](../struct.Mat.html#method.threshold).
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
-#[allow(non_camel_case_types, missing_docs)]
+#[allow(missing_docs)]
 pub enum ThresholdType {
     Binary = 0,
     BinaryInv = 1,
@@ -549,10 +549,6 @@ impl Mat {
     }
 
     fn matrix_to_vec<T, MElem: AsRef<[T]>, M: AsRef<[MElem]>>(value: M) -> Vec<*const T> {
-        value
-            .as_ref()
-            .iter()
-            .map(|x| x.as_ref().as_ptr())
-            .collect::<Vec<_>>()
+        value.as_ref().iter().map(|x| x.as_ref().as_ptr()).collect::<Vec<_>>()
     }
 }
