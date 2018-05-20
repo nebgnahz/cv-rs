@@ -36,6 +36,33 @@ extern "C" {
 
     fn cv_cvt_color(cmat: *const CMat, output: *mut CMat, code: ColorConversion);
     fn cv_pyr_down(cmat: *const CMat, output: *mut CMat);
+    fn cv_threshold(from: *const CMat, to: *mut CMat, thresh: f64, maxval: f64, ttype: ThresholdType);
+    fn cv_erode(
+        from: *const CMat,
+        to: *mut CMat,
+        kernel: *const CMat,
+        anchor: Point2i,
+        iterations: i32,
+        border_type: i32,
+        border_value: Scalar,
+    );
+    fn cv_dilate(
+        from: *const CMat,
+        to: *mut CMat,
+        kernel: *const CMat,
+        anchor: Point2i,
+        iterations: i32,
+        border_type: i32,
+        border_value: Scalar,
+    );
+    fn cv_gaussian_blur(
+        from: *const CMat,
+        to: *mut CMat,
+        dsize: Size2i,
+        sigma_x: c_double,
+        sigma_y: c_double,
+        border_type: i32,
+    );
     fn cv_resize(
         from: *const CMat,
         to: *mut CMat,
@@ -87,6 +114,22 @@ pub enum HistogramComparisionMethod {
     ChiSquareAlternative = 4,
     /// HISTCMP_KL_DIV
     KullbackLeiblerDivergence = 5,
+}
+
+/// ThresholdTypes used in
+/// [threshold](../struct.Mat.html#method.threshold).
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+#[allow(non_camel_case_types, missing_docs)]
+pub enum ThresholdType {
+    Binary = 0,
+    BinaryInv = 1,
+    Trunc = 2,
+    ToZero = 3,
+    ToZeroInv = 4,
+    Mask = 7,
+    Otsu = 8,
+    Triangle = 16,
 }
 
 /// Color conversion code used in
@@ -352,6 +395,72 @@ impl Mat {
     pub fn pyr_down(&self) -> Mat {
         let m = CMat::new();
         unsafe { cv_pyr_down(self.inner, m) }
+        Mat::from_raw(m)
+    }
+
+    /// Threshold
+    ///
+    pub fn threshold(&self, thresh: f64, maxval: f64, threshold_type: ThresholdType) -> Mat {
+        let m = CMat::new();
+        unsafe { cv_threshold(self.inner, m, thresh, maxval, threshold_type) }
+        Mat::from_raw(m)
+    }
+
+    /// Erode
+    ///
+    pub fn erode(
+        &self,
+        kernel: &Mat,
+        anchor: Point2i,
+        iterations: i32,
+        border_type: BorderType,
+        border_value: Scalar,
+    ) -> Mat {
+        let m = CMat::new();
+        unsafe {
+            cv_erode(
+                self.inner,
+                m,
+                kernel.inner,
+                anchor,
+                iterations,
+                border_type as i32,
+                border_value,
+            )
+        }
+        Mat::from_raw(m)
+    }
+
+    /// Dilate
+    ///
+    pub fn dilate(
+        &self,
+        kernel: &Mat,
+        anchor: Point2i,
+        iterations: i32,
+        border_type: BorderType,
+        border_value: Scalar,
+    ) -> Mat {
+        let m = CMat::new();
+        unsafe {
+            cv_dilate(
+                self.inner,
+                m,
+                kernel.inner,
+                anchor,
+                iterations,
+                border_type as i32,
+                border_value,
+            )
+        }
+        Mat::from_raw(m)
+    }
+
+    /// Gaussian Blur
+    ///
+    pub fn gaussian_blur(&self, dsize: Size2i, sigma_x: f64, sigma_y: f64, border_type: BorderType) -> Mat {
+        let m = CMat::new();
+        unsafe { cv_gaussian_blur(self.inner, m, dsize, sigma_x, sigma_y, border_type as i32) }
         Mat::from_raw(m)
     }
 
