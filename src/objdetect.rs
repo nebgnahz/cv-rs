@@ -1,9 +1,9 @@
 //! Various object detection algorithms, such as Haar feature-based cascade
 //! classifier for object detection and histogram of oriented gradients (HOG).
 
-use super::*;
 use super::core::*;
 use super::errors::*;
+use super::*;
 use failure::Error;
 use std::ffi::CString;
 use std::os::raw::{c_char, c_double, c_int};

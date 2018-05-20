@@ -1,11 +1,11 @@
 //! HMM
-use super::*;
 use super::private::*;
-use ::*;
-use mat::CMat;
+use super::*;
 use errors::*;
+use mat::CMat;
 use std::os::raw::c_char;
 use std::path::Path;
+use *;
 
 extern "C" {
     fn cv_hmm_new(

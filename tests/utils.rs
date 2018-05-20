@@ -5,17 +5,17 @@
 
 extern crate cv;
 
-use cv::*;
 use cv::imgcodecs::*;
 use cv::objdetect::*;
+use cv::*;
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 pub fn close_rect(a: Rect, b: Rect, epsilon: i32) -> bool {
-    ((a.x - b.x) < epsilon) && ((a.y - b.y) < epsilon) && ((a.width - b.width)) < epsilon
-        && ((a.height - b.height)) < epsilon
+    ((a.x - b.x) < epsilon) && ((a.y - b.y) < epsilon) && (a.width - b.width) < epsilon
+        && (a.height - b.height) < epsilon
 }
 
 pub fn timed<F>(label: &str, inner: F)
@@ -79,7 +79,5 @@ pub fn load_frontal_face() -> CascadeClassifier {
 }
 
 pub fn get_asset_path(name: &'static str) -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("assets")
-        .join(name)
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("assets").join(name)
 }

@@ -10,9 +10,9 @@ pub use self::holisticword::*;
 #[cfg(feature = "tesseract")]
 pub use self::tesseract::*;
 
-use ::*;
-use mat::CMat;
 use failure::Error;
+use mat::CMat;
+use *;
 
 extern "C" {
     fn cv_ocr_run(
