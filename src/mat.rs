@@ -15,8 +15,7 @@ use std::ops::{BitAnd, BitOr, BitXor, Not};
 pub enum CMat {}
 
 impl CMat {
-    /// Create a new, empty CMat
-    pub fn new() -> *mut CMat {
+    pub(crate) fn new() -> *mut CMat {
         unsafe { cv_mat_new() }
     }
 }
@@ -83,7 +82,7 @@ extern "C" {
 #[derive(Debug)]
 pub struct Mat {
     /// Pointer to the actual C/C++ data structure
-    pub inner: *mut CMat,
+    pub(crate) inner: *mut CMat,
 
     /// Number of columns
     pub cols: c_int,
@@ -100,6 +99,11 @@ pub struct Mat {
 
 unsafe impl Send for CMat {}
 unsafe impl Send for Mat {}
+impl Into<CMat> for Mat {
+    fn into(self) -> CMat {
+        unsafe { *self.inner }
+    }
+}
 
 impl Mat {
     /// Loads `Mat` from file storage
