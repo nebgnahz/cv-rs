@@ -1,6 +1,6 @@
 [package]
 name = "cv"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Ben Zhang <benzh@cs.berkeley.edu>"]
 build = "build.rs"
 repository = "https://github.com/nebgnahz/cv-rs.git"

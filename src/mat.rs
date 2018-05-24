@@ -10,11 +10,12 @@ use std::path::Path;
 use std::slice;
 use *;
 
+/// The class `CMat` is used as a pointer to represent the Mat opencv structure
 #[derive(Clone, Copy, Debug)]
-pub(crate) enum CMat {}
+pub enum CMat {}
 
 impl CMat {
-    pub fn new() -> *mut CMat {
+    pub(crate) fn new() -> *mut CMat {
         unsafe { cv_mat_new() }
     }
 }
@@ -98,6 +99,11 @@ pub struct Mat {
 
 unsafe impl Send for CMat {}
 unsafe impl Send for Mat {}
+impl Into<CMat> for Mat {
+    fn into(self) -> CMat {
+        unsafe { *self.inner }
+    }
+}
 
 impl Mat {
     /// Loads `Mat` from file storage
