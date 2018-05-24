@@ -152,4 +152,10 @@ void cv_mat_bitwise_xor(const cv::Mat* const src1, const cv::Mat* const src2, cv
 int cv_mat_count_non_zero(const cv::Mat* const src) {
     return cv::countNonZero(*src);
 }
+
+void cv_mat_copy_make_border(
+    const cv::Mat* const src, cv::Mat* const d, int t, int b, int l, int r, int type, Scalar color) {
+    cv::Scalar c(color.v0, color.v1, color.v2, color.v3);
+    copyMakeBorder(*src, *d, t, b, l, r, type, c);
+}
 }

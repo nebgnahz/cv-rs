@@ -1,6 +1,6 @@
 //! Provide types for matching keypoint descriptors
-use ::*;
 use std::os::raw::{c_char, c_int};
+use *;
 
 enum CDescriptorMatcher {}
 
@@ -131,12 +131,7 @@ impl DescriptorMatcher {
     pub fn knn_match(&self, query_descriptors: &Mat, k: usize) -> Vec<Vec<DMatch>> {
         let mut matches = CVec::<CVec<DMatch>>::default();
         unsafe {
-            cv_matcher_knn_match(
-                self.value,
-                query_descriptors.inner,
-                k as c_int,
-                &mut matches,
-            );
+            cv_matcher_knn_match(self.value, query_descriptors.inner, k as c_int, &mut matches);
         }
         matches.unpack()
     }

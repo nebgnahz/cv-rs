@@ -1,9 +1,9 @@
 extern crate cv;
 
-use cv::*;
 use cv::highgui::*;
 use cv::imgcodecs::ImageReadMode;
 use cv::imgproc::ColorConversion;
+use cv::*;
 
 fn main() {
     ////////////////////////////////
@@ -64,12 +64,7 @@ fn main() {
             let intensity = (bin_val * 255.0 / max_val) as i32;
             let rect = Rect::new(h * scale + 1, s * scale + 1, scale - 1, scale - 1);
 
-            hist_image.rectangle_custom(
-                rect,
-                Scalar::all(intensity),
-                LineType::Filled as i32,
-                LineType::Line8,
-            );
+            hist_image.rectangle_custom(rect, Scalar::all(intensity), LineType::Filled as i32, LineType::Line8);
         }
     }
 

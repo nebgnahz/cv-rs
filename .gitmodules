@@ -1,0 +1,8 @@
+[submodule "opencv_contrib"]
+	path = opencv_contrib
+	url = https://github.com/opencv/opencv_contrib.git
+	shallow = true
+[submodule "opencv"]
+	path = opencv
+	url = https://github.com/opencv/opencv.git
+	shallow = true

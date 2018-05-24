@@ -1,14 +1,14 @@
 //! Mat
 
-use ::*;
 use core::*;
 use failure::Error;
 use std::ffi::CString;
 use std::mem;
+use std::ops::{BitAnd, BitOr, BitXor, Not};
 use std::os::raw::{c_char, c_double, c_int};
 use std::path::Path;
 use std::slice;
-use std::ops::{BitAnd, BitOr, BitXor, Not};
+use *;
 
 #[derive(Clone, Copy, Debug)]
 pub(crate) enum CMat {}
@@ -63,6 +63,16 @@ extern "C" {
     fn cv_mat_bitwise_or(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
     fn cv_mat_bitwise_xor(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
     fn cv_mat_count_non_zero(src: *const CMat) -> c_int;
+    fn cv_mat_copy_make_border(
+        src: *const CMat,
+        dst: *mut CMat,
+        top: c_int,
+        bottom: c_int,
+        left: c_int,
+        right: c_int,
+        border_type: c_int,
+        color: Scalar,
+    ) -> c_int;
 }
 
 /// The class `Mat` represents an n-dimensional dense numerical single-channel or multi-channel array.
@@ -324,16 +334,7 @@ impl Mat {
         let mut max = 0.0;
         let mut min_loc = Point2i::new(0, 0);
         let mut max_loc = Point2i::new(0, 0);
-        unsafe {
-            cv_mat_min_max_loc(
-                self.inner,
-                &mut min,
-                &mut max,
-                &mut min_loc,
-                &mut max_loc,
-                mask.inner,
-            )
-        }
+        unsafe { cv_mat_min_max_loc(self.inner, &mut min, &mut max, &mut min_loc, &mut max_loc, mask.inner) }
         (min, max, min_loc, max_loc)
     }
 
@@ -361,6 +362,55 @@ impl Mat {
     pub fn count_non_zero(&self) -> c_int {
         unsafe { cv_mat_count_non_zero(self.inner) }
     }
+
+    /// Forms a border around an image.
+    ///
+    /// The function copies the source image into the middle of the destination
+    /// image. The areas to the left, to the right, above and below the copied
+    /// source image will be filled with extrapolated pixels. This is not what
+    /// filtering functions based on it do (they extrapolate pixels on-fly), but
+    /// what other more complex functions, including your own, may do to
+    /// simplify image boundary handling.
+    pub fn copy_make_border(
+        &self,
+        top: i32,
+        bottom: i32,
+        left: i32,
+        right: i32,
+        type_: BorderType,
+        color: Scalar,
+    ) -> Mat {
+        let m = CMat::new();
+        unsafe {
+            cv_mat_copy_make_border(self.inner, m, top, bottom, left, right, type_ as i32, color);
+        }
+        Mat::from_raw(m)
+    }
+}
+
+/// Various border types, image boundaries are denoted with `|`.
+#[derive(Debug, Copy, Clone)]
+pub enum BorderType {
+    /// `iiiiii|abcdefgh|iiiiiii`  with some specified `i`
+    Constant = 0,
+    /// `aaaaaa|abcdefgh|hhhhhhh`
+    Replicate = 1,
+    /// `fedcba|abcdefgh|hgfedcb`
+    Reflect = 2,
+    /// `cdefgh|abcdefgh|abcdefg`
+    Wrap = 3,
+    /// `gfedcb|abcdefgh|gfedcba`
+    Reflect101 = 4,
+    /// `uvwxyz|abcdefgh|ijklmno`
+    Transparent = 5,
+    /// Do not look outside of ROI.
+    Isolated = 16,
+}
+
+impl BorderType {
+    #[allow(non_upper_case_globals)]
+    /// same as Reflect101
+    pub const Default: BorderType = BorderType::Reflect101;
 }
 
 impl Drop for Mat {
@@ -380,6 +430,15 @@ impl BitAnd for Mat {
     }
 }
 
+impl<'a> BitAnd for &'a Mat {
+    type Output = Mat;
+    fn bitand(self, rhs: &'a Mat) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_mat_bitwise_and(self.inner, rhs.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
 impl BitOr for Mat {
     type Output = Self;
     fn bitor(self, rhs: Self) -> Self::Output {
@@ -389,9 +448,27 @@ impl BitOr for Mat {
     }
 }
 
+impl<'a> BitOr for &'a Mat {
+    type Output = Mat;
+    fn bitor(self, rhs: &'a Mat) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_mat_bitwise_or(self.inner, rhs.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
 impl BitXor for Mat {
     type Output = Self;
     fn bitxor(self, rhs: Self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_mat_bitwise_xor(self.inner, rhs.inner, m) }
+        Mat::from_raw(m)
+    }
+}
+
+impl<'a> BitXor for &'a Mat {
+    type Output = Mat;
+    fn bitxor(self, rhs: &'a Mat) -> Self::Output {
         let m = CMat::new();
         unsafe { cv_mat_bitwise_xor(self.inner, rhs.inner, m) }
         Mat::from_raw(m)
@@ -410,5 +487,14 @@ impl Not for Mat {
 impl Clone for Mat {
     fn clone(&self) -> Self {
         Mat::from_buffer(self.rows, self.cols, self.cv_type(), self.data())
+    }
+}
+
+impl<'a> Not for &'a Mat {
+    type Output = Mat;
+    fn not(self) -> Self::Output {
+        let m = CMat::new();
+        unsafe { cv_mat_bitwise_not(self.inner, m) }
+        Mat::from_raw(m)
     }
 }

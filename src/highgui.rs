@@ -1,10 +1,10 @@
 //! highgui: high-level GUI
 use failure::Error;
+use mat::*;
 use std::ffi::CString;
 use std::mem;
 use std::os::raw::{c_char, c_int, c_void};
 use std::ptr;
-use mat::*;
 
 extern "C" {
     fn cv_named_window(name: *const c_char, flags: WindowFlag);

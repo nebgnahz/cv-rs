@@ -1,10 +1,10 @@
 //! Holistic word
-use super::*;
 use super::private::*;
-use ::*;
+use super::*;
 use errors::*;
 use std::os::raw::c_char;
 use std::path::Path;
+use *;
 
 extern "C" {
     fn cv_holistic_new(

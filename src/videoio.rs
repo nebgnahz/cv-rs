@@ -2,9 +2,9 @@
 //! videoio](http://docs.opencv.org/3.1.0/dd/de7/group__videoio.html)
 
 use core::*;
-use mat::*;
 use errors::*;
 use failure::Error;
+use mat::*;
 use std::os::raw::{c_char, c_double, c_int};
 
 // =============================================================================
