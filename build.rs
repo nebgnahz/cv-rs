@@ -1,4 +1,4 @@
-extern crate gcc;
+extern crate cc;
 
 #[cfg(windows)]
 fn opencv_include() -> String {
@@ -71,7 +71,7 @@ fn opencv_link() {
 fn main() {
     let files = get_files("native");
 
-    let mut opencv_config = gcc::Build::new();
+    let mut opencv_config = cc::Build::new();
     opencv_config
         .cpp(true)
         .files(files)

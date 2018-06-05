@@ -32,6 +32,7 @@ pub mod objdetect;
 pub mod text;
 pub mod video;
 pub mod videoio;
+pub mod phash;
 
 pub use core::*;
 pub use mat::*;
