@@ -15,11 +15,11 @@ bytes = "0.4"
 failure = "0.1"
 
 [dev-dependencies]
-getopts = "0"
-float-cmp = "0"
+getopts = "0.2"
+float-cmp = "0.4"
 
 [build-dependencies]
-cc = "1"
+cc = { version = "1.0", features = ["parallel"] }
 
 [features]
 cuda = []
