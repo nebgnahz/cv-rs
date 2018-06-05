@@ -324,8 +324,10 @@ pub fn codec_name_from_4cc(value: &str) -> Result<u32, Error> {
         Err(CvError::UnicodeChars(value.into()).into())
     } else {
         let bytes = value.as_bytes();
-        let result = ((bytes[0] as u32) & 0xFFu32) + (((bytes[1] as u32) & 0xFFu32) << 8)
-            + (((bytes[2] as u32) & 0xFFu32) << 16) + (((bytes[3] as u32) & 0xFFu32) << 24);
+        let result = ((bytes[0] as u32) & 0xFFu32)
+            + (((bytes[1] as u32) & 0xFFu32) << 8)
+            + (((bytes[2] as u32) & 0xFFu32) << 16)
+            + (((bytes[3] as u32) & 0xFFu32) << 24);
         Ok(result)
     }
 }

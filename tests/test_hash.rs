@@ -2,8 +2,8 @@ extern crate cv;
 mod utils;
 
 use cv::imgcodecs::ImageReadMode;
-use cv::*;
 use cv::phash::*;
+use cv::*;
 use utils::*;
 
 #[test]

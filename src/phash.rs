@@ -5,9 +5,7 @@ use *;
 #[derive(Clone, Copy, Debug)]
 enum CPHash {}
 
-impl CPHash {
-
-}
+impl CPHash {}
 
 extern "C" {
     fn cv_phash_new() -> *mut CPHash;
@@ -25,9 +23,7 @@ impl PHash {
     /// Creates new PHash
     pub fn new() -> PHash {
         let value = unsafe { cv_phash_new() };
-        Self {
-            value
-        }
+        Self { value }
     }
 
     /// Computes image hash

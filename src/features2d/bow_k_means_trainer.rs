@@ -4,7 +4,12 @@ use *;
 enum CBOWKMeansTrainer {}
 
 extern "C" {
-    fn cv_bow_trainer_new(cluster_count: i32, term_criteria: *mut CTermCriteria, attempts: i32,  centers: KMeansCenters) -> *mut CBOWKMeansTrainer;
+    fn cv_bow_trainer_new(
+        cluster_count: i32,
+        term_criteria: *mut CTermCriteria,
+        attempts: i32,
+        centers: KMeansCenters,
+    ) -> *mut CBOWKMeansTrainer;
     fn cv_bow_trainer_drop(bow_trainer: *mut CBOWKMeansTrainer);
     fn cv_bow_trainer_add(bow_trainer: *mut CBOWKMeansTrainer, descriptors: *mut CMat);
     fn cv_bow_trainer_cluster(bow_trainer: *mut CBOWKMeansTrainer) -> *mut CMat;
@@ -36,7 +41,7 @@ impl Drop for BOWKMeansTrainer {
 
 impl BOWKMeansTrainer {
     /// Creates a new maximally stable extremal region extractor criteria.
-    pub fn new(        cluster_count:i32, term_criteria: TermCriteria, attempts: i32,  centers: KMeansCenters) -> Self {
+    pub fn new(cluster_count: i32, term_criteria: TermCriteria, attempts: i32, centers: KMeansCenters) -> Self {
         let ptr = unsafe { cv_bow_trainer_new(cluster_count, term_criteria.c_criteria, attempts, centers) };
         Self { value: ptr }
     }
@@ -54,4 +59,3 @@ impl BOWKMeansTrainer {
         Mat::from_raw(cmat)
     }
 }
-

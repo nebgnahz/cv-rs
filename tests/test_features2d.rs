@@ -84,12 +84,7 @@ fn flann_based_matcher_knn() {
 
 #[test]
 fn bow() {
-    let mut bow = BOWKMeansTrainer::new(
-        2,
-        TermCriteria::new(TermType::Count, 100, 0.01),
-        1,
-        KMeansCenters::Pp,
-    );
+    let mut bow = BOWKMeansTrainer::new(2, TermCriteria::new(TermType::Count, 100, 0.01), 1, KMeansCenters::Pp);
     let lenna = load_lenna();
     let messi = load_messi_color();
     let sift: SIFT = SIFTBuilder::default().into();

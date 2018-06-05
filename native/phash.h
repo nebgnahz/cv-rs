@@ -6,8 +6,8 @@
 
 extern "C" {
 
-void *cv_phash_new();
-void cv_phash_drop(cv::Ptr <cv::img_hash::PHash> *phash);
-void cv_phash_compute(cv::Ptr <cv::img_hash::PHash> *phash, cv::Mat &mat, cv::Mat &result);
+void* cv_phash_new();
+void cv_phash_drop(cv::Ptr<cv::img_hash::PHash>* phash);
+void cv_phash_compute(cv::Ptr<cv::img_hash::PHash>* phash, cv::Mat& mat, cv::Mat& result);
 }
 #endif

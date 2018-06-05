@@ -29,10 +29,10 @@ pub mod imgcodecs;
 pub mod imgproc;
 pub mod mat;
 pub mod objdetect;
+pub mod phash;
 pub mod text;
 pub mod video;
 pub mod videoio;
-pub mod phash;
 
 pub use core::*;
 pub use mat::*;
