@@ -1,6 +1,3 @@
-#ifndef PHASH_H_
-#define PHASH_H_
-
 #include <opencv2/core.hpp>
 #include <opencv2/img_hash.hpp>
 
@@ -20,4 +17,3 @@ void cv_phash_compute(cv::Ptr <cv::img_hash::PHash> *phash, cv::Mat &mat, cv::Ma
     phash->get()->compute(mat, result);
 }
 }
-#endif
