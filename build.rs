@@ -22,8 +22,8 @@ fn opencv_link() {
 fn try_opencv_link() -> Result<(), Box<std::error::Error>> {
     let opencv_dir = std::env::var("OPENCV_LIB")?;
     let files = std::fs::read_dir(&opencv_dir)?.collect::<Vec<_>>();
-    let opencv_world = get_file(files.iter(), "world")?;
-    let img_hash = get_file(files.iter(), "img_hash")?;
+    let opencv_world = get_opencv_lib_path(files.iter(), "world")?;
+    let img_hash = get_opencv_lib_path(files.iter(), "img_hash")?;
 
     println!("cargo:rustc-link-search=native={}", opencv_dir);
     println!("cargo:rustc-link-lib={}", opencv_world);
@@ -31,7 +31,8 @@ fn try_opencv_link() -> Result<(), Box<std::error::Error>> {
     Ok(())
 }
 
-fn get_file<'a, T: Iterator<Item = &'a std::io::Result<std::fs::DirEntry>>>(
+#[cfg(windows)]
+fn get_opencv_lib_path<'a, T: Iterator<Item = &'a std::io::Result<std::fs::DirEntry>>>(
     files: T,
     name: &str,
 ) -> Result<String, Box<std::error::Error>> {
@@ -47,7 +48,8 @@ fn get_file<'a, T: Iterator<Item = &'a std::io::Result<std::fs::DirEntry>>>(
         ))
     })?;
     let lib = lib.file_name();
-    let lib = lib.into_string()
+    let lib = lib
+        .into_string()
         .map_err(|e| BuildError::new(format!("Cannot convert path '{:?}' to string", e)))?;
     // we expect filename to be something like 'open_world340.lib' or
     // 'open_world.340.dll.a', so we just consider everything after the
