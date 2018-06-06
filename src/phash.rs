@@ -5,8 +5,6 @@ use *;
 #[derive(Clone, Copy, Debug)]
 enum CPHash {}
 
-impl CPHash {}
-
 extern "C" {
     fn cv_phash_new() -> *mut CPHash;
     fn cv_phash_drop(phash: *mut CPHash);
