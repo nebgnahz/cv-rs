@@ -1,11 +1,12 @@
 extern crate cv;
 extern crate float_cmp;
+mod floatutils;
 mod utils;
 
 use cv::imgcodecs::ImageReadMode;
 use cv::imgproc::*;
 use cv::*;
-use float_cmp::ApproxEqRatio;
+use floatutils::*;
 
 const FIRST_IMAGE_PATH: &str = "assets/Histogram_Comparison_Source_0.png";
 const SECOND_IMAGE_PATH: &str = "assets/Histogram_Comparison_Source_1.png";
@@ -68,8 +69,4 @@ fn get_image_histogram(path: &'static str) -> Mat {
     let image = image.calc_hist(&channels, &Mat::new(), &hsize, &ranges);
     let image = image.normalize(0.0, 1.0, NormType::MinMax);
     image
-}
-
-fn assert_eq(a: f64, b: f64) {
-    assert!(a.approx_eq_ratio(&b, 0.01), format!("{} == {}", a, b));
 }

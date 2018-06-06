@@ -25,7 +25,7 @@ extern "C" {
     fn cv_mat_from_file_storage(path: *const c_char, section: *const c_char) -> *mut CMat;
     fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
     fn cv_mat_zeros(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
-    fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: c_int, buffer: *const u8) -> *mut CMat;
+    fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: CvType, buffer: *const u8) -> *mut CMat;
     fn cv_mat_is_valid(mat: *mut CMat) -> bool;
     fn cv_mat_rows(cmat: *const CMat) -> c_int;
     fn cv_mat_cols(cmat: *const CMat) -> c_int;
@@ -161,7 +161,7 @@ impl Mat {
     ///
     /// ::std::mem::forget(new_image);
     /// ```
-    pub fn from_buffer(rows: c_int, cols: c_int, cv_type: c_int, buf: &Vec<u8>) -> Mat {
+    pub fn from_buffer(rows: c_int, cols: c_int, cv_type: CvType, buf: &[u8]) -> Mat {
         let raw = unsafe { cv_mat_from_buffer(rows, cols, cv_type, buf.as_ptr()) };
         Mat::from_raw(raw)
     }
@@ -487,6 +487,12 @@ impl Not for Mat {
         let m = CMat::new();
         unsafe { cv_mat_bitwise_not(self.inner, m) }
         Mat::from_raw(m)
+    }
+}
+
+impl Clone for Mat {
+    fn clone(&self) -> Self {
+        Mat::from_buffer(self.rows, self.cols, self.cv_type(), self.data())
     }
 }
 

@@ -63,6 +63,6 @@ $CMakeArgs = $CMAKE_OPTIONS + ("-DCMAKE_INSTALL_PREFIX=$OPENCV_DIR", "-DCMAKE_BU
 Write-Host "cmake -G $CMAKE_CONFIG_GENERATOR $CMakeArgs"
 cmake -G $CMAKE_CONFIG_GENERATOR @CMakeArgs
 if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }
-cmake --build .  --target install --config release -- -j 4
+cmake --build .  --target install --config release -- -j $env:NUMBER_OF_PROCESSORS 
 if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }
 Pop-Location

@@ -1,6 +1,3 @@
-// TODO(benzh): For some reason, Cargo keeps saying these functions are not
-// used. I guess each individual file in `tests` are compiled, so this file is
-// compiled in its own, making these functions appearing useless.
 #![allow(dead_code)]
 
 extern crate cv;

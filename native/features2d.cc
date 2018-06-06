@@ -142,4 +142,23 @@ void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
     descriptorMatcher.get()->knnMatch(queryDescriptors, matches_vector, k);
     cv_to_ffi(matches_vector, matches);
 }
+
+void* cv_bow_trainer_new(int clusterCount, const cv::TermCriteria& termcrit, int attempts, int flags) {
+    return new cv::BOWKMeansTrainer(clusterCount, termcrit, attempts, flags);
+}
+
+void cv_bow_trainer_drop(cv::BOWKMeansTrainer* trainer) {
+    delete trainer;
+    trainer = nullptr;
+}
+
+void cv_bow_trainer_add(cv::BOWKMeansTrainer& trainer, cv::Mat& descriptors) {
+    trainer.add(descriptors);
+}
+
+void* cv_bow_trainer_cluster(cv::BOWKMeansTrainer& trainer) {
+    cv::Mat* mat = new cv::Mat();
+    *mat = trainer.cluster();
+    return (mat);
+}
 }

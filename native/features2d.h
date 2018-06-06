@@ -78,6 +78,11 @@ void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
                           cv::Mat& queryDescriptors,
                           int k,
                           CVec<CVec<DMatch>>* matches);
+
+void* cv_bow_trainer_new(int clusterCount, const cv::TermCriteria& termcrit, int attempts, int flags);
+void cv_bow_trainer_drop(cv::BOWKMeansTrainer* trainer);
+void cv_bow_trainer_add(cv::BOWKMeansTrainer& trainer, cv::Mat& descriptors);
+void* cv_bow_trainer_cluster(cv::BOWKMeansTrainer& trainer);
 }
 
 #endif  // CV_RS_FEATURES2D_H
