@@ -47,8 +47,7 @@ fn get_file<'a, T: Iterator<Item = &'a std::io::Result<std::fs::DirEntry>>>(
         ))
     })?;
     let lib = lib.file_name();
-    let lib = lib
-        .into_string()
+    let lib = lib.into_string()
         .map_err(|e| BuildError::new(format!("Cannot convert path '{:?}' to string", e)))?;
     // we expect filename to be something like 'open_world340.lib' or
     // 'open_world.340.dll.a', so we just consider everything after the
