@@ -11,6 +11,7 @@ extern "C" {
     fn cv_phash_new() -> *mut CPHash;
     fn cv_phash_drop(phash: *mut CPHash);
     fn cv_phash_compute(phash: *mut CPHash, mat: *const CMat, result: *mut CMat);
+    fn cv_phash_compare(phash: *mut CPHash, lhs: *const CMat, rhs: *mut CMat) -> f64;
 }
 
 /// Slower than average_hash, but tolerant of minor modifications
@@ -31,6 +32,11 @@ impl PHash {
         let result = CMat::new();
         unsafe { cv_phash_compute(self.value, mat.inner, result) };
         Mat::from_raw(result)
+    }
+
+    /// Compares two image hashes
+    pub fn compare(&self, lhs: &Mat, rhs: &Mat) -> f64 {
+        unsafe { cv_phash_compare(self.value, lhs.inner, rhs.inner) }
     }
 }
 

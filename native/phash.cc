@@ -16,4 +16,8 @@ void cv_phash_drop(cv::Ptr<cv::img_hash::PHash>* phash) {
 void cv_phash_compute(cv::Ptr<cv::img_hash::PHash>* phash, cv::Mat& mat, cv::Mat& result) {
     phash->get()->compute(mat, result);
 }
+
+double cv_phash_compare(cv::Ptr<cv::img_hash::PHash>* phash, cv::Mat& lhs, cv::Mat& rhs) {
+    return phash->get()->compare(lhs, rhs);
+}
 }

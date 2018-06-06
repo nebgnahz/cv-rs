@@ -1,7 +1,6 @@
 extern crate cv;
 use cv::highgui::*;
 use cv::imgproc::*;
-use cv::video::tracking::*;
 use cv::videoio::*;
 use cv::*;
 
