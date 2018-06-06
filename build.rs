@@ -21,28 +21,40 @@ fn opencv_link() {
 #[cfg(windows)]
 fn try_opencv_link() -> Result<(), Box<std::error::Error>> {
     let opencv_dir = std::env::var("OPENCV_LIB")?;
-    let files = std::fs::read_dir(&opencv_dir)?;
-    let opencv_world_entry = files.filter_map(|entry| entry.ok()).find(|entry| {
+    let files = std::fs::read_dir(&opencv_dir)?.collect::<Vec<_>>();
+    let opencv_world = get_file(files.iter(), "world")?;
+    let img_hash = get_file(files.iter(), "img_hash")?;
+
+    println!("cargo:rustc-link-search=native={}", opencv_dir);
+    println!("cargo:rustc-link-lib={}", opencv_world);
+    println!("cargo:rustc-link-lib={}", img_hash);
+    Ok(())
+}
+
+fn get_file<'a, T: Iterator<Item = &'a std::io::Result<std::fs::DirEntry>>>(
+    files: T,
+    name: &str,
+) -> Result<String, Box<std::error::Error>> {
+    let opencv_world_entry = files.filter_map(|entry| entry.as_ref().ok()).find(|entry| {
         let file_name = entry.file_name().to_string_lossy().into_owned();
-        (file_name.starts_with("opencv_world") || file_name.starts_with("libopencv_world"))
+        (file_name.starts_with(&format!("opencv_{}", name)) || file_name.starts_with(&format!("libopencv_{}", name)))
             && !file_name.ends_with("d.lib")
     });
-    match opencv_world_entry {
-        Some(opencv_world) => {
-            let opencv_world = opencv_world.file_name();
-            let opencv_world = opencv_world.into_string().unwrap();
-            // we expect filename to be something like 'open_world340.lib' or
-            // 'open_world.340.dll.a', so we just consider everything after the
-            // version number is an extension
-            let opencv_world_without_extension = opencv_world.trim_right_matches(|c: char| !c.is_numeric());
-            println!("cargo:rustc-link-search=native={}", opencv_dir);
-            println!("cargo:rustc-link-lib={}", opencv_world_without_extension);
-            Ok(())
-        }
-        None => Err(Box::new(BuildError {
-            details: "Cannot find opencv_world file in provided %OPENCV_LIB% directory",
-        })),
-    }
+    let lib = opencv_world_entry.ok_or_else(|| {
+        BuildError::new(format!(
+            "Cannot find opencv_{} file in provided %OPENCV_LIB% directory",
+            name
+        ))
+    })?;
+    let lib = lib.file_name();
+    let lib = lib
+        .into_string()
+        .map_err(|e| BuildError::new(format!("Cannot convert path '{:?}' to string", e)))?;
+    // we expect filename to be something like 'open_world340.lib' or
+    // 'open_world.340.dll.a', so we just consider everything after the
+    // version number is an extension
+    let lib_without_extension = lib.trim_right_matches(|c: char| !c.is_numeric());
+    Ok(lib_without_extension.into())
 }
 
 #[cfg(unix)]
@@ -92,16 +104,34 @@ fn main() {
     opencv_link();
 }
 
+fn get_files(path: &str) -> Vec<std::path::PathBuf> {
+    std::fs::read_dir(path)
+        .unwrap()
+        .into_iter()
+        .filter_map(|x| x.ok().map(|x| x.path()))
+        .filter(|x| x.extension().map(|e| e == "cc").unwrap_or(false))
+        .collect::<Vec<_>>()
+}
+
 #[cfg(windows)]
 #[derive(Debug)]
 struct BuildError {
-    details: &'static str,
+    details: String,
+}
+
+#[cfg(windows)]
+impl BuildError {
+    fn new<T: Into<String>>(details: T) -> Self {
+        Self {
+            details: details.into(),
+        }
+    }
 }
 
 #[cfg(windows)]
 impl std::error::Error for BuildError {
     fn description(&self) -> &str {
-        self.details
+        &self.details
     }
 }
 
@@ -110,13 +140,4 @@ impl std::fmt::Display for BuildError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", self.details)
     }
-}
-
-fn get_files(path: &str) -> Vec<std::path::PathBuf> {
-    std::fs::read_dir(path)
-        .unwrap()
-        .into_iter()
-        .filter_map(|x| x.ok().map(|x| x.path()))
-        .filter(|x| x.extension().map(|e| e == "cc").unwrap_or(false))
-        .collect::<Vec<_>>()
 }
