@@ -11,17 +11,16 @@ use utils::*;
 
 #[test]
 fn phash_test() {
-    let image_path = get_asset_path("Ubuntu.png");
-    let image_path2 = get_asset_path("lenna.png");
-    let mat = Mat::from_path(image_path, ImageReadMode::Grayscale).unwrap();
-    let lenna = Mat::from_path(image_path2, ImageReadMode::Grayscale).unwrap();
-    let phash = PHash::new();
-    let hash = phash.compute(&mat);
-    let hash2 = phash.compute(&mat);
-    let lenna_hash = phash.compute(&lenna);
-    let diff = phash.compare(&hash, &hash2);
-    let diff_lenna = phash.compare(&hash, &lenna_hash);
+    test(PHash::new(), 30.0);
+}
 
-    assert_eq(diff, 0.0);
-    assert_ne(diff_lenna, 0.0);
+fn test<T: Hash>(hash: T, expected_diff: f64) {
+    let lenna = get_asset_path("lenna.png");
+    let solvay_conference = get_asset_path("Solvay_conference_1927.jpg");
+    let lenna = Mat::from_path(lenna, ImageReadMode::Grayscale).unwrap();
+    let solvay_conference = Mat::from_path(solvay_conference, ImageReadMode::Grayscale).unwrap();
+    let lenna_hash = hash.compute(&lenna);
+    let solvay_hash = hash.compute(&solvay_conference);
+    let diff = hash.compare(&lenna_hash, &solvay_hash);
+    assert_eq(diff, expected_diff)
 }
