@@ -307,7 +307,8 @@ impl Mat {
     /// [Mat::at2](struct.Mat.html#method.at2).
     pub fn at3<T: FromBytes>(&self, i0: i32, i1: i32, i2: i32) -> T {
         let data = self.data();
-        let pos = i0 as usize * self.step1(0) * self.elem_size1() + i1 as usize * self.step1(1) * self.elem_size1()
+        let pos = i0 as usize * self.step1(0) * self.elem_size1()
+            + i1 as usize * self.step1(1) * self.elem_size1()
             + i2 as usize;
         let byte = &data[pos];
         let ptr: *const _ = byte;

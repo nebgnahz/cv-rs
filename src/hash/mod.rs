@@ -3,13 +3,12 @@
 mod phash;
 pub use self::phash::*;
 
-use failure::Error;
 use mat::CMat;
 use *;
 
 extern "C" {
-    fn cv_phash_compute(phash: *const private::CHash, mat: *const CMat, result: *mut CMat);
-    fn cv_phash_compare(phash: *const private::CHash, lhs: *const CMat, rhs: *mut CMat) -> f64;
+    fn cv_hash_compute(phash: *const private::CHash, mat: *const CMat, result: *mut CMat);
+    fn cv_hash_compare(phash: *const private::CHash, lhs: *const CMat, rhs: *mut CMat) -> f64;
 }
 
 mod private {
@@ -38,13 +37,13 @@ impl<T: HashImplInterface> Hash for T {
     fn compute(&self, mat: &Mat) -> Mat {
         let result = CMat::new();
         let value = self.get_value();
-        unsafe { cv_phash_compute(value, mat.inner, result) };
+        unsafe { cv_hash_compute(value, mat.inner, result) };
         Mat::from_raw(result)
     }
 
     /// Compares two image hashes
     fn compare(&self, lhs: &Mat, rhs: &Mat) -> f64 {
         let value = self.get_value();
-        unsafe { cv_phash_compare(value, lhs.inner, rhs.inner) }
+        unsafe { cv_hash_compare(value, lhs.inner, rhs.inner) }
     }
 }

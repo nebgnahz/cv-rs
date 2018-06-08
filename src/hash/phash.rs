@@ -2,7 +2,6 @@
 
 use super::private::*;
 use super::*;
-use *;
 
 extern "C" {
     fn cv_phash_new() -> *mut CHash;
