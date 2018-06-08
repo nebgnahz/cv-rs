@@ -3,8 +3,8 @@ extern crate float_cmp;
 mod floatutils;
 mod utils;
 
+use cv::hash::*;
 use cv::imgcodecs::ImageReadMode;
-use cv::phash::*;
 use cv::*;
 use floatutils::*;
 use utils::*;
