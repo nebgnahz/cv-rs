@@ -10,6 +10,11 @@ use floatutils::*;
 use utils::*;
 
 #[test]
+fn average_test() {
+    test(AverageHash::new(), 30.0);
+}
+
+#[test]
 fn phash_test() {
     test(PHash::new(), 30.0);
 }
@@ -17,8 +22,8 @@ fn phash_test() {
 fn test<T: Hash>(hash: T, expected_diff: f64) {
     let lenna = get_asset_path("lenna.png");
     let solvay_conference = get_asset_path("Solvay_conference_1927.jpg");
-    let lenna = Mat::from_path(lenna, ImageReadMode::Grayscale).unwrap();
-    let solvay_conference = Mat::from_path(solvay_conference, ImageReadMode::Grayscale).unwrap();
+    let lenna = Mat::from_path(lenna, ImageReadMode::Color).unwrap();
+    let solvay_conference = Mat::from_path(solvay_conference, ImageReadMode::Color).unwrap();
     let lenna_hash = hash.compute(&lenna);
     let solvay_hash = hash.compute(&solvay_conference);
     let diff = hash.compare(&lenna_hash, &solvay_hash);
