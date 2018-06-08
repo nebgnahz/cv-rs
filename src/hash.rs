@@ -59,44 +59,14 @@ impl<T: HashImplInterface> Hash for T {
     }
 }
 
-/// AverageHash
-#[derive(Debug)]
-pub struct AverageHash {
-    value: *mut CHash,
-}
-
-/// BlockMeanHash
-#[derive(Debug)]
-pub struct BlockMeanHash {
-    value: *mut CHash,
-}
-
-/// ColorMomentHash
-#[derive(Debug)]
-pub struct ColorMomentHash {
-    value: *mut CHash,
-}
-
-/// MarrHildrethHash
-#[derive(Debug)]
-pub struct MarrHildrethHash {
-    value: *mut CHash,
-}
-
-/// Slower than average_hash, but tolerant of minor modifications
-#[derive(Debug)]
-pub struct PHash {
-    value: *mut CHash,
-}
-
-/// RadialVarianceHash
-#[derive(Debug)]
-pub struct RadialVarianceHash {
-    value: *mut CHash,
-}
-
 macro_rules! impl_hash {
     ($x:ident, $ctor:ident, $drop:ident) => {
+        /// $x
+        #[derive(Debug)]
+        pub struct $x {
+            value: *mut CHash,
+        }
+
         impl $x {
             /// Creates new $x
             pub fn new() -> Self {
