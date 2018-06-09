@@ -34,7 +34,7 @@ mod private {
 #[allow(missing_docs)]
 pub trait HashImplInterface: HashImpl {}
 
-/// Basic trait for all OCR types
+/// Basic trait for all hash types
 pub trait Hash {
     /// Computes image hash
     fn compute(&self, mat: &Mat) -> Mat;
