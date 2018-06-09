@@ -68,7 +68,7 @@ macro_rules! impl_hash {
         }
 
         impl $x {
-            /// Creates new $x
+            /// Creates new instance
             pub fn new() -> Self {
                 let value = unsafe { $ctor() };
                 Self { value }
