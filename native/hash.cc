@@ -15,6 +15,7 @@ void* cv_average_hash_new() {
     cv::Ptr<cv::img_hash::AverageHash> result = cv::img_hash::AverageHash::create();
     return new cv::Ptr<cv::img_hash::AverageHash>(result);
 }
+
 void cv_average_hash_drop(cv::Ptr<cv::img_hash::AverageHash>* hash) {
     delete hash;
     hash = nullptr;
@@ -24,6 +25,7 @@ void* cv_block_mean_hash_new() {
     cv::Ptr<cv::img_hash::BlockMeanHash> result = cv::img_hash::BlockMeanHash::create();
     return new cv::Ptr<cv::img_hash::BlockMeanHash>(result);
 }
+
 void cv_block_mean_hash_drop(cv::Ptr<cv::img_hash::BlockMeanHash>* hash) {
     delete hash;
     hash = nullptr;
@@ -33,6 +35,7 @@ void* cv_color_moment_hash_new() {
     cv::Ptr<cv::img_hash::ColorMomentHash> result = cv::img_hash::ColorMomentHash::create();
     return new cv::Ptr<cv::img_hash::ColorMomentHash>(result);
 }
+
 void cv_color_moment_hash_drop(cv::Ptr<cv::img_hash::ColorMomentHash>* hash) {
     delete hash;
     hash = nullptr;

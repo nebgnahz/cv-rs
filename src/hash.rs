@@ -1,4 +1,4 @@
-//! Provides different algorithms for text detection and recognition in natural scene images
+//! The module brings implementations of different image hashing algorithms.
 use self::private::*;
 
 use mat::CMat;
@@ -60,8 +60,8 @@ impl<T: HashImplInterface> Hash for T {
 }
 
 macro_rules! impl_hash {
-    ($x:ident, $ctor:ident, $drop:ident) => {
-        /// $x
+    ($x:ident, $ctor:ident, $drop:ident, $description:expr) => {
+        #[doc=$description]
         #[derive(Debug)]
         pub struct $x {
             value: *mut CHash,
@@ -93,13 +93,39 @@ macro_rules! impl_hash {
     };
 }
 
-impl_hash!(AverageHash, cv_average_hash_new, cv_average_hash_drop);
-impl_hash!(BlockMeanHash, cv_block_mean_hash_new, cv_block_mean_hash_drop);
-impl_hash!(ColorMomentHash, cv_color_moment_hash_new, cv_color_moment_hash_drop);
-impl_hash!(MarrHildrethHash, cv_marr_hildreth_hash_new, cv_marr_hildreth_hash_drop);
-impl_hash!(PHash, cv_phash_new, cv_phash_drop);
+impl_hash!(
+    AverageHash,
+    cv_average_hash_new,
+    cv_average_hash_drop,
+    "Computes average hash value of the input image"
+);
+impl_hash!(
+    BlockMeanHash,
+    cv_block_mean_hash_new,
+    cv_block_mean_hash_drop,
+    "Image hash based on block mean"
+);
+impl_hash!(
+    ColorMomentHash,
+    cv_color_moment_hash_new,
+    cv_color_moment_hash_drop,
+    "	Image hash based on color moments"
+);
+impl_hash!(
+    MarrHildrethHash,
+    cv_marr_hildreth_hash_new,
+    cv_marr_hildreth_hash_drop,
+    "Marr-Hildreth Operator Based Hash, slowest but more discriminative."
+);
+impl_hash!(
+    PHash,
+    cv_phash_new,
+    cv_phash_drop,
+    "Slower than AverageHash, but tolerant of minor modifications"
+);
 impl_hash!(
     RadialVarianceHash,
     cv_radial_variance_hash_new,
-    cv_radial_variance_hash_drop
+    cv_radial_variance_hash_drop,
+    "Image hash based on Radon transform"
 );
