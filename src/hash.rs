@@ -109,7 +109,7 @@ impl_hash!(
     ColorMomentHash,
     cv_color_moment_hash_new,
     cv_color_moment_hash_drop,
-    "	Image hash based on color moments"
+    "Image hash based on color moments"
 );
 impl_hash!(
     MarrHildrethHash,
