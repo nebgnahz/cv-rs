@@ -86,8 +86,8 @@ All possible features are listed below:
 - Run powershell console as administrator in `c:\opencv`.
 - (***Optional, skip these steps if you don't need CUDA***)
     1. Download CUDA from [official site](https://developer.nvidia.com/cuda-downloads?target_os=Windows&target_arch=x86_64&target_version=10). Choose `local` package.
-    1. Run `PowerShell -NoExit .\1_install_CUDA.ps1 -FileName path_to_installer` (for example, `C:\Users\UserName\Downloads\cuda_9.1.85_win10.exe`).
-- Run `PowerShell -NoExit .\msvc_2_build_OCV.ps1  -EnableCuda 0 -Compiler vc15`. `1` stays for compilation with CUDA, `0` for compilation without it. Possible compiler values: `vc14` for VS2015/`vc15` for VS2017. **Caution: CUDA is compatible with VS2015 only**
+    1. Run `PowerShell -NoExit -File .\mingw_build_OCV.ps1 -MinGWPath .\1_install_CUDA.ps1 -FileName path_to_installer` (for example, `C:\Users\UserName\Downloads\cuda_9.1.85_win10.exe`).
+- Run `PowerShell -NoExit -File .\mingw_build_OCV.ps1 -MinGWPath .\msvc_2_build_OCV.ps1  -EnableCuda 0 -Compiler vc15`. `1` stays for compilation with CUDA, `0` for compilation without it. Possible compiler values: `vc14` for VS2015/`vc15` for VS2017. **Caution: CUDA is compatible with VS2015 only**
 - Wait until installation finishes. Now you have properly configured OpenCV.
 
 #### If you are using GNU toolchain
@@ -101,7 +101,7 @@ All possible features are listed below:
 - Create directory `C:\opencv`.
 - Copy files from `.windows` folder there.
 - Run powershell console as administrator in `c:\opencv`.
-- Run `PowerShell -NoExit .\mingw_build_OCV.ps1 -MinGWPath "C:\Program Files\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin"` (your path may be different).
+- Run `PowerShell -NoExit -File .\mingw_build_OCV.ps1 -MinGWPath .\mingw_build_OCV.ps1 -MinGWPath "C:\Program Files\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin"` (your path may be different).
 - Wait until installation finishes. Now you have properly configured OpenCV.
 
 ## Usage
