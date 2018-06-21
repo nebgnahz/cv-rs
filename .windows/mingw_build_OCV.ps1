@@ -20,7 +20,8 @@ $CMAKE_OPTIONS = @(
   "-DBUILD_PERF_TESTS:BOOL=OFF",
   "-DBUILD_DOCS:BOOL=OFF",
   "-DBUILD_EXAMPLES:BOOL=OFF",
-  "-DINSTALL_CREATE_DISTRIB:BOOL=ON"
+  "-DINSTALL_CREATE_DISTRIB:BOOL=ON",
+  "-DCPU_DISPATCH="
 )
 
 #SCRIPT BODY
@@ -49,6 +50,7 @@ $oldErrorAction = $ErrorActionPreference
 $ErrorActionPreference = "Stop"
 git --version
 cmake --version
+Write-Host (Get-Command mingw32-make).Source
 $ErrorActionPreference = $oldErrorAction
 
 
