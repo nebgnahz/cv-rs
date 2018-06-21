@@ -21,8 +21,8 @@ else {
     }
 }
 
-$OPENCV_BUILD_DIR = "$pwd\$Compiler\build\opencv";
-$OPENCV_DIR = "$pwd\$Compiler\install\opencv";
+$OPENCV_BUILD_DIR = "$pwd\artifacts\$COMPILER\build\opencv";
+$OPENCV_DIR = "$pwd\artifacts\$COMPILER\install\opencv";
 $CMAKE_OPTIONS = @(
   "-DWITH_CUDA:BOOL=$CudaSwitch",
   "-DCUDA_ARCH_BIN=5.2",
