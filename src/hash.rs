@@ -91,10 +91,10 @@ macro_rules! impl_hash {
 
         impl HashImplInterface for $x {}
 
-        // we know that this pointer is for calling virtual pure functions
-        // however, Rust doesn't allow us to share unsafe pointers between threads
-        // but it's save because the only place we mutate the pointer is `drop`,
-        // which makes the value inaccessible, so we're ok here too
+        // We know that this pointer is used for calling virtual pure functions,
+        // But Rust doesn't allow us to share unsafe pointers between threads.
+        // However, it's safe because the only place we mutate the pointer is `drop`,
+        // Which makes the value inaccessible, so we're ok here too
         unsafe impl Send for $x {}
         unsafe impl Sync for $x {}
     };
