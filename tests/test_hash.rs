@@ -8,6 +8,15 @@ use cv::imgcodecs::ImageReadMode;
 use cv::*;
 use floatutils::*;
 use utils::*;
+use std::sync::{Arc, Mutex};
+
+#[test]
+fn hash_multithreading() {
+    fn test_fn<T: Sync>(_: T) {}
+
+    let hash = Arc::new(Mutex::new(AverageHash::new()));
+    test_fn(hash);
+}
 
 #[test]
 fn average_hash_test() {
