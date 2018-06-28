@@ -10,6 +10,12 @@ use floatutils::*;
 use utils::*;
 
 #[test]
+fn hash_multithreading() {
+    fn test_fn<T: Sync>(_: T) {}
+    test_fn(AverageHash::new());
+}
+
+#[test]
 fn average_hash_test() {
     test(AverageHash::new(), 30.0);
 }
