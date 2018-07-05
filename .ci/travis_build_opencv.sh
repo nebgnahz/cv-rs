@@ -2,8 +2,8 @@
 set -eux -o pipefail
 
 OPENCV_VERSION=${OPENCV_VERSION:-3.4.1}
-OPENCV_BUILD=$(pwd)/opencv-$OPENCV_VERSION/build
-OPENCV_CONTRIB=$(pwd)/opencv_contrib-$OPENCV_VERSION/modules
+OPENCV_BUILD=$(pwd)/opencv/build
+OPENCV_CONTRIB=$(pwd)/opencv_contrib/modules
 INSTALL_FLAG=$HOME/usr/installed-version/$OPENCV_VERSION
 INSTALL_PREFIX=$HOME/usr
 
@@ -11,10 +11,7 @@ if [[ ! -e $INSTALL_FLAG ]]; then
     TMP=$(mktemp -d)
     mkdir -p $OPENCV_BUILD
 
-    cd $OPENCV_BUILD
-	
-	echo "Configuring at $(pwd)"
-	
+    pushd $OPENCV_BUILD
     cmake \
         -D WITH_CUDA=ON \
         -D BUILD_EXAMPLES=OFF \
@@ -30,8 +27,6 @@ if [[ ! -e $INSTALL_FLAG ]]; then
         -D CUDA_ARCH_BIN=5.2 \
         -D CUDA_ARCH_PTX="" \
         ..
-	
-	echo "Building at $(pwd)"
 	
     make install && sudo mkdir -p "$(dirname "$INSTALL_FLAG")" && sudo touch "$INSTALL_FLAG";
     touch $HOME/fresh-cache
