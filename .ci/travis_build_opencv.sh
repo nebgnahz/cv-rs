@@ -11,7 +11,7 @@ if [[ ! -e $INSTALL_FLAG ]]; then
     TMP=$(mktemp -d)
     mkdir -p $OPENCV_BUILD
 
-    pushd $OPENCV_BUILD
+    cd $OPENCV_BUILD
 	
 	echo "Configuring at $(pwd)"
 	
@@ -34,7 +34,6 @@ if [[ ! -e $INSTALL_FLAG ]]; then
 	echo "Building at $(pwd)"
 	
     make install && sudo mkdir -p "$(dirname "$INSTALL_FLAG")" && sudo touch "$INSTALL_FLAG";
-    popd
     touch $HOME/fresh-cache
 fi
 
