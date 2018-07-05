@@ -132,11 +132,11 @@ impl Mat {
     /// returns an owned vector of the encoded image.
     pub fn image_encode(&self, ext: &str, flags: Vec<ImageWriteMode>) -> Result<Vec<u8>, Error> {
         let ext = CString::new(ext)?;
-        let result = ::std::ptr::null_mut();
         unsafe {
-            cv_imencode(ext.into_raw(), self.inner, flags.as_ptr(), flags.len(), result);
-            if (*result).has_value {
-                Ok((*result).value.unpack())
+            let mut result: COption<CVec<u8>> = mem::zeroed();
+            cv_imencode(ext.into_raw(), self.inner, flags.as_ptr(), flags.len(), &mut result);
+            if result.has_value {
+                Ok(result.value.unpack())
             } else {
                 Err(CvError::UnknownError("Unable to convert this image to bytes".into()).into())
             }
