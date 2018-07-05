@@ -1,4 +1,6 @@
 #include "imcodecs.h"
+#include "common.h"
+#include "utils.h"
 
 extern "C" {
 
@@ -15,21 +17,17 @@ void* cv_imdecode(const uint8_t* const buffer, size_t len, int flag) {
     return (dst);
 }
 
-// TODO: replace raw pointer return with CResult because it's memory leak
-ImencodeResult
-cv_imencode(const char* const ext, const cv::Mat* const image, const int* const flag_ptr, size_t flag_size) {
+void cv_imencode(const char* const ext, const cv::Mat* const image, const int* const flag_ptr, size_t flag_size, COption<CVec<uint8_t>>* result) {
     std::vector<uchar> buf;
     std::vector<int> params(flag_ptr, flag_ptr + flag_size);
     bool r = cv::imencode(ext, *image, buf, params);
-
-    int size = buf.size();
-    uint8_t* buffer = new uint8_t[size];
-    std::copy(buf.begin(), buf.begin() + size, buffer);
-
-    ImencodeResult result;
-    result.status = r;
-    result.size = size;
-    result.buf = buffer;
-    return result;
+    if (r) {
+        CVec<uint8_t> cvec;
+        cv_to_ffi(buf, &cvec);
+        *result = COption<CVec<uint8_t>>{true, cvec};
+    }
+    else {
+        *result = COption<CVec<uint8_t>>{false, CVec<uint8_t>()};
+    }
 }
 }
