@@ -1,6 +1,4 @@
 #include "imcodecs.h"
-#include "common.h"
-#include "utils.h"
 
 extern "C" {
 
