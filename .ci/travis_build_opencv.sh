@@ -9,12 +9,12 @@ INSTALL_PREFIX=$HOME/usr
 
 if [[ ! -e $INSTALL_FLAG ]]; then
     TMP=$(mktemp -d)
-    if [[ ! -d $OPENCV_BUILD ]]; then
-		git submodule update --init --recursive
-        mkdir -p $OPENCV_BUILD
-    fi
+    mkdir -p $OPENCV_BUILD
 
     pushd $OPENCV_BUILD
+	
+	echo "Configuring at $(pwd)"
+	
     cmake \
         -D WITH_CUDA=ON \
         -D BUILD_EXAMPLES=OFF \
@@ -30,6 +30,9 @@ if [[ ! -e $INSTALL_FLAG ]]; then
         -D CUDA_ARCH_BIN=5.2 \
         -D CUDA_ARCH_PTX="" \
         ..
+	
+	echo "Building at $(pwd)"
+	
     make install && sudo mkdir -p "$(dirname "$INSTALL_FLAG")" && sudo touch "$INSTALL_FLAG";
     popd
     touch $HOME/fresh-cache
