@@ -1,9 +1,7 @@
 #!/bin/bash
 set -eux -o pipefail
 
-OPENCV_VERSION=${OPENCV_VERSION:-3.4.0}
-URL=https://github.com/opencv/opencv/archive/$OPENCV_VERSION.zip
-URL_CONTRIB=https://github.com/opencv/opencv_contrib/archive/$OPENCV_VERSION.zip
+OPENCV_VERSION=${OPENCV_VERSION:-3.4.1}
 OPENCV_BUILD=$(pwd)/opencv-$OPENCV_VERSION/build
 OPENCV_CONTRIB=$(pwd)/opencv_contrib-$OPENCV_VERSION/modules
 INSTALL_FLAG=$HOME/usr/installed-version/$OPENCV_VERSION
@@ -13,7 +11,7 @@ if [[ ! -e $INSTALL_FLAG ]]; then
     TMP=$(mktemp -d)
     if [[ ! -d $OPENCV_BUILD ]]; then
 		git submodule update --init --recursive
-        mkdir $OPENCV_BUILD
+        mkdir -p $OPENCV_BUILD
     fi
 
     pushd $OPENCV_BUILD
