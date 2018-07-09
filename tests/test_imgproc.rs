@@ -70,3 +70,10 @@ fn get_image_histogram(path: &'static str) -> Mat {
     let image = image.normalize(0.0, 1.0, NormType::MinMax);
     image
 }
+
+#[test]
+fn canny_edge_detection() {
+    let lenna = utils::load_lenna();
+    let edges = lenna.canny(70.0, 140.0, 3, false);
+    assert!(edges.is_ok());
+}
