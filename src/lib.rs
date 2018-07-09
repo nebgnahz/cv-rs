@@ -34,6 +34,7 @@ pub mod text;
 pub mod video;
 pub mod videoio;
 
+pub use errors::catch_opencv_errors;
 pub use core::*;
 pub use mat::*;
 
