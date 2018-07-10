@@ -37,7 +37,7 @@ before_install:
   - sudo -E ./.ci/install_cuda.sh
   - sudo -E ./.ci/travis_build_opencv.sh
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/usr/local/lib/x86_64-linux-gnu
-  - rustup component add rustfmt-preview
+  - rustup component add rustfmt-preview --toolchain nightly
   - cargo fmt --version
 
 script:
@@ -47,7 +47,7 @@ script:
   - cargo build --features tesseract
   - cargo test -v --features tesseract
   - cargo doc --features cuda --no-deps
-  - cargo fmt -- --write-mode=diff
+  - cargo fmt -- --check
   - diff -u <(cat native/*) <(clang-format native/*)
 
 notifications:
