@@ -1,8 +1,3 @@
-// @Author: urban
-// @Date:   2018-04-21T22:17:18+02:00
-// @Last modified by:   urban
-// @Last modified time: 2018-04-21T22:18:57+02:00
-
 //! Mat
 
 use core::*;
