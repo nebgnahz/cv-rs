@@ -235,3 +235,10 @@ fn path_to_cstring<P: AsRef<Path>>(path: P) -> Result<CString, Error> {
     let result = CString::new(x)?;
     Ok(result)
 }
+
+#[repr(C)]
+#[derive(Debug, Clone)]
+pub(crate) struct COption<T> {
+    has_value: bool,
+    value: T,
+}

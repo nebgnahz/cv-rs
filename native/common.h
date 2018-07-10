@@ -91,4 +91,10 @@ struct CVec {
     T* array;
     size_t size;
 };
+
+template <typename T>
+struct COption {
+    bool hasValue;
+    T value;
+};
 #endif  // CV_RS_COMMON_H
