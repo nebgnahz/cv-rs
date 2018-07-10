@@ -6,7 +6,7 @@ dist: trusty
 
 language: rust
 rust:
-  - stable
+  - nightly
 
 addons:
   apt:
@@ -47,7 +47,7 @@ script:
   - cargo build --features tesseract
   - cargo test -v --features tesseract
   - cargo doc --features cuda --no-deps
-  - cargo fmt -- --write-mode=diff
+  - cargo fmt -- --check
   - diff -u <(cat native/*) <(clang-format native/*)
 
 notifications:
