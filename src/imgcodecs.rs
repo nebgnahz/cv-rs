@@ -1,13 +1,13 @@
 //! Image file reading and writing, see [OpenCV
 //! imgcodecs](http://docs.opencv.org/3.1.0/d4/da8/group__imgcodecs.html).
 
-use ::*;
 use errors::*;
+use failure::Error;
 use mat::*;
 use std::ffi::CString;
 use std::os::raw::c_char;
 use std::path::Path;
-use failure::Error;
+use *;
 
 extern "C" {
     fn cv_imread(input: *const c_char, flags: ImageReadMode) -> *mut CMat;
@@ -17,7 +17,8 @@ extern "C" {
         inner: *const CMat,
         flag_ptr: *const ImageWriteMode,
         flag_size: usize,
-    ) -> ImencodeResult;
+        result: *mut COption<CVec<u8>>,
+    );
 }
 
 // =============================================================================
@@ -119,13 +120,6 @@ pub enum ImageWritePngStrategy {
     Fixed = 4,
 }
 
-#[repr(C)]
-struct ImencodeResult {
-    status: bool,
-    buf: *mut u8,
-    size: usize,
-}
-
 impl Mat {
     /// Decodes an image from `buf` according to the specified mode.
     pub fn image_decode(buf: &[u8], mode: ImageReadMode) -> Mat {
@@ -138,11 +132,14 @@ impl Mat {
     /// returns an owned vector of the encoded image.
     pub fn image_encode(&self, ext: &str, flags: Vec<ImageWriteMode>) -> Result<Vec<u8>, Error> {
         let ext = CString::new(ext)?;
-        let r = unsafe { cv_imencode(ext.into_raw(), self.inner, flags.as_ptr(), flags.len()) };
-        if r.status {
-            unsafe { Ok(::std::slice::from_raw_parts(r.buf, r.size).to_vec()) }
-        } else {
-            Err(CvError::UnknownError("Unable to convert this image to bytes".into()).into())
+        unsafe {
+            let mut result: COption<CVec<u8>> = mem::zeroed();
+            cv_imencode(ext.into_raw(), self.inner, flags.as_ptr(), flags.len(), &mut result);
+            if result.has_value {
+                Ok(result.value.unpack())
+            } else {
+                Err(CvError::UnknownError("Unable to convert this image to bytes".into()).into())
+            }
         }
     }
 

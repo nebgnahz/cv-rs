@@ -1,14 +1,16 @@
-// @Author: urban
-// @Date:   2018-03-31T10:45:28+02:00
-// @Last modified by:   urban
-// @Last modified time: 2018-04-21T22:16:18+02:00
-
 //! Core data structures in OpenCV
 
 use bytes::{self, ByteOrder};
 use mat::*;
 use std::mem;
 use std::os::raw::c_int;
+
+pub(crate) enum CTermCriteria {}
+
+extern "C" {
+    fn cv_term_criteria_new(t: TermType, count: c_int, epsilon: f64) -> *mut CTermCriteria;
+    fn cv_term_criteria_drop(criteria: *mut CTermCriteria);
+}
 
 /// Data structure for salient point detectors
 #[derive(Default, Debug, Clone, Copy)]
@@ -454,4 +456,38 @@ pub enum ThresholdType {
     Otsu = 8,
     /// Triangle thresholding
     Triangle = 16,
+}
+
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+/// Term criteria type, can be one of: Count, Eps or Count + Eps
+pub enum TermType {
+    /// The maximum number of iterations or elements to compute
+    Count = 1,
+
+    /// the desired accuracy or change in parameters at which the iterative
+    /// algorithm stops.
+    EPS = 2,
+}
+
+/// Termination criteria for iterative algorithms.
+#[derive(Debug)]
+pub struct TermCriteria {
+    pub(crate) c_criteria: *mut CTermCriteria,
+}
+
+impl TermCriteria {
+    /// Creates a new termination criteria.
+    pub fn new(t: TermType, max_count: c_int, epsilon: f64) -> Self {
+        let c_criteria = unsafe { cv_term_criteria_new(t, max_count, epsilon) };
+        TermCriteria { c_criteria: c_criteria }
+    }
+}
+
+impl Drop for TermCriteria {
+    fn drop(&mut self) {
+        unsafe {
+            cv_term_criteria_drop(self.c_criteria);
+        }
+    }
 }

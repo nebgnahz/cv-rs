@@ -1,6 +1,3 @@
-#ifndef UTILS_H_
-#define UTILS_H_
-
 #include <opencv2/core.hpp>
 #include <vector>
 
@@ -45,4 +42,3 @@ void cv_to_ffi(const std::string& source, CDisposableString* dest) {
 void ffi_to_cv(const cv::Mat& source, cv::Mat* dest) {
     *dest = source;
 }
-#endif

@@ -1,10 +1,10 @@
 extern crate cv;
 extern crate getopts;
 
-use cv::*;
 use cv::highgui::*;
 use cv::imgcodecs::*;
 use cv::objdetect::*;
+use cv::*;
 
 #[cfg(feature = "cuda")]
 use cv::cuda::GpuHog as Hog;
@@ -46,9 +46,7 @@ fn run() -> Result<()> {
     let show = matches.opt_present("s");
     let measure = matches.opt_present("m");
 
-    let dir = matches
-        .opt_str("d")
-        .expect("You need to provide the directory");
+    let dir = matches.opt_str("d").expect("You need to provide the directory");
 
     if show {
         highgui_named_window("window", WindowFlag::Autosize).unwrap();
@@ -70,11 +68,7 @@ fn run() -> Result<()> {
 
 fn run_detect_for_image<P: AsRef<Path>, OD: ObjectDetect>(detector: &mut OD, path: P, show: bool, measure: bool) {
     let mut buf = Vec::new();
-    let filename = path.as_ref()
-        .file_stem()
-        .unwrap()
-        .to_string_lossy()
-        .into_owned();
+    let filename = path.as_ref().file_stem().unwrap().to_string_lossy().into_owned();
     let frame_num = filename.parse::<usize>().unwrap();
     File::open(path).unwrap().read_to_end(&mut buf).unwrap();
     let mat = Mat::image_decode(&buf, ImageReadMode::Grayscale);
@@ -92,10 +86,7 @@ fn run_detect_for_image<P: AsRef<Path>, OD: ObjectDetect>(detector: &mut OD, pat
     }
 
     if show {
-        results
-            .iter()
-            .map(|&(r, _w)| mat.rectangle(r.scale(0.6)))
-            .count();
+        results.iter().map(|&(r, _w)| mat.rectangle(r.scale(0.6))).count();
         mat.show("window", 0).unwrap();
     }
 }

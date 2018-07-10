@@ -38,6 +38,7 @@ before_install:
   - sudo -E ./.ci/travis_build_opencv.sh
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/usr/local/lib/x86_64-linux-gnu
   - rustup component add rustfmt-preview
+  - cargo fmt --version
 
 script:
   - cargo build --no-default-features

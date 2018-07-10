@@ -1,27 +1,15 @@
 #!/bin/bash
 set -eux -o pipefail
 
-OPENCV_VERSION=${OPENCV_VERSION:-3.4.0}
-URL=https://github.com/opencv/opencv/archive/$OPENCV_VERSION.zip
-URL_CONTRIB=https://github.com/opencv/opencv_contrib/archive/$OPENCV_VERSION.zip
-OPENCV_BUILD=$(pwd)/opencv-$OPENCV_VERSION/build
-OPENCV_CONTRIB=$(pwd)/opencv_contrib-$OPENCV_VERSION/modules
+OPENCV_VERSION=${OPENCV_VERSION:-3.4.1}
+OPENCV_BUILD=$(pwd)/opencv/build
+OPENCV_CONTRIB=$(pwd)/opencv_contrib/modules
 INSTALL_FLAG=$HOME/usr/installed-version/$OPENCV_VERSION
 INSTALL_PREFIX=$HOME/usr
 
 if [[ ! -e $INSTALL_FLAG ]]; then
     TMP=$(mktemp -d)
-    if [[ ! -d $OPENCV_BUILD ]]; then
-        curl -sL ${URL}  > ${TMP}/opencv.zip
-        unzip -q ${TMP}/opencv.zip
-        rm ${TMP}/opencv.zip
-
-        curl -sL ${URL_CONTRIB}  > ${TMP}/opencv_contrib.zip
-        unzip -q ${TMP}/opencv_contrib.zip
-        rm ${TMP}/opencv_contrib.zip
-
-        mkdir $OPENCV_BUILD
-    fi
+    mkdir -p $OPENCV_BUILD
 
     pushd $OPENCV_BUILD
     cmake \

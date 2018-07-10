@@ -1,6 +1,6 @@
 //! Provide types for matching keypoint descriptors
-use ::*;
 use std::os::raw::{c_char, c_int};
+use *;
 
 enum CDescriptorMatcher {}
 
@@ -85,7 +85,7 @@ impl DescriptorMatcher {
     }
 
     /// Adds descriptors to train a CPU or GPU descriptor collection
-    pub fn add(&self, descriptors: &Vec<&Mat>) {
+    pub fn add(&mut self, descriptors: &Vec<&Mat>) {
         let descriptors = descriptors.iter().map(|x| x.inner).collect();
         let vec_view = CVecView::pack(&descriptors);
         unsafe {
@@ -94,7 +94,7 @@ impl DescriptorMatcher {
     }
 
     /// Trains a descriptor matcher
-    pub fn train(&self) {
+    pub fn train(&mut self) {
         unsafe { cv_matcher_train(self.value) }
     }
 
@@ -131,12 +131,7 @@ impl DescriptorMatcher {
     pub fn knn_match(&self, query_descriptors: &Mat, k: usize) -> Vec<Vec<DMatch>> {
         let mut matches = CVec::<CVec<DMatch>>::default();
         unsafe {
-            cv_matcher_knn_match(
-                self.value,
-                query_descriptors.inner,
-                k as c_int,
-                &mut matches,
-            );
+            cv_matcher_knn_match(self.value, query_descriptors.inner, k as c_int, &mut matches);
         }
         matches.unpack()
     }

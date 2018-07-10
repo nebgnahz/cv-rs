@@ -21,8 +21,9 @@ else {
     }
 }
 
-$OPENCV_BUILD_DIR = "$pwd\$Compiler\build\opencv";
-$OPENCV_DIR = "$pwd\$Compiler\install\opencv";
+$OPENCV_BUILD_DIR = "$pwd\artifacts\$COMPILER\build\opencv";
+$OPENCV_DIR = "$pwd\artifacts\$COMPILER\install\opencv";
+$OPENCV_CONTRIB_DIR = "$pwd\opencv_contrib\modules";
 $CMAKE_OPTIONS = @(
   "-DWITH_CUDA:BOOL=$CudaSwitch",
   "-DCUDA_ARCH_BIN=5.2",
@@ -69,14 +70,10 @@ Write-Host "INSTALL OPENCV AT $OPENCV_DIR"
 mkdir $OPENCV_BUILD_DIR -ErrorAction SilentlyContinue
 mkdir $OPENCV_DIR -ErrorAction SilentlyContinue
 
-$oldErrorAction = $ErrorActionPreference
-$ErrorActionPreference = "SilentlyContinue"
-git clone -b $OPENCV_VERSION_TAG --depth 1 https://github.com/opencv/opencv.git
-git clone -b $OPENCV_VERSION_TAG --depth 1 https://github.com/opencv/opencv_contrib.git
-$ErrorActionPreference = $oldErrorAction
+git submodule update --init --recursive
 
 Push-Location -Path $OPENCV_BUILD_DIR
-$CMakeArgs = $CMAKE_OPTIONS + ("-DCMAKE_INSTALL_PREFIX=$OPENCV_DIR", "-DCMAKE_BUILD_TYPE=Release", "-DOPENCV_EXTRA_MODULES_PATH=$pwd\opencv_contrib\modules", $REPO_LOCATION)
+$CMakeArgs = $CMAKE_OPTIONS + ("-DCMAKE_INSTALL_PREFIX=$OPENCV_DIR", "-DCMAKE_BUILD_TYPE=Release", "-DOPENCV_EXTRA_MODULES_PATH=$OPENCV_CONTRIB_DIR", $REPO_LOCATION)
 Write-Host "cmake -G $CMAKE_CONFIG_GENERATOR $CMakeArgs"
 cmake -G $CMAKE_CONFIG_GENERATOR @CMakeArgs
 if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }

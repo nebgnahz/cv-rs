@@ -1,6 +1,6 @@
 [package]
 name = "cv"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Ben Zhang <benzh@cs.berkeley.edu>"]
 build = "build.rs"
 repository = "https://github.com/nebgnahz/cv-rs.git"
@@ -15,11 +15,11 @@ bytes = "0.4"
 failure = "0.1"
 
 [dev-dependencies]
-getopts = "0"
-float-cmp = "0"
+getopts = "0.2"
+float-cmp = "0.4"
 
 [build-dependencies]
-gcc = "0"
+cc = { version = "1.0", features = ["parallel"] }
 
 [features]
 cuda = []

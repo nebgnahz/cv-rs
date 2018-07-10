@@ -5,8 +5,9 @@ $REPO_LOCATION = "$pwd\opencv"
 $OPENCV_VERSION_TAG = "3.4.0"
 $COMPILER = "mingw"
 $CMAKE_CONFIG_GENERATOR = "MinGW Makefiles"
-$OPENCV_BUILD_DIR = "$pwd\$COMPILER\build\opencv";
-$OPENCV_DIR = "$pwd\$COMPILER\install\opencv";
+$OPENCV_BUILD_DIR = "$pwd\artifacts\$COMPILER\build\opencv";
+$OPENCV_DIR = "$pwd\artifacts\$COMPILER\install\opencv";
+$OPENCV_CONTRIB_DIR = "$pwd\opencv_contrib\modules";
 $CMAKE_OPTIONS = @(
   "-DWITH_CUDA:BOOL=OFF",
   "-DCUDA_ARCH_BIN=5.2",
@@ -19,7 +20,8 @@ $CMAKE_OPTIONS = @(
   "-DBUILD_PERF_TESTS:BOOL=OFF",
   "-DBUILD_DOCS:BOOL=OFF",
   "-DBUILD_EXAMPLES:BOOL=OFF",
-  "-DINSTALL_CREATE_DISTRIB:BOOL=ON"
+  "-DINSTALL_CREATE_DISTRIB:BOOL=ON",
+  "-DCPU_DISPATCH="
 )
 
 #SCRIPT BODY
@@ -48,6 +50,7 @@ $oldErrorAction = $ErrorActionPreference
 $ErrorActionPreference = "Stop"
 git --version
 cmake --version
+Write-Host (Get-Command mingw32-make).Source
 $ErrorActionPreference = $oldErrorAction
 
 
@@ -56,17 +59,13 @@ Write-Host "INSTALL OPENCV AT $OPENCV_DIR"
 mkdir $OPENCV_BUILD_DIR -ErrorAction SilentlyContinue
 mkdir $OPENCV_DIR -ErrorAction SilentlyContinue
 
-$oldErrorAction = $ErrorActionPreference
-$ErrorActionPreference = "SilentlyContinue"
-git clone -b $OPENCV_VERSION_TAG --depth 1 https://github.com/opencv/opencv.git
-git clone -b $OPENCV_VERSION_TAG --depth 1 https://github.com/opencv/opencv_contrib.git
-$ErrorActionPreference = $oldErrorAction
+git submodule update --init --recursive
 
 Push-Location -Path $OPENCV_BUILD_DIR
-$CMakeArgs = $CMAKE_OPTIONS + ("-DCMAKE_INSTALL_PREFIX=$OPENCV_DIR", "-DCMAKE_BUILD_TYPE=Release", "-DOPENCV_EXTRA_MODULES_PATH=$pwd\opencv_contrib\modules", $REPO_LOCATION)
+$CMakeArgs = $CMAKE_OPTIONS + ("-DCMAKE_INSTALL_PREFIX=$OPENCV_DIR", "-DCMAKE_BUILD_TYPE=Release", "-DOPENCV_EXTRA_MODULES_PATH=$OPENCV_CONTRIB_DIR", $REPO_LOCATION)
 Write-Host "cmake -G $CMAKE_CONFIG_GENERATOR $CMakeArgs"
 cmake -G $CMAKE_CONFIG_GENERATOR @CMakeArgs
 if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }
-cmake --build .  --target install --config release -- -j 4
+cmake --build .  --target install --config release -- -j $env:NUMBER_OF_PROCESSORS 
 if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }
 Pop-Location

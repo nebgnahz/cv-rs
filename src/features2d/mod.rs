@@ -1,9 +1,11 @@
 //! Provide 2D image feature detectors and descriptor extractors
+mod bow_k_means_trainer;
 mod descriptor_matcher;
 mod mser;
 mod sift;
 mod surf;
 
+pub use self::bow_k_means_trainer::*;
 pub use self::descriptor_matcher::*;
 pub use self::mser::*;
 pub use self::sift::*;

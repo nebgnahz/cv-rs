@@ -3,25 +3,24 @@
 // @Last modified by:   urban
 // @Last modified time: 2018-04-21T22:18:57+02:00
 
-
-
 //! Mat
 
-use ::*;
 use core::*;
 use failure::Error;
 use std::ffi::CString;
 use std::mem;
+use std::ops::{BitAnd, BitOr, BitXor, Not};
 use std::os::raw::{c_char, c_double, c_int};
 use std::path::Path;
 use std::slice;
-use std::ops::{BitAnd, BitOr, BitXor, Not};
+use *;
 
+/// The class `CMat` is used as a pointer to represent the Mat opencv structure
 #[derive(Clone, Copy, Debug)]
-pub(crate) enum CMat {}
+pub enum CMat {}
 
 impl CMat {
-    pub fn new() -> *mut CMat {
+    pub(crate) fn new() -> *mut CMat {
         unsafe { cv_mat_new() }
     }
 }
@@ -31,7 +30,7 @@ extern "C" {
     fn cv_mat_from_file_storage(path: *const c_char, section: *const c_char) -> *mut CMat;
     fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
     fn cv_mat_zeros(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
-    fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: c_int, buffer: *const u8) -> *mut CMat;
+    fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: CvType, buffer: *const u8) -> *mut CMat;
     fn cv_mat_is_valid(mat: *mut CMat) -> bool;
     fn cv_mat_rows(cmat: *const CMat) -> c_int;
     fn cv_mat_cols(cmat: *const CMat) -> c_int;
@@ -114,6 +113,11 @@ pub struct Mat {
 
 unsafe impl Send for CMat {}
 unsafe impl Send for Mat {}
+impl Into<CMat> for Mat {
+    fn into(self) -> CMat {
+        unsafe { *self.inner }
+    }
+}
 
 impl Mat {
     /// Loads `Mat` from file storage
@@ -171,7 +175,7 @@ impl Mat {
     ///
     /// ::std::mem::forget(new_image);
     /// ```
-    pub fn from_buffer(rows: c_int, cols: c_int, cv_type: c_int, buf: &Vec<u8>) -> Mat {
+    pub fn from_buffer(rows: c_int, cols: c_int, cv_type: CvType, buf: &[u8]) -> Mat {
         let raw = unsafe { cv_mat_from_buffer(rows, cols, cv_type, buf.as_ptr()) };
         Mat::from_raw(raw)
     }
@@ -317,7 +321,8 @@ impl Mat {
     /// [Mat::at2](struct.Mat.html#method.at2).
     pub fn at3<T: FromBytes>(&self, i0: i32, i1: i32, i2: i32) -> T {
         let data = self.data();
-        let pos = i0 as usize * self.step1(0) * self.elem_size1() + i1 as usize * self.step1(1) * self.elem_size1()
+        let pos = i0 as usize * self.step1(0) * self.elem_size1()
+            + i1 as usize * self.step1(1) * self.elem_size1()
             + i2 as usize;
         let byte = &data[pos];
         let ptr: *const _ = byte;
@@ -350,16 +355,7 @@ impl Mat {
         let mut max = 0.0;
         let mut min_loc = Point2i::new(0, 0);
         let mut max_loc = Point2i::new(0, 0);
-        unsafe {
-            cv_mat_min_max_loc(
-                self.inner,
-                &mut min,
-                &mut max,
-                &mut min_loc,
-                &mut max_loc,
-                mask.inner,
-            )
-        }
+        unsafe { cv_mat_min_max_loc(self.inner, &mut min, &mut max, &mut min_loc, &mut max_loc, mask.inner) }
         (min, max, min_loc, max_loc)
     }
 
@@ -387,8 +383,6 @@ impl Mat {
     pub fn count_non_zero(&self) -> c_int {
         unsafe { cv_mat_count_non_zero(self.inner) }
     }
-
-
 
     /// Threshold apples fixed-level threshold for each array element.
     pub fn threshold(&self, thresh: f64, max_val: f64, t: ThresholdType) -> Mat {
@@ -515,6 +509,12 @@ impl Not for Mat {
         let m = CMat::new();
         unsafe { cv_mat_bitwise_not(self.inner, m) }
         Mat::from_raw(m)
+    }
+}
+
+impl Clone for Mat {
+    fn clone(&self) -> Self {
+        Mat::from_buffer(self.rows, self.cols, self.cv_type(), self.data())
     }
 }
 

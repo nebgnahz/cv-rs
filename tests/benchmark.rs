@@ -1,9 +1,9 @@
 extern crate cv;
 
-use cv::*;
 use cv::imgcodecs::*;
 use cv::imgproc::*;
 use cv::objdetect::ObjectDetect;
+use cv::*;
 mod utils;
 use utils::*;
 
