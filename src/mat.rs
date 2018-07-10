@@ -64,6 +64,14 @@ extern "C" {
     fn cv_mat_bitwise_or(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
     fn cv_mat_bitwise_xor(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
     fn cv_mat_count_non_zero(src: *const CMat) -> c_int;
+    fn cv_mat_threshold(
+        src: *const CMat,
+        dst: *mut CMat,
+        thresh: c_double,
+        max_val: c_double,
+        thresh_type: ThresholdType,
+    );
+
     fn cv_mat_copy_make_border(
         src: *const CMat,
         dst: *mut CMat,
@@ -74,6 +82,7 @@ extern "C" {
         border_type: c_int,
         color: Scalar,
     ) -> c_int;
+
 }
 
 /// The class `Mat` represents an n-dimensional dense numerical single-channel or multi-channel array.
@@ -367,6 +376,13 @@ impl Mat {
     /// Counts non-zero array elements.
     pub fn count_non_zero(&self) -> c_int {
         unsafe { cv_mat_count_non_zero(self.inner) }
+    }
+
+    /// Threshold apples fixed-level threshold for each array element.
+    pub fn threshold(&self, thresh: f64, max_val: f64, t: ThresholdType) -> Mat {
+        let m = CMat::new();
+        unsafe { cv_mat_threshold(self.inner, m, thresh, max_val, t) }
+        Mat::from_raw(m)
     }
 
     /// Forms a border around an image.

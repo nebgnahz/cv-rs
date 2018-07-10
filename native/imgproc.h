@@ -44,6 +44,7 @@ void cv_calc_back_project(const cv::Mat* images,
                           cv::Mat* back_project,
                           const float** ranges);
 void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result);
+void cv_mat_threshold(const cv::Mat* const src, cv::Mat* const dst, double thresh, double maxval, int thresh_type);
 }
 
 #endif  // CV_RS_IMGPROC_H

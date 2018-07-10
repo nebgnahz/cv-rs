@@ -435,6 +435,29 @@ pub enum NormType {
     MinMax = 32,
 }
 
+/// Threshold type. Please refer to [OpenCV's
+/// documentation] (https://docs.opencv.org/trunk/d7/d1b/group__imgproc__misc.html#gaa9e58d2860d4afa658ef70a9b1115576)
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+pub enum ThresholdType {
+    /// Binary thresholding
+    Binary = 0,
+    /// Inverse binary thresholding
+    BinaryInv = 1,
+    /// Trunc thresholding
+    Trunc = 2,
+    /// Zero thresholding
+    ToZero = 3,
+    /// Inverse zero thresholding
+    ToZeroInv = 4,
+    /// Mask thresholding
+    Mask = 7,
+    /// Otsu thresholding
+    Otsu = 8,
+    /// Triangle thresholding
+    Triangle = 16,
+}
+
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 /// Term criteria type, can be one of: Count, Eps or Count + Eps
