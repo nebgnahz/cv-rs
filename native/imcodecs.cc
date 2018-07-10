@@ -15,7 +15,11 @@ void* cv_imdecode(const uint8_t* const buffer, size_t len, int flag) {
     return (dst);
 }
 
-void cv_imencode(const char* const ext, const cv::Mat* const image, const int* const flag_ptr, size_t flag_size, COption<CVec<uint8_t>>* result) {
+void cv_imencode(const char* const ext,
+                 const cv::Mat* const image,
+                 const int* const flag_ptr,
+                 size_t flag_size,
+                 COption<CVec<uint8_t>>* result) {
     std::vector<uchar> buf;
     std::vector<int> params(flag_ptr, flag_ptr + flag_size);
     bool r = cv::imencode(ext, *image, buf, params);
@@ -23,8 +27,7 @@ void cv_imencode(const char* const ext, const cv::Mat* const image, const int* c
         CVec<uint8_t> cvec;
         cv_to_ffi(buf, &cvec);
         *result = COption<CVec<uint8_t>>{true, cvec};
-    }
-    else {
+    } else {
         *result = COption<CVec<uint8_t>>{false, CVec<uint8_t>()};
     }
 }

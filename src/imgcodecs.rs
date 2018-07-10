@@ -17,7 +17,7 @@ extern "C" {
         inner: *const CMat,
         flag_ptr: *const ImageWriteMode,
         flag_size: usize,
-        result: *mut COption<CVec<u8>>
+        result: *mut COption<CVec<u8>>,
     );
 }
 
