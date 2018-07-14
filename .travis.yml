@@ -39,6 +39,7 @@ before_install:
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/usr/local/lib/x86_64-linux-gnu
   - rustup component add rustfmt-preview
   - cargo fmt --version
+  - clang-format --version
 
 script:
   - cargo build --no-default-features
