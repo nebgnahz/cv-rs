@@ -6,7 +6,7 @@ dist: trusty
 
 language: rust
 rust:
-  - nightly
+  - stable
 
 addons:
   apt:
