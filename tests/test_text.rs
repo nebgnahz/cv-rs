@@ -1,11 +1,16 @@
 extern crate cv;
 mod utils;
 
+#[allow(unused_imports)]
 use cv::imgcodecs::ImageReadMode;
+#[allow(unused_imports)]
 use cv::text::*;
+#[allow(unused_imports)]
 use cv::*;
+#[allow(unused_imports)]
 use utils::*;
 
+#[allow(dead_code)]
 const VOCABULARY: &str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 #[cfg(feature = "tesseract")]
@@ -51,6 +56,7 @@ mod tesseract {
 }
 
 #[test]
+#[cfg(feature = "tesseract")]
 fn ocr_hmm_test() {
     let image_path = get_asset_path("Ubuntu.png");
     let classifier_name = get_asset_path("OCRHMM_knn_model_data.xml.gz");
@@ -75,6 +81,7 @@ fn ocr_hmm_test() {
 
 #[test]
 #[should_panic]
+#[cfg(feature = "tesseract")]
 fn ocr_holistic_word_panic() {
     let _ = OcrHolisticWord::new("a", "a", "a").unwrap();
 }

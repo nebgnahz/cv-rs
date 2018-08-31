@@ -101,9 +101,11 @@ mod unix {
         println!("cargo:rustc-link-lib=opencv_imgcodecs");
         println!("cargo:rustc-link-lib=opencv_imgproc");
         println!("cargo:rustc-link-lib=opencv_objdetect");
-        println!("cargo:rustc-link-lib=opencv_text");
         println!("cargo:rustc-link-lib=opencv_videoio");
         println!("cargo:rustc-link-lib=opencv_video");
+        if cfg!(feature = "tesseract") {
+            println!("cargo:rustc-link-lib=opencv_text");
+        }
         if cfg!(feature = "cuda") {
             println!("cargo:rustc-link-lib=opencv_cudaobjdetect");
         }
@@ -128,6 +130,11 @@ fn main() {
 
     if cfg!(not(target_env = "msvc")) {
         opencv_config.flag("--std=c++11");
+    }
+
+    if cfg!(feature = "tesseract") {
+        let tesseract_files = get_files("native/tesseract");
+        opencv_config.files(tesseract_files);
     }
 
     if cfg!(feature = "cuda") {
