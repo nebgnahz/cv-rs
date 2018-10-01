@@ -352,6 +352,8 @@ pub enum CvType {
     Cv64FC1 = 6,
     /// 8 bit, two channel (rarelly seen)
     Cv8UC2 = 8,
+    /// 32 bit signed, two channels (uv vectors)
+    Cv32FC2 = 13,
     /// 8 bit unsigned, three channels (RGB image)
     Cv8UC3 = 16,
     /// 8 bit signed, three channels (RGB image)
