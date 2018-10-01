@@ -49,10 +49,10 @@ impl Mat {
 	/// * `sigma_dist_fix` spatial sigma for postprocess cross bilateralf filter
 	/// * `sigma_color_fix` color sigma for postprocess cross bilateral filter
 	/// * `occ_thr` threshold for detecting occlusions
-	/// * `upscale_averaging_radius window` size for bilateral upscale operation
-	/// * `upscale_sigma_dist spatial` sigma for bilateral upscale operation
-	/// * `upscale_sigma_color color` sigma for bilateral upscale operation
-	/// * `speed_up_thr threshold` to detect point with irregular flow - where flow should be
+	/// * `upscale_averaging_radius` window size for bilateral upscale operation
+	/// * `upscale_sigma_dist` spatial sigma for bilateral upscale operation
+	/// * `upscale_sigma_color` color sigma for bilateral upscale operation
+	/// * `speed_up_thr` threshold to detect point with irregular flow - where flow should be
 	/// recalculated after upscale
 	pub fn from_optical_flow_sf(
 		from: &Mat,
