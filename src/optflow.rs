@@ -7,13 +7,19 @@
 //! successful (I probably haven't tried hard enough). There is another port
 //! [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
 //! bindings using a Python script.
-#![deny(trivial_casts)]
-#![deny(trivial_numeric_casts)]
-#![deny(unused_import_braces)]
-#![deny(unused_qualifications)]
-
 use super::*;
 use std::os::raw::{c_double, c_int};
+
+#[derive(Copy, Clone, Debug)]
+///
+pub enum DisPreset {
+	///
+	ULTRAFAST = 0,
+	///
+	FAST = 1,
+	///
+	MEDIUM = 2,
+}
 
 extern "C" {
 	fn calc_optical_flow_sf(
@@ -34,7 +40,16 @@ extern "C" {
 		upscale_sigma_color: c_double,
 		speed_up_thr: c_double,
 	);
+
+	fn calc_optical_flow_df(from: *const CMat, to: *const CMat, out: *mut CMat);
+
+	fn calc_optical_flow_farneback(from: *const CMat, to: *const CMat, out: *mut CMat);
+
+	fn calc_optical_flow_dis(from: *const CMat, to: *const CMat, out: *mut CMat, preset: u32);
+
+	fn calc_optical_flow_std(from: *const CMat, to: *const CMat, out: *mut CMat);
 }
+
 impl Mat {
 	/// Fast dense optical flow based on PyrLK sparse matches interpolation.
 	///	* `from` First 8-bit 3-channel image.
@@ -91,6 +106,41 @@ impl Mat {
 				upscale_sigma_color,
 				speed_up_thr,
 			);
+		}
+		Mat::from_raw(out)
+	}
+	///
+	pub fn from_optical_flow_df(from: &Mat, to: &Mat) -> Mat {
+		let out = CMat::new();
+		unsafe {
+			calc_optical_flow_df(from.inner, to.inner, out);
+		}
+		Mat::from_raw(out)
+	}
+
+	///
+	pub fn calc_optical_flow_farneback(from: &Mat, to: &Mat) -> Mat {
+		let out = CMat::new();
+		unsafe {
+			calc_optical_flow_farneback(from.inner, to.inner, out);
+		}
+		Mat::from_raw(out)
+	}
+
+	///
+	pub fn calc_optical_flow_dis(from: &Mat, to: &Mat, preset: DisPreset) -> Mat {
+		let out = CMat::new();
+		unsafe {
+			calc_optical_flow_dis(from.inner, to.inner, out, preset as u32);
+		}
+		Mat::from_raw(out)
+	}
+
+	///
+	pub fn calc_optical_flow_std(from: &Mat, to: &Mat) -> Mat {
+		let out = CMat::new();
+		unsafe {
+			calc_optical_flow_std(from.inner, to.inner, out);
 		}
 		Mat::from_raw(out)
 	}

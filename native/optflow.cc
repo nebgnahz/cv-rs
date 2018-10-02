@@ -20,4 +20,45 @@ void calc_optical_flow_sf(cv::Mat* from, cv::Mat* to, cv::Mat* out, int layers,
 			speed_up_thr);
 }
 
+void calc_optical_flow_df(cv::Mat* from, cv::Mat* to, cv::Mat* out) {
+
+	auto array_from = cv::InputArray(*from);
+	auto array_to = cv::InputArray(*to);
+	auto array_out = cv::InputOutputArray(*out);
+
+	auto deep_flow = cv::optflow::createOptFlow_DeepFlow();
+	deep_flow->calc(array_from, array_to, array_out);
+}
+
+void calc_optical_flow_farneback(cv::Mat* from, cv::Mat* to, cv::Mat* out) {
+
+	auto array_from = cv::InputArray(*from);
+	auto array_to = cv::InputArray(*to);
+	auto array_out = cv::InputOutputArray(*out);
+
+	auto deep_flow = cv::optflow::createOptFlow_Farneback();
+	deep_flow->calc(array_from, array_to, array_out);
+}
+
+void calc_optical_flow_dis(cv::Mat* from, cv::Mat* to, cv::Mat* out,
+		unsigned int preset) {
+
+	auto array_from = cv::InputArray(*from);
+	auto array_to = cv::InputArray(*to);
+	auto array_out = cv::InputOutputArray(*out);
+
+	auto deep_flow = cv::optflow::createOptFlow_DIS(preset);
+	deep_flow->calc(array_from, array_to, array_out);
+}
+
+void calc_optical_flow_std(cv::Mat* from, cv::Mat* to, cv::Mat* out) {
+
+	auto array_from = cv::InputArray(*from);
+	auto array_to = cv::InputArray(*to);
+	auto array_out = cv::InputOutputArray(*out);
+
+	auto deep_flow = cv::optflow::createOptFlow_SparseToDense();
+	deep_flow->calc(array_from, array_to, array_out);
+}
+
 }
