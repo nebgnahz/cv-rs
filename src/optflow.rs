@@ -21,6 +21,8 @@ pub enum DisPreset {
 	MEDIUM = 2,
 }
 
+#[allow(non_camel_case_types)]
+type c_bool = c_int;
 extern "C" {
 	fn calc_optical_flow_sf(
 		from: *const CMat,
@@ -43,11 +45,42 @@ extern "C" {
 
 	fn calc_optical_flow_df(from: *const CMat, to: *const CMat, out: *mut CMat);
 
-	fn calc_optical_flow_farneback(from: *const CMat, to: *const CMat, out: *mut CMat);
+	fn calc_optical_flow_farneback(
+		from: *const CMat,
+		to: *const CMat,
+		out: *mut CMat,
+		numLevels: c_int,
+		pyrScale: c_double,
+		fastPyramids: c_bool,
+		winSize: c_int,
+		numIters: c_int,
+		polyN: c_int,
+		polySigma: c_double,
+		flags: c_int,
+	);
 
 	fn calc_optical_flow_dis(from: *const CMat, to: *const CMat, out: *mut CMat, preset: u32);
 
 	fn calc_optical_flow_std(from: *const CMat, to: *const CMat, out: *mut CMat);
+
+	fn calc_optical_flow_dtvl1(
+		from: *const CMat,
+		to: *const CMat,
+		out: *mut CMat,
+		tau: c_double,
+		lambda: c_double,
+		theta: c_double,
+		nscales: c_int,
+		warps: c_int,
+		epsilon: c_double,
+		innerIterations: c_int,
+		outerIterations: c_int,
+		scaleStep: c_double,
+		gamma: c_double,
+		medianFiltering: c_int,
+		useInitialFlow: c_bool,
+	);
+
 }
 
 impl Mat {
@@ -119,10 +152,71 @@ impl Mat {
 	}
 
 	///
-	pub fn calc_optical_flow_farneback(from: &Mat, to: &Mat) -> Mat {
+	pub fn from_optical_flow_farneback(
+		from: &Mat,
+		to: &Mat,
+		num_levels: i32,
+		pyr_scale: f64,
+		fast_pyramids: bool,
+		win_size: i32,
+		num_iters: i32,
+		poly_n: i32,
+		poly_sigma: f64,
+	) -> Mat {
 		let out = CMat::new();
 		unsafe {
-			calc_optical_flow_farneback(from.inner, to.inner, out);
+			calc_optical_flow_farneback(
+				from.inner,
+				to.inner,
+				out,
+				num_levels,
+				pyr_scale,
+				fast_pyramids as c_bool,
+				win_size,
+				num_iters,
+				poly_n,
+				poly_sigma,
+				0, // no flags, ignore existing
+			);
+		}
+		Mat::from_raw(out)
+	}
+
+	///
+	pub fn cfrom_optical_flow_dtvl1(
+		from: &Mat,
+		to: &Mat,
+		tau: f64,
+		lambda: f64,
+		theta: f64,
+		nscales: i32,
+		warps: i32,
+		epsilon: f64,
+		inner_iterations: i32,
+		outer_iterations: i32,
+		scale_step: f64,
+		gamma: f64,
+		median_filtering: i32,
+	) -> Mat {
+		let out = CMat::new();
+		unsafe {
+			calc_optical_flow_dtvl1(
+				from.inner,
+				to.inner,
+				out,
+				tau,
+				lambda,
+				theta,
+				nscales,
+				warps,
+				epsilon,
+				inner_iterations,
+				outer_iterations,
+				scale_step,
+				gamma,
+				median_filtering,
+				0, // false
+			);
 		}
 		Mat::from_raw(out)
 	}
