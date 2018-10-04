@@ -7,6 +7,7 @@
 //! successful (I probably haven't tried hard enough). There is another port
 //! [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
 //! bindings using a Python script.
+use super::imgproc::*;
 use super::*;
 use std::os::raw::{c_double, c_int};
 
@@ -163,11 +164,20 @@ impl Mat {
 		poly_n: i32,
 		poly_sigma: f64,
 	) -> Mat {
+		// Need grayscale
+		let from = from.cvt_color(ColorConversion::BGR2YUV);
+		let mut y_from = Mat::with_size(from.rows, from.cols, CvType::Cv8UC1 as i32);
+		from.mix_channels_to(&mut y_from, 1, 1, [(0, 0)]);
+
+		let to = to.cvt_color(ColorConversion::BGR2YUV);
+		let mut y_to = Mat::with_size(from.rows, from.cols, CvType::Cv8UC1 as i32);
+		to.mix_channels_to(&mut y_to, 1, 1, [(0, 0)]);
+
 		let out = CMat::new();
 		unsafe {
 			calc_optical_flow_farneback(
-				from.inner,
-				to.inner,
+				y_from.inner,
+				y_to.inner,
 				out,
 				num_levels,
 				pyr_scale,
