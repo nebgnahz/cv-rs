@@ -143,11 +143,29 @@ impl Mat {
 		}
 		Mat::from_raw(out)
 	}
+
+	/// Converts the image to one layer 8-bit grayscale
+	pub fn to_grayscale(&self) -> Self {
+		if self.channels == 1 {
+			self.clone()
+		} else {
+			let from = self.cvt_color(ColorConversion::BGR2YUV);
+			let mut luma = Mat::with_size(from.rows, from.cols, CvType::Cv8UC1 as i32);
+			from.mix_channels_to(&mut luma, 1, 1, [(0, 0)]);
+			luma
+		}
+	}
 	///
 	pub fn from_optical_flow_df(from: &Mat, to: &Mat) -> Mat {
 		let out = CMat::new();
-		unsafe {
-			calc_optical_flow_df(from.inner, to.inner, out);
+		if from.channels == 1 && to.channels == 1 {
+			unsafe {
+				calc_optical_flow_df(from.inner, to.inner, out);
+			}
+		} else {
+			unsafe {
+				calc_optical_flow_df(from.to_grayscale().inner, to.to_grayscale().inner, out);
+			}
 		}
 		Mat::from_raw(out)
 	}
@@ -164,30 +182,40 @@ impl Mat {
 		poly_n: i32,
 		poly_sigma: f64,
 	) -> Mat {
-		// Need grayscale
-		let from = from.cvt_color(ColorConversion::BGR2YUV);
-		let mut y_from = Mat::with_size(from.rows, from.cols, CvType::Cv8UC1 as i32);
-		from.mix_channels_to(&mut y_from, 1, 1, [(0, 0)]);
-
-		let to = to.cvt_color(ColorConversion::BGR2YUV);
-		let mut y_to = Mat::with_size(from.rows, from.cols, CvType::Cv8UC1 as i32);
-		to.mix_channels_to(&mut y_to, 1, 1, [(0, 0)]);
-
+		// Need grayscale, will create if missing
 		let out = CMat::new();
-		unsafe {
-			calc_optical_flow_farneback(
-				y_from.inner,
-				y_to.inner,
-				out,
-				num_levels,
-				pyr_scale,
-				fast_pyramids as c_bool,
-				win_size,
-				num_iters,
-				poly_n,
-				poly_sigma,
-				0, // no flags, ignore existing
-			);
+		if from.channels == 1 && to.channels == 1 {
+			unsafe {
+				calc_optical_flow_farneback(
+					from.inner,
+					to.inner,
+					out,
+					num_levels,
+					pyr_scale,
+					fast_pyramids as c_bool,
+					win_size,
+					num_iters,
+					poly_n,
+					poly_sigma,
+					0, // no flags, ignore existing
+				);
+			}
+		} else {
+			unsafe {
+				calc_optical_flow_farneback(
+					from.to_grayscale().inner,
+					to.to_grayscale().inner,
+					out,
+					num_levels,
+					pyr_scale,
+					fast_pyramids as c_bool,
+					win_size,
+					num_iters,
+					poly_n,
+					poly_sigma,
+					0, // no flags, ignore existing
+				);
+			}
 		}
 		Mat::from_raw(out)
 	}
