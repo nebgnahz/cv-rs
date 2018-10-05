@@ -54,6 +54,11 @@ struct CResult<T: Copy> {
     error: CDisposableString,
 }
 
+#[repr(C)]
+struct CEmptyResult {
+    error: CDisposableString,
+}
+
 impl<T: Copy> Into<Result<T, String>> for CResult<T> {
     fn into(self) -> Result<T, String> {
         if self.error.value.is_null() {
@@ -77,6 +82,20 @@ impl<T: Copy> CResult<T> {
             func(result_ref);
         };
         result
+    }
+}
+
+impl Into<Result<(), String>> for CEmptyResult {
+    fn into(self) -> Result<(), String> {
+        if self.error.value.is_null() {
+            Ok(())
+        } else {
+            unsafe {
+                let c_str = std::ffi::CStr::from_ptr(self.error.value);
+                let err = c_str.to_string_lossy().into_owned();
+                Err(err)
+            }
+        }
     }
 }
 

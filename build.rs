@@ -40,7 +40,8 @@ mod windows {
         let opencv_world_entry = files.filter_map(|entry| entry.as_ref().ok()).find(|entry| {
             let file_name = entry.file_name().to_string_lossy().into_owned();
             (file_name.starts_with(&format!("opencv_{}", name))
-                || file_name.starts_with(&format!("libopencv_{}", name))) && !file_name.ends_with("d.lib")
+                || file_name.starts_with(&format!("libopencv_{}", name)))
+                && !file_name.ends_with("d.lib")
         });
         let lib = opencv_world_entry.ok_or_else(|| {
             BuildError::new(format!(

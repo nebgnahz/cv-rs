@@ -104,8 +104,7 @@ extern "C" {
         threshold2: c_double,
         aperture_size: c_int,
         l2_gradient: c_int,
-        result: *mut CResult<*const CMat>,
-    );
+    ) -> CEmptyResult;
 }
 
 /// Possible methods for histogram comparision method
@@ -567,7 +566,7 @@ impl Mat {
         l2_gradient: bool,
     ) -> Result<Mat, String> {
         let edges = Mat::new();
-        let result = CResult::<*const CMat>::from_callback(|r| unsafe {
+        let result = unsafe {
             cv_canny(
                 self.inner,
                 edges.inner,
@@ -578,16 +577,12 @@ impl Mat {
                     true => 1,
                     false => 0,
                 },
-                r,
             )
-        });
+        };
 
-        let result: Result<*const CMat, String> = result.into();
+        let result: Result<(), String> = result.into();
 
-        match result {
-            Ok(_) => Ok(edges),
-            Err(e) => Err(e),
-        }
+        result.map(|_| edges)
     }
 
     fn matrix_to_vec<T, MElem: AsRef<[T]>, M: AsRef<[MElem]>>(value: M) -> Vec<*const T> {
