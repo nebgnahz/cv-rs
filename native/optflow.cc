@@ -19,12 +19,9 @@ void calc_optical_flow_sf(cv::Mat* from,
                           double upscale_sigma_dist,
                           double upscale_sigma_color,
                           double speed_up_thr) {
-    auto array_from = cv::InputArray(*from);
-    auto array_to = cv::InputArray(*to);
-    auto array_out = cv::OutputArray(*out);
-    cv::optflow::calcOpticalFlowSF(array_from,
-                                   array_to,
-                                   array_out,
+    cv::optflow::calcOpticalFlowSF(*from,
+                                   *to,
+                                   *out,
                                    layers,
                                    averaging_block_size,
                                    max_flow,
@@ -41,13 +38,8 @@ void calc_optical_flow_sf(cv::Mat* from,
 }
 
 void calc_optical_flow_df(cv::Mat* from, cv::Mat* to, cv::Mat* out) {
-    auto array_from = cv::InputArray(*from);
-    auto array_to = cv::InputArray(*to);
-    auto array_out = cv::InputOutputArray(*out);
-
     auto optical_flow = cv::optflow::createOptFlow_DeepFlow();
-
-    optical_flow->calc(array_from, array_to, array_out);
+    optical_flow->calc(*from, *to, *out);
 }
 
 void calc_optical_flow_farneback(cv::Mat* from,
@@ -61,14 +53,10 @@ void calc_optical_flow_farneback(cv::Mat* from,
                                  int polyN,
                                  double polySigma,
                                  int flags) {
-    auto array_from = cv::InputArray(*from);
-    auto array_to = cv::InputArray(*to);
-    auto array_out = cv::InputOutputArray(*out);
-
     auto optical_flow =
         cv::FarnebackOpticalFlow::create(numLevels, pyrScale, fastPyramids, winSize, numIters, polyN, polySigma, flags);
 
-    optical_flow->calc(array_from, array_to, array_out);
+    optical_flow->calc(*from, *to, *out);
 }
 
 void calc_optical_flow_dtvl1(cv::Mat* from,
@@ -86,10 +74,6 @@ void calc_optical_flow_dtvl1(cv::Mat* from,
                              double gamma,
                              int medianFiltering,
                              bool useInitialFlow) {
-    auto array_from = cv::InputArray(*from);
-    auto array_to = cv::InputArray(*to);
-    auto array_out = cv::InputOutputArray(*out);
-
     auto optical_flow = cv::DualTVL1OpticalFlow::create(tau,
                                                         lambda,
                                                         theta,
@@ -103,24 +87,16 @@ void calc_optical_flow_dtvl1(cv::Mat* from,
                                                         medianFiltering,
                                                         useInitialFlow);
 
-    optical_flow->calc(array_from, array_to, array_out);
+    optical_flow->calc(*from, *to, *out);
 }
 
 void calc_optical_flow_dis(cv::Mat* from, cv::Mat* to, cv::Mat* out, unsigned int preset) {
-    auto array_from = cv::InputArray(*from);
-    auto array_to = cv::InputArray(*to);
-    auto array_out = cv::InputOutputArray(*out);
-
     auto optical_flow = cv::optflow::createOptFlow_DIS(preset);
-    optical_flow->calc(array_from, array_to, array_out);
+    optical_flow->calc(*from, *to, *out);
 }
 
 void calc_optical_flow_std(cv::Mat* from, cv::Mat* to, cv::Mat* out) {
-    auto array_from = cv::InputArray(*from);
-    auto array_to = cv::InputArray(*to);
-    auto array_out = cv::InputOutputArray(*out);
-
     auto optical_flow = cv::optflow::createOptFlow_SparseToDense();
-    optical_flow->calc(array_from, array_to, array_out);
+    optical_flow->calc(*from, *to, *out);
 }
 }
