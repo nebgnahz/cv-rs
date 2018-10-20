@@ -1,8 +1,8 @@
 param([Parameter(mandatory=$true)][bool] $EnableCuda, [Parameter(mandatory=$true)][string] $Compiler)
 $CudaSwitch = If ($EnableCuda) {"ON"} Else {"OFF"}
 #SCRIPT CONSTANTS
-$pwd = Get-Location
-$REPO_LOCATION = "$pwd\opencv"
+$pwd = (Get-Location).Path.Replace("\", "/")
+$REPO_LOCATION = "$pwd/opencv"
 $OPENCV_VERSION_TAG = "3.4.0"
 $CMAKE_CONFIG_GENERATOR;
 
@@ -21,9 +21,9 @@ else {
     }
 }
 
-$OPENCV_BUILD_DIR = "$pwd\artifacts\$COMPILER\build\opencv";
-$OPENCV_DIR = "$pwd\artifacts\$COMPILER\install\opencv";
-$OPENCV_CONTRIB_DIR = "$pwd\opencv_contrib\modules";
+$OPENCV_BUILD_DIR = "$pwd/artifacts/$COMPILER/build/opencv";
+$OPENCV_DIR = "$pwd/artifacts/$COMPILER/install/opencv";
+$OPENCV_CONTRIB_DIR = "$pwd/opencv_contrib/modules";
 $CMAKE_OPTIONS = @(
   "-DWITH_CUDA:BOOL=$CudaSwitch",
   "-DCUDA_ARCH_BIN=5.2",
@@ -43,16 +43,16 @@ $CMAKE_OPTIONS = @(
 Write-Host "CONFIGURE OPENCV PATHS"
 
 $env:OPENCV_DIR = $OPENCV_DIR
-$env:OPENCV_LIB = "$OPENCV_DIR\x64\$Compiler\lib"
-if ($env:Path.IndexOf("$OPENCV_DIR\x64\$Compiler\bin") -eq (-1)) {
-	$env:Path = "$env:Path;$OPENCV_DIR\x64\$Compiler\bin"
+$env:OPENCV_LIB = "$OPENCV_DIR/x64/$Compiler/lib"
+if ($env:Path.IndexOf("$OPENCV_DIR/x64/$Compiler/bin") -eq (-1)) {
+	$env:Path = "$env:Path;$OPENCV_DIR/x64/$Compiler/bin"
 }
 
 [Environment]::SetEnvironmentVariable("OPENCV_DIR", $env:OPENCV_DIR, [EnvironmentVariableTarget]::Machine)
 [Environment]::SetEnvironmentVariable("OPENCV_LIB", $env:OPENCV_LIB, [EnvironmentVariableTarget]::Machine)
 [Environment]::SetEnvironmentVariable("Path", $env:Path, [EnvironmentVariableTarget]::Machine)
 
-if (Test-Path "$OPENCV_DIR\x64\$Compiler\bin") {
+if (Test-Path "$OPENCV_DIR/x64/$Compiler/bin") {
 	Write-Host "Compiled OpenCV found. Skip installation"
 	return;
 }
@@ -74,7 +74,7 @@ git submodule update --init --recursive
 
 Push-Location -Path $OPENCV_BUILD_DIR
 $CMakeArgs = $CMAKE_OPTIONS + ("-DCMAKE_INSTALL_PREFIX=$OPENCV_DIR", "-DCMAKE_BUILD_TYPE=Release", "-DOPENCV_EXTRA_MODULES_PATH=$OPENCV_CONTRIB_DIR", $REPO_LOCATION)
-Write-Host "cmake -G $CMAKE_CONFIG_GENERATOR $CMakeArgs"
+Write-Host "cmake -G '$CMAKE_CONFIG_GENERATOR' $CMakeArgs"
 cmake -G $CMAKE_CONFIG_GENERATOR @CMakeArgs
 if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode )  }
 cmake --build .  --target install --config release -- /m
