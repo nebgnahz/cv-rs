@@ -15,6 +15,7 @@ enum CVideoCapture {}
 extern "C" {
     fn cv_videocapture_new(index: c_int) -> *mut CVideoCapture;
     fn cv_videocapture_from_file(path: *const c_char) -> *mut CVideoCapture;
+    fn cv_videocapture_from_gst_pipeline(pipeline: *const c_char) -> *mut CVideoCapture;
     fn cv_videocapture_is_opened(ccap: *const CVideoCapture) -> bool;
     fn cv_videocapture_read(v: *mut CVideoCapture, m: *mut CMat) -> bool;
     fn cv_videocapture_drop(cap: *mut CVideoCapture);
@@ -131,6 +132,14 @@ impl VideoCapture {
     pub fn from_path(path: &str) -> Self {
         let s = ::std::ffi::CString::new(path).unwrap();
         let cap = unsafe { cv_videocapture_from_file((&s).as_ptr()) };
+        VideoCapture { inner: cap }
+    }
+
+    /// Create a capture device from a gstreamer pipeline (eg.
+    ///  gst-launch-1.0 v4l2src ! videoconvert ! appsink).
+    pub fn from_pipeline(pipeline: &str) -> Self {
+        let s = ::std::ffi::CString::new(pipeline).unwrap();
+        let cap = unsafe { cv_videocapture_from_gst_pipeline((&s).as_ptr()) };
         VideoCapture { inner: cap }
     }
 
