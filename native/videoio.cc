@@ -10,6 +10,10 @@ void* cv_videocapture_from_file(const char* const filename) {
     return new cv::VideoCapture(filename);
 }
 
+void* cv_videocapture_from_gst_pipeline(const char* const pipeline) {
+    return new cv::VideoCapture(pipeline, cv::CAP_GSTREAMER);
+}
+
 bool cv_videocapture_is_opened(const cv::VideoCapture* const cap) {
     return cap->isOpened();
 }

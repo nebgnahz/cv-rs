@@ -8,6 +8,7 @@ extern "C" {
 
 void* cv_videocapture_new(int index);
 void* cv_videocapture_from_file(const char* const filename);
+void* cv_videocapture_from_gst_pipeline(const char* const pipeline);
 bool cv_videocapture_is_opened(const cv::VideoCapture* const cap);
 bool cv_videocapture_read(cv::VideoCapture* cap, cv::Mat* mat);
 void cv_videocapture_drop(cv::VideoCapture* cap);
