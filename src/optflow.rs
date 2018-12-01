@@ -9,7 +9,6 @@
 //! bindings using a Python script.
 use super::imgproc::*;
 use super::*;
-use std::os::raw::{c_double, c_int};
 
 #[derive(Copy, Clone, Debug)]
 ///
@@ -23,25 +22,25 @@ pub enum DisPreset {
 }
 
 #[allow(non_camel_case_types)]
-type c_bool = c_int;
+type IntBool = i32;
 extern "C" {
     fn calc_optical_flow_sf(
         from: *const CMat,
         to: *const CMat,
         out: *mut CMat,
-        layers: c_int,
-        averaging_block_size: c_int,
-        max_flow: c_int,
-        sigma_dist: c_double,
-        sigma_color: c_double,
-        postprocess_window: c_int,
-        sigma_dist_fix: c_double,
-        sigma_color_fix: c_double,
-        occ_thr: c_double,
-        upscale_averaging_radius: c_int,
-        upscale_sigma_dist: c_double,
-        upscale_sigma_color: c_double,
-        speed_up_thr: c_double,
+        layers: i32,
+        averaging_block_size: i32,
+        max_flow: i32,
+        sigma_dist: f64,
+        sigma_color: f64,
+        postprocess_window: i32,
+        sigma_dist_fix: f64,
+        sigma_color_fix: f64,
+        occ_thr: f64,
+        upscale_averaging_radius: i32,
+        upscale_sigma_dist: f64,
+        upscale_sigma_color: f64,
+        speed_up_thr: f64,
     );
 
     fn calc_optical_flow_df(from: *const CMat, to: *const CMat, out: *mut CMat);
@@ -50,14 +49,14 @@ extern "C" {
         from: *const CMat,
         to: *const CMat,
         out: *mut CMat,
-        numLevels: c_int,
-        pyrScale: c_double,
-        fastPyramids: c_bool,
-        winSize: c_int,
-        numIters: c_int,
-        polyN: c_int,
-        polySigma: c_double,
-        flags: c_int,
+        numLevels: i32,
+        pyrScale: f64,
+        fastPyramids: IntBool,
+        winSize: i32,
+        numIters: i32,
+        polyN: i32,
+        polySigma: f64,
+        flags: i32,
     );
 
     fn calc_optical_flow_dis(from: *const CMat, to: *const CMat, out: *mut CMat, preset: u32);
@@ -68,18 +67,18 @@ extern "C" {
         from: *const CMat,
         to: *const CMat,
         out: *mut CMat,
-        tau: c_double,
-        lambda: c_double,
-        theta: c_double,
-        nscales: c_int,
-        warps: c_int,
-        epsilon: c_double,
-        innerIterations: c_int,
-        outerIterations: c_int,
-        scaleStep: c_double,
-        gamma: c_double,
-        medianFiltering: c_int,
-        useInitialFlow: c_bool,
+        tau: f64,
+        lambda: f64,
+        theta: f64,
+        nscales: i32,
+        warps: i32,
+        epsilon: f64,
+        innerIterations: i32,
+        outerIterations: i32,
+        scaleStep: f64,
+        gamma: f64,
+        medianFiltering: i32,
+        useInitialFlow: IntBool,
     );
 
 }
@@ -192,7 +191,7 @@ impl Mat {
                     out,
                     num_levels,
                     pyr_scale,
-                    fast_pyramids as c_bool,
+                    fast_pyramids as IntBool,
                     win_size,
                     num_iters,
                     poly_n,
@@ -208,7 +207,7 @@ impl Mat {
                     out,
                     num_levels,
                     pyr_scale,
-                    fast_pyramids as c_bool,
+                    fast_pyramids as IntBool,
                     win_size,
                     num_iters,
                     poly_n,
