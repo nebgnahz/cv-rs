@@ -92,4 +92,11 @@ void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Re
     *result = Result<double>::FromFunction(
         [first_image, second_image, method]() { return cv::compareHist(*first_image, *second_image, method); });
 }
+
+EmptyResult
+cv_canny(cv::Mat* image, cv::Mat* edges, double threshold1, double threshold2, int aperture_size, bool l2_gradient) {
+    return EmptyResult::FromFunction([image, edges, threshold1, threshold2, aperture_size, l2_gradient]() {
+        cv::Canny(*image, *edges, threshold1, threshold2, aperture_size, l2_gradient);
+    });
+}
 }

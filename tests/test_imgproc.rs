@@ -70,3 +70,14 @@ fn get_image_histogram(path: &'static str) -> Mat {
     let image = image.normalize(0.0, 1.0, NormType::MinMax);
     image
 }
+
+#[test]
+fn canny_edge_detection() {
+    let lenna = utils::load_lenna();
+    let edges = lenna.canny(70.0, 140.0, 3, false);
+    assert!(edges.is_ok());
+
+    let bad_edges = lenna.canny(70.0, 140.0, 1, false);
+    // error: (-206:Bad flag (parameter or structure field)) Aperture size should be odd between 3 and 7 in function \'Canny\'
+    assert!(bad_edges.is_err());
+}

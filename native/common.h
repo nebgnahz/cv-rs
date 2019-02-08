@@ -86,6 +86,26 @@ struct Result {
     }
 };
 
+// Caller is responsible for disposing `error` field
+struct EmptyResult {
+    CDisposableString error;
+
+    static EmptyResult FromFunction(std::function<void()> function) {
+        char* error = nullptr;
+
+        try {
+            function();
+        } catch (cv::Exception& e) {
+            const char* err_msg = e.what();
+            auto len = std::strlen(err_msg);
+            error = new char[len + 1];
+            std::strcpy(error, err_msg);
+        }
+
+        return EmptyResult{CDisposableString{error}};
+    }
+};
+
 template <typename T>
 struct CVec {
     T* array;

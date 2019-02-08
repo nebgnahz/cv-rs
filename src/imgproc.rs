@@ -96,6 +96,15 @@ extern "C" {
         method: HistogramComparisionMethod,
         result: *mut CResult<c_double>,
     );
+
+    fn cv_canny(
+        image: *const CMat,
+        edges: *mut CMat,
+        threshold1: c_double,
+        threshold2: c_double,
+        aperture_size: c_int,
+        l2_gradient: c_int,
+    ) -> CEmptyResult;
 }
 
 /// Possible methods for histogram comparision method
@@ -546,6 +555,34 @@ impl Mat {
     pub fn compare_hist(&self, other: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
         let result = CResult::<f64>::from_callback(|r| unsafe { cv_compare_hist(self.inner, other.inner, method, r) });
         result.into()
+    }
+
+    /// Performs canny edge detection
+    pub fn canny(
+        &self,
+        threshold1: f64,
+        threshold2: f64,
+        aperture_size: i32,
+        l2_gradient: bool,
+    ) -> Result<Mat, String> {
+        let edges = Mat::new();
+        let result = unsafe {
+            cv_canny(
+                self.inner,
+                edges.inner,
+                threshold1,
+                threshold2,
+                aperture_size,
+                match l2_gradient {
+                    true => 1,
+                    false => 0,
+                },
+            )
+        };
+
+        let result: Result<(), String> = result.into();
+
+        result.map(|_| edges)
     }
 
     fn matrix_to_vec<T, MElem: AsRef<[T]>, M: AsRef<[MElem]>>(value: M) -> Vec<*const T> {
