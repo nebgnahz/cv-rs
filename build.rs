@@ -88,8 +88,14 @@ mod windows {
 
 #[cfg(unix)]
 mod unix {
-    pub fn opencv_include() -> &'static str {
-        "/usr/local/include"
+    use std::env;
+
+    pub fn opencv_include() -> String {
+        if let Ok(dir) = env::var("OPENCV_DIR") {
+            format!("{}/include", dir)
+        } else {
+            "/usr/local/include".into()
+        }
     }
 
     pub fn opencv_link() {
