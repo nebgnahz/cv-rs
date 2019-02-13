@@ -276,7 +276,7 @@ impl Mat {
             } else if size.width == 1 {
                 i0 as usize * (self.step1(1) * self.elem_size1())
             } else {
-                unimplemented!{};
+                unimplemented! {};
             }
         };
 

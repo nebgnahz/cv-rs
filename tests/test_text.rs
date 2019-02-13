@@ -24,7 +24,8 @@ mod tesseract {
             Some(VOCABULARY),
             EngineMode::Default,
             PageSegmentationMode::Auto,
-        ).unwrap();
+        )
+        .unwrap();
         let res = ocr.run(&image, ComponentLevel::TextLine);
         assert_contains(&res.0, "Heruro worudo")
     }
@@ -40,7 +41,8 @@ mod tesseract {
             Some(VOCABULARY),
             EngineMode::Default,
             PageSegmentationMode::Auto,
-        ).unwrap();
+        )
+        .unwrap();
         let res = ocr.run(&image, ComponentLevel::Word);
         assert_contains(&res.0, "uBuntu")
     }
@@ -66,7 +68,8 @@ fn ocr_hmm_test() {
         &transition_probability_table,
         &emission_probability_table,
         ClassifierType::Knn,
-    ).unwrap();
+    )
+    .unwrap();
     let res = ocr.run(&image, ComponentLevel::Word);
     let reslen = res.0.len();
 
