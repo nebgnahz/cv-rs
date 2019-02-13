@@ -1,4 +1,5 @@
 #[macro_export]
+#[doc(hidden)]
 macro_rules! path_to_cstring {
     ($x:expr) => {
         match $x {
@@ -12,6 +13,7 @@ macro_rules! path_to_cstring {
 }
 
 #[macro_export]
+#[doc(hidden)]
 macro_rules! string_to_cstring {
     ($x:expr) => {
         match $x {

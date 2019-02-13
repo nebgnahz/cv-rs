@@ -56,7 +56,7 @@ mod windows {
         // we expect filename to be something like 'open_world340.lib' or
         // 'open_world.340.dll.a', so we just consider everything after the
         // version number is an extension
-        let lib_without_extension = lib.trim_right_matches(|c: char| !c.is_numeric());
+        let lib_without_extension = lib.trim_end_matches(|c: char| !c.is_numeric());
         Ok(lib_without_extension.into())
     }
 
