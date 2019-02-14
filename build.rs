@@ -99,7 +99,9 @@ mod unix {
     }
 
     pub fn opencv_link() {
-        println!("cargo:rustc-link-search=native=/usr/local/lib");
+        let cargo_rustc_link_search = env::var("OPENCV_LIB").unwrap_or("/use/local/lib".into());
+
+        println!("cargo:rustc-link-search=native={}", cargo_rustc_link_search);
         println!("cargo:rustc-link-lib=opencv_core");
         println!("cargo:rustc-link-lib=opencv_features2d");
         println!("cargo:rustc-link-lib=opencv_xfeatures2d");
