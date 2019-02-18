@@ -345,11 +345,21 @@ impl Mat {
         (min, max, min_loc, max_loc)
     }
 
+    /// Copy specified channels from `self` to the specified channels of `other`
+    /// `Mat`.
+    pub fn mix_channels_to<T: AsRef<[(i32, i32)]>>(&self, other: &mut Mat, nsrcs: usize, ndsts: usize, from_to: T) {
+        let slice = from_to.as_ref();
+        let ptr = slice.as_ptr() as *const c_int;
+        unsafe {
+            cv_mat_mix_channels(self.inner, nsrcs, other.inner, ndsts, ptr, slice.len());
+        }
+    }
+
     /// Copy specified channels from `self` to the specified channels of output
     /// `Mat`.
     // The usage (self.depth) here is buggy, it should actually be the type!
-    pub fn mix_channels<T: AsRef<[(c_int, c_int)]>>(&self, nsrcs: usize, ndsts: usize, from_to: T) -> Mat {
-        let m = Mat::with_size(self.rows, self.cols, self.depth);
+    pub fn mix_channels<T: AsRef<[(i32, i32)]>>(&self, nsrcs: usize, ndsts: usize, from_to: T) -> Mat {
+        let m = Mat::with_size(self.rows, self.cols, self.cv_type() as i32);
         let slice = from_to.as_ref();
         let ptr = slice.as_ptr() as *const c_int;
         unsafe {
