@@ -1,3 +1,4 @@
+#![cfg(feature = "text")]
 extern crate cv;
 mod utils;
 

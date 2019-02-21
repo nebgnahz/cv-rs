@@ -30,6 +30,7 @@ pub mod imgcodecs;
 pub mod imgproc;
 pub mod mat;
 pub mod objdetect;
+#[cfg(feature = "text")]
 pub mod text;
 pub mod video;
 pub mod videoio;

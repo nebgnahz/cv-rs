@@ -69,7 +69,8 @@ features = [ "cuda" ]
 
 All possible features are listed below:
 - `cuda` - for CUDA support, requires installed CUDA
-- `tesseract` - for Tesseract OCR support, requires installed Tesseract
+- `text` - for text recognition support. Requires building from sources, is not included in most package managers by default, e.g. in brew
+- `tesseract` - for Tesseract OCR support, requires installed Tesseract and enabled `text` feature
 
 ### Windows
 
