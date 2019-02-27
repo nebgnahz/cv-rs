@@ -1,8 +1,19 @@
 extern crate cv;
 
+use cv::{imgcodecs::ImageReadMode, Mat};
+use std::path;
+
+fn load_histogram_comparison_source_0_mat() -> cv::Mat {
+    let histogram_comparison_source_0 = path::PathBuf::new()
+        .join("assets")
+        .join("Histogram_Comparison_Source_0.png");
+
+    Mat::from_path(histogram_comparison_source_0, ImageReadMode::Color).unwrap()
+}
+
 mod knn_tests {
-    use cv::imgcodecs::ImageReadMode;
-    use cv::{mat::Mat, video::analysis::BackgroundSubtractorKNN};
+    use super::load_histogram_comparison_source_0_mat;
+    use cv::video::analysis::BackgroundSubtractorKNN;
 
     #[test]
     fn test_create_background_subtractor_knn_default() {
@@ -15,7 +26,8 @@ mod knn_tests {
         #[allow(unused_mut)]
         let mut bgs = BackgroundSubtractorKNN::default();
 
-        let image = Mat::from_path("assets/Histogram_Comparison_Source_0.png", ImageReadMode::Color).unwrap();
+        let image = load_histogram_comparison_source_0_mat();
+
         bgs.apply(&image, -1.0);
     }
 
@@ -24,7 +36,8 @@ mod knn_tests {
         #[allow(unused_mut)]
         let mut bgs = BackgroundSubtractorKNN::default();
 
-        let image = Mat::from_path("assets/Histogram_Comparison_Source_0.png", ImageReadMode::Color).unwrap();
+        let image = load_histogram_comparison_source_0_mat();
+
         assert_eq!(200, image.rows);
         assert_eq!(200, image.cols);
         bgs.apply(&image, -1.0);
@@ -45,8 +58,8 @@ mod knn_tests {
 }
 
 mod mog2_tests {
-    use cv::imgcodecs::ImageReadMode;
-    use cv::{mat::Mat, video::analysis::BackgroundSubtractorMOG2};
+    use super::load_histogram_comparison_source_0_mat;
+    use cv::video::analysis::BackgroundSubtractorMOG2;
 
     #[test]
     fn test_create_background_subtractor_mog2_default() {
@@ -59,7 +72,8 @@ mod mog2_tests {
         #[allow(unused_mut)]
         let mut bgs = BackgroundSubtractorMOG2::default();
 
-        let image = Mat::from_path("assets/Histogram_Comparison_Source_0.png", ImageReadMode::Color).unwrap();
+        let image = load_histogram_comparison_source_0_mat();
+
         bgs.apply(&image, -1.0);
     }
 
@@ -68,7 +82,8 @@ mod mog2_tests {
         #[allow(unused_mut)]
         let mut bgs = BackgroundSubtractorMOG2::default();
 
-        let image = Mat::from_path("assets/Histogram_Comparison_Source_0.png", ImageReadMode::Color).unwrap();
+        let image = load_histogram_comparison_source_0_mat();
+
         assert_eq!(200, image.rows);
         assert_eq!(200, image.cols);
         bgs.apply(&image, -1.0);
