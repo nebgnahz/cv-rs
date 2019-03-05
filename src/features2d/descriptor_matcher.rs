@@ -1,4 +1,5 @@
 //! Provide types for matching keypoint descriptors
+use std::marker::PhantomData;
 use std::os::raw::{c_char, c_int};
 use *;
 
@@ -51,8 +52,8 @@ pub enum DescriptorMatcherType {
 }
 
 impl DescriptorMatcherType {
-    pub(crate) fn as_str(&self) -> &'static str {
-        match *self {
+    pub(crate) fn as_str(self) -> &'static str {
+        match self {
             DescriptorMatcherType::BruteForce => "BruteForce",
             DescriptorMatcherType::BruteForceL1 => "BruteForce-L1",
             DescriptorMatcherType::BruteForceHamming => "BruteForce-Hamming",
@@ -64,11 +65,12 @@ impl DescriptorMatcherType {
 
 /// Type for matching keypoint descriptors
 #[derive(Debug)]
-pub struct DescriptorMatcher {
+pub struct DescriptorMatcher<'a> {
     value: *mut CDescriptorMatcher,
+    phantom: PhantomData<&'a ()>,
 }
 
-impl Drop for DescriptorMatcher {
+impl<'a> Drop for DescriptorMatcher<'a> {
     fn drop(&mut self) {
         unsafe {
             cv_matcher_drop(self.value);
@@ -76,17 +78,20 @@ impl Drop for DescriptorMatcher {
     }
 }
 
-impl DescriptorMatcher {
+impl<'a> DescriptorMatcher<'a> {
     /// Creates a descriptor matcher of a given type with the default parameters (using default constructor).
-    pub fn new(descriptor_matcher_type: DescriptorMatcherType) -> DescriptorMatcher {
+    pub fn new(descriptor_matcher_type: DescriptorMatcherType) -> Self {
         let descriptor_matcher_type = CString::new(descriptor_matcher_type.as_str()).unwrap();
         let value = unsafe { cv_matcher_new(descriptor_matcher_type.as_ptr()) };
-        DescriptorMatcher { value: value }
+        DescriptorMatcher {
+            value: value,
+            phantom: PhantomData,
+        }
     }
 
     /// Adds descriptors to train a CPU or GPU descriptor collection
-    pub fn add(&mut self, descriptors: &Vec<&Mat>) {
-        let descriptors = descriptors.iter().map(|x| x.inner).collect();
+    pub fn add(&mut self, descriptors: impl IntoIterator<Item = &'a Mat>) {
+        let descriptors = descriptors.into_iter().map(|x| x.inner).collect();
         let vec_view = CVecView::pack(&descriptors);
         unsafe {
             cv_matcher_add(self.value, &vec_view);
