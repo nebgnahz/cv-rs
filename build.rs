@@ -24,12 +24,41 @@ mod windows {
     fn try_opencv_link() -> Result<(), Box<Error>> {
         let opencv_dir = env::var("OPENCV_LIB")?;
         let files = fs::read_dir(&opencv_dir)?.collect::<Vec<_>>();
-        let opencv_world = get_opencv_lib_path(files.iter(), "world")?;
-        let img_hash = get_opencv_lib_path(files.iter(), "img_hash")?;
+        match get_opencv_lib_path(files.iter(), "world") {
+            Ok(opencv_world) => {
+                let img_hash = get_opencv_lib_path(files.iter(), "img_hash")?;
+                println!("cargo:rustc-link-lib={}", opencv_world);
+                println!("cargo:rustc-link-lib={}", img_hash);
+            }
+            Err(_) => {
+                // Look for the normal libs.
+                // Adding a 3 to the end ensures that video doesn't find videoio.
+                let libs = [
+                    "core3",
+                    "features2d3",
+                    "xfeatures2d3",
+                    "highgui3",
+                    "img_hash3",
+                    "imgcodecs3",
+                    "imgproc3",
+                    "objdetect3",
+                    "text3",
+                    "videoio3",
+                    "video3",
+                ];
+                let lib_iter = libs.iter().cloned().chain(if cfg!(feature = "cuda") {
+                    Some("cudaobjdetect3")
+                } else {
+                    None
+                });
+                for lib in lib_iter {
+                    let path = get_opencv_lib_path(files.iter(), lib)?;
+                    println!("cargo:rustc-link-lib={}", path);
+                }
+            }
+        }
 
         println!("cargo:rustc-link-search=native={}", opencv_dir);
-        println!("cargo:rustc-link-lib={}", opencv_world);
-        println!("cargo:rustc-link-lib={}", img_hash);
         Ok(())
     }
 
