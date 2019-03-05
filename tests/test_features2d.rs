@@ -46,8 +46,7 @@ fn flann_based_matcher() {
     let (_, descriptors) = sift.detect_and_compute(&lenna, &mask);
 
     let mut descriptor_matcher = DescriptorMatcher::new(DescriptorMatcherType::FlannBased);
-    let train_descriptors = vec![&descriptors];
-    descriptor_matcher.add(&train_descriptors);
+    descriptor_matcher.add(Some(&descriptors));
     descriptor_matcher.train();
     let result = descriptor_matcher.match_(&descriptors);
     assert_ne!(result.len(), 0);
@@ -74,8 +73,7 @@ fn flann_based_matcher_knn() {
     let (_, descriptors) = sift.detect_and_compute(&lenna, &mask);
 
     let mut descriptor_matcher = DescriptorMatcher::new(DescriptorMatcherType::FlannBased);
-    let train_descriptors = vec![&descriptors];
-    descriptor_matcher.add(&train_descriptors);
+    descriptor_matcher.add(Some(&descriptors));
     descriptor_matcher.train();
     let result = descriptor_matcher.knn_match(&descriptors, K);
     assert_ne!(result.len(), 0);

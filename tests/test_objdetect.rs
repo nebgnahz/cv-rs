@@ -36,7 +36,7 @@ fn test_cascade_lenna() {
     let model_path = cascade_model_path();
     let cascade = CascadeClassifier::from_path(model_path).unwrap();
     let result = cascade.detect(&mat);
-    assert!(result.len() > 0);
+    assert!(!result.is_empty());
     assert!(utils::close_rect(
         result[0].0,
         cv::Rect {

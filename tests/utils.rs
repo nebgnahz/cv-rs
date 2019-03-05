@@ -33,7 +33,7 @@ where
             let start = Instant::now();
             inner();
             let elapsed = start.elapsed();
-            elapsed.as_secs() as f64 * 1_000.0 + elapsed.subsec_nanos() as f64 / 1_000_000.0
+            elapsed.as_secs() as f64 * 1_000.0 + f64::from(elapsed.subsec_nanos()) / 1_000_000.0
         })
         .sum();
     println!("  {}: {} ms", label, total / (iteration as f64));
