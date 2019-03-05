@@ -17,8 +17,8 @@ void cv_to_ffi(const cv::Point& source, Point2i* dest) {
 };
 
 void cv_to_ffi(const cv::KeyPoint& source, KeyPoint* dest) {
-    dest->pt.x = dest->pt.x;
-    dest->pt.y = dest->pt.y;
+    dest->pt.x = source.pt.x;
+    dest->pt.y = source.pt.y;
     dest->size = source.size;
     dest->angle = source.angle;
     dest->response = source.response;
