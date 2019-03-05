@@ -81,7 +81,7 @@ fn run_detect_for_image<P: AsRef<Path>, OD: ObjectDetect>(detector: &mut OD, pat
     if measure {
         println!(
             "{}",
-            elapsed.as_secs() as f64 * 1_000.0 + elapsed.subsec_nanos() as f64 / 1_000_000.0
+            elapsed.as_secs() as f64 * 1_000.0 + f64::from(elapsed.subsec_nanos()) / 1_000_000.0
         );
     }
 

@@ -50,7 +50,7 @@ fn main() {
     let hist_image = Mat::with_size(hist_h, hist_w, CvType::Cv8UC3 as i32);
 
     // Normalize the histogram to the height of the histogram window
-    let b_hist = hist.normalize(0.0, hist_h as f64, NormType::MinMax);
+    let b_hist = hist.normalize(0.0, f64::from(hist_h), NormType::MinMax);
 
     // Plot each segment as a line element
     for i in 1..hsize {
