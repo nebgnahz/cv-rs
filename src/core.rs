@@ -240,6 +240,7 @@ pub trait FromBytes {
 }
 
 impl<T: FromBytes> FromBytes for (T, T, T) {
+    #[allow(clippy::erasing_op, clippy::identity_op)]
     fn from_bytes(bytes: &[u8]) -> (T, T, T) {
         let size = mem::size_of::<T>();
         (
@@ -402,12 +403,13 @@ impl RotatedRect {
 
     /// Return the minimal up-right rectangle containing the rotated rectangle
     pub fn bounding_rect(&self) -> Rect {
+        use std::f32::NAN;
         let pt = self.points();
-        let x = pt.iter().map(|p| p.x).fold(0. / 0., f32::min).floor() as c_int;
-        let y = pt.iter().map(|p| p.y).fold(0. / 0., f32::min).floor() as c_int;
+        let x = pt.iter().map(|p| p.x).fold(NAN, f32::min).floor() as c_int;
+        let y = pt.iter().map(|p| p.y).fold(NAN, f32::min).floor() as c_int;
 
-        let width = pt.iter().map(|p| p.x).fold(0. / 0., f32::max).ceil() as c_int - x + 1;
-        let height = pt.iter().map(|p| p.y).fold(0. / 0., f32::max).ceil() as c_int - y + 1;
+        let width = pt.iter().map(|p| p.x).fold(NAN, f32::max).ceil() as c_int - x + 1;
+        let height = pt.iter().map(|p| p.y).fold(NAN, f32::max).ceil() as c_int - y + 1;
         Rect::new(x, y, width, height)
     }
 }
