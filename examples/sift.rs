@@ -6,7 +6,6 @@ use cv::features2d::*;
 use cv::highgui::*;
 use cv::imgcodecs::ImageReadMode;
 use cv::*;
-use itertools::Itertools;
 use std::iter::once;
 use std::os::raw::c_int;
 
