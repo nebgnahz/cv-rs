@@ -5,6 +5,7 @@ extern crate itertools;
 use cv::features2d::*;
 use cv::highgui::*;
 use cv::imgcodecs::ImageReadMode;
+use cv::imgproc::*;
 use cv::*;
 use std::iter::once;
 use std::os::raw::c_int;
@@ -44,16 +45,12 @@ fn main() {
             c1.ellipse(
                 Point2i::new(x, y),
                 Size2i::new((kp.size * 1.0).ceil() as i32, (kp.size * 0.5).ceil() as i32),
-                f64::from(kp.angle),
-                0.0,
-                360.0,
+                CircleParams::new().angle(f64::from(kp.angle)),
             );
             c2.ellipse(
                 Point2i::new(x, y),
                 Size2i::new((kp.size * 1.0).ceil() as i32, (kp.size * 0.5).ceil() as i32),
-                f64::from(kp.angle),
-                0.0,
-                360.0,
+                CircleParams::new().angle(f64::from(kp.angle)),
             );
         }
     }

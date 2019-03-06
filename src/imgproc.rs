@@ -349,45 +349,27 @@ impl Mat {
     }
 
     /// Draws a simple, thick ellipse
-    pub fn ellipse(&self, center: Point2i, axes: Size2i, angle: f64, start_angle: f64, end_angle: f64) {
-        self.ellipse_custom(
-            center,
-            axes,
-            angle,
-            start_angle,
-            end_angle,
-            Scalar::new(255, 255, 0, 255),
-            1,
-            LineType::Line8,
-            0,
-        )
-    }
-
-    /// Draws a custom ellipse
-    pub fn ellipse_custom(
-        &self,
-        center: Point2i,
-        axes: Size2i,
-        angle: f64,
-        start_angle: f64,
-        end_angle: f64,
-        color: Scalar,
-        thickness: c_int,
-        linetype: LineType,
-        shift: c_int,
-    ) {
+    ///
+    /// ```no_run
+    /// # use cv::imgproc::*;
+    /// # use cv::*;
+    /// let mat = Mat::new();
+    /// // Fill in your matrix here.
+    /// mat.ellipse(Point2i{ x: 50, y: 50 }, Size2i { width: 10, height: 10 }, Default::default());
+    /// ```
+    pub fn ellipse(&self, center: Point2i, axes: Size2i, params: CircleParams) {
         unsafe {
             cv_ellipse(
                 self.inner,
                 center,
                 axes,
-                angle,
-                start_angle,
-                end_angle,
-                color,
-                thickness,
-                linetype,
-                shift,
+                params.angle,
+                params.start_angle,
+                params.end_angle,
+                params.color,
+                params.thickness,
+                params.linetype,
+                0,
             )
         }
     }
@@ -408,7 +390,6 @@ impl Mat {
     }
 
     /// Threshold
-    ///
     pub fn threshold(&self, thresh: f64, maxval: f64, threshold_type: ThresholdType) -> Mat {
         let m = CMat::new();
         unsafe { cv_threshold(self.inner, m, thresh, maxval, threshold_type) }
@@ -416,7 +397,6 @@ impl Mat {
     }
 
     /// Erode
-    ///
     pub fn erode(
         &self,
         kernel: &Mat,
@@ -441,7 +421,6 @@ impl Mat {
     }
 
     /// Dilate
-    ///
     pub fn dilate(
         &self,
         kernel: &Mat,
@@ -584,5 +563,66 @@ impl Mat {
 
     fn matrix_to_vec<T, MElem: AsRef<[T]>, M: AsRef<[MElem]>>(value: M) -> Vec<*const T> {
         value.as_ref().iter().map(|x| x.as_ref().as_ptr()).collect::<Vec<_>>()
+    }
+}
+
+/// The parameters for drawing circles, ellipses, etc.
+#[derive(Copy, Clone, Debug)]
+pub struct CircleParams {
+    angle: f64,
+    start_angle: f64,
+    end_angle: f64,
+    color: Scalar,
+    thickness: i32,
+    linetype: LineType,
+}
+
+impl Default for CircleParams {
+    fn default() -> Self {
+        Self {
+            angle: 0.0,
+            start_angle: 0.0,
+            end_angle: 360.0,
+            color: Scalar::new(255, 255, 0, 255),
+            thickness: 1,
+            linetype: LineType::Line8,
+        }
+    }
+}
+
+impl CircleParams {
+    /// Makes a default `CircleParams`.
+    pub fn new() -> Self {
+        Default::default()
+    }
+    /// `angle` is in degrees.
+    pub fn angle(mut self, angle: f64) -> Self {
+        self.angle = angle;
+        self
+    }
+    /// `start_angle` is in degrees.
+    pub fn start_angle(mut self, start_angle: f64) -> Self {
+        self.start_angle = start_angle;
+        self
+    }
+    /// `end_angle` is in degrees.
+    pub fn end_angle(mut self, end_angle: f64) -> Self {
+        self.end_angle = end_angle;
+        self
+    }
+    /// Sets the `color` of the shape.
+    pub fn color(mut self, color: Scalar) -> Self {
+        self.color = color;
+        self
+    }
+    /// Line thickness to draw with.
+    pub fn thickness(mut self, thickness: i32) -> Self {
+        self.thickness = thickness;
+        self
+    }
+    /// Line type (dotted, solid, etc).
+    pub fn linetype(mut self, linetype: LineType) -> Self {
+        self.linetype = linetype;
+        self
     }
 }
