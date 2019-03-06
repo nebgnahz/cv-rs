@@ -70,8 +70,7 @@ macro_rules! impl_hash {
         impl $x {
             /// Creates new instance
             pub fn new() -> Self {
-                let value = unsafe { $ctor() };
-                Self { value }
+                Default::default()
             }
         }
 
@@ -80,6 +79,13 @@ macro_rules! impl_hash {
                 unsafe {
                     $drop(self.value as *mut _);
                 }
+            }
+        }
+
+        impl Default for $x {
+            fn default() -> Self {
+                let value = unsafe { $ctor() };
+                Self { value }
             }
         }
 

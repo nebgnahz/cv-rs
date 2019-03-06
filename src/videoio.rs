@@ -333,10 +333,10 @@ pub fn codec_name_from_4cc(value: &str) -> Result<u32, Error> {
         Err(CvError::UnicodeChars(value.into()).into())
     } else {
         let bytes = value.as_bytes();
-        let result = ((bytes[0] as u32) & 0xFFu32)
-            + (((bytes[1] as u32) & 0xFFu32) << 8)
-            + (((bytes[2] as u32) & 0xFFu32) << 16)
-            + (((bytes[3] as u32) & 0xFFu32) << 24);
+        let result = u32::from(bytes[0])
+            + (u32::from(bytes[1]) << 8)
+            + (u32::from(bytes[2]) << 16)
+            + (u32::from(bytes[3]) << 24);
         Ok(result)
     }
 }
@@ -346,8 +346,8 @@ pub fn codec_name_to_4cc(value: u32) -> String {
     let vec = vec![
         (value & 0xFFu32) as u8,
         ((value & 0xFF00u32) >> 8) as u8,
-        ((value & 0xFF0000u32) >> 16) as u8,
-        ((value & 0xFF000000u32) >> 24) as u8,
+        ((value & 0xFF_0000u32) >> 16) as u8,
+        ((value & 0xFF00_0000u32) >> 24) as u8,
     ];
     String::from_utf8(vec).unwrap()
 }

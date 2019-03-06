@@ -573,10 +573,7 @@ impl Mat {
                 threshold1,
                 threshold2,
                 aperture_size,
-                match l2_gradient {
-                    true => 1,
-                    false => 0,
-                },
+                if l2_gradient { 1 } else { 0 },
             )
         };
 

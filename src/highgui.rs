@@ -79,13 +79,13 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum WindowFlag {
     /// the window can be resized (no constraint) or switched to fullscreen.
-    Normal = 0x00000000,
+    Normal = 0x0000_0000,
     /// the window is constrained by the image displayed.
-    Autosize = 0x00000001,
+    Autosize = 0x0000_0001,
     /// the window is with opengl support.
-    Opengl = 0x00001000,
+    Opengl = 0x0000_1000,
     /// the window can be resized arbitrarily (no ratio constraint).
-    FreeRatio = 0x00000100,
+    FreeRatio = 0x0000_0100,
 }
 
 /// Mouse Events

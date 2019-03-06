@@ -128,11 +128,11 @@ pub(crate) struct CVecView<T: Sized> {
     size: usize,
 }
 
-fn pack<T, U: Sized, F>(v: &Vec<T>, mut f: F) -> CVecView<U>
+fn pack<I, U>(v: I) -> CVecView<U>
 where
-    F: FnMut(&T) -> U,
+    I: IntoIterator<Item = U>,
 {
-    let mut mapped: Vec<_> = v.iter().map(|i| f(i)).collect();
+    let mut mapped: Vec<_> = v.into_iter().collect();
     let size = mapped.len();
     let capacity = mapped.capacity();
     let array = mapped.as_mut_ptr();
@@ -156,7 +156,7 @@ impl<T: Copy> Pack for T {
 impl<T: Pack> Pack for CVecView<T> {
     type In = Vec<T::In>;
     fn pack(v: &Self::In) -> Self {
-        pack(v, |e| Pack::pack(e))
+        pack(v.iter().map(Pack::pack))
     }
 }
 
@@ -180,7 +180,7 @@ unsafe fn unpack<T: NestedVec, U, F>(v: &CVec<T>, mut f: F) -> Vec<U>
 where
     F: FnMut(&T) -> U,
 {
-    (0..v.size).map(|i| f(&*v.array.offset(i as isize))).collect()
+    (0..v.size).map(|i| f(&*v.array.add(i))).collect()
 }
 
 pub(crate) trait Unpack {
@@ -251,7 +251,7 @@ impl Unpack for CDisposableString {
 
 fn path_to_cstring<P: AsRef<Path>>(path: P) -> Result<CString, Error> {
     let path = path.as_ref();
-    let x = path.to_str().ok_or(CvError::InvalidPath(path.into()))?;
+    let x = path.to_str().ok_or_else(|| CvError::InvalidPath(path.into()))?;
     let result = CString::new(x)?;
     Ok(result)
 }

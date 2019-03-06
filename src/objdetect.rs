@@ -56,9 +56,7 @@ impl ObjectDetect for CascadeClassifier {
 impl CascadeClassifier {
     /// Creates a cascade classifier, uninitialized. Before use, call load.
     pub fn new() -> CascadeClassifier {
-        CascadeClassifier {
-            inner: unsafe { cv_cascade_classifier_new() },
-        }
+        Default::default()
     }
 
     /// Creates a cascade classifier using the model specified.
@@ -114,7 +112,7 @@ impl CascadeClassifier {
                 self.inner,
                 mat.inner,
                 &mut c_result,
-                scale_factor as c_double,
+                c_double::from(scale_factor),
                 min_neighbors,
                 0,
                 min_size,
@@ -122,6 +120,14 @@ impl CascadeClassifier {
             )
         }
         c_result.unpack()
+    }
+}
+
+impl Default for CascadeClassifier {
+    fn default() -> Self {
+        Self {
+            inner: unsafe { cv_cascade_classifier_new() },
+        }
     }
 }
 
