@@ -4,27 +4,6 @@ use core::*;
 use std::os::raw::*;
 use *;
 
-enum CSURF {}
-
-extern "C" {
-    fn cv_surf_new(
-        hessian_threshold: c_double,
-        octaves: c_int,
-        octave_layers: c_int,
-        extended: bool,
-        upright: bool,
-    ) -> *mut CSURF;
-    fn cv_surf_drop(cmser: *mut CSURF);
-    fn cv_surf_detect_and_compute(
-        detector: *const CSURF,
-        image: *const CMat,
-        mask: *const CMat,
-        keypoints: *mut CVec<KeyPoint>,
-        descriptors: *mut CMat,
-        use_provided_keypoints: bool,
-    );
-}
-
 /// Speeded up robust features extractor.
 #[derive(Debug)]
 pub struct SURF {

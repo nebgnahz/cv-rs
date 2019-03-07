@@ -10,13 +10,9 @@ use std::path::Path;
 use std::slice;
 use *;
 
-/// The class `CMat` is used as a pointer to represent the Mat opencv structure
-#[derive(Clone, Copy, Debug)]
-pub enum CMat {}
-
 impl CMat {
     pub(crate) fn new() -> *mut CMat {
-        unsafe { cv_mat_new() }
+        unsafe { native::cv_mat_new() }
     }
 }
 
@@ -26,7 +22,7 @@ impl CMat {
 #[derive(Debug)]
 pub struct Mat {
     /// Pointer to the actual C/C++ data structure
-    pub(crate) inner: *mut CMat,
+    pub(crate) inner: native::cv_Mat,
 
     /// Number of columns
     pub cols: c_int,
@@ -57,7 +53,7 @@ impl Mat {
 
         let path = path.as_ptr();
         let section = section.as_ptr();
-        let result = unsafe { cv_mat_from_file_storage(path, section) };
+        let result = unsafe { native::cv_mat_from_file_storage(path, section) };
         Ok(Mat::from_raw(result))
     }
 
@@ -448,60 +444,4 @@ impl<'a> Not for &'a Mat {
         unsafe { cv_mat_bitwise_not(self.inner, m) }
         Mat::from_raw(m)
     }
-}
-
-extern "C" {
-    fn cv_mat_new() -> *mut CMat;
-    fn cv_mat_from_file_storage(path: *const c_char, section: *const c_char) -> *mut CMat;
-    fn cv_mat_new_with_size(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
-    fn cv_mat_zeros(rows: c_int, cols: c_int, t: c_int) -> *mut CMat;
-    fn cv_mat_from_buffer(rows: c_int, cols: c_int, t: CvType, buffer: *const u8) -> *mut CMat;
-    fn cv_mat_is_valid(mat: *mut CMat) -> bool;
-    fn cv_mat_rows(cmat: *const CMat) -> c_int;
-    fn cv_mat_cols(cmat: *const CMat) -> c_int;
-    fn cv_mat_depth(cmat: *const CMat) -> c_int;
-    fn cv_mat_channels(cmat: *const CMat) -> c_int;
-    fn cv_mat_data(cmat: *const CMat) -> *const u8;
-    fn cv_mat_total(cmat: *const CMat) -> usize;
-    fn cv_mat_step1(cmat: *const CMat, i: c_int) -> usize;
-    fn cv_mat_elem_size(cmat: *const CMat) -> usize;
-    fn cv_mat_elem_size1(cmat: *const CMat) -> usize;
-    fn cv_mat_type(cmat: *const CMat) -> CvType;
-    fn cv_mat_roi(cmat: *const CMat, rect: Rect) -> *mut CMat;
-    fn cv_mat_flip(src: *mut CMat, code: c_int);
-    fn cv_mat_drop(mat: *mut CMat);
-    fn cv_mat_eye(rows: c_int, cols: c_int, cv_type: CvType) -> *mut CMat;
-    fn cv_mat_in_range(cmat: *const CMat, lowerb: Scalar, upperb: Scalar, dst: *mut CMat);
-    fn cv_mat_min_max_loc(
-        cmat: *const CMat,
-        min: *mut f64,
-        max: *mut f64,
-        min_loc: *mut Point2i,
-        max_loc: *mut Point2i,
-        cmask: *const CMat,
-    );
-    fn cv_mat_mix_channels(
-        cmat: *const CMat,
-        nsrcs: usize,
-        dst: *mut CMat,
-        ndsts: usize,
-        from_to: *const c_int,
-        npairs: usize,
-    );
-    fn cv_mat_normalize(csrc: *const CMat, cdst: *mut CMat, alpha: c_double, beta: c_double, norm_type: NormType);
-    fn cv_mat_bitwise_and(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
-    fn cv_mat_bitwise_not(src: *const CMat, dst: *mut CMat);
-    fn cv_mat_bitwise_or(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
-    fn cv_mat_bitwise_xor(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
-    fn cv_mat_count_non_zero(src: *const CMat) -> c_int;
-    fn cv_mat_copy_make_border(
-        src: *const CMat,
-        dst: *mut CMat,
-        top: c_int,
-        bottom: c_int,
-        left: c_int,
-        right: c_int,
-        border_type: c_int,
-        color: Scalar,
-    ) -> c_int;
 }

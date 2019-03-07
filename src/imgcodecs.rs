@@ -9,18 +9,6 @@ use std::os::raw::c_char;
 use std::path::Path;
 use *;
 
-extern "C" {
-    fn cv_imread(input: *const c_char, flags: ImageReadMode) -> *mut CMat;
-    fn cv_imdecode(buf: *const u8, l: usize, m: ImageReadMode) -> *mut CMat;
-    fn cv_imencode(
-        ext: *const c_char,
-        inner: *const CMat,
-        flag_ptr: *const ImageWriteMode,
-        flag_size: usize,
-        result: *mut COption<CVec<u8>>,
-    );
-}
-
 // =============================================================================
 //  Imgproc
 // =============================================================================

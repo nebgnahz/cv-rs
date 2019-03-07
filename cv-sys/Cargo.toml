@@ -1,0 +1,17 @@
+[package]
+name = "cv-sys"
+version = "0.1.0"
+authors = ["Geordon Worley <vadixidav@gmail.com>", "Ben Zhang <benzh@cs.berkeley.edu>"]
+description = "FFI bindings for OpenCV"
+edition = "2018"
+license = "MIT"
+readme = "../README.md"
+repository = "https://github.com/nebgnahz/cv-rs"
+documentation = "https://docs.rs/cv-sys/"
+
+[features]
+cuda = []
+
+[build-dependencies]
+bindgen = "0.48.1"
+cmake = "0.1.35"

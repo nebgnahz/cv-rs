@@ -7,18 +7,6 @@ use std::os::raw::c_char;
 use std::path::Path;
 use *;
 
-extern "C" {
-    fn cv_hmm_new(
-        classifier_filename: *const c_char,
-        vocabulary: *const c_char,
-        transition_probabilities_table: *mut CMat,
-        emission_probabilities_table: *mut CMat,
-        classifier_type: ClassifierType,
-        result: *mut CResult<*mut COCR>,
-    );
-    fn cv_hmm_drop(ocr: *mut COCR);
-}
-
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[allow(missing_docs)]

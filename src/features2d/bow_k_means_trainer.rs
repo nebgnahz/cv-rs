@@ -1,20 +1,6 @@
 //! Provide types for matching keypoint descriptors
 use *;
 
-enum CBOWKMeansTrainer {}
-
-extern "C" {
-    fn cv_bow_trainer_new(
-        cluster_count: i32,
-        term_criteria: *mut CTermCriteria,
-        attempts: i32,
-        centers: KMeansCenters,
-    ) -> *mut CBOWKMeansTrainer;
-    fn cv_bow_trainer_drop(bow_trainer: *mut CBOWKMeansTrainer);
-    fn cv_bow_trainer_add(bow_trainer: *mut CBOWKMeansTrainer, descriptors: *mut CMat);
-    fn cv_bow_trainer_cluster(bow_trainer: *mut CBOWKMeansTrainer) -> *mut CMat;
-}
-
 /// K-means - based class to train visual vocabulary using the bag of visual words approach
 #[derive(Debug)]
 pub struct BOWKMeansTrainer {

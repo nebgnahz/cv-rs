@@ -3,33 +3,6 @@ use std::marker::PhantomData;
 use std::os::raw::{c_char, c_int};
 use *;
 
-enum CDescriptorMatcher {}
-
-extern "C" {
-    fn cv_matcher_new(descriptor_matcher_type: *const c_char) -> *mut CDescriptorMatcher;
-    fn cv_matcher_drop(descriptor_matcher: *mut CDescriptorMatcher);
-    fn cv_matcher_add(descriptor_matcher: *mut CDescriptorMatcher, descriptors: *const CVecView<*mut CMat>);
-    fn cv_matcher_train(descriptor_matcher: *mut CDescriptorMatcher);
-    fn cv_matcher_is_empty(descriptor_matcher: *mut CDescriptorMatcher) -> bool;
-    fn cv_matcher_match(
-        descriptor_matcher: *mut CDescriptorMatcher,
-        query_descriptors: *mut CMat,
-        matches: *mut CVec<DMatch>,
-    );
-    fn cv_matcher_match_two(
-        descriptor_matcher: *mut CDescriptorMatcher,
-        query_descriptors: *mut CMat,
-        train_descriptors: *mut CMat,
-        matches: *mut CVec<DMatch>,
-    );
-    fn cv_matcher_knn_match(
-        descriptor_matcher: *mut CDescriptorMatcher,
-        query_descriptors: *mut CMat,
-        k: c_int,
-        matches: *mut CVec<CVec<DMatch>>,
-    );
-}
-
 /// Type for matching keypoint descriptors
 #[repr(C)]
 #[derive(Default, Debug, Clone, Copy)]

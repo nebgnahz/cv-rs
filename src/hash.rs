@@ -4,24 +4,6 @@ use self::private::*;
 use mat::CMat;
 use *;
 
-extern "C" {
-    fn cv_hash_compute(phash: *const CHash, mat: *const CMat, result: *mut CMat);
-    fn cv_hash_compare(phash: *const CHash, lhs: *const CMat, rhs: *mut CMat) -> f64;
-
-    fn cv_average_hash_new() -> *mut CHash;
-    fn cv_average_hash_drop(phash: *mut CHash);
-    fn cv_block_mean_hash_new() -> *mut CHash;
-    fn cv_block_mean_hash_drop(phash: *mut CHash);
-    fn cv_color_moment_hash_new() -> *mut CHash;
-    fn cv_color_moment_hash_drop(phash: *mut CHash);
-    fn cv_marr_hildreth_hash_new() -> *mut CHash;
-    fn cv_marr_hildreth_hash_drop(phash: *mut CHash);
-    fn cv_phash_new() -> *mut CHash;
-    fn cv_phash_drop(phash: *mut CHash);
-    fn cv_radial_variance_hash_new() -> *mut CHash;
-    fn cv_radial_variance_hash_drop(phash: *mut CHash);
-}
-
 mod private {
     #[allow(missing_copy_implementations, missing_debug_implementations)]
     pub enum CHash {}

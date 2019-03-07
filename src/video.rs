@@ -11,17 +11,13 @@ pub mod tracking {
     //   VideoTrack
     // =========================================================================
 
-    extern "C" {
-        fn cv_camshift(image: *mut CMat, w: Rect, c_criteria: *const CTermCriteria) -> RotatedRect;
-    }
-
     impl Mat {
         /// Finds an object center, size, and orientation; returns as `RotatedRect`.
         ///
         /// * `wndw` - initial search window.
         /// * `criteria` - stop criteria for the underlying meanShift.
         pub fn camshift(&self, wndw: Rect, criteria: &TermCriteria) -> RotatedRect {
-            unsafe { cv_camshift(self.inner, wndw, criteria.c_criteria) }
+            unsafe { native::cv_camshift(self.inner, wndw, criteria.c_criteria) }
         }
     }
 }

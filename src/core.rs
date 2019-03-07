@@ -5,13 +5,6 @@ use mat::*;
 use std::mem;
 use std::os::raw::c_int;
 
-pub(crate) enum CTermCriteria {}
-
-extern "C" {
-    fn cv_term_criteria_new(t: TermType, count: c_int, epsilon: f64) -> *mut CTermCriteria;
-    fn cv_term_criteria_drop(criteria: *mut CTermCriteria);
-}
-
 /// Data structure for salient point detectors
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]

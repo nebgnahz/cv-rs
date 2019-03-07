@@ -30,14 +30,6 @@ pub struct GpuMat {
     pub depth: c_int,
 }
 
-extern "C" {
-    fn cv_cuda_gpu_mat_default() -> *mut CGpuMat;
-    fn cv_cuda_gpu_mat_drop(gpu_mat: *mut CGpuMat);
-    fn cv_cuda_gpu_mat_upload(gpu_mat: *mut CGpuMat, cpu_mat: *const CMat);
-    fn cv_mat_from_gpu_mat(gpu_mat: *mut CGpuMat) -> *mut CMat;
-    fn cv_cuda_gpu_mat_from_mat(mat: *mut CMat) -> *mut CGpuMat;
-}
-
 impl GpuMat {
     /// Creates a default `GpuMat`.
     pub fn default() -> GpuMat {

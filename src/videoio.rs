@@ -7,22 +7,6 @@ use failure::Error;
 use mat::*;
 use std::os::raw::{c_char, c_double, c_int};
 
-// =============================================================================
-//   VideoCapture
-// =============================================================================
-enum CVideoCapture {}
-
-extern "C" {
-    fn cv_videocapture_new(index: c_int) -> *mut CVideoCapture;
-    fn cv_videocapture_from_file(path: *const c_char) -> *mut CVideoCapture;
-    fn cv_videocapture_from_gst_pipeline(pipeline: *const c_char) -> *mut CVideoCapture;
-    fn cv_videocapture_is_opened(ccap: *const CVideoCapture) -> bool;
-    fn cv_videocapture_read(v: *mut CVideoCapture, m: *mut CMat) -> bool;
-    fn cv_videocapture_drop(cap: *mut CVideoCapture);
-    fn cv_videocapture_set(cap: *mut CVideoCapture, property: CapProp, value: c_double) -> bool;
-    fn cv_videocapture_get(cap: *mut CVideoCapture, property: CapProp) -> c_double;
-}
-
 /// Video capturing from video files, image sequences or cameras.
 #[derive(Debug)]
 pub struct VideoCapture {

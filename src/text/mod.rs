@@ -14,18 +14,6 @@ use failure::Error;
 use mat::CMat;
 use *;
 
-extern "C" {
-    fn cv_ocr_run(
-        ocr: *const private::COCR,
-        image: *const CMat,
-        output_text: *mut CDisposableString,
-        component_rects: *mut CVec<Rect>,
-        component_texts: *mut CVec<CDisposableString>,
-        component_confidences: *mut CVec<f32>,
-        component_level: ComponentLevel,
-    );
-}
-
 mod private {
     #[allow(missing_copy_implementations, missing_debug_implementations)]
     pub enum COCR {}

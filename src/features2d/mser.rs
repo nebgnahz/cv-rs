@@ -3,29 +3,6 @@ use core::*;
 use std::os::raw::*;
 use *;
 
-enum CMSER {}
-
-extern "C" {
-    fn cv_mser_new(
-        delta: c_int,
-        min_area: c_int,
-        max_area: c_int,
-        max_variation: c_double,
-        min_diversity: c_double,
-        max_evolution: c_int,
-        area_threshold: c_double,
-        min_margin: c_double,
-        edge_blur_size: c_int,
-    ) -> *mut CMSER;
-    fn cv_mser_drop(cmser: *mut CMSER);
-    fn cv_mser_detect_regions(
-        detector: *const CMSER,
-        image: *const CMat,
-        msers: *mut CVec<CVec<Point2i>>,
-        bboxes: *mut CVec<Rect>,
-    );
-}
-
 /// Maximally stable extremal region extractor.
 #[derive(Debug)]
 pub struct Mser {

@@ -6,18 +6,6 @@ use std::os::raw::c_char;
 use std::path::Path;
 use *;
 
-extern "C" {
-    fn cv_tesseract_new(
-        data_path: *const c_char,
-        language: *const c_char,
-        char_whitelist: *const c_char,
-        oem: EngineMode,
-        psmode: PageSegmentationMode,
-        result: *mut CResult<*mut COCR>,
-    );
-    fn cv_tesseract_drop(ocr: *mut COCR);
-}
-
 #[repr(C)]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 #[allow(missing_docs)]

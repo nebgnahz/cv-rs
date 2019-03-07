@@ -6,16 +6,6 @@ use std::os::raw::c_char;
 use std::path::Path;
 use *;
 
-extern "C" {
-    fn cv_holistic_new(
-        archive_file: *const c_char,
-        weights_file: *const c_char,
-        words_file: *const c_char,
-        result: *mut CResult<*mut COCR>,
-    );
-    fn cv_holistic_drop(ocr: *mut COCR);
-}
-
 /// `OcrHolisticWord` class provides an interface with the tesseract-ocr API
 #[derive(Debug)]
 pub struct OcrHolisticWord {

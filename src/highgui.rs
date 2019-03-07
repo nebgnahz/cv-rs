@@ -6,18 +6,6 @@ use std::mem;
 use std::os::raw::{c_char, c_int, c_void};
 use std::ptr;
 
-extern "C" {
-    fn cv_named_window(name: *const c_char, flags: WindowFlag);
-    fn cv_destroy_window(name: *const c_char);
-    fn cv_set_mouse_callback(
-        name: *const c_char,
-        on_mouse: extern "C" fn(e: MouseEventType, x: c_int, y: c_int, f: c_int, data: *mut c_void),
-        userdata: *mut c_void,
-    );
-    fn cv_imshow(name: *const c_char, cmat: *mut CMat);
-    fn cv_wait_key(delay_ms: c_int) -> c_int;
-}
-
 /// Create a window that can be used as a placeholder for images and
 /// trackbars. All created windows are referred to by their names. If a window
 /// with the same name already exists, the function does nothing.

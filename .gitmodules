@@ -1,8 +1,8 @@
 [submodule "opencv_contrib"]
-	path = opencv_contrib
+	path = cv-sys/opencv_contrib
 	url = https://github.com/opencv/opencv_contrib.git
 	shallow = true
 [submodule "opencv"]
-	path = opencv
+	path = cv-sys/opencv
 	url = https://github.com/opencv/opencv.git
 	shallow = true

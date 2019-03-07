@@ -4,27 +4,6 @@ use core::*;
 use std::os::raw::*;
 use *;
 
-enum CSIFT {}
-
-extern "C" {
-    fn cv_sift_new(
-        features: c_int,
-        octave_layers: c_int,
-        contrast_threshold: c_double,
-        edge_threshold: c_double,
-        sigma: c_double,
-    ) -> *mut CSIFT;
-    fn cv_sift_drop(cmser: *mut CSIFT);
-    fn cv_sift_detect_and_compute(
-        detector: *const CSIFT,
-        image: *const CMat,
-        mask: *const CMat,
-        keypoints: *mut CVec<KeyPoint>,
-        descriptors: *mut CMat,
-        use_provided_keypoints: bool,
-    );
-}
-
 /// Speeded up robust features extractor.
 #[derive(Debug)]
 pub struct SIFT {

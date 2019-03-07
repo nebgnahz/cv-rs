@@ -18,6 +18,7 @@
 extern crate bytes;
 #[macro_use]
 extern crate failure;
+extern crate native;
 
 pub mod core;
 #[cfg(feature = "cuda")]
