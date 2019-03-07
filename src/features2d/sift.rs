@@ -4,6 +4,8 @@ use core::*;
 use std::os::raw::*;
 use *;
 
+enum CSIFT {}
+
 /// Speeded up robust features extractor.
 #[derive(Debug)]
 pub struct SIFT {
@@ -19,7 +21,7 @@ impl SIFT {
         edge_threshold: f64,
         sigma: f64,
     ) -> Self {
-        let sift = unsafe { cv_sift_new(features, octave_layers, contrast_threshold, edge_threshold, sigma) };
+        let sift = unsafe { native::cv_sift_new(features, octave_layers, contrast_threshold, edge_threshold, sigma) };
         SIFT { value: sift }
     }
 }
@@ -27,7 +29,7 @@ impl SIFT {
 impl Drop for SIFT {
     fn drop(&mut self) {
         unsafe {
-            cv_sift_drop(self.value);
+            native::cv_sift_drop(self.value);
         }
     }
 }
@@ -91,7 +93,7 @@ impl Feature2D for SIFT {
         let mut keypoints = CVec::<KeyPoint>::default();
         let descriptors = CMat::new();
         unsafe {
-            cv_sift_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
+            native::cv_sift_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
         }
         (keypoints.unpack(), Mat::from_raw(descriptors))
     }

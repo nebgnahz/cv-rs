@@ -3,6 +3,8 @@ use core::*;
 use std::os::raw::*;
 use *;
 
+enum CMSER {}
+
 /// Maximally stable extremal region extractor.
 #[derive(Debug)]
 pub struct Mser {
@@ -15,7 +17,7 @@ impl Mser {
         let mut msers = CVec::<CVec<Point2i>>::default();
         let mut bboxes = CVec::<Rect>::default();
         unsafe {
-            cv_mser_detect_regions(self.value, image.inner, &mut msers, &mut bboxes);
+            native::cv_mser_detect_regions(self.value, image.inner, &mut msers, &mut bboxes);
         }
         let msers = msers.unpack();
         let boxes = bboxes.unpack();
@@ -26,7 +28,7 @@ impl Mser {
 impl Drop for Mser {
     fn drop(&mut self) {
         unsafe {
-            cv_mser_drop(self.value);
+            native::cv_mser_drop(self.value);
         }
     }
 }
@@ -120,7 +122,7 @@ impl Default for MserBuilder {
 impl Into<Mser> for MserBuilder {
     fn into(self) -> Mser {
         let value = unsafe {
-            cv_mser_new(
+            native::cv_mser_new(
                 self.delta,
                 self.min_area,
                 self.max_area,

@@ -10,6 +10,11 @@ use std::os::raw::{c_char, c_double, c_int};
 use std::path::Path;
 use std::vec::Vec;
 
+enum CCascadeClassifier {}
+
+/// We can safely send the classifier (a mutable pointer) to a different thread
+unsafe impl Send for CascadeClassifier {}
+
 /// An object detect trait.
 pub trait ObjectDetect {
     /// Detects the object inside this image and returns a list of detections
@@ -49,7 +54,7 @@ impl CascadeClassifier {
     pub fn load<P: AsRef<Path>>(&self, path: P) -> Result<(), Error> {
         if let Some(p) = path.as_ref().to_str() {
             let s = CString::new(p)?;
-            if unsafe { cv_cascade_classifier_load(self.inner, (&s).as_ptr()) } {
+            if unsafe { native::cv_cascade_classifier_load(self.inner, (&s).as_ptr()) } {
                 return Ok(());
             }
         }
@@ -87,7 +92,7 @@ impl CascadeClassifier {
     ) -> Vec<Rect> {
         let mut c_result = CVec::<Rect>::default();
         unsafe {
-            cv_cascade_classifier_detect(
+            native::cv_cascade_classifier_detect(
                 self.inner,
                 mat.inner,
                 &mut c_result,
@@ -105,7 +110,7 @@ impl CascadeClassifier {
 impl Default for CascadeClassifier {
     fn default() -> Self {
         Self {
-            inner: unsafe { cv_cascade_classifier_new() },
+            inner: unsafe { native::cv_cascade_classifier_new() },
         }
     }
 }
@@ -113,7 +118,7 @@ impl Default for CascadeClassifier {
 impl Drop for CascadeClassifier {
     fn drop(&mut self) {
         unsafe {
-            cv_cascade_classifier_drop(self.inner);
+            native::cv_cascade_classifier_drop(self.inner);
         }
     }
 }
@@ -129,12 +134,6 @@ pub struct SvmDetector {
     pub(crate) inner: *mut CSvmDetector,
 }
 
-extern "C" {
-    fn cv_hog_default_people_detector() -> *mut CSvmDetector;
-    fn cv_hog_daimler_people_detector() -> *mut CSvmDetector;
-    fn cv_hog_detector_drop(d: *mut CSvmDetector);
-}
-
 impl SvmDetector {
     /// The built-in people detector.
     ///
@@ -142,14 +141,14 @@ impl SvmDetector {
     /// people you would want to detect have to be atleast 64x128.
     pub fn default_people_detector() -> SvmDetector {
         SvmDetector {
-            inner: unsafe { cv_hog_default_people_detector() },
+            inner: unsafe { native::cv_hog_default_people_detector() },
         }
     }
 
     /// Returns the Daimler people detector.
     pub fn daimler_people_detector() -> SvmDetector {
         SvmDetector {
-            inner: unsafe { cv_hog_daimler_people_detector() },
+            inner: unsafe { native::cv_hog_daimler_people_detector() },
         }
     }
 }
@@ -157,7 +156,7 @@ impl SvmDetector {
 impl Drop for SvmDetector {
     fn drop(&mut self) {
         unsafe {
-            cv_hog_detector_drop(self.inner);
+            native::cv_hog_detector_drop(self.inner);
         }
     }
 }
@@ -284,27 +283,10 @@ pub struct HogDescriptor {
 
 unsafe impl Send for HogDescriptor {}
 
-extern "C" {
-    fn cv_hog_new() -> *mut CHogDescriptor;
-    fn cv_hog_drop(hog: *mut CHogDescriptor);
-    fn cv_hog_set_svm_detector(hog: *mut CHogDescriptor, svm: *mut CSvmDetector);
-    fn cv_hog_detect(
-        hog: *mut CHogDescriptor,
-        image: *mut CMat,
-        objs: *mut CVec<Rect>,
-        weights: *mut CVec<c_double>,
-        win_stride: Size2i,
-        padding: Size2i,
-        scale: c_double,
-        final_threshold: c_double,
-        use_means_shift: bool,
-    );
-}
-
 impl Default for HogDescriptor {
     fn default() -> HogDescriptor {
         HogDescriptor {
-            inner: unsafe { cv_hog_new() },
+            inner: unsafe { native::cv_hog_new() },
             params: HogParams::default(),
         }
     }
@@ -315,7 +297,7 @@ impl ObjectDetect for HogDescriptor {
         let mut detected = CVec::<Rect>::default();
         let mut weights = CVec::<c_double>::default();
         unsafe {
-            cv_hog_detect(
+            native::cv_hog_detect(
                 self.inner,
                 image.inner,
                 &mut detected,
@@ -338,19 +320,19 @@ impl HogDescriptor {
     /// Creates a HogDescriptor with provided parameters.
     pub fn with_params(params: HogParams) -> HogDescriptor {
         HogDescriptor {
-            inner: unsafe { cv_hog_new() },
+            inner: unsafe { native::cv_hog_new() },
             params: params,
         }
     }
 
     /// Sets the SVM detector.
     pub fn set_svm_detector(&mut self, detector: SvmDetector) {
-        unsafe { cv_hog_set_svm_detector(self.inner, detector.inner) }
+        unsafe { native::cv_hog_set_svm_detector(self.inner, detector.inner) }
     }
 }
 
 impl Drop for HogDescriptor {
     fn drop(&mut self) {
-        unsafe { cv_hog_drop(self.inner) }
+        unsafe { native::cv_hog_drop(self.inner) }
     }
 }

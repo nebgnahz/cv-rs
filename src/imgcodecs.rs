@@ -111,7 +111,7 @@ pub enum ImageWritePngStrategy {
 impl Mat {
     /// Decodes an image from `buf` according to the specified mode.
     pub fn image_decode(buf: &[u8], mode: ImageReadMode) -> Mat {
-        let inner = unsafe { cv_imdecode(buf.as_ptr(), buf.len(), mode) };
+        let inner = unsafe { native::cv_imdecode(buf.as_ptr(), buf.len(), mode) };
         Self::from_raw(inner)
     }
 
@@ -122,7 +122,7 @@ impl Mat {
         let ext = CString::new(ext)?;
         unsafe {
             let mut result: COption<CVec<u8>> = mem::zeroed();
-            cv_imencode(ext.into_raw(), self.inner, flags.as_ptr(), flags.len(), &mut result);
+            native::cv_imencode(ext.into_raw(), self.inner, flags.as_ptr(), flags.len(), &mut result);
             if result.has_value {
                 Ok(result.value.unpack())
             } else {
@@ -135,7 +135,7 @@ impl Mat {
     pub fn from_path<P: AsRef<Path>>(path: P, flags: ImageReadMode) -> Result<Mat, Error> {
         let path = path_to_cstring(path)?;
         let path = path.as_ptr();
-        let result = unsafe { cv_imread(path, flags) };
+        let result = unsafe { native::cv_imread(path, flags) };
         Ok(Mat::from_raw(result))
     }
 }

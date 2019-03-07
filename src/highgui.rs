@@ -12,7 +12,7 @@ use std::ptr;
 pub fn highgui_named_window(name: &str, flags: WindowFlag) -> Result<(), Error> {
     let s = CString::new(name)?;
     unsafe {
-        cv_named_window(s.as_ptr(), flags);
+        native::cv_named_window(s.as_ptr(), flags);
     }
     Ok(())
 }
@@ -21,7 +21,7 @@ pub fn highgui_named_window(name: &str, flags: WindowFlag) -> Result<(), Error> 
 pub fn highgui_destroy_window(name: &str) {
     let s = CString::new(name).unwrap();
     unsafe {
-        cv_destroy_window((&s).as_ptr());
+        native::cv_destroy_window((&s).as_ptr());
     }
 }
 
@@ -55,7 +55,7 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
 
     let s = CString::new(name)?;
     unsafe {
-        cv_set_mouse_callback(s.as_ptr(), _mouse_callback, box_wrapper_raw);
+        native::cv_set_mouse_callback(s.as_ptr(), _mouse_callback, box_wrapper_raw);
     }
     Ok(())
 }
@@ -116,8 +116,8 @@ impl Show for Mat {
     fn show(&self, name: &str, delay: c_int) -> Result<(), Error> {
         let s = CString::new(name)?;
         unsafe {
-            cv_imshow((&s).as_ptr(), self.inner);
-            cv_wait_key(delay);
+            native::cv_imshow((&s).as_ptr(), self.inner);
+            native::cv_wait_key(delay);
         }
         Ok(())
     }

@@ -4,6 +4,8 @@ use core::*;
 use std::os::raw::*;
 use *;
 
+enum CSURF {}
+
 /// Speeded up robust features extractor.
 #[derive(Debug)]
 pub struct SURF {
@@ -13,7 +15,7 @@ pub struct SURF {
 impl SURF {
     /// Creates a new maximally stable extremal region extractor criteria.
     pub fn new(hessian_threshold: f64, octaves: c_int, octave_layers: c_int, extended: bool, upright: bool) -> Self {
-        let surf = unsafe { cv_surf_new(hessian_threshold, octaves, octave_layers, extended, upright) };
+        let surf = unsafe { native::cv_surf_new(hessian_threshold, octaves, octave_layers, extended, upright) };
         SURF { value: surf }
     }
 }
@@ -21,7 +23,7 @@ impl SURF {
 impl Drop for SURF {
     fn drop(&mut self) {
         unsafe {
-            cv_surf_drop(self.value);
+            native::cv_surf_drop(self.value);
         }
     }
 }
@@ -85,7 +87,7 @@ impl Feature2D for SURF {
         let mut keypoints = CVec::<KeyPoint>::default();
         let descriptors = CMat::new();
         unsafe {
-            cv_surf_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
+            native::cv_surf_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
         }
         (keypoints.unpack(), Mat::from_raw(descriptors))
     }

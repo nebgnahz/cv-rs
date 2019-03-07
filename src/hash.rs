@@ -30,14 +30,14 @@ impl<T: HashImplInterface> Hash for T {
     fn compute(&self, mat: &Mat) -> Mat {
         let result = CMat::new();
         let value = self.get_value();
-        unsafe { cv_hash_compute(value, mat.inner, result) };
+        unsafe { native::cv_hash_compute(value, mat.inner, result) };
         Mat::from_raw(result)
     }
 
     /// Compares two image hashes
     fn compare(&self, lhs: &Mat, rhs: &Mat) -> f64 {
         let value = self.get_value();
-        unsafe { cv_hash_compare(value, lhs.inner, rhs.inner) }
+        unsafe { native::cv_hash_compare(value, lhs.inner, rhs.inner) }
     }
 }
 
@@ -90,37 +90,37 @@ macro_rules! impl_hash {
 
 impl_hash!(
     AverageHash,
-    cv_average_hash_new,
-    cv_average_hash_drop,
+    native::cv_average_hash_new,
+    native::cv_average_hash_drop,
     "Computes average hash value of the input image"
 );
 impl_hash!(
     BlockMeanHash,
-    cv_block_mean_hash_new,
-    cv_block_mean_hash_drop,
+    native::cv_block_mean_hash_new,
+    native::cv_block_mean_hash_drop,
     "Image hash based on block mean"
 );
 impl_hash!(
     ColorMomentHash,
-    cv_color_moment_hash_new,
-    cv_color_moment_hash_drop,
+    native::cv_color_moment_hash_new,
+    native::cv_color_moment_hash_drop,
     "Image hash based on color moments"
 );
 impl_hash!(
     MarrHildrethHash,
-    cv_marr_hildreth_hash_new,
-    cv_marr_hildreth_hash_drop,
+    native::cv_marr_hildreth_hash_new,
+    native::cv_marr_hildreth_hash_drop,
     "Marr-Hildreth Operator Based Hash, slowest but more discriminative."
 );
 impl_hash!(
     PHash,
-    cv_phash_new,
-    cv_phash_drop,
+    native::cv_phash_new,
+    native::cv_phash_drop,
     "Slower than AverageHash, but tolerant of minor modifications"
 );
 impl_hash!(
     RadialVarianceHash,
-    cv_radial_variance_hash_new,
-    cv_radial_variance_hash_drop,
+    native::cv_radial_variance_hash_new,
+    native::cv_radial_variance_hash_drop,
     "Image hash based on Radon transform"
 );

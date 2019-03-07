@@ -48,7 +48,7 @@ impl<T: OcrImplInterface> Ocr for T {
         let mut component_texts = CVec::<CDisposableString>::default();
         let mut component_confidences = CVec::<f32>::default();
         unsafe {
-            cv_ocr_run(
+            native::cv_ocr_run(
                 value,
                 image.inner,
                 &mut output_text,

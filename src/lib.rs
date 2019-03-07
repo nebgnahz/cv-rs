@@ -46,10 +46,6 @@ use std::mem;
 use std::os::raw::{c_char, c_void};
 use std::path::Path;
 
-extern "C" {
-    fn c_drop(value: *mut c_void);
-}
-
 #[repr(C)]
 struct CResult<T: Copy> {
     value: T,
@@ -109,7 +105,7 @@ struct CDisposableString {
 impl Drop for CDisposableString {
     fn drop(&mut self) {
         if !self.value.is_null() {
-            unsafe { c_drop(self.value as *mut _) }
+            unsafe { native::c_drop(self.value as *mut _) }
         }
     }
 }
@@ -230,14 +226,11 @@ impl<T: NestedVec> Default for CVec<T> {
 
 impl<T: NestedVec> Drop for CVec<T> {
     fn drop(&mut self) {
-        extern "C" {
-            fn cv_vec_drop(vec: *mut c_void, depth: u32);
-        }
         unsafe {
             let depth = CVec::<T>::LEVEL;
             let self_ptr: *mut _ = self;
             let self_ptr: *mut c_void = self_ptr as *mut _;
-            cv_vec_drop(self_ptr, depth);
+            native::cv_vec_drop(self_ptr, depth);
         }
     }
 }

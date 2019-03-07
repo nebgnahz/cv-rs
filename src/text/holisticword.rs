@@ -28,7 +28,7 @@ impl OcrHolisticWord {
         let c_words_file = words_file.as_ptr();
 
         let result = CResult::<*mut COCR>::from_callback(|r| unsafe {
-            cv_holistic_new(c_archive_file, c_weights_file, c_words_file, r)
+            native::cv_holistic_new(c_archive_file, c_weights_file, c_words_file, r)
         });
         let result: Result<_, String> = result.into();
         let result = result.map_err(CvError::UnknownError)?;
@@ -39,7 +39,7 @@ impl OcrHolisticWord {
 impl Drop for OcrHolisticWord {
     fn drop(&mut self) {
         unsafe {
-            cv_holistic_drop(self.value);
+            native::cv_holistic_drop(self.value);
         }
     }
 }

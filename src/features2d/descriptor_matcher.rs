@@ -3,6 +3,8 @@ use std::marker::PhantomData;
 use std::os::raw::{c_char, c_int};
 use *;
 
+enum CDescriptorMatcher {}
+
 /// Type for matching keypoint descriptors
 #[repr(C)]
 #[derive(Default, Debug, Clone, Copy)]
@@ -46,7 +48,7 @@ pub struct DescriptorMatcher<'a> {
 impl<'a> Drop for DescriptorMatcher<'a> {
     fn drop(&mut self) {
         unsafe {
-            cv_matcher_drop(self.value);
+            native::cv_matcher_drop(self.value);
         }
     }
 }
@@ -67,25 +69,25 @@ impl<'a> DescriptorMatcher<'a> {
         let descriptors = descriptors.into_iter().map(|x| x.inner).collect();
         let vec_view = CVecView::pack(&descriptors);
         unsafe {
-            cv_matcher_add(self.value, &vec_view);
+            native::cv_matcher_add(self.value, &vec_view);
         }
     }
 
     /// Trains a descriptor matcher
     pub fn train(&mut self) {
-        unsafe { cv_matcher_train(self.value) }
+        unsafe { native::cv_matcher_train(self.value) }
     }
 
     /// Returns true if there are no train descriptors
     pub fn is_empty(&self) -> bool {
-        unsafe { cv_matcher_is_empty(self.value) }
+        unsafe { native::cv_matcher_is_empty(self.value) }
     }
 
     /// Finds the best match for each descriptor from a query set
     pub fn match_(&self, query_descriptors: &Mat) -> Vec<DMatch> {
         let mut matches = CVec::<DMatch>::default();
         unsafe {
-            cv_matcher_match(self.value, query_descriptors.inner, &mut matches);
+            native::cv_matcher_match(self.value, query_descriptors.inner, &mut matches);
         }
         matches.unpack()
     }
@@ -95,7 +97,7 @@ impl<'a> DescriptorMatcher<'a> {
     pub fn match_two(&self, query_descriptors: &Mat, train_descriptors: &Mat) -> Vec<DMatch> {
         let mut matches = CVec::<DMatch>::default();
         unsafe {
-            cv_matcher_match_two(
+            native::cv_matcher_match_two(
                 self.value,
                 query_descriptors.inner,
                 train_descriptors.inner,
@@ -109,7 +111,7 @@ impl<'a> DescriptorMatcher<'a> {
     pub fn knn_match(&self, query_descriptors: &Mat, k: usize) -> Vec<Vec<DMatch>> {
         let mut matches = CVec::<CVec<DMatch>>::default();
         unsafe {
-            cv_matcher_knn_match(self.value, query_descriptors.inner, k as c_int, &mut matches);
+            native::cv_matcher_knn_match(self.value, query_descriptors.inner, k as c_int, &mut matches);
         }
         matches.unpack()
     }
