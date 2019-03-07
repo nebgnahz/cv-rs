@@ -10,11 +10,6 @@ use std::os::raw::{c_char, c_double, c_int};
 use std::path::Path;
 use std::vec::Vec;
 
-enum CCascadeClassifier {}
-
-/// We can safely send the classifier (a mutable pointer) to a different thread
-unsafe impl Send for CascadeClassifier {}
-
 /// An object detect trait.
 pub trait ObjectDetect {
     /// Detects the object inside this image and returns a list of detections
@@ -25,7 +20,7 @@ pub trait ObjectDetect {
 /// Cascade classifier class for object detection.
 #[derive(Debug)]
 pub struct CascadeClassifier {
-    inner: *mut CCascadeClassifier,
+    inner: *mut native::cv_CascadeClassifier,
 }
 
 impl ObjectDetect for CascadeClassifier {
@@ -90,20 +85,20 @@ impl CascadeClassifier {
         min_size: Size2i,
         max_size: Size2i,
     ) -> Vec<Rect> {
-        let mut c_result = CVec::<Rect>::default();
+        let mut c_result = CVec::<native::Rect>::default();
         unsafe {
             native::cv_cascade_classifier_detect(
                 self.inner,
                 mat.inner,
-                &mut c_result,
+                c_result.to_native_ptr_mut(),
                 c_double::from(scale_factor),
                 min_neighbors,
                 0,
-                min_size,
-                max_size,
+                min_size.into(),
+                max_size.into(),
             )
         }
-        c_result.unpack()
+        unpack_clone(&c_result, Into::into)
     }
 }
 
@@ -123,15 +118,11 @@ impl Drop for CascadeClassifier {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-/// Opaque type for C/C++ SvmDetector object
-pub enum CSvmDetector {}
-
 /// SvmDetector
 #[derive(Debug)]
 pub struct SvmDetector {
     /// Pointer to the inner data structure
-    pub(crate) inner: *mut CSvmDetector,
+    pub(crate) inner: *mut native::std_vector,
 }
 
 impl SvmDetector {
@@ -270,18 +261,14 @@ impl Default for HogParams {
     }
 }
 
-enum CHogDescriptor {}
-
 /// `HogDescriptor` implements Histogram of Oriented Gradients.
 #[derive(Debug)]
 pub struct HogDescriptor {
-    inner: *mut CHogDescriptor,
+    inner: *mut native::cv_HOGDescriptor,
 
     /// Hog parameters.
     pub params: HogParams,
 }
-
-unsafe impl Send for HogDescriptor {}
 
 impl Default for HogDescriptor {
     fn default() -> HogDescriptor {
@@ -294,16 +281,16 @@ impl Default for HogDescriptor {
 
 impl ObjectDetect for HogDescriptor {
     fn detect(&self, image: &Mat) -> Vec<(Rect, f64)> {
-        let mut detected = CVec::<Rect>::default();
+        let mut detected = CVec::<native::Rect>::default();
         let mut weights = CVec::<c_double>::default();
         unsafe {
             native::cv_hog_detect(
                 self.inner,
                 image.inner,
-                &mut detected,
-                &mut weights,
-                self.params.win_stride,
-                self.params.padding,
+                detected.to_native_ptr_mut(),
+                weights.to_native_ptr_mut(),
+                self.params.win_stride.into(),
+                self.params.padding.into(),
                 self.params.scale,
                 self.params.final_threshold,
                 self.params.use_meanshift_grouping,
@@ -312,7 +299,7 @@ impl ObjectDetect for HogDescriptor {
 
         let results = detected.unpack();
         let weights = weights.unpack();
-        results.into_iter().zip(weights).collect::<Vec<_>>()
+        results.into_iter().map(Into::into).zip(weights).collect::<Vec<_>>()
     }
 }
 

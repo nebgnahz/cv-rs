@@ -6,8 +6,8 @@
 
 extern "C" {
 
-void* cv_cascade_classifier_new();
-void* cv_cascade_classifier_from_path(const char* const path);
+cv::CascadeClassifier* cv_cascade_classifier_new();
+cv::CascadeClassifier* cv_cascade_classifier_from_path(const char* const path);
 bool cv_cascade_classifier_load(cv::CascadeClassifier* cc, const char* const path);
 void cv_cascade_classifier_drop(cv::CascadeClassifier* cc);
 void cv_cascade_classifier_detect(cv::CascadeClassifier* cascade,
@@ -19,10 +19,10 @@ void cv_cascade_classifier_detect(cv::CascadeClassifier* cascade,
                                   Size2i min_size,
                                   Size2i max_size);
 
-void* cv_hog_new();
+cv::HOGDescriptor* cv_hog_new();
 void cv_hog_drop(cv::HOGDescriptor*);
-void* cv_hog_default_people_detector();
-void* cv_hog_daimler_people_detector();
+std::vector<float>* cv_hog_default_people_detector();
+std::vector<float>* cv_hog_daimler_people_detector();
 void cv_hog_detector_drop(std::vector<float>*);
 void cv_hog_set_svm_detector(cv::HOGDescriptor*, std::vector<float>*);
 void cv_hog_detect(cv::HOGDescriptor*,

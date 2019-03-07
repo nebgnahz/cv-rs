@@ -3,16 +3,16 @@
 
 extern "C" {
 
-void* cv_cascade_classifier_new() {
+cv::CascadeClassifier* cv_cascade_classifier_new() {
     return new cv::CascadeClassifier();
+}
+
+cv::CascadeClassifier* cv_cascade_classifier_from_path(const char* const p) {
+    return new cv::CascadeClassifier(p);
 }
 
 bool cv_cascade_classifier_load(cv::CascadeClassifier* cascade, const char* const p) {
     return cascade->load(p);
-}
-
-void* cv_cascade_classifier_from_path(const char* const p) {
-    return new cv::CascadeClassifier(p);
 }
 
 void cv_cascade_classifier_drop(cv::CascadeClassifier* cascade) {
@@ -45,7 +45,7 @@ void cv_cascade_classifier_detect(cv::CascadeClassifier* cascade,
     }
 }
 
-void* cv_hog_new() {
+cv::HOGDescriptor* cv_hog_new() {
     return new cv::HOGDescriptor();
 }
 
@@ -54,11 +54,11 @@ void cv_hog_drop(cv::HOGDescriptor* hog) {
     hog = nullptr;
 }
 
-void* cv_hog_default_people_detector() {
+std::vector<float>* cv_hog_default_people_detector() {
     return new std::vector<float>(cv::HOGDescriptor::getDefaultPeopleDetector());
 }
 
-void* cv_hog_daimler_people_detector() {
+std::vector<float>* cv_hog_daimler_people_detector() {
     return new std::vector<float>(cv::HOGDescriptor::getDaimlerPeopleDetector());
 }
 

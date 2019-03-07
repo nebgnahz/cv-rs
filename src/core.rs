@@ -230,6 +230,15 @@ impl From<Rect> for native::Rect {
     }
 }
 
+impl From<native::Rect> for Rect {
+    fn from(n: native::Rect) -> Self {
+        Self {
+            width: n.width,
+            height: n.height,
+        }
+    }
+}
+
 /// The `Rect2f` are rectangles in float.
 #[derive(Default, Debug, Clone, Copy)]
 pub struct Rect2f {

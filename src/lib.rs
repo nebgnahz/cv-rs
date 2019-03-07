@@ -172,12 +172,32 @@ pub(crate) struct CVec<T: Sized + NestedVec> {
     size: usize,
 }
 
+impl<T> CVec<T>
+    where T: Copy
+{
+    fn to_native_ptr(&self) -> *const native::CVec<T> {
+        self as *const native::CVec
+    }
+
+    fn to_native_ptr_mut(&self) -> *mut native::CVec<T> {
+        self.to_native_ptr() as *mut native::CVec
+    }
+}
+
 // Unsafe because CVec is not guaranteed to contain valid pointer and size
 unsafe fn unpack<T: NestedVec, U, F>(v: &CVec<T>, mut f: F) -> Vec<U>
 where
     F: FnMut(&T) -> U,
 {
     (0..v.size).map(|i| f(&*v.array.add(i))).collect()
+}
+
+// Unsafe because CVec is not guaranteed to contain valid pointer and size
+unsafe fn unpack_clone<T: NestedVec + Clone, U, F>(v: &CVec<T>, mut f: F) -> Vec<U>
+where
+    F: FnMut(T) -> U,
+{
+    (0..v.size).map(|i| f((*v.array.add(i)).clone())).collect()
 }
 
 pub(crate) trait Unpack {
