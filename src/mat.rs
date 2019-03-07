@@ -26,7 +26,7 @@ impl CMat {
 #[derive(Debug)]
 pub struct Mat {
     /// Pointer to the actual C/C++ data structure
-    pub(crate) inner: *mut CMat,
+    pub(crate) inner: *mut native::cv_Mat,
 
     /// Number of columns
     pub cols: c_int,

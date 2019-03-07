@@ -114,6 +114,15 @@ impl Size2i {
     }
 }
 
+impl From<Size2i> for native::Size2i {
+    fn from(n: Size2i) -> Self {
+        Self {
+            width: n.width,
+            height: n.height,
+        }
+    }
+}
+
 /// `Size2f` struct is used for specifying the size of an image or rectangle with float dimensions.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
