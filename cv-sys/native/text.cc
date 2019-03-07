@@ -4,9 +4,9 @@
 extern "C" {
 void cv_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
                 cv::Mat& image,
-                CDisposableString* output_text,
+                CString* output_text,
                 CVec<Rect>* component_rects,
-                CVec<CDisposableString>* component_texts,
+                CVec<CString>* component_texts,
                 CVec<float>* component_confidences,
                 int component_level) {
     std::string output;

@@ -61,48 +61,61 @@ typedef struct {
     int trainIdx;
 } DMatch;
 
-typedef struct {
-    const char* value;
-} CDisposableString;
+struct CString {
+    char* value;
+
+    CString(const char* s) {
+        if (s) {
+            auto len = std::strlen(s);
+            value = new char[len + 1];
+            std::strcpy(value, s);
+        } else {
+            value = nullptr;
+        }
+    }
+    ~CString() {
+        if (value) {
+            delete value;
+        }
+    }
+
+    bool is_str() const;
+
+    const char* get_str() const ;
+};
 
 // Caller is responsible for disposing `error` field
 template <typename T>
 struct Result {
     T value;
-    CDisposableString error;
+    CString error;
 
     static Result<T> FromFunction(std::function<T()> function) {
         T value;
-        char* error = nullptr;
+        CString error(nullptr);
         try {
             value = function();
         } catch (cv::Exception& e) {
-            const char* err_msg = e.what();
-            auto len = std::strlen(err_msg);
-            error = new char[len + 1];
-            std::strcpy(error, err_msg);
+            error = CString(e.what());
         }
-        return Result<T>{value, CDisposableString{error}};
+        return Result<T>{value, error};
     }
 };
 
-// Caller is responsible for disposing `error` field
+// Bindings generation needs to call the destructor which frees the string memory.
 struct EmptyResult {
-    CDisposableString error;
+    CString error;
 
     static EmptyResult FromFunction(std::function<void()> function) {
-        char* error = nullptr;
+        CString error(nullptr);
 
         try {
             function();
         } catch (cv::Exception& e) {
-            const char* err_msg = e.what();
-            auto len = std::strlen(err_msg);
-            error = new char[len + 1];
-            std::strcpy(error, err_msg);
+            error = CString(e.what());
         }
 
-        return EmptyResult{CDisposableString{error}};
+        return EmptyResult{error};
     }
 };
 

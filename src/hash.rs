@@ -1,6 +1,19 @@
 //! The module brings implementations of different image hashing algorithms.
 use self::private::*;
 
+use native::cv_average_hash_new;
+use native::cv_average_hash_drop;
+use native::cv_block_mean_hash_new;
+use native::cv_block_mean_hash_drop;
+use native::cv_color_moment_hash_new;
+use native::cv_color_moment_hash_drop;
+use native::cv_marr_hildreth_hash_new;
+use native::cv_marr_hildreth_hash_drop;
+use native::cv_phash_new;
+use native::cv_phash_drop;
+use native::cv_radial_variance_hash_new;
+use native::cv_radial_variance_hash_drop;
+
 use mat::CMat;
 use *;
 
@@ -90,37 +103,37 @@ macro_rules! impl_hash {
 
 impl_hash!(
     AverageHash,
-    native::cv_average_hash_new,
-    native::cv_average_hash_drop,
+    cv_average_hash_new,
+    cv_average_hash_drop,
     "Computes average hash value of the input image"
 );
 impl_hash!(
     BlockMeanHash,
-    native::cv_block_mean_hash_new,
-    native::cv_block_mean_hash_drop,
+    cv_block_mean_hash_new,
+    cv_block_mean_hash_drop,
     "Image hash based on block mean"
 );
 impl_hash!(
     ColorMomentHash,
-    native::cv_color_moment_hash_new,
-    native::cv_color_moment_hash_drop,
+    cv_color_moment_hash_new,
+    cv_color_moment_hash_drop,
     "Image hash based on color moments"
 );
 impl_hash!(
     MarrHildrethHash,
-    native::cv_marr_hildreth_hash_new,
-    native::cv_marr_hildreth_hash_drop,
+    cv_marr_hildreth_hash_new,
+    cv_marr_hildreth_hash_drop,
     "Marr-Hildreth Operator Based Hash, slowest but more discriminative."
 );
 impl_hash!(
     PHash,
-    native::cv_phash_new,
-    native::cv_phash_drop,
+    cv_phash_new,
+    cv_phash_drop,
     "Slower than AverageHash, but tolerant of minor modifications"
 );
 impl_hash!(
     RadialVarianceHash,
-    native::cv_radial_variance_hash_new,
-    native::cv_radial_variance_hash_drop,
+    cv_radial_variance_hash_new,
+    cv_radial_variance_hash_drop,
     "Image hash based on Radon transform"
 );

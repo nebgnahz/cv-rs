@@ -33,10 +33,8 @@ void cv_to_ffi(const cv::DMatch& source, DMatch* dest) {
     dest->trainIdx = source.trainIdx;
 }
 
-void cv_to_ffi(const std::string& source, CDisposableString* dest) {
-    char* result = new char[source.length() + 1];
-    strcpy(result, source.c_str());
-    dest->value = result;
+void cv_to_ffi(const std::string& source, CString* dest) {
+    *dest = CString(source.c_str());
 }
 
 void ffi_to_cv(const cv::Mat& source, cv::Mat* dest) {

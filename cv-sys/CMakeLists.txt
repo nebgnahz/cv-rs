@@ -11,6 +11,7 @@ set(MODULES
 string(REGEX REPLACE "([^;]+)" "native/\\1.hpp;native/\\1.cc" module_srcs "${MODULES}")
 
 set(SRC
+    native/common.cc
     native/common.hpp
     native/common-rust.cc
     native/common-rust.hpp

@@ -274,7 +274,7 @@ impl Mat {
 
     /// Convert an image from one color space to another.
     pub fn cvt_color(&self, code: ColorConversion) -> Mat {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_cvt_color(self.inner, m, code) }
         Mat::from_raw(m)
     }
@@ -282,14 +282,14 @@ impl Mat {
     /// Blurs an image and downsamples it. This function performs the
     /// downsampling step of the Gaussian pyramid construction.
     pub fn pyr_down(&self) -> Mat {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_pyr_down(self.inner, m) }
         Mat::from_raw(m)
     }
 
     /// Threshold
     pub fn threshold(&self, thresh: f64, maxval: f64, threshold_type: ThresholdType) -> Mat {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_threshold(self.inner, m, thresh, maxval, threshold_type) }
         Mat::from_raw(m)
     }
@@ -303,7 +303,7 @@ impl Mat {
         border_type: BorderType,
         border_value: Scalar,
     ) -> Mat {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe {
             native::cv_erode(
                 self.inner,
@@ -327,7 +327,7 @@ impl Mat {
         border_type: BorderType,
         border_value: Scalar,
     ) -> Mat {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe {
             native::cv_dilate(
                 self.inner,
@@ -345,7 +345,7 @@ impl Mat {
     /// Gaussian Blur
     ///
     pub fn gaussian_blur(&self, dsize: Size2i, sigma_x: f64, sigma_y: f64, border_type: BorderType) -> Mat {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_gaussian_blur(self.inner, m, dsize, sigma_x, sigma_y, border_type as i32) }
         Mat::from_raw(m)
     }
@@ -355,7 +355,7 @@ impl Mat {
     /// The function resize resizes the image down to or up to the specified
     /// size.
     pub fn resize_to(&self, dsize: Size2i, interpolation: InterpolationFlag) -> Mat {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_resize(self.inner, m, dsize, 0.0, 0.0, interpolation) }
         Mat::from_raw(m)
     }
@@ -365,7 +365,7 @@ impl Mat {
     /// The function resize resizes the image down to or up to the specified
     /// size.
     pub fn resize_by(&self, fx: f64, fy: f64, interpolation: InterpolationFlag) -> Mat {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_resize(self.inner, m, Size2i::default(), fx, fy, interpolation) }
         Mat::from_raw(m)
     }
@@ -378,7 +378,7 @@ impl Mat {
         hist_size: U,
         ranges: M,
     ) -> Mat {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         let channels = channels.as_ref();
         let hist_size = hist_size.as_ref();
         let ranges = Self::matrix_to_vec(ranges);
@@ -405,7 +405,7 @@ impl Mat {
         hist: &Mat,
         ranges: M,
     ) -> Mat {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         let ranges = Self::matrix_to_vec(ranges);
         unsafe {
             native::cv_calc_back_project(
