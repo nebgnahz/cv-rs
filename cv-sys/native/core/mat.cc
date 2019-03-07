@@ -2,7 +2,7 @@
 
 extern "C" {
 
-void* cv_mat_from_file_storage(const char* path, const char* section) {
+cv::Mat* cv_mat_from_file_storage(const char* path, const char* section) {
     auto result = new cv::Mat();
     cv::FileStorage fs(path, cv::FileStorage::READ);
     fs[section] >> *result;
@@ -10,26 +10,26 @@ void* cv_mat_from_file_storage(const char* path, const char* section) {
     return result;
 }
 
-void* cv_mat_new() {
+cv::Mat* cv_mat_new() {
     cv::Mat* image = new cv::Mat();
     return (image);
 }
 
-void* cv_mat_new_with_size(int rows, int cols, int type) {
+cv::Mat* cv_mat_new_with_size(int rows, int cols, int type) {
     return (new cv::Mat(rows, cols, type));
 }
 
-void* cv_mat_zeros(int rows, int cols, int type) {
+cv::Mat* cv_mat_zeros(int rows, int cols, int type) {
     cv::Mat* mat = new cv::Mat();
     *mat = cv::Mat::zeros(rows, cols, type);
     return (mat);
 }
 
-void* cv_mat_from_buffer(int rows, int cols, int type, const uint8_t* buf) {
+cv::Mat* cv_mat_from_buffer(int rows, int cols, int type, const uint8_t* buf) {
     return new cv::Mat(rows, cols, type, const_cast<void*>(reinterpret_cast<const void*>(buf)));
 }
 
-void* cv_mat_eye(int rows, int cols, int type) {
+cv::Mat* cv_mat_eye(int rows, int cols, int type) {
     auto result = new cv::Mat();
     *result = cv::Mat::eye(rows, cols, type);
     return result;
@@ -39,7 +39,7 @@ bool cv_mat_is_valid(cv::Mat* mat) {
     return mat->data != NULL;
 }
 
-void* cv_mat_roi(cv::Mat* mat, Rect crect) {
+cv::Mat* cv_mat_roi(cv::Mat* mat, Rect crect) {
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
     cv::Mat* dst = new cv::Mat(*mat, rect);
     return (dst);

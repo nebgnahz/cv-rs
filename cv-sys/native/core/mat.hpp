@@ -8,14 +8,14 @@
 
 extern "C" {
 
-void* cv_mat_from_file_storage(const char* path, const char* section);
-void* cv_mat_new();
-void* cv_mat_new_with_size(int rows, int cols, int type);
-void* cv_mat_zeros(int rows, int cols, int type);
-void* cv_mat_from_buffer(int rows, int cols, int type, const uint8_t* buf);
-void* cv_mat_eye(int rows, int cols, int type);
+cv::Mat* cv_mat_from_file_storage(const char* path, const char* section);
+cv::Mat* cv_mat_new();
+cv::Mat* cv_mat_new_with_size(int rows, int cols, int type);
+cv::Mat* cv_mat_zeros(int rows, int cols, int type);
+cv::Mat* cv_mat_from_buffer(int rows, int cols, int type, const uint8_t* buf);
+cv::Mat* cv_mat_eye(int rows, int cols, int type);
 bool cv_mat_valid(cv::Mat* mat);
-void* cv_mat_roi(cv::Mat* mat, Rect crect);
+cv::Mat* cv_mat_roi(cv::Mat* mat, Rect crect);
 void cv_mat_flip(cv::Mat* image, int code);
 int cv_mat_rows(const cv::Mat* const mat);
 int cv_mat_cols(const cv::Mat* const mat);

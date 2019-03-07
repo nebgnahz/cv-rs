@@ -10,16 +10,6 @@ use std::path::Path;
 use std::slice;
 use *;
 
-/// The class `CMat` is used as a pointer to represent the Mat opencv structure
-#[derive(Clone, Copy, Debug)]
-pub enum CMat {}
-
-impl CMat {
-    pub(crate) fn new() -> *mut CMat {
-        unsafe { native::cv_mat_new() }
-    }
-}
-
 /// The class `Mat` represents an n-dimensional dense numerical single-channel or multi-channel array.
 /// It can be used to store real or complex-valued vectors and matrices, grayscale or color images,
 /// voxel volumes, vector fields, point clouds, tensors, histograms
@@ -41,14 +31,6 @@ pub struct Mat {
     pub channels: c_int,
 }
 
-unsafe impl Send for CMat {}
-unsafe impl Send for Mat {}
-impl Into<CMat> for Mat {
-    fn into(self) -> CMat {
-        unsafe { *self.inner }
-    }
-}
-
 impl Mat {
     /// Loads `Mat` from file storage
     pub fn from_file_storage<P: AsRef<Path>>(path: P, section: &str) -> Result<Mat, Error> {
@@ -64,7 +46,7 @@ impl Mat {
     #[inline]
     /// Creates a `Mat` object from raw `CMat` pointer. This will read the rows
     /// and cols of the image.
-    pub(crate) fn from_raw(raw: *mut CMat) -> Mat {
+    pub(crate) fn from_raw(raw: *mut native::cv_Mat) -> Mat {
         Mat {
             inner: raw,
             rows: unsafe { native::cv_mat_rows(raw) },
@@ -76,7 +58,7 @@ impl Mat {
 
     /// Creates an empty `Mat` struct.
     pub fn new() -> Mat {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         Mat::from_raw(m)
     }
 
@@ -106,7 +88,7 @@ impl Mat {
     /// ::std::mem::forget(new_image);
     /// ```
     pub fn from_buffer(rows: c_int, cols: c_int, cv_type: CvType, buf: &[u8]) -> Mat {
-        let raw = unsafe { native::cv_mat_from_buffer(rows, cols, cv_type, buf.as_ptr()) };
+        let raw = unsafe { native::cv_mat_from_buffer(rows, cols, cv_type as i32, buf.as_ptr()) };
         Mat::from_raw(raw)
     }
 
@@ -173,7 +155,7 @@ impl Mat {
 
     /// Return a region of interest from a `Mat` specfied by a `Rect`.
     pub fn roi(&self, rect: Rect) -> Mat {
-        let cmat = unsafe { native::cv_mat_roi(self.inner, rect) };
+        let cmat = unsafe { native::cv_mat_roi(self.inner, rect.into()) };
         Mat::from_raw(cmat)
     }
 
@@ -192,12 +174,12 @@ impl Mat {
     /// Returns the images type. For supported types, please see
     /// [CvType](enum.CvType).
     pub fn cv_type(&self) -> CvType {
-        unsafe { native::cv_mat_type(self.inner) }
+        unsafe { native::cv_mat_type(self.inner).into() }
     }
 
     /// Returns an identity matrix of the specified size and type.
     pub fn eye(rows: i32, cols: i32, cv_type: CvType) -> Mat {
-        let result = unsafe { native::cv_mat_eye(rows, cols, cv_type) };
+        let result = unsafe { native::cv_mat_eye(rows, cols, cv_type as i32) };
         Mat::from_raw(result)
     }
 
@@ -264,9 +246,9 @@ impl Mat {
     /// (lowerb and upperb). The output Mat has the same size as `self` and
     /// CV_8U type.
     pub fn in_range(&self, lowerb: Scalar, upperb: Scalar) -> Mat {
-        let m = CMat::new();
-        unsafe { native::cv_mat_in_range(self.inner, lowerb, upperb, m) }
-        Mat::from_raw(m)
+        let m = Mat::new();
+        unsafe { native::cv_mat_in_range(self.inner, lowerb.into(), upperb.into(), m.inner) }
+        m
     }
 
     /// Finds the global minimum and maximum in an array.
@@ -283,10 +265,10 @@ impl Mat {
     pub fn min_max_loc(&self, mask: &Mat) -> (f64, f64, Point2i, Point2i) {
         let mut min = 0.0;
         let mut max = 0.0;
-        let mut min_loc = Point2i::new(0, 0);
-        let mut max_loc = Point2i::new(0, 0);
+        let mut min_loc = Point2i::new(0, 0).into();
+        let mut max_loc = Point2i::new(0, 0).into();
         unsafe { native::cv_mat_min_max_loc(self.inner, &mut min, &mut max, &mut min_loc, &mut max_loc, mask.inner) }
-        (min, max, min_loc, max_loc)
+        (min, max, min_loc.into(), max_loc.into())
     }
 
     /// Copy specified channels from `self` to the specified channels of output
@@ -304,8 +286,8 @@ impl Mat {
 
     /// Normalize the Mat according to the normalization type.
     pub fn normalize(&self, alpha: f64, beta: f64, t: NormType) -> Mat {
-        let m = CMat::new();
-        unsafe { native::cv_mat_normalize(self.inner, m, alpha, beta, t) }
+        let m = native::cv_mat_new();
+        unsafe { native::cv_mat_normalize(self.inner, m, alpha, beta, t as i32) }
         Mat::from_raw(m)
     }
 
@@ -331,9 +313,9 @@ impl Mat {
         type_: BorderType,
         color: Scalar,
     ) -> Mat {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe {
-            native::cv_mat_copy_make_border(self.inner, m, top, bottom, left, right, type_ as i32, color);
+            native::cv_mat_copy_make_border(self.inner, m, top, bottom, left, right, type_ as i32, color.into());
         }
         Mat::from_raw(m)
     }
@@ -375,16 +357,16 @@ impl Drop for Mat {
 impl BitAnd for Mat {
     type Output = Self;
     fn bitand(self, rhs: Self) -> Self::Output {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_mat_bitwise_and(self.inner, rhs.inner, m) }
-        Self::from_raw(m)
+        Mat::from_raw(m)
     }
 }
 
 impl<'a> BitAnd for &'a Mat {
     type Output = Mat;
     fn bitand(self, rhs: &'a Mat) -> Self::Output {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_mat_bitwise_and(self.inner, rhs.inner, m) }
         Mat::from_raw(m)
     }
@@ -393,7 +375,7 @@ impl<'a> BitAnd for &'a Mat {
 impl BitOr for Mat {
     type Output = Self;
     fn bitor(self, rhs: Self) -> Self::Output {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_mat_bitwise_or(self.inner, rhs.inner, m) }
         Mat::from_raw(m)
     }
@@ -402,7 +384,7 @@ impl BitOr for Mat {
 impl<'a> BitOr for &'a Mat {
     type Output = Mat;
     fn bitor(self, rhs: &'a Mat) -> Self::Output {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_mat_bitwise_or(self.inner, rhs.inner, m) }
         Mat::from_raw(m)
     }
@@ -411,7 +393,7 @@ impl<'a> BitOr for &'a Mat {
 impl BitXor for Mat {
     type Output = Self;
     fn bitxor(self, rhs: Self) -> Self::Output {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_mat_bitwise_xor(self.inner, rhs.inner, m) }
         Mat::from_raw(m)
     }
@@ -420,7 +402,7 @@ impl BitXor for Mat {
 impl<'a> BitXor for &'a Mat {
     type Output = Mat;
     fn bitxor(self, rhs: &'a Mat) -> Self::Output {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_mat_bitwise_xor(self.inner, rhs.inner, m) }
         Mat::from_raw(m)
     }
@@ -429,7 +411,7 @@ impl<'a> BitXor for &'a Mat {
 impl Not for Mat {
     type Output = Self;
     fn not(self) -> Self::Output {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_mat_bitwise_not(self.inner, m) }
         Mat::from_raw(m)
     }
@@ -444,7 +426,7 @@ impl Clone for Mat {
 impl<'a> Not for &'a Mat {
     type Output = Mat;
     fn not(self) -> Self::Output {
-        let m = CMat::new();
+        let m = native::cv_mat_new();
         unsafe { native::cv_mat_bitwise_not(self.inner, m) }
         Mat::from_raw(m)
     }

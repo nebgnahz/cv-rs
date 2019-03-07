@@ -57,6 +57,28 @@ impl Scalar {
     }
 }
 
+impl From<native::Scalar> for Scalar {
+    fn from(n: native::Scalar) -> Self {
+        Self {
+            v0: n.v0,
+            n1: n.v1,
+            n2: n.v2,
+            n3: n.v3,
+        }
+    }
+}
+
+impl From<Scalar> for native::Scalar {
+    fn from(n: Scalar) -> Self {
+        Self {
+            v0: n.v0,
+            n1: n.v1,
+            n2: n.v2,
+            n3: n.v3,
+        }
+    }
+}
+
 /// 2D integer points specified by its coordinates `x` and `y`.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
@@ -425,6 +447,29 @@ pub enum CvType {
     Cv32FC3 = 21,
     /// 32 bit float, three channels (RGB image)
     Cv64FC3 = 22,
+}
+
+impl From<i32> for CvType {
+    fn from(n: i32) -> CvType {
+        match n {
+            0 => Cv8UC1,
+            1 => Cv8SC1,
+            2 => Cv16UC1,
+            3 => Cv16SC1,
+            4 => Cv32SC1,
+            5 => Cv32FC1,
+            6 => Cv64FC1,
+            8 => Cv8UC2,
+            16 => Cv8UC3,
+            17 => Cv8SC3,
+            18 => Cv16UC3,
+            19 => Cv16SC3,
+            20 => Cv32SC3,
+            21 => Cv32FC3,
+            22 => Cv64FC3,
+            _ => panic!("cv::CvType: unknown CvType"),
+        }
+    }
 }
 
 /// This struct represents a rotated (i.e. not up-right) rectangle. Each
