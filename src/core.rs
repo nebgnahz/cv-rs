@@ -75,6 +75,24 @@ impl Point2i {
     }
 }
 
+impl From<Point2i> for native::Point2i {
+    fn from(n: Point2i) -> Self {
+        Self {
+            x: n.x,
+            y: n.y,
+        }
+    }
+}
+
+impl From<native::Point2i> for Point2i {
+    fn from(n: native::Point2i) -> Self {
+        Self {
+            x: n.x,
+            y: n.y,
+        }
+    }
+}
+
 /// 2D floating points specified by its coordinates `x` and `y`.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]
@@ -90,6 +108,24 @@ impl Point2f {
     /// Creats a new `Point2f`.
     pub fn new(x: f32, y: f32) -> Self {
         Point2f { x: x, y: y }
+    }
+}
+
+impl From<Point2f> for native::Point2f {
+    fn from(n: Point2f) -> Self {
+        Self {
+            x: n.x,
+            y: n.y,
+        }
+    }
+}
+
+impl From<native::Point2f> for Point2f {
+    fn from(n: native::Point2f) -> Self {
+        Self {
+            x: n.x,
+            y: n.y,
+        }
     }
 }
 
@@ -181,6 +217,15 @@ impl Rect {
             y: (self.y as f32) / (mat.rows as f32),
             width: (self.width as f32) / (mat.cols as f32),
             height: (self.height as f32) / (mat.rows as f32),
+        }
+    }
+}
+
+impl From<Rect> for native::Rect {
+    fn from(n: Rect) -> Self {
+        Self {
+            width: n.width,
+            height: n.height,
         }
     }
 }
@@ -418,6 +463,26 @@ impl RotatedRect {
     }
 }
 
+impl From<RotatedRect> for native::RotatedRect {
+    fn from(n: RotatedRect) -> Self {
+        Self {
+            center: n.center.into(),
+            size: n.size.into(),
+            angle: n.angle,
+        }
+    }
+}
+
+impl From<native::RotatedRect> for RotatedRect {
+    fn from(n: native::RotatedRect) -> Self {
+        Self {
+            center: n.center.into(),
+            size: n.size.into(),
+            angle: n.angle,
+        }
+    }
+}
+
 /// Normalization type. Please refer to [OpenCV's
 /// documentation](http://docs.cv.org/trunk/d2/de8/group__core__array.html).
 #[repr(C)]
@@ -456,7 +521,7 @@ pub enum TermType {
 /// Termination criteria for iterative algorithms.
 #[derive(Debug)]
 pub struct TermCriteria {
-    pub(crate) c_criteria: *mut CTermCriteria,
+    pub(crate) c_criteria: *mut native::cv_TermCriteria,
 }
 
 impl TermCriteria {
