@@ -123,6 +123,7 @@ impl From<c_int> for MouseEventType {
             9 => MButtonClick,
             10 => MouseWheel,
             11 => MouseHWheel,
+            _ => panic!("cv::MouseEventType: unknown C mouse event type"),
         }
     }
 }

@@ -18,8 +18,8 @@ impl Mser {
             native::cv_mser_detect_regions(self.value, image.inner, &mut msers, &mut bboxes);
         }
         let msers = msers.iter().map(|inner| inner.iter().cloned().map(Into::into).collect()).collect();
-        let boxes = boxes.iter().cloned().map(Into::into).collect();
-        (msers, boxes)
+        let bboxes = bboxes.iter().cloned().map(Into::into).collect();
+        (msers, bboxes)
     }
 }
 

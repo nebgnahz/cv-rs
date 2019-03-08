@@ -499,6 +499,7 @@ pub enum CvType {
 
 impl From<i32> for CvType {
     fn from(n: i32) -> CvType {
+        use self::CvType::*;
         match n {
             0 => Cv8UC1,
             1 => Cv8SC1,

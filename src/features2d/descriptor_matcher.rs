@@ -66,7 +66,7 @@ impl<'a> DescriptorMatcher<'a> {
     /// Creates a descriptor matcher of a given type with the default parameters (using default constructor).
     pub fn new(descriptor_matcher_type: DescriptorMatcherType) -> Self {
         let descriptor_matcher_type = CString::new(descriptor_matcher_type.as_str()).unwrap();
-        let value = unsafe { cv_matcher_new(descriptor_matcher_type.as_ptr()) };
+        let value = unsafe { native::cv_matcher_new(descriptor_matcher_type.as_ptr()) };
         DescriptorMatcher {
             value: value,
             phantom: PhantomData,

@@ -281,14 +281,14 @@ impl Default for HogDescriptor {
 
 impl ObjectDetect for HogDescriptor {
     fn detect(&self, image: &Mat) -> Vec<(Rect, f64)> {
-        let mut detected = CVec::<native::Rect>::default();
-        let mut weights = CVec::<c_double>::default();
+        let mut detected: native::CVec<native::Rect> = unsafe { std::mem::zeroed() };
+        let mut weights: native::CVec<c_double> = unsafe { std::mem::zeroed() };
         unsafe {
             native::cv_hog_detect(
                 self.inner,
                 image.inner,
-                detected.to_native_ptr_mut(),
-                weights.to_native_ptr_mut(),
+                &mut detected,
+                &mut weights,
                 self.params.win_stride.into(),
                 self.params.padding.into(),
                 self.params.scale,
@@ -297,9 +297,7 @@ impl ObjectDetect for HogDescriptor {
             )
         }
 
-        let results = detected.unpack();
-        let weights = weights.unpack();
-        results.into_iter().map(Into::into).zip(weights).collect::<Vec<_>>()
+        detected.iter().cloned().map(Into::into).zip(weights.iter().cloned()).collect()
     }
 }
 
