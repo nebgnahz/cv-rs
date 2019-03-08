@@ -37,7 +37,7 @@ void cv_mser_detect_and_compute(cv::Ptr<cv::MSER>* detector,
 
 cv::Ptr<cv::DescriptorMatcher>* cv_matcher_new(const char* descriptorMatcherType);
 void cv_matcher_drop(cv::Ptr<cv::DescriptorMatcher>* descriptorMatcher);
-void cv_matcher_add(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher, CVec<cv::Mat*>& descriptors);
+void cv_matcher_add(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher, cv::Mat* const* descriptors, size_t len);
 void cv_matcher_train(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher);
 bool cv_matcher_is_empty(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher);
 void cv_matcher_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
