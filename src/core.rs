@@ -61,9 +61,9 @@ impl From<native::Scalar> for Scalar {
     fn from(n: native::Scalar) -> Self {
         Self {
             v0: n.v0,
-            n1: n.v1,
-            n2: n.v2,
-            n3: n.v3,
+            v1: n.v1,
+            v2: n.v2,
+            v3: n.v3,
         }
     }
 }
@@ -72,9 +72,9 @@ impl From<Scalar> for native::Scalar {
     fn from(n: Scalar) -> Self {
         Self {
             v0: n.v0,
-            n1: n.v1,
-            n2: n.v2,
-            n3: n.v3,
+            v1: n.v1,
+            v2: n.v2,
+            v3: n.v3,
         }
     }
 }
@@ -192,6 +192,24 @@ pub struct Size2f {
     pub height: f32,
 }
 
+impl From<Size2f> for native::Size2f {
+    fn from(n: Size2f) -> Self {
+        Self {
+            width: n.width,
+            height: n.height,
+        }
+    }
+}
+
+impl From<native::Size2f> for Size2f {
+    fn from(n: native::Size2f) -> Self {
+        Self {
+            width: n.width,
+            height: n.height,
+        }
+    }
+}
+
 /// The `Rect` defines a rectangle in integer.
 #[derive(Default, Debug, Clone, Copy, Eq, PartialEq)]
 #[repr(C)]
@@ -246,6 +264,8 @@ impl Rect {
 impl From<Rect> for native::Rect {
     fn from(n: Rect) -> Self {
         Self {
+            x: n.x,
+            y: n.y,
             width: n.width,
             height: n.height,
         }
@@ -255,6 +275,8 @@ impl From<Rect> for native::Rect {
 impl From<native::Rect> for Rect {
     fn from(n: native::Rect) -> Self {
         Self {
+            x: n.x,
+            y: n.y,
             width: n.width,
             height: n.height,
         }
@@ -581,7 +603,7 @@ pub struct TermCriteria {
 impl TermCriteria {
     /// Creates a new termination criteria.
     pub fn new(t: TermType, max_count: c_int, epsilon: f64) -> Self {
-        let c_criteria = unsafe { native::cv_term_criteria_new(t, max_count, epsilon) };
+        let c_criteria = unsafe { native::cv_term_criteria_new(t as i32, max_count, epsilon) };
         TermCriteria { c_criteria: c_criteria }
     }
 }

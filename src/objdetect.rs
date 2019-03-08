@@ -6,7 +6,7 @@ use super::errors::*;
 use super::*;
 use failure::Error;
 use std::ffi::CString;
-use std::os::raw::{c_char, c_double, c_int};
+use std::os::raw::{c_double, c_int};
 use std::path::Path;
 use std::vec::Vec;
 

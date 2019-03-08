@@ -3,7 +3,7 @@
 
 use super::core::*;
 use super::*;
-use std::os::raw::{c_double, c_float, c_int};
+use std::os::raw::c_int;
 
 /// Possible methods for histogram comparision method
 #[repr(C)]

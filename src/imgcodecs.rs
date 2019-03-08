@@ -5,7 +5,6 @@ use errors::*;
 use failure::Error;
 use mat::*;
 use std::ffi::CString;
-use std::os::raw::c_char;
 use std::path::Path;
 use *;
 

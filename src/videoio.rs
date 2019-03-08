@@ -5,7 +5,7 @@ use core::*;
 use errors::*;
 use failure::Error;
 use mat::*;
-use std::os::raw::{c_char, c_double, c_int};
+use std::os::raw::c_int;
 
 // =============================================================================
 //   VideoCapture

@@ -5,7 +5,7 @@ use failure::Error;
 use std::ffi::CString;
 use std::mem;
 use std::ops::{BitAnd, BitOr, BitXor, Not};
-use std::os::raw::{c_char, c_double, c_int};
+use std::os::raw::c_int;
 use std::path::Path;
 use std::slice;
 use *;

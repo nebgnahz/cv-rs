@@ -2,7 +2,7 @@
 
 extern "C" {
 
-void* cv_term_criteria_new(int type, int count, double epsilon) {
+cv::TermCriteria* cv_term_criteria_new(int type, int count, double epsilon) {
     return new cv::TermCriteria(type, count, epsilon);
 }
 

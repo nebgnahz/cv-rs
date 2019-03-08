@@ -1,6 +1,6 @@
 //! Provide types for matching keypoint descriptors
 use std::marker::PhantomData;
-use std::os::raw::{c_char, c_int};
+use std::os::raw::c_int;
 use *;
 
 /// Type for matching keypoint descriptors

@@ -3,7 +3,7 @@ use failure::Error;
 use mat::*;
 use std::ffi::CString;
 use std::mem;
-use std::os::raw::{c_char, c_int, c_void};
+use std::os::raw::{c_int, c_void};
 use std::ptr;
 
 /// Create a window that can be used as a placeholder for images and
