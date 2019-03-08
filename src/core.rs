@@ -28,7 +28,7 @@ pub struct KeyPoint {
 impl From<native::KeyPoint> for KeyPoint {
     fn from(n: native::KeyPoint) -> Self {
         Self {
-            point: n.point,
+            point: n.pt.into(),
             size: n.size,
             angle: n.angle,
             response: n.response,
@@ -41,7 +41,7 @@ impl From<native::KeyPoint> for KeyPoint {
 impl From<KeyPoint> for native::KeyPoint {
     fn from(n: KeyPoint) -> Self {
         Self {
-            point: n.point,
+            pt: n.point.into(),
             size: n.size,
             angle: n.angle,
             response: n.response,

@@ -9,7 +9,7 @@ enum CSIFT {}
 /// Speeded up robust features extractor.
 #[derive(Debug)]
 pub struct SIFT {
-    value: *mut CSIFT,
+    value: *mut native::cv_Ptr<native::cv_xfeatures2d_SIFT>,
 }
 
 impl SIFT {
@@ -90,11 +90,11 @@ impl Into<SIFT> for SIFTBuilder {
 
 impl Feature2D for SIFT {
     fn detect_and_compute(&self, image: &Mat, mask: &Mat) -> (Vec<KeyPoint>, Mat) {
-        let mut keypoints = CVec::<KeyPoint>::default();
-        let descriptors = CMat::new();
+        let mut keypoints: native::CVec<native::KeyPoint> = unsafe { std::mem::zeroed() };
+        let descriptors = native::cv_mat_new();
         unsafe {
             native::cv_sift_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
         }
-        (keypoints.unpack(), Mat::from_raw(descriptors))
+        (keypoints.into(), Mat::from_raw(descriptors))
     }
 }
