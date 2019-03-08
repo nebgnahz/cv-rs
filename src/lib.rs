@@ -173,7 +173,8 @@ pub(crate) struct CVec<T: Sized + NestedVec> {
 }
 
 impl<T> CVec<T>
-    where T: Copy
+where
+    T: Copy,
 {
     fn to_native_ptr(&self) -> *const native::CVec<T> {
         self as *const native::CVec
@@ -255,24 +256,9 @@ impl<T: NestedVec> Drop for CVec<T> {
     }
 }
 
-impl Unpack for CDisposableString {
-    type Out = String;
-
-    fn unpack(&self) -> Self::Out {
-        unsafe { CStr::from_ptr(self.value) }.to_string_lossy().into_owned()
-    }
-}
-
 fn path_to_cstring<P: AsRef<Path>>(path: P) -> Result<CString, Error> {
     let path = path.as_ref();
     let x = path.to_str().ok_or_else(|| CvError::InvalidPath(path.into()))?;
     let result = CString::new(x)?;
     Ok(result)
-}
-
-#[repr(C)]
-#[derive(Debug, Clone)]
-pub(crate) struct COption<T> {
-    has_value: bool,
-    value: T,
 }

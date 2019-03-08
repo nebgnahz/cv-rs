@@ -111,7 +111,7 @@ pub enum ImageWritePngStrategy {
 impl Mat {
     /// Decodes an image from `buf` according to the specified mode.
     pub fn image_decode(buf: &[u8], mode: ImageReadMode) -> Mat {
-        let inner = unsafe { native::cv_imdecode(buf.as_ptr(), buf.len(), mode) };
+        let inner = unsafe { native::cv_nat_imdecode(buf.as_ptr(), buf.len(), mode as i32) };
         Self::from_raw(inner)
     }
 
@@ -121,13 +121,15 @@ impl Mat {
     pub fn image_encode(&self, ext: &str, flags: Vec<ImageWriteMode>) -> Result<Vec<u8>, Error> {
         let ext = CString::new(ext)?;
         unsafe {
-            let mut result: COption<CVec<u8>> = mem::zeroed();
-            native::cv_imencode(ext.into_raw(), self.inner, flags.as_ptr(), flags.len(), &mut result);
-            if result.has_value {
-                Ok(result.value.unpack())
-            } else {
-                Err(CvError::UnknownError("Unable to convert this image to bytes".into()).into())
-            }
+            let mut result: native::COption<native::CVec<u8>> = mem::zeroed();
+            // This happens to be fine because `ImageWriteMode` is `repr(C)`
+            // and LLVM defines a C enum to be the same size as an int.
+            let c_flags = flags.as_ptr() as *const i32;
+            native::cv_nat_imencode(ext.into_raw(), self.inner, c_flags, flags.len(), &mut result);
+            let result: Option<native::CVec<u8>> = result.into();
+            result
+                .map(Into::into)
+                .ok_or_else(|| CvError::UnknownError("Unable to convert this image to bytes".to_owned()).into())
         }
     }
 
@@ -135,7 +137,7 @@ impl Mat {
     pub fn from_path<P: AsRef<Path>>(path: P, flags: ImageReadMode) -> Result<Mat, Error> {
         let path = path_to_cstring(path)?;
         let path = path.as_ptr();
-        let result = unsafe { native::cv_imread(path, flags) };
+        let result = unsafe { native::cv_nat_imread(path, flags as i32) };
         Ok(Mat::from_raw(result))
     }
 }
