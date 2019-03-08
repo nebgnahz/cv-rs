@@ -3,15 +3,15 @@
 
 extern "C" {
 
-void* cv_mser_new(int delta,
-                  int min_area,
-                  int max_area,
-                  double max_variation,
-                  double min_diversity,
-                  int max_evolution,
-                  double area_threshold,
-                  double min_margin,
-                  int edge_blur_size) {
+cv::Ptr<cv::MSER>* cv_mser_new(int delta,
+                               int min_area,
+                               int max_area,
+                               double max_variation,
+                               double min_diversity,
+                               int max_evolution,
+                               double area_threshold,
+                               double min_margin,
+                               int edge_blur_size) {
     cv::Ptr<cv::MSER> result = cv::MSER::create(delta,
                                                 min_area,
                                                 max_area,
@@ -53,7 +53,7 @@ void cv_mser_detect_and_compute(cv::Ptr<cv::MSER>* detector,
     cv_to_ffi(keypoints_vector, keypoints);
 }
 
-void* cv_matcher_new(const char* descriptorMatcherType) {
+cv::Ptr<cv::DescriptorMatcher>* cv_matcher_new(const char* descriptorMatcherType) {
     auto result = cv::DescriptorMatcher::create(descriptorMatcherType);
     return new cv::Ptr<cv::DescriptorMatcher>(result);
 }
@@ -103,7 +103,7 @@ void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
     cv_to_ffi(matches_vector, matches);
 }
 
-void* cv_bow_trainer_new(int clusterCount, const cv::TermCriteria& termcrit, int attempts, int flags) {
+cv::BOWKMeansTrainer* cv_bow_trainer_new(int clusterCount, const cv::TermCriteria& termcrit, int attempts, int flags) {
     return new cv::BOWKMeansTrainer(clusterCount, termcrit, attempts, flags);
 }
 
@@ -116,7 +116,7 @@ void cv_bow_trainer_add(cv::BOWKMeansTrainer& trainer, cv::Mat& descriptors) {
     trainer.add(descriptors);
 }
 
-void* cv_bow_trainer_cluster(cv::BOWKMeansTrainer& trainer) {
+cv::Mat* cv_bow_trainer_cluster(cv::BOWKMeansTrainer& trainer) {
     cv::Mat* mat = new cv::Mat();
     *mat = trainer.cluster();
     return (mat);

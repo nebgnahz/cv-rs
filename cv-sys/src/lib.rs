@@ -54,3 +54,9 @@ where
         Vec::from_iter((0..self.size).map(|n| unsafe { &*self.array.add(n) }).cloned())
     }
 }
+
+impl<T> CVec<T> {
+    pub fn iter(&self) -> impl Iterator<Item=&T> {
+        unsafe { std::slice::from_raw_parts(self.array, self.size).iter() }
+    }
+}

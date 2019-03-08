@@ -10,15 +10,15 @@ extern "C" {
 // =============================================================================
 //   MSER
 // =============================================================================
-void* cv_mser_new(int delta,
-                  int min_area,
-                  int max_area,
-                  double max_variation,
-                  double min_diversity,
-                  int max_evolution,
-                  double area_threshold,
-                  double min_margin,
-                  int edge_blur_size);
+cv::Ptr<cv::MSER>* cv_mser_new(int delta,
+                               int min_area,
+                               int max_area,
+                               double max_variation,
+                               double min_diversity,
+                               int max_evolution,
+                               double area_threshold,
+                               double min_margin,
+                               int edge_blur_size);
 void cv_mser_drop(cv::Ptr<cv::MSER>* detector);
 void cv_mser_detect_regions(cv::Ptr<cv::MSER>* detector,
                             cv::Mat* image,
@@ -35,7 +35,7 @@ void cv_mser_detect_and_compute(cv::Ptr<cv::MSER>* detector,
 //   DESCRIPTOR MATCHER
 // =============================================================================
 
-void* cv_matcher_new(const char* descriptorMatcherType);
+cv::Ptr<cv::DescriptorMatcher>* cv_matcher_new(const char* descriptorMatcherType);
 void cv_matcher_drop(cv::Ptr<cv::DescriptorMatcher>* descriptorMatcher);
 void cv_matcher_add(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher, CVec<cv::Mat*>& descriptors);
 void cv_matcher_train(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher);
@@ -52,10 +52,10 @@ void cv_matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
                           int k,
                           CVec<CVec<DMatch>>* matches);
 
-void* cv_bow_trainer_new(int clusterCount, const cv::TermCriteria& termcrit, int attempts, int flags);
+cv::BOWKMeansTrainer* cv_bow_trainer_new(int clusterCount, const cv::TermCriteria& termcrit, int attempts, int flags);
 void cv_bow_trainer_drop(cv::BOWKMeansTrainer* trainer);
 void cv_bow_trainer_add(cv::BOWKMeansTrainer& trainer, cv::Mat& descriptors);
-void* cv_bow_trainer_cluster(cv::BOWKMeansTrainer& trainer);
+cv::Mat* cv_bow_trainer_cluster(cv::BOWKMeansTrainer& trainer);
 }
 
 #endif  // CV_RS_FEATURES2D_H
