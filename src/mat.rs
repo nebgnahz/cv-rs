@@ -150,7 +150,7 @@ impl Mat {
 
     /// Check if the `Mat` is valid or not.
     pub fn is_valid(&self) -> bool {
-        unsafe { native::cv_mat_is_valid(self.inner) }
+        unsafe { native::cv_mat_valid(self.inner) }
     }
 
     /// Return a region of interest from a `Mat` specfied by a `Rect`.

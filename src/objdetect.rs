@@ -85,12 +85,12 @@ impl CascadeClassifier {
         min_size: Size2i,
         max_size: Size2i,
     ) -> Vec<Rect> {
-        let mut c_result = CVec::<native::Rect>::default();
+        let mut c_result: native::CVec<native::Rect> = unsafe { std::mem::zeroed() };
         unsafe {
             native::cv_cascade_classifier_detect(
                 self.inner,
                 mat.inner,
-                c_result.to_native_ptr_mut(),
+                &mut c_result,
                 c_double::from(scale_factor),
                 min_neighbors,
                 0,
@@ -98,7 +98,7 @@ impl CascadeClassifier {
                 max_size.into(),
             )
         }
-        unpack_clone(&c_result, Into::into)
+        c_result.iter().cloned().map(Into::into).collect()
     }
 }
 
