@@ -1,7 +1,8 @@
 #include "xfeatures2d.hpp"
 #include "utils.hpp"
 
-void* cv_surf_new(double hessianThreshold, int nOctaves, int nOctaveLayers, bool extended, bool upright) {
+cv::Ptr<cv::xfeatures2d::SURF>*
+cv_surf_new(double hessianThreshold, int nOctaves, int nOctaveLayers, bool extended, bool upright) {
     auto result = cv::xfeatures2d::SURF::create(hessianThreshold, nOctaves, nOctaveLayers, extended, upright);
     return new cv::Ptr<cv::xfeatures2d::SURF>(result);
 }
@@ -21,7 +22,8 @@ void cv_surf_detect_and_compute(cv::Ptr<cv::xfeatures2d::SURF>* detector,
     cv_to_ffi(keypoints_vector, keypoints);
 }
 
-void* cv_sift_new(int nfeatures, int nOctaveLayers, double contrastThreshold, double edgeThreshold, double sigma) {
+cv::Ptr<cv::xfeatures2d::SIFT>*
+cv_sift_new(int nfeatures, int nOctaveLayers, double contrastThreshold, double edgeThreshold, double sigma) {
     auto result = cv::xfeatures2d::SIFT::create(nfeatures, nOctaveLayers, contrastThreshold, edgeThreshold, sigma);
     return new cv::Ptr<cv::xfeatures2d::SIFT>(result);
 }

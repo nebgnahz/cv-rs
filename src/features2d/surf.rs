@@ -4,12 +4,10 @@ use core::*;
 use std::os::raw::*;
 use *;
 
-enum CSURF {}
-
 /// Speeded up robust features extractor.
 #[derive(Debug)]
 pub struct SURF {
-    value: *mut CSURF,
+    value: *mut native::cv_Ptr<native::cv_xfeatures2d_SURF>,
 }
 
 impl SURF {
@@ -84,11 +82,11 @@ impl Into<SURF> for SURFBuilder {
 
 impl Feature2D for SURF {
     fn detect_and_compute(&self, image: &Mat, mask: &Mat) -> (Vec<KeyPoint>, Mat) {
-        let mut keypoints = CVec::<KeyPoint>::default();
-        let descriptors = CMat::new();
+        let mut keypoints: native::CVec<native::KeyPoint> = unsafe { std::mem::zeroed() };
+        let descriptors = native::cv_mat_new();
         unsafe {
             native::cv_surf_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
         }
-        (keypoints.unpack(), Mat::from_raw(descriptors))
+        (keypoints.into(), Mat::from_raw(descriptors))
     }
 }

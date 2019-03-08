@@ -46,12 +46,12 @@ impl<T> Into<std::option::Option<T>> for crate::COption<T> {
     }
 }
 
-impl<T> Into<Vec<T>> for CVec<T>
+impl<T, U> Into<Vec<U>> for CVec<T>
 where
-    T: Clone,
+    T: Into<U> + Clone,
 {
-    fn into(self) -> Vec<T> {
-        Vec::from_iter((0..self.size).map(|n| unsafe { &*self.array.add(n) }).cloned())
+    fn into(self) -> Vec<U> {
+        Vec::from_iter((0..self.size).map(|n| unsafe { &*self.array.add(n) }).cloned().map(Into::into))
     }
 }
 

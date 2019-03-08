@@ -25,6 +25,32 @@ pub struct KeyPoint {
     pub class_id: c_int,
 }
 
+impl From<native::KeyPoint> for KeyPoint {
+    fn from(n: native::KeyPoint) -> Self {
+        Self {
+            point: n.point,
+            size: n.size,
+            angle: n.angle,
+            response: n.response,
+            octave: n.octave,
+            class_id: n.class_id,
+        }
+    }
+}
+
+impl From<KeyPoint> for native::KeyPoint {
+    fn from(n: KeyPoint) -> Self {
+        Self {
+            point: n.point,
+            size: n.size,
+            angle: n.angle,
+            response: n.response,
+            octave: n.octave,
+            class_id: n.class_id,
+        }
+    }
+}
+
 /// A 4-element struct that is widely used to pass pixel values.
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]

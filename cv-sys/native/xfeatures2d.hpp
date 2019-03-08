@@ -1,5 +1,5 @@
-#ifndef CV_RS_FEATURES2D_H
-#define CV_RS_FEATURES2D_H
+#ifndef CV_RS_XFEATURES2D_H
+#define CV_RS_XFEATURES2D_H
 
 #include "common.hpp"
 #include <opencv2/core.hpp>
@@ -11,7 +11,8 @@ extern "C" {
 //   SURF
 // =============================================================================
 
-void* cv_surf_new(double hessianThreshold, int nOctaves, int nOctaveLayers, bool extended, bool upright);
+cv::Ptr<cv::xfeatures2d::SURF>*
+cv_surf_new(double hessianThreshold, int nOctaves, int nOctaveLayers, bool extended, bool upright);
 void cv_surf_drop(cv::Ptr<cv::xfeatures2d::SURF>* detector);
 void cv_surf_detect_and_compute(cv::Ptr<cv::xfeatures2d::SURF>* detector,
                                 cv::Mat* image,
@@ -24,7 +25,8 @@ void cv_surf_detect_and_compute(cv::Ptr<cv::xfeatures2d::SURF>* detector,
 //   SIFT
 // =============================================================================
 
-void* cv_sift_new(int nfeatures, int nOctaveLayers, double contrastThreshold, double edgeThreshold, double sigma);
+cv::Ptr<cv::xfeatures2d::SIFT>*
+cv_sift_new(int nfeatures, int nOctaveLayers, double contrastThreshold, double edgeThreshold, double sigma);
 void cv_sift_drop(cv::Ptr<cv::xfeatures2d::SIFT>* detector);
 void cv_sift_detect_and_compute(cv::Ptr<cv::xfeatures2d::SIFT>* detector,
                                 cv::Mat* image,
@@ -34,4 +36,4 @@ void cv_sift_detect_and_compute(cv::Ptr<cv::xfeatures2d::SIFT>* detector,
                                 bool useProvidedKeypoints);
 }
 
-#endif  // CV_RS_FEATURES2D_H
+#endif  // CV_RS_XFEATURES2D_H
