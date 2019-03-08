@@ -12,7 +12,7 @@ use std::ptr;
 pub fn highgui_named_window(name: &str, flags: WindowFlag) -> Result<(), Error> {
     let s = CString::new(name)?;
     unsafe {
-        native::cv_named_window(s.as_ptr(), flags);
+        native::cv_nat_named_window(s.as_ptr(), flags as i32);
     }
     Ok(())
 }
@@ -21,7 +21,7 @@ pub fn highgui_named_window(name: &str, flags: WindowFlag) -> Result<(), Error> 
 pub fn highgui_destroy_window(name: &str) {
     let s = CString::new(name).unwrap();
     unsafe {
-        native::cv_destroy_window((&s).as_ptr());
+        native::cv_nat_destroy_window((&s).as_ptr());
     }
 }
 
@@ -40,7 +40,8 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
         data: *mut c_void,
     }
 
-    extern "C" fn _mouse_callback(e: MouseEventType, x: c_int, y: c_int, f: c_int, ud: *mut c_void) {
+    extern "C" fn _mouse_callback(e: c_int, x: c_int, y: c_int, f: c_int, ud: *mut c_void) {
+        let e: MouseEventType = e.into();
         let cb_wrapper = unsafe { ptr::read(ud as *mut CallbackWrapper) };
         let true_callback = *(cb_wrapper.cb);
         true_callback(e, x, y, f, cb_wrapper.data);
@@ -55,7 +56,7 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
 
     let s = CString::new(name)?;
     unsafe {
-        native::cv_set_mouse_callback(s.as_ptr(), _mouse_callback, box_wrapper_raw);
+        native::cv_nat_set_mouse_callback(s.as_ptr(), Some(_mouse_callback), box_wrapper_raw);
     }
     Ok(())
 }
@@ -106,6 +107,26 @@ pub enum MouseEventType {
     MouseHWheel = 11,
 }
 
+impl From<c_int> for MouseEventType {
+    fn from(n: c_int) -> Self {
+        use self::MouseEventType::*;
+        match n {
+            0 => MouseMove,
+            1 => LButtonDown,
+            2 => RButtonDown,
+            3 => MButtonDown,
+            4 => LButtonUp,
+            5 => RButtonUp,
+            6 => MButtonUp,
+            7 => LButtonClick,
+            8 => RButtonClick,
+            9 => MButtonClick,
+            10 => MouseWheel,
+            11 => MouseHWheel,
+        }
+    }
+}
+
 /// Provides some highgui functionallity
 pub trait Show {
     /// Calls out to highgui to show the image, the duration is specified by `delay`.
@@ -116,8 +137,8 @@ impl Show for Mat {
     fn show(&self, name: &str, delay: c_int) -> Result<(), Error> {
         let s = CString::new(name)?;
         unsafe {
-            native::cv_imshow((&s).as_ptr(), self.inner);
-            native::cv_wait_key(delay);
+            native::cv_nat_imshow((&s).as_ptr(), self.inner);
+            native::cv_nat_wait_key(delay);
         }
         Ok(())
     }
