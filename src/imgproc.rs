@@ -97,6 +97,17 @@ extern "C" {
         result: *mut CResult<c_double>,
     );
 
+    fn cv_scharr(
+        src: *const CMat,
+        dst: *mut CMat,
+        ddepth: c_int,
+        dx: c_int,
+        dy: c_int,
+        scale: c_double,
+        delta: c_double,
+        border_type: c_int
+    );
+
     fn cv_canny(
         image: *const CMat,
         edges: *mut CMat,
@@ -105,6 +116,7 @@ extern "C" {
         aperture_size: c_int,
         l2_gradient: c_int,
     ) -> CEmptyResult;
+
 }
 
 /// Possible methods for histogram comparision method
@@ -557,6 +569,32 @@ impl Mat {
         result.into()
     }
 
+    /// Calculates the first x- or y- image derivative using Scharr operator.
+    pub fn scharr(
+        &self ,
+        ddepth: i32,
+        dx: i32,
+        dy: i32,
+        scale: f64,
+        delta: f64,
+        border_type: BorderType
+    ) -> Mat {
+        let m = CMat::new();
+        unsafe {
+            cv_scharr(
+                self.inner,
+                m,
+                ddepth,
+                dx,
+                dy,
+                scale,
+                delta,
+                border_type as i32
+            );
+        }
+        Mat::from_raw(m)
+    }
+
     /// Performs canny edge detection
     pub fn canny(
         &self,
@@ -584,6 +622,8 @@ impl Mat {
 
         result.map(|_| edges)
     }
+
+
 
     fn matrix_to_vec<T, MElem: AsRef<[T]>, M: AsRef<[MElem]>>(value: M) -> Vec<*const T> {
         value.as_ref().iter().map(|x| x.as_ref().as_ptr()).collect::<Vec<_>>()
