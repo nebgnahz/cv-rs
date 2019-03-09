@@ -97,6 +97,18 @@ extern "C" {
         result: *mut CResult<c_double>,
     );
 
+    fn cv_sobel(
+        src: *const CMat,
+        dst: *mut CMat,
+        ddepth: c_int,
+        dx: c_int,
+        dy: c_int,
+        k_size: c_int,
+        scale: c_double,
+        delta: c_double,
+        border_type: c_int
+    );
+
     fn cv_scharr(
         src: *const CMat,
         dst: *mut CMat,
@@ -567,6 +579,34 @@ impl Mat {
     pub fn compare_hist(&self, other: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
         let result = CResult::<f64>::from_callback(|r| unsafe { cv_compare_hist(self.inner, other.inner, method, r) });
         result.into()
+    }
+
+    /// Calculates the first x- or y- image derivative using Sobel operator.
+    pub fn sobel(
+        &self ,
+        ddepth: i32,
+        dx: i32,
+        dy: i32,
+        k_size: i32,
+        scale: f64,
+        delta: f64,
+        border_type: BorderType
+    ) -> Mat {
+        let m = CMat::new();
+        unsafe {
+            cv_sobel(
+                self.inner,
+                m,
+                ddepth,
+                dx,
+                dy,
+                k_size,
+                scale,
+                delta,
+                border_type as i32
+            );
+        }
+        Mat::from_raw(m)
     }
 
     /// Calculates the first x- or y- image derivative using Scharr operator.
