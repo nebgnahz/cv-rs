@@ -97,7 +97,7 @@ impl<'a> DescriptorMatcher<'a> {
         unsafe {
             native::cv_matcher_match(self.value, query_descriptors.inner, &mut matches);
         }
-        matches.iter().cloned().map(Into::into).collect()
+        matches.into()
     }
 
     /// Finds the best match for each descriptor from a query set.
@@ -112,15 +112,16 @@ impl<'a> DescriptorMatcher<'a> {
                 &mut matches,
             );
         }
-        matches.iter().cloned().map(Into::into).collect()
+        matches.into()
     }
 
     /// Finds the k best matches for each descriptor from a query set.
     pub fn knn_match(&self, query_descriptors: &Mat, k: usize) -> Vec<Vec<DMatch>> {
-        let mut matches: native::CVec::<native::CVec<native::DMatch>> = unsafe { std::mem::zeroed() };
+        let mut matches: native::CVec<native::CVec<native::DMatch>> = unsafe { std::mem::zeroed() };
         unsafe {
             native::cv_matcher_knn_match(self.value, query_descriptors.inner, k as c_int, &mut matches);
         }
-        matches.iter().map(|inner| inner.iter().cloned().map(Into::into).collect()).collect()
+        let matches: Vec<native::CVec<native::DMatch>> = matches.into();
+        matches.into_iter().map(Into::into).collect()
     }
 }

@@ -7,18 +7,12 @@ use failure::Error;
 use mat::*;
 use std::os::raw::c_int;
 
-// =============================================================================
-//   VideoCapture
-// =============================================================================
-enum CVideoCapture {}
-
 /// Video capturing from video files, image sequences or cameras.
 #[derive(Debug)]
 pub struct VideoCapture {
     inner: *mut native::cv_VideoCapture,
 }
 
-unsafe impl Send for CVideoCapture {}
 unsafe impl Send for VideoCapture {}
 
 /// Video capture's property identifier.
@@ -181,9 +175,6 @@ impl Drop for VideoCapture {
 // =============================================================================
 //   VideoWriter
 // =============================================================================
-
-/// Opaque VideoWriter type.
-enum CvVideoWriter {}
 
 /// `VideoWriter` provides easy access to write videos to files.
 /// -On Linux FFMPEG is used to write videos;

@@ -98,7 +98,7 @@ impl CascadeClassifier {
                 max_size.into(),
             )
         }
-        c_result.iter().cloned().map(Into::into).collect()
+        c_result.into()
     }
 }
 
@@ -296,8 +296,10 @@ impl ObjectDetect for HogDescriptor {
                 self.params.use_meanshift_grouping,
             )
         }
+        let detected: Vec<Rect> = detected.iter().cloned().map(Into::into).collect();
+        let weights: Vec<f64> = weights.iter().cloned().collect();
 
-        detected.iter().cloned().map(Into::into).zip(weights.iter().cloned()).collect()
+        detected.into_iter().zip(weights.into_iter()).collect()
     }
 }
 

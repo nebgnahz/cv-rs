@@ -82,11 +82,11 @@ impl Into<SURF> for SURFBuilder {
 
 impl Feature2D for SURF {
     fn detect_and_compute(&self, image: &Mat, mask: &Mat) -> (Vec<KeyPoint>, Mat) {
-        let mut keypoints: native::CVec<native::KeyPoint> = unsafe { std::mem::zeroed() };
-        let descriptors = native::cv_mat_new();
         unsafe {
+            let mut keypoints: native::CVec<native::KeyPoint> = std::mem::zeroed();
+            let descriptors = native::cv_mat_new();
             native::cv_surf_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
+            (keypoints.into(), Mat::from_raw(descriptors))
         }
-        (keypoints.into(), Mat::from_raw(descriptors))
     }
 }

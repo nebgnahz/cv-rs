@@ -5,8 +5,6 @@ use mat::*;
 use std::mem;
 use std::os::raw::c_int;
 
-pub(crate) enum CTermCriteria {}
-
 /// Data structure for salient point detectors
 #[derive(Default, Debug, Clone, Copy)]
 #[repr(C)]

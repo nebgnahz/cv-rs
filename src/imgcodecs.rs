@@ -110,8 +110,10 @@ pub enum ImageWritePngStrategy {
 impl Mat {
     /// Decodes an image from `buf` according to the specified mode.
     pub fn image_decode(buf: &[u8], mode: ImageReadMode) -> Mat {
-        let inner = unsafe { native::cv_nat_imdecode(buf.as_ptr(), buf.len(), mode as i32) };
-        Self::from_raw(inner)
+        unsafe {
+            let inner = native::cv_nat_imdecode(buf.as_ptr(), buf.len(), mode as i32);
+            Self::from_raw(inner)
+        }
     }
 
     /// Encodes an image; the encoding scheme depends on the extension provided;
@@ -137,6 +139,6 @@ impl Mat {
         let path = path_to_cstring(path)?;
         let path = path.as_ptr();
         let result = unsafe { native::cv_nat_imread(path, flags as i32) };
-        Ok(Mat::from_raw(result))
+        Ok(unsafe { Mat::from_raw(result) } )
     }
 }

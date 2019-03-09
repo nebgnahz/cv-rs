@@ -23,9 +23,6 @@ use native::cv_radial_variance_hash_new;
 use *;
 
 mod private {
-    #[allow(missing_copy_implementations, missing_debug_implementations)]
-    pub enum CHash {}
-
     pub trait HashImpl {
         fn get_value(&self) -> *mut native::cv_Ptr<native::cv_img_hash_ImgHashBase>;
     }
@@ -46,16 +43,20 @@ pub trait Hash {
 impl<T: HashImplInterface> Hash for T {
     /// Computes image hash
     fn compute(&self, mat: &Mat) -> Mat {
-        let result = native::cv_mat_new();
-        let value = self.get_value();
-        unsafe { native::cv_hash_compute(value, mat.inner, result) };
-        Mat::from_raw(result)
+        unsafe {
+            let result = native::cv_mat_new();
+            let value = self.get_value();
+            native::cv_hash_compute(value, mat.inner, result);
+            Mat::from_raw(result)
+        }
     }
 
     /// Compares two image hashes
     fn compare(&self, lhs: &Mat, rhs: &Mat) -> f64 {
-        let value = self.get_value();
-        unsafe { native::cv_hash_compare(value, lhs.inner, rhs.inner) }
+        unsafe {
+            let value = self.get_value();
+            native::cv_hash_compare(value, lhs.inner, rhs.inner)
+        }
     }
 }
 

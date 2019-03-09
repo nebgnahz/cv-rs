@@ -41,7 +41,9 @@ impl BOWKMeansTrainer {
 
     /// Clusters train descriptors
     pub fn cluster(&mut self) -> Mat {
-        let cmat = unsafe { native::cv_bow_trainer_cluster(self.value) };
-        Mat::from_raw(cmat)
+        unsafe {
+            let cmat = native::cv_bow_trainer_cluster(self.value);
+            Mat::from_raw(cmat)
+        }
     }
 }

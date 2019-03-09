@@ -12,8 +12,8 @@ pub struct Mser {
 impl Mser {
     /// Detect MSER regions.
     pub fn detect_regions(&self, image: &Mat) -> (Vec<Vec<Point2i>>, Vec<Rect>) {
-        let mut msers: native::CVec::<native::CVec<native::Point2i>> = unsafe {std::mem::zeroed()};
-        let mut bboxes: native::CVec::<native::Rect> = unsafe {std::mem::zeroed()};
+        let mut msers: native::CVec<native::CVec<native::Point2i>> = unsafe {std::mem::zeroed()};
+        let mut bboxes: native::CVec<native::Rect> = unsafe {std::mem::zeroed()};
         unsafe {
             native::cv_mser_detect_regions(self.value, image.inner, &mut msers, &mut bboxes);
         }

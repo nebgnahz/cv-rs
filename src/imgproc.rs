@@ -276,30 +276,36 @@ impl Mat {
                 params.thickness,
                 params.linetype as i32,
                 0,
-            )
+            );
         }
     }
 
     /// Convert an image from one color space to another.
     pub fn cvt_color(&self, code: ColorConversion) -> Mat {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_cvt_color(self.inner, m, code as i32) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_cvt_color(self.inner, m, code as i32);
+            Mat::from_raw(m)
+        }
     }
 
     /// Blurs an image and downsamples it. This function performs the
     /// downsampling step of the Gaussian pyramid construction.
     pub fn pyr_down(&self) -> Mat {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_pyr_down(self.inner, m) }
-        Mat::from_raw(m)
+        unsafe { 
+            let m = native::cv_mat_new();
+            native::cv_pyr_down(self.inner, m);
+            Mat::from_raw(m)
+        }
     }
 
     /// Threshold
     pub fn threshold(&self, thresh: f64, maxval: f64, threshold_type: ThresholdType) -> Mat {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_nat_threshold(self.inner, m, thresh, maxval, threshold_type as i32) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_nat_threshold(self.inner, m, thresh, maxval, threshold_type as i32);
+            Mat::from_raw(m)
+        }
     }
 
     /// Erode
@@ -311,8 +317,8 @@ impl Mat {
         border_type: BorderType,
         border_value: Scalar,
     ) -> Mat {
-        let m = native::cv_mat_new();
         unsafe {
+            let m = native::cv_mat_new();
             native::cv_nat_erode(
                 self.inner,
                 m,
@@ -321,9 +327,9 @@ impl Mat {
                 iterations,
                 border_type as i32,
                 border_value.into(),
-            )
+            );
+            Mat::from_raw(m)
         }
-        Mat::from_raw(m)
     }
 
     /// Dilate
@@ -335,8 +341,8 @@ impl Mat {
         border_type: BorderType,
         border_value: Scalar,
     ) -> Mat {
-        let m = native::cv_mat_new();
         unsafe {
+            let m = native::cv_mat_new();
             native::cv_nat_dilate(
                 self.inner,
                 m,
@@ -345,17 +351,19 @@ impl Mat {
                 iterations,
                 border_type as i32,
                 border_value.into(),
-            )
+            );
+            Mat::from_raw(m)
         }
-        Mat::from_raw(m)
     }
 
     /// Gaussian Blur
     ///
     pub fn gaussian_blur(&self, dsize: Size2i, sigma_x: f64, sigma_y: f64, border_type: BorderType) -> Mat {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_gaussian_blur(self.inner, m, dsize.into(), sigma_x, sigma_y, border_type as i32) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_gaussian_blur(self.inner, m, dsize.into(), sigma_x, sigma_y, border_type as i32);
+            Mat::from_raw(m)
+        }
     }
 
     /// Resizes an image.
@@ -363,9 +371,11 @@ impl Mat {
     /// The function resize resizes the image down to or up to the specified
     /// size.
     pub fn resize_to(&self, dsize: Size2i, interpolation: InterpolationFlag) -> Mat {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_nat_resize(self.inner, m, dsize.into(), 0.0, 0.0, interpolation as i32) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_nat_resize(self.inner, m, dsize.into(), 0.0, 0.0, interpolation as i32);
+            Mat::from_raw(m)
+        }
     }
 
     /// Resizes an image.
@@ -373,9 +383,11 @@ impl Mat {
     /// The function resize resizes the image down to or up to the specified
     /// size.
     pub fn resize_by(&self, fx: f64, fy: f64, interpolation: InterpolationFlag) -> Mat {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_nat_resize(self.inner, m, Size2i::default().into(), fx, fy, interpolation as i32) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_nat_resize(self.inner, m, Size2i::default().into(), fx, fy, interpolation as i32);
+            Mat::from_raw(m)
+        }
     }
 
     /// Calculate a histogram of an image.
@@ -386,11 +398,11 @@ impl Mat {
         hist_size: U,
         ranges: M,
     ) -> Mat {
-        let m = native::cv_mat_new();
-        let channels = channels.as_ref();
-        let hist_size = hist_size.as_ref();
-        let ranges = Self::matrix_to_vec(ranges);
         unsafe {
+            let m = native::cv_mat_new();
+            let channels = channels.as_ref();
+            let hist_size = hist_size.as_ref();
+            let ranges = Self::matrix_to_vec(ranges);
             native::cv_calc_hist(
                 self.inner,
                 1,
@@ -401,8 +413,8 @@ impl Mat {
                 hist_size.as_ptr(),
                 ranges.as_ptr(),
             );
+            Mat::from_raw(m)
         }
-        Mat::from_raw(m)
     }
 
     /// Calculate the back projection of a histogram. The function calculates
@@ -413,9 +425,9 @@ impl Mat {
         hist: &Mat,
         ranges: M,
     ) -> Mat {
-        let m = native::cv_mat_new();
-        let ranges = Self::matrix_to_vec(ranges);
         unsafe {
+            let m = native::cv_mat_new();
+            let ranges = Self::matrix_to_vec(ranges);
             native::cv_calc_back_project(
                 self.inner,
                 1,
@@ -424,8 +436,8 @@ impl Mat {
                 m,
                 ranges.as_ptr(),
             );
+            Mat::from_raw(m)
         }
-        Mat::from_raw(m)
     }
 
     /// Compares two histograms.
@@ -438,7 +450,7 @@ impl Mat {
     /// To compare such histograms or more general sparse configurations of weighted points,
     /// consider using the cv::EMD function.
     pub fn compare_hist(&self, other: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
-        let r: native::Result<f64> = unsafe { std::mem::zeroed() };
+        let mut r: native::Result<f64> = unsafe { std::mem::zeroed() };
         unsafe { native::cv_compare_hist(self.inner, other.inner, method as i32, &mut r) }
         r.into()
     }

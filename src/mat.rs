@@ -40,26 +40,28 @@ impl Mat {
         let path = path.as_ptr();
         let section = section.as_ptr();
         let result = unsafe { native::cv_mat_from_file_storage(path, section) };
-        Ok(Mat::from_raw(result))
+        Ok(unsafe { Mat::from_raw(result) } )
     }
 
     #[inline]
     /// Creates a `Mat` object from raw `CMat` pointer. This will read the rows
     /// and cols of the image.
-    pub(crate) fn from_raw(raw: *mut native::cv_Mat) -> Mat {
+    pub(crate) unsafe fn from_raw(raw: *mut native::cv_Mat) -> Mat {
         Mat {
             inner: raw,
-            rows: unsafe { native::cv_mat_rows(raw) },
-            cols: unsafe { native::cv_mat_cols(raw) },
-            depth: unsafe { native::cv_mat_depth(raw) },
-            channels: unsafe { native::cv_mat_channels(raw) },
+            rows: native::cv_mat_rows(raw),
+            cols: native::cv_mat_cols(raw),
+            depth: native::cv_mat_depth(raw),
+            channels: native::cv_mat_channels(raw),
         }
     }
 
     /// Creates an empty `Mat` struct.
     pub fn new() -> Mat {
-        let m = native::cv_mat_new();
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            Mat::from_raw(m)
+        }
     }
 
     /// Creates a new `Mat` from buffer. Note that internally opencv function
@@ -87,21 +89,25 @@ impl Mat {
     ///
     /// ::std::mem::forget(new_image);
     /// ```
-    pub fn from_buffer(rows: c_int, cols: c_int, cv_type: CvType, buf: &[u8]) -> Mat {
-        let raw = unsafe { native::cv_mat_from_buffer(rows, cols, cv_type as i32, buf.as_ptr()) };
+    pub unsafe fn from_buffer(rows: c_int, cols: c_int, cv_type: CvType, buf: &[u8]) -> Mat {
+        let raw = native::cv_mat_from_buffer(rows, cols, cv_type as i32, buf.as_ptr());
         Mat::from_raw(raw)
     }
 
     /// Create an empty `Mat` with specific size (rows, cols and types).
     pub fn with_size(rows: c_int, cols: c_int, t: c_int) -> Self {
-        let m = unsafe { native::cv_mat_new_with_size(rows, cols, t) };
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new_with_size(rows, cols, t);
+            Mat::from_raw(m)
+        }
     }
 
     /// Create an empty `Mat` with specific size (rows, cols and types).
     pub fn zeros(rows: c_int, cols: c_int, t: c_int) -> Self {
-        let m = unsafe { native::cv_mat_zeros(rows, cols, t) };
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_zeros(rows, cols, t);
+            Mat::from_raw(m)
+        }
     }
 
     /// Returns the raw data (as a `u8` pointer)
@@ -155,8 +161,10 @@ impl Mat {
 
     /// Return a region of interest from a `Mat` specfied by a `Rect`.
     pub fn roi(&self, rect: Rect) -> Mat {
-        let cmat = unsafe { native::cv_mat_roi(self.inner, rect.into()) };
-        Mat::from_raw(cmat)
+        unsafe {
+            let cmat = native::cv_mat_roi(self.inner, rect.into());
+            Mat::from_raw(cmat)
+        }
     }
 
     /// Flips an image around vertical, horizontal, or both axes.
@@ -179,8 +187,10 @@ impl Mat {
 
     /// Returns an identity matrix of the specified size and type.
     pub fn eye(rows: i32, cols: i32, cv_type: CvType) -> Mat {
-        let result = unsafe { native::cv_mat_eye(rows, cols, cv_type as i32) };
-        Mat::from_raw(result)
+        unsafe {
+            let result = native::cv_mat_eye(rows, cols, cv_type as i32);
+            Mat::from_raw(result)
+        }
     }
 
     /// Returns individual pixel (element) information within the Mat. This
@@ -286,9 +296,11 @@ impl Mat {
 
     /// Normalize the Mat according to the normalization type.
     pub fn normalize(&self, alpha: f64, beta: f64, t: NormType) -> Mat {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_mat_normalize(self.inner, m, alpha, beta, t as i32) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_mat_normalize(self.inner, m, alpha, beta, t as i32);
+            Mat::from_raw(m)
+        }
     }
 
     /// Counts non-zero array elements.
@@ -313,11 +325,11 @@ impl Mat {
         type_: BorderType,
         color: Scalar,
     ) -> Mat {
-        let m = native::cv_mat_new();
         unsafe {
+            let m = native::cv_mat_new();
             native::cv_mat_copy_make_border(self.inner, m, top, bottom, left, right, type_ as i32, color.into());
+            Mat::from_raw(m)
         }
-        Mat::from_raw(m)
     }
 }
 
@@ -357,77 +369,93 @@ impl Drop for Mat {
 impl BitAnd for Mat {
     type Output = Self;
     fn bitand(self, rhs: Self) -> Self::Output {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_mat_bitwise_and(self.inner, rhs.inner, m) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_mat_bitwise_and(self.inner, rhs.inner, m);
+            Mat::from_raw(m)
+        }
     }
 }
 
 impl<'a> BitAnd for &'a Mat {
     type Output = Mat;
     fn bitand(self, rhs: &'a Mat) -> Self::Output {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_mat_bitwise_and(self.inner, rhs.inner, m) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_mat_bitwise_and(self.inner, rhs.inner, m);
+            Mat::from_raw(m)
+        }
     }
 }
 
 impl BitOr for Mat {
     type Output = Self;
     fn bitor(self, rhs: Self) -> Self::Output {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_mat_bitwise_or(self.inner, rhs.inner, m) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_mat_bitwise_or(self.inner, rhs.inner, m);
+            Mat::from_raw(m)
+        }
     }
 }
 
 impl<'a> BitOr for &'a Mat {
     type Output = Mat;
     fn bitor(self, rhs: &'a Mat) -> Self::Output {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_mat_bitwise_or(self.inner, rhs.inner, m) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_mat_bitwise_or(self.inner, rhs.inner, m);
+            Mat::from_raw(m)
+        }
     }
 }
 
 impl BitXor for Mat {
     type Output = Self;
     fn bitxor(self, rhs: Self) -> Self::Output {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_mat_bitwise_xor(self.inner, rhs.inner, m) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_mat_bitwise_xor(self.inner, rhs.inner, m);
+            Mat::from_raw(m)
+        }
     }
 }
 
 impl<'a> BitXor for &'a Mat {
     type Output = Mat;
     fn bitxor(self, rhs: &'a Mat) -> Self::Output {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_mat_bitwise_xor(self.inner, rhs.inner, m) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_mat_bitwise_xor(self.inner, rhs.inner, m);
+            Mat::from_raw(m)
+        }
     }
 }
 
 impl Not for Mat {
     type Output = Self;
     fn not(self) -> Self::Output {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_mat_bitwise_not(self.inner, m) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_mat_bitwise_not(self.inner, m);
+            Mat::from_raw(m)
+        }
     }
 }
 
 impl Clone for Mat {
     fn clone(&self) -> Self {
-        Mat::from_buffer(self.rows, self.cols, self.cv_type(), self.data())
+        unsafe { Mat::from_buffer(self.rows, self.cols, self.cv_type(), self.data()) }
     }
 }
 
 impl<'a> Not for &'a Mat {
     type Output = Mat;
     fn not(self) -> Self::Output {
-        let m = native::cv_mat_new();
-        unsafe { native::cv_mat_bitwise_not(self.inner, m) }
-        Mat::from_raw(m)
+        unsafe {
+            let m = native::cv_mat_new();
+            native::cv_mat_bitwise_not(self.inner, m);
+            Mat::from_raw(m)
+        }
     }
 }
