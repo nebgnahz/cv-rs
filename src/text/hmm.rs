@@ -41,7 +41,7 @@ impl OcrHmmDecoder {
         let vocabulary = CString::new(vocabulary)?;
 
         let result = CResult::<*mut COCR>::from_callback(|r| unsafe {
-            native::cv_hmm_new(
+            native::cvsys_hmm_new(
                 classifier_filename.as_ptr(),
                 vocabulary.as_ptr(),
                 transition_probabilities_table.inner,
@@ -59,7 +59,7 @@ impl OcrHmmDecoder {
 impl Drop for OcrHmmDecoder {
     fn drop(&mut self) {
         unsafe {
-            native::cv_hmm_drop(self.value);
+            native::cvsys_hmm_drop(self.value);
         }
     }
 }

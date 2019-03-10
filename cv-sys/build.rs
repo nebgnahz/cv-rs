@@ -70,6 +70,8 @@ fn main() {
 
     // Build OpenCV and add it to cargo.
     let dst = config.build();
+
+    // Link cvsys.
     println!("cargo:rustc-link-search=native={}", dst.join("build").join("Debug").display());
     println!("cargo:rustc-link-lib=static=cvsys");
 

@@ -7,13 +7,13 @@ use *;
 /// Speeded up robust features extractor.
 #[derive(Debug)]
 pub struct SURF {
-    value: *mut native::cv_Ptr<native::cv_xfeatures2d_SURF>,
+    value: *mut native::cvsys_Ptr<native::cvsys_xfeatures2d_SURF>,
 }
 
 impl SURF {
     /// Creates a new maximally stable extremal region extractor criteria.
     pub fn new(hessian_threshold: f64, octaves: c_int, octave_layers: c_int, extended: bool, upright: bool) -> Self {
-        let surf = unsafe { native::cv_surf_new(hessian_threshold, octaves, octave_layers, extended, upright) };
+        let surf = unsafe { native::cvsys_surf_new(hessian_threshold, octaves, octave_layers, extended, upright) };
         SURF { value: surf }
     }
 }
@@ -21,7 +21,7 @@ impl SURF {
 impl Drop for SURF {
     fn drop(&mut self) {
         unsafe {
-            native::cv_surf_drop(self.value);
+            native::cvsys_surf_drop(self.value);
         }
     }
 }
@@ -84,8 +84,8 @@ impl Feature2D for SURF {
     fn detect_and_compute(&self, image: &Mat, mask: &Mat) -> (Vec<KeyPoint>, Mat) {
         unsafe {
             let mut keypoints: native::CVec<native::KeyPoint> = std::mem::zeroed();
-            let descriptors = native::cv_mat_new();
-            native::cv_surf_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
+            let descriptors = native::cvsys_mat_new();
+            native::cvsys_surf_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
             (keypoints.into(), Mat::from_raw(descriptors))
         }
     }

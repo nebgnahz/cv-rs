@@ -12,7 +12,7 @@ use std::ptr;
 pub fn highgui_named_window(name: &str, flags: WindowFlag) -> Result<(), Error> {
     let s = CString::new(name)?;
     unsafe {
-        native::cv_nat_named_window(s.as_ptr(), flags as i32);
+        native::cvsys_nat_named_window(s.as_ptr(), flags as i32);
     }
     Ok(())
 }
@@ -21,7 +21,7 @@ pub fn highgui_named_window(name: &str, flags: WindowFlag) -> Result<(), Error> 
 pub fn highgui_destroy_window(name: &str) {
     let s = CString::new(name).unwrap();
     unsafe {
-        native::cv_nat_destroy_window((&s).as_ptr());
+        native::cvsys_nat_destroy_window((&s).as_ptr());
     }
 }
 
@@ -56,7 +56,7 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
 
     let s = CString::new(name)?;
     unsafe {
-        native::cv_nat_set_mouse_callback(s.as_ptr(), Some(_mouse_callback), box_wrapper_raw);
+        native::cvsys_nat_set_mouse_callback(s.as_ptr(), Some(_mouse_callback), box_wrapper_raw);
     }
     Ok(())
 }
@@ -138,8 +138,8 @@ impl Show for Mat {
     fn show(&self, name: &str, delay: c_int) -> Result<(), Error> {
         let s = CString::new(name)?;
         unsafe {
-            native::cv_nat_imshow((&s).as_ptr(), self.inner);
-            native::cv_nat_wait_key(delay);
+            native::cvsys_nat_imshow((&s).as_ptr(), self.inner);
+            native::cvsys_nat_wait_key(delay);
         }
         Ok(())
     }

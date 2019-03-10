@@ -1,15 +1,15 @@
 #include "video.hpp"
 
-cv::TermCriteria* cv_term_criteria_new(int type, int count, double epsilon) {
+cv::TermCriteria* cvsys_term_criteria_new(int type, int count, double epsilon) {
     return new cv::TermCriteria(type, count, epsilon);
 }
 
-void cv_term_criteria_drop(cv::TermCriteria* criteria) {
+void cvsys_term_criteria_drop(cv::TermCriteria* criteria) {
     delete criteria;
     criteria = nullptr;
 }
 
-RotatedRect cv_camshift(cv::Mat* bp_image, Rect crect, cv::TermCriteria* criteria) {
+RotatedRect cvsys_camshift(cv::Mat* bp_image, Rect crect, cv::TermCriteria* criteria) {
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
     cv::RotatedRect rr = cv::CamShift(*bp_image, rect, *criteria);
     RotatedRect c_rr;

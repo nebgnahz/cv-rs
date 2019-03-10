@@ -1,48 +1,48 @@
 #include "text.hpp"
 #include "utils.hpp"
 
-void cv_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
-                cv::Mat& image,
-                CString* output_text,
-                CVec<Rect>* component_rects,
-                CVec<CString>* component_texts,
-                CVec<float>* component_confidences,
-                int component_level) {
+void cvsys_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
+                   cv::Mat& image,
+                   CString* output_text,
+                   CVec<Rect>* component_rects,
+                   CVec<CString>* component_texts,
+                   CVec<float>* component_confidences,
+                   int component_level) {
     std::string output;
     std::vector<cv::Rect> boxes;
     std::vector<std::string> words;
     std::vector<float> confidences;
     ocr.get()->run(image, output, &boxes, &words, &confidences, component_level);
 
-    cv_to_ffi(output, output_text);
-    cv_to_ffi(boxes, component_rects);
-    cv_to_ffi(words, component_texts);
-    cv_to_ffi(confidences, component_confidences);
+    cvsys_to_ffi(output, output_text);
+    cvsys_to_ffi(boxes, component_rects);
+    cvsys_to_ffi(words, component_texts);
+    cvsys_to_ffi(confidences, component_confidences);
 }
 
-void cv_tesseract_new(const char* datapath,
-                      const char* language,
-                      const char* char_whitelist,
-                      int oem,
-                      int psmode,
-                      Result<void*>* result) {
+void cvsys_tesseract_new(const char* datapath,
+                         const char* language,
+                         const char* char_whitelist,
+                         int oem,
+                         int psmode,
+                         Result<void*>* result) {
     *result = Result<void*>::FromFunction([datapath, language, char_whitelist, oem, psmode]() {
         auto result = cv::text::OCRTesseract::create(datapath, language, char_whitelist, oem, psmode);
         return new cv::Ptr<cv::text::OCRTesseract>(result);
     });
 }
 
-void cv_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr) {
+void cvsys_tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr) {
     delete ocr;
     ocr = nullptr;
 }
 
-void cv_hmm_new(const char* classifier_filename,
-                const char* vocabulary,
-                cv::Mat& transition_probabilities_table,
-                cv::Mat& emission_probabilities_table,
-                cv::text::classifier_type classifier_type,
-                Result<void*>* result) {
+void cvsys_hmm_new(const char* classifier_filename,
+                   const char* vocabulary,
+                   cv::Mat& transition_probabilities_table,
+                   cv::Mat& emission_probabilities_table,
+                   cv::text::classifier_type classifier_type,
+                   Result<void*>* result) {
     *result = Result<void*>::FromFunction([classifier_filename,
                                            vocabulary,
                                            transition_probabilities_table,
@@ -56,22 +56,22 @@ void cv_hmm_new(const char* classifier_filename,
     });
 }
 
-void cv_hmm_drop(cv::Ptr<cv::text::OCRHMMDecoder>* ocr) {
+void cvsys_hmm_drop(cv::Ptr<cv::text::OCRHMMDecoder>* ocr) {
     delete ocr;
     ocr = nullptr;
 }
 
-void cv_holistic_new(const char* archive_file,
-                     const char* weights_file,
-                     const char* words_file,
-                     Result<void*>* result) {
+void cvsys_holistic_new(const char* archive_file,
+                        const char* weights_file,
+                        const char* words_file,
+                        Result<void*>* result) {
     *result = Result<void*>::FromFunction([archive_file, weights_file, words_file]() {
         auto result = cv::text::OCRHolisticWordRecognizer::create(archive_file, weights_file, words_file);
         return new cv::Ptr<cv::text::OCRHolisticWordRecognizer>(result);
     });
 }
 
-void cv_holistic_drop(cv::Ptr<cv::text::OCRHolisticWordRecognizer>* ocr) {
+void cvsys_holistic_drop(cv::Ptr<cv::text::OCRHolisticWordRecognizer>* ocr) {
     delete ocr;
     ocr = nullptr;
 }

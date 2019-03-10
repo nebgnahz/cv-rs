@@ -1,11 +1,11 @@
 #include "common-rust.hpp"
 
-void cv_vec_drop(CVec<void>* vec, unsigned int depth) {
+void cvsys_vec_drop(CVec<void>* vec, unsigned int depth) {
     if (vec->array != nullptr) {
         if (depth > 1) {
             auto nestedVec = (CVec<void>*) vec->array;
             for (size_t i = 0; i < vec->size; ++i) {
-                cv_vec_drop(&nestedVec[i], depth - 1);
+                cvsys_vec_drop(&nestedVec[i], depth - 1);
             }
         }
         free(vec->array);

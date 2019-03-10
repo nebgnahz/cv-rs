@@ -8,12 +8,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
-cv::Mat* cv_nat_imread(const char* const filename, int flags);
-cv::Mat* cv_nat_imdecode(const uint8_t* const buffer, size_t len, int flag);
-void cv_nat_imencode(const char* const ext,
-                     const cv::Mat* const image,
-                     const int* const flag_ptr,
-                     size_t flag_size,
-                     COption<CVec<uint8_t>>* result);
+cv::Mat* cvsys_nat_imread(const char* const filename, int flags);
+cv::Mat* cvsys_nat_imdecode(const uint8_t* const buffer, size_t len, int flag);
+void cvsys_nat_imencode(const char* const ext,
+                        const cv::Mat* const image,
+                        const int* const flag_ptr,
+                        size_t flag_size,
+                        COption<CVec<uint8_t>>* result);
 
 #endif  // CV_RS_IMCODECS_H

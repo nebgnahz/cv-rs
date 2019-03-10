@@ -6,7 +6,7 @@ use *;
 /// Maximally stable extremal region extractor.
 #[derive(Debug)]
 pub struct Mser {
-    value: *mut native::cv_Ptr<native::cv_MSER>,
+    value: *mut native::cvsys_Ptr<native::cvsys_MSER>,
 }
 
 impl Mser {
@@ -15,7 +15,7 @@ impl Mser {
         let mut msers: native::CVec<native::CVec<native::Point2i>> = unsafe {std::mem::zeroed()};
         let mut bboxes: native::CVec<native::Rect> = unsafe {std::mem::zeroed()};
         unsafe {
-            native::cv_mser_detect_regions(self.value, image.inner, &mut msers, &mut bboxes);
+            native::cvsys_mser_detect_regions(self.value, image.inner, &mut msers, &mut bboxes);
         }
         let msers = msers.iter().map(|inner| inner.iter().cloned().map(Into::into).collect()).collect();
         let bboxes = bboxes.iter().cloned().map(Into::into).collect();
@@ -26,7 +26,7 @@ impl Mser {
 impl Drop for Mser {
     fn drop(&mut self) {
         unsafe {
-            native::cv_mser_drop(self.value);
+            native::cvsys_mser_drop(self.value);
         }
     }
 }
@@ -120,7 +120,7 @@ impl Default for MserBuilder {
 impl Into<Mser> for MserBuilder {
     fn into(self) -> Mser {
         let value = unsafe {
-            native::cv_mser_new(
+            native::cvsys_mser_new(
                 self.delta,
                 self.min_area,
                 self.max_area,

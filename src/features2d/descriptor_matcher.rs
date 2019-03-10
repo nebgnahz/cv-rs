@@ -50,14 +50,14 @@ impl DescriptorMatcherType {
 /// Type for matching keypoint descriptors
 #[derive(Debug)]
 pub struct DescriptorMatcher<'a> {
-    value: *mut native::cv_Ptr<native::cv_DescriptorMatcher>,
+    value: *mut native::cvsys_Ptr<native::cvsys_DescriptorMatcher>,
     phantom: PhantomData<&'a ()>,
 }
 
 impl<'a> Drop for DescriptorMatcher<'a> {
     fn drop(&mut self) {
         unsafe {
-            native::cv_matcher_drop(self.value);
+            native::cvsys_matcher_drop(self.value);
         }
     }
 }
@@ -66,7 +66,7 @@ impl<'a> DescriptorMatcher<'a> {
     /// Creates a descriptor matcher of a given type with the default parameters (using default constructor).
     pub fn new(descriptor_matcher_type: DescriptorMatcherType) -> Self {
         let descriptor_matcher_type = CString::new(descriptor_matcher_type.as_str()).unwrap();
-        let value = unsafe { native::cv_matcher_new(descriptor_matcher_type.as_ptr()) };
+        let value = unsafe { native::cvsys_matcher_new(descriptor_matcher_type.as_ptr()) };
         DescriptorMatcher {
             value: value,
             phantom: PhantomData,
@@ -77,25 +77,25 @@ impl<'a> DescriptorMatcher<'a> {
     pub fn add(&mut self, descriptors: impl IntoIterator<Item = &'a Mat>) {
         let descriptors = descriptors.into_iter().map(|x| x.inner).collect::<Vec<_>>();
         unsafe {
-            native::cv_matcher_add(self.value, descriptors.as_ptr(), descriptors.len());
+            native::cvsys_matcher_add(self.value, descriptors.as_ptr(), descriptors.len());
         }
     }
 
     /// Trains a descriptor matcher
     pub fn train(&mut self) {
-        unsafe { native::cv_matcher_train(self.value) }
+        unsafe { native::cvsys_matcher_train(self.value) }
     }
 
     /// Returns true if there are no train descriptors
     pub fn is_empty(&self) -> bool {
-        unsafe { native::cv_matcher_is_empty(self.value) }
+        unsafe { native::cvsys_matcher_is_empty(self.value) }
     }
 
     /// Finds the best match for each descriptor from a query set
     pub fn match_(&self, query_descriptors: &Mat) -> Vec<DMatch> {
         let mut matches: native::CVec<native::DMatch> = unsafe { std::mem::zeroed() };
         unsafe {
-            native::cv_matcher_match(self.value, query_descriptors.inner, &mut matches);
+            native::cvsys_matcher_match(self.value, query_descriptors.inner, &mut matches);
         }
         matches.into()
     }
@@ -105,7 +105,7 @@ impl<'a> DescriptorMatcher<'a> {
     pub fn match_two(&self, query_descriptors: &Mat, train_descriptors: &Mat) -> Vec<DMatch> {
         let mut matches: native::CVec<native::DMatch> = unsafe { std::mem::zeroed() };
         unsafe {
-            native::cv_matcher_match_two(
+            native::cvsys_matcher_match_two(
                 self.value,
                 query_descriptors.inner,
                 train_descriptors.inner,
@@ -119,7 +119,7 @@ impl<'a> DescriptorMatcher<'a> {
     pub fn knn_match(&self, query_descriptors: &Mat, k: usize) -> Vec<Vec<DMatch>> {
         let mut matches: native::CVec<native::CVec<native::DMatch>> = unsafe { std::mem::zeroed() };
         unsafe {
-            native::cv_matcher_knn_match(self.value, query_descriptors.inner, k as c_int, &mut matches);
+            native::cvsys_matcher_knn_match(self.value, query_descriptors.inner, k as c_int, &mut matches);
         }
         let matches: Vec<native::CVec<native::DMatch>> = matches.into();
         matches.into_iter().map(Into::into).collect()

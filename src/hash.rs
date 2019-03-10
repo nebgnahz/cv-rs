@@ -1,30 +1,30 @@
 //! The module brings implementations of different image hashing algorithms.
 use self::private::*;
 
-use native::cv_average_hash_drop;
-use native::cv_average_hash_new;
-use native::cv_block_mean_hash_drop;
-use native::cv_block_mean_hash_new;
-use native::cv_color_moment_hash_drop;
-use native::cv_color_moment_hash_new;
-use native::cv_img_hash_AverageHash;
-use native::cv_img_hash_BlockMeanHash;
-use native::cv_img_hash_ColorMomentHash;
-use native::cv_img_hash_MarrHildrethHash;
-use native::cv_img_hash_PHash;
-use native::cv_img_hash_RadialVarianceHash;
-use native::cv_marr_hildreth_hash_drop;
-use native::cv_marr_hildreth_hash_new;
-use native::cv_phash_drop;
-use native::cv_phash_new;
-use native::cv_radial_variance_hash_drop;
-use native::cv_radial_variance_hash_new;
+use native::cvsys_average_hash_drop;
+use native::cvsys_average_hash_new;
+use native::cvsys_block_mean_hash_drop;
+use native::cvsys_block_mean_hash_new;
+use native::cvsys_color_moment_hash_drop;
+use native::cvsys_color_moment_hash_new;
+use native::cvsys_img_hash_AverageHash;
+use native::cvsys_img_hash_BlockMeanHash;
+use native::cvsys_img_hash_ColorMomentHash;
+use native::cvsys_img_hash_MarrHildrethHash;
+use native::cvsys_img_hash_PHash;
+use native::cvsys_img_hash_RadialVarianceHash;
+use native::cvsys_marr_hildreth_hash_drop;
+use native::cvsys_marr_hildreth_hash_new;
+use native::cvsys_phash_drop;
+use native::cvsys_phash_new;
+use native::cvsys_radial_variance_hash_drop;
+use native::cvsys_radial_variance_hash_new;
 
 use *;
 
 mod private {
     pub trait HashImpl {
-        fn get_value(&self) -> *mut native::cv_Ptr<native::cv_img_hash_ImgHashBase>;
+        fn get_value(&self) -> *mut native::cvsys_Ptr<native::cvsys_img_hash_ImgHashBase>;
     }
 }
 
@@ -44,9 +44,9 @@ impl<T: HashImplInterface> Hash for T {
     /// Computes image hash
     fn compute(&self, mat: &Mat) -> Mat {
         unsafe {
-            let result = native::cv_mat_new();
+            let result = native::cvsys_mat_new();
             let value = self.get_value();
-            native::cv_hash_compute(value, mat.inner, result);
+            native::cvsys_hash_compute(value, mat.inner, result);
             Mat::from_raw(result)
         }
     }
@@ -55,7 +55,7 @@ impl<T: HashImplInterface> Hash for T {
     fn compare(&self, lhs: &Mat, rhs: &Mat) -> f64 {
         unsafe {
             let value = self.get_value();
-            native::cv_hash_compare(value, lhs.inner, rhs.inner)
+            native::cvsys_hash_compare(value, lhs.inner, rhs.inner)
         }
     }
 }
@@ -65,7 +65,7 @@ macro_rules! impl_hash {
         #[doc=$description]
         #[derive(Debug)]
         pub struct $x {
-            value: *mut native::cv_Ptr<$ty>,
+            value: *mut native::cvsys_Ptr<$ty>,
         }
 
         impl $x {
@@ -91,8 +91,8 @@ macro_rules! impl_hash {
         }
 
         impl HashImpl for $x {
-            fn get_value(&self) -> *mut native::cv_Ptr<native::cv_img_hash_ImgHashBase> {
-                self.value as *mut native::cv_Ptr<native::cv_img_hash_ImgHashBase>
+            fn get_value(&self) -> *mut native::cvsys_Ptr<native::cvsys_img_hash_ImgHashBase> {
+                self.value as *mut native::cvsys_Ptr<native::cvsys_img_hash_ImgHashBase>
             }
         }
 
@@ -109,43 +109,43 @@ macro_rules! impl_hash {
 
 impl_hash!(
     AverageHash,
-    cv_average_hash_new,
-    cv_average_hash_drop,
-    cv_img_hash_AverageHash,
+    cvsys_average_hash_new,
+    cvsys_average_hash_drop,
+    cvsys_img_hash_AverageHash,
     "Computes average hash value of the input image"
 );
 impl_hash!(
     BlockMeanHash,
-    cv_block_mean_hash_new,
-    cv_block_mean_hash_drop,
-    cv_img_hash_BlockMeanHash,
+    cvsys_block_mean_hash_new,
+    cvsys_block_mean_hash_drop,
+    cvsys_img_hash_BlockMeanHash,
     "Image hash based on block mean"
 );
 impl_hash!(
     ColorMomentHash,
-    cv_color_moment_hash_new,
-    cv_color_moment_hash_drop,
-    cv_img_hash_ColorMomentHash,
+    cvsys_color_moment_hash_new,
+    cvsys_color_moment_hash_drop,
+    cvsys_img_hash_ColorMomentHash,
     "Image hash based on color moments"
 );
 impl_hash!(
     MarrHildrethHash,
-    cv_marr_hildreth_hash_new,
-    cv_marr_hildreth_hash_drop,
-    cv_img_hash_MarrHildrethHash,
+    cvsys_marr_hildreth_hash_new,
+    cvsys_marr_hildreth_hash_drop,
+    cvsys_img_hash_MarrHildrethHash,
     "Marr-Hildreth Operator Based Hash, slowest but more discriminative."
 );
 impl_hash!(
     PHash,
-    cv_phash_new,
-    cv_phash_drop,
-    cv_img_hash_PHash,
+    cvsys_phash_new,
+    cvsys_phash_drop,
+    cvsys_img_hash_PHash,
     "Slower than AverageHash, but tolerant of minor modifications"
 );
 impl_hash!(
     RadialVarianceHash,
-    cv_radial_variance_hash_new,
-    cv_radial_variance_hash_drop,
-    cv_img_hash_RadialVarianceHash,
+    cvsys_radial_variance_hash_new,
+    cvsys_radial_variance_hash_drop,
+    cvsys_img_hash_RadialVarianceHash,
     "Image hash based on Radon transform"
 );

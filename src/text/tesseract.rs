@@ -57,7 +57,7 @@ impl OcrTesseract {
         let c_char_whitelist = to_nullable_string(&c_char_whitelist);
 
         let result = CResult::<*mut COCR>::from_callback(|r| unsafe {
-            native::cv_tesseract_new(c_data_path, c_language, c_char_whitelist, oem, psmode, r)
+            native::cvsys_tesseract_new(c_data_path, c_language, c_char_whitelist, oem, psmode, r)
         });
         let result: Result<_, String> = result.into();
         let result = result.map_err(CvError::UnknownError)?;
@@ -68,7 +68,7 @@ impl OcrTesseract {
 impl Drop for OcrTesseract {
     fn drop(&mut self) {
         unsafe {
-            native::cv_tesseract_drop(self.value);
+            native::cvsys_tesseract_drop(self.value);
         }
     }
 }

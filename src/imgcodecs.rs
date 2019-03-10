@@ -111,7 +111,7 @@ impl Mat {
     /// Decodes an image from `buf` according to the specified mode.
     pub fn image_decode(buf: &[u8], mode: ImageReadMode) -> Mat {
         unsafe {
-            let inner = native::cv_nat_imdecode(buf.as_ptr(), buf.len(), mode as i32);
+            let inner = native::cvsys_nat_imdecode(buf.as_ptr(), buf.len(), mode as i32);
             Self::from_raw(inner)
         }
     }
@@ -126,7 +126,7 @@ impl Mat {
             // This happens to be fine because `ImageWriteMode` is `repr(C)`
             // and LLVM defines a C enum to be the same size as an int.
             let c_flags = flags.as_ptr() as *const i32;
-            native::cv_nat_imencode(ext.into_raw(), self.inner, c_flags, flags.len(), &mut result);
+            native::cvsys_nat_imencode(ext.into_raw(), self.inner, c_flags, flags.len(), &mut result);
             let result: Option<native::CVec<u8>> = result.into();
             result
                 .map(Into::into)
@@ -138,7 +138,7 @@ impl Mat {
     pub fn from_path<P: AsRef<Path>>(path: P, flags: ImageReadMode) -> Result<Mat, Error> {
         let path = path_to_cstring(path)?;
         let path = path.as_ptr();
-        let result = unsafe { native::cv_nat_imread(path, flags as i32) };
+        let result = unsafe { native::cvsys_nat_imread(path, flags as i32) };
         Ok(unsafe { Mat::from_raw(result) } )
     }
 }

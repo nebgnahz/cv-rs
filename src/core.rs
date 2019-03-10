@@ -622,13 +622,13 @@ pub enum TermType {
 /// Termination criteria for iterative algorithms.
 #[derive(Debug)]
 pub struct TermCriteria {
-    pub(crate) c_criteria: *mut native::cv_TermCriteria,
+    pub(crate) c_criteria: *mut native::cvsys_TermCriteria,
 }
 
 impl TermCriteria {
     /// Creates a new termination criteria.
     pub fn new(t: TermType, max_count: c_int, epsilon: f64) -> Self {
-        let c_criteria = unsafe { native::cv_term_criteria_new(t as i32, max_count, epsilon) };
+        let c_criteria = unsafe { native::cvsys_term_criteria_new(t as i32, max_count, epsilon) };
         TermCriteria { c_criteria: c_criteria }
     }
 }
@@ -636,7 +636,7 @@ impl TermCriteria {
 impl Drop for TermCriteria {
     fn drop(&mut self) {
         unsafe {
-            native::cv_term_criteria_drop(self.c_criteria);
+            native::cvsys_term_criteria_drop(self.c_criteria);
         }
     }
 }

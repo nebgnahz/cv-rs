@@ -10,7 +10,7 @@ use std::os::raw::c_int;
 /// Video capturing from video files, image sequences or cameras.
 #[derive(Debug)]
 pub struct VideoCapture {
-    inner: *mut native::cv_VideoCapture,
+    inner: *mut native::cvsys_VideoCapture,
 }
 
 unsafe impl Send for VideoCapture {}
@@ -105,7 +105,7 @@ impl VideoCapture {
     /// Creates a capture device with specified camera id. If there is a single
     /// camera connected, just pass 0.
     pub fn new(index: c_int) -> Self {
-        let cap = unsafe { native::cv_videocapture_new(index) };
+        let cap = unsafe { native::cvsys_videocapture_new(index) };
         VideoCapture { inner: cap }
     }
 
@@ -114,7 +114,7 @@ impl VideoCapture {
     /// samples like img_00.jpg, img_01.jpg, img_02.jpg, ...).
     pub fn from_path(path: &str) -> Self {
         let s = ::std::ffi::CString::new(path).unwrap();
-        let cap = unsafe { native::cv_videocapture_from_file((&s).as_ptr()) };
+        let cap = unsafe { native::cvsys_videocapture_from_file((&s).as_ptr()) };
         VideoCapture { inner: cap }
     }
 
@@ -122,13 +122,13 @@ impl VideoCapture {
     ///  gst-launch-1.0 v4l2src ! videoconvert ! appsink).
     pub fn from_pipeline(pipeline: &str) -> Self {
         let s = ::std::ffi::CString::new(pipeline).unwrap();
-        let cap = unsafe { native::cv_videocapture_from_gst_pipeline((&s).as_ptr()) };
+        let cap = unsafe { native::cvsys_videocapture_from_gst_pipeline((&s).as_ptr()) };
         VideoCapture { inner: cap }
     }
 
     /// Returns true if video capturing has been initialized already.
     pub fn is_open(&self) -> bool {
-        unsafe { native::cv_videocapture_is_opened(self.inner) }
+        unsafe { native::cvsys_videocapture_is_opened(self.inner) }
     }
 
     /// Grabs, decodes and returns the next video frame. `read` combines
@@ -140,7 +140,7 @@ impl VideoCapture {
     /// are no more frames in video file), the methods return `None`.
     pub fn read(&self) -> Option<Mat> {
         let mat = Mat::new();
-        let status = unsafe { native::cv_videocapture_read(self.inner, mat.inner) };
+        let status = unsafe { native::cvsys_videocapture_read(self.inner, mat.inner) };
         if status {
             Some(mat)
         } else {
@@ -150,12 +150,12 @@ impl VideoCapture {
 
     /// Sets a property in the `VideoCapture`.
     pub fn set(&self, property: CapProp, value: f64) -> bool {
-        unsafe { native::cv_videocapture_set(self.inner, property as i32, value) }
+        unsafe { native::cvsys_videocapture_set(self.inner, property as i32, value) }
     }
 
     /// Gets a property in the `VideoCapture`.
     pub fn get(&self, property: CapProp) -> Option<f64> {
-        let ret = unsafe { native::cv_videocapture_get(self.inner, property as i32) };
+        let ret = unsafe { native::cvsys_videocapture_get(self.inner, property as i32) };
         if ret != 0.0 {
             Some(ret)
         } else {
@@ -167,7 +167,7 @@ impl VideoCapture {
 impl Drop for VideoCapture {
     fn drop(&mut self) {
         unsafe {
-            native::cv_videocapture_drop(self.inner);
+            native::cvsys_videocapture_drop(self.inner);
         }
     }
 }
@@ -182,7 +182,7 @@ impl Drop for VideoCapture {
 /// -On MacOSX QTKit is used.
 #[derive(Debug)]
 pub struct VideoWriter {
-    inner: *mut native::cv_VideoWriter,
+    inner: *mut native::cvsys_VideoWriter,
 }
 
 impl VideoWriter {
@@ -199,7 +199,7 @@ impl VideoWriter {
     ///  currently supported on Windows only).
     pub fn new(path: &str, fourcc: c_int, fps: f64, frame_size: Size2i, is_color: bool) -> VideoWriter {
         let s = ::std::ffi::CString::new(path).unwrap();
-        let writer = unsafe { native::cv_videowriter_new((&s).as_ptr(), fourcc, fps, frame_size.into(), is_color) };
+        let writer = unsafe { native::cvsys_videowriter_new((&s).as_ptr(), fourcc, fps, frame_size.into(), is_color) };
         VideoWriter { inner: writer }
     }
 
@@ -216,29 +216,29 @@ impl VideoWriter {
     ///  currently supported on Windows only).
     pub fn open(&self, path: &str, fourcc: c_int, fps: f64, frame_size: Size2i, is_color: bool) -> bool {
         let s = ::std::ffi::CString::new(path).unwrap();
-        unsafe { native::cv_videowriter_open(self.inner, (&s).as_ptr(), fourcc, fps, frame_size.into(), is_color) }
+        unsafe { native::cvsys_videowriter_open(self.inner, (&s).as_ptr(), fourcc, fps, frame_size.into(), is_color) }
     }
 
     /// Writes the specified image to video file. It must have the same size as
     /// has been specified when opening the video writer.
     pub fn write(&self, mat: &Mat) {
-        unsafe { native::cv_videowriter_write(self.inner, mat.inner) }
+        unsafe { native::cvsys_videowriter_write(self.inner, mat.inner) }
     }
 
     /// Returns true if video writer has been initialized already.
     pub fn is_open(&self) -> bool {
-        unsafe { native::cv_videowriter_is_opened(self.inner) }
+        unsafe { native::cvsys_videowriter_is_opened(self.inner) }
     }
 
     /// Sets a property in the `VideoWriter`.
     /// Note: `VideoWriterProperty::FrameBytes` is read-only.
     pub fn set(&self, property: VideoWriterProperty, value: f64) -> bool {
-        unsafe { native::cv_videowriter_set(self.inner, property as i32, value) }
+        unsafe { native::cvsys_videowriter_set(self.inner, property as i32, value) }
     }
 
     /// Gets a property in the `VideoWriter`.
     pub fn get(&self, property: VideoWriterProperty) -> Option<f64> {
-        let ret = unsafe { native::cv_videowriter_get(self.inner, property as i32) };
+        let ret = unsafe { native::cvsys_videowriter_get(self.inner, property as i32) };
         if ret != 0.0 {
             Some(ret)
         } else {
@@ -250,7 +250,7 @@ impl VideoWriter {
 impl Default for VideoWriter {
     fn default() -> VideoWriter {
         VideoWriter {
-            inner: unsafe { native::cv_videowriter_default() },
+            inner: unsafe { native::cvsys_videowriter_default() },
         }
     }
 }
@@ -258,7 +258,7 @@ impl Default for VideoWriter {
 impl Drop for VideoWriter {
     fn drop(&mut self) {
         unsafe {
-            native::cv_videowriter_drop(self.inner);
+            native::cvsys_videowriter_drop(self.inner);
         }
     }
 }

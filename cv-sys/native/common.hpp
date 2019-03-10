@@ -81,7 +81,7 @@ struct CString {
 
     bool is_str() const;
 
-    const char* get_str() const ;
+    const char* get_str() const;
 };
 
 // Caller is responsible for disposing `error` field

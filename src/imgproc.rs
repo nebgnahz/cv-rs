@@ -226,7 +226,7 @@ impl Mat {
         shift: c_int,
     ) {
         unsafe {
-            native::cv_nat_line(
+            native::cvsys_nat_line(
                 self.inner,
                 pt1.into(),
                 pt2.into(),
@@ -245,7 +245,7 @@ impl Mat {
 
     /// Draws a rectangle with custom color, thickness and linetype.
     pub fn rectangle_custom(&self, rect: Rect, color: Scalar, thickness: c_int, linetype: LineType) {
-        unsafe { native::cv_nat_rectangle(self.inner, rect.into(), color.into(), thickness, linetype as i32) }
+        unsafe { native::cvsys_nat_rectangle(self.inner, rect.into(), color.into(), thickness, linetype as i32) }
     }
 
     /// Draw a simple, thick, or filled up-right rectangle.
@@ -265,7 +265,7 @@ impl Mat {
     /// ```
     pub fn ellipse(&self, center: Point2i, axes: Size2i, params: CircleParams) {
         unsafe {
-            native::cv_nat_ellipse(
+            native::cvsys_nat_ellipse(
                 self.inner,
                 center.into(),
                 axes.into(),
@@ -283,8 +283,8 @@ impl Mat {
     /// Convert an image from one color space to another.
     pub fn cvt_color(&self, code: ColorConversion) -> Mat {
         unsafe {
-            let m = native::cv_mat_new();
-            native::cv_cvt_color(self.inner, m, code as i32);
+            let m = native::cvsys_mat_new();
+            native::cvsys_cvt_color(self.inner, m, code as i32);
             Mat::from_raw(m)
         }
     }
@@ -293,8 +293,8 @@ impl Mat {
     /// downsampling step of the Gaussian pyramid construction.
     pub fn pyr_down(&self) -> Mat {
         unsafe { 
-            let m = native::cv_mat_new();
-            native::cv_pyr_down(self.inner, m);
+            let m = native::cvsys_mat_new();
+            native::cvsys_pyr_down(self.inner, m);
             Mat::from_raw(m)
         }
     }
@@ -302,8 +302,8 @@ impl Mat {
     /// Threshold
     pub fn threshold(&self, thresh: f64, maxval: f64, threshold_type: ThresholdType) -> Mat {
         unsafe {
-            let m = native::cv_mat_new();
-            native::cv_nat_threshold(self.inner, m, thresh, maxval, threshold_type as i32);
+            let m = native::cvsys_mat_new();
+            native::cvsys_nat_threshold(self.inner, m, thresh, maxval, threshold_type as i32);
             Mat::from_raw(m)
         }
     }
@@ -318,8 +318,8 @@ impl Mat {
         border_value: Scalar,
     ) -> Mat {
         unsafe {
-            let m = native::cv_mat_new();
-            native::cv_nat_erode(
+            let m = native::cvsys_mat_new();
+            native::cvsys_nat_erode(
                 self.inner,
                 m,
                 kernel.inner,
@@ -342,8 +342,8 @@ impl Mat {
         border_value: Scalar,
     ) -> Mat {
         unsafe {
-            let m = native::cv_mat_new();
-            native::cv_nat_dilate(
+            let m = native::cvsys_mat_new();
+            native::cvsys_nat_dilate(
                 self.inner,
                 m,
                 kernel.inner,
@@ -360,8 +360,8 @@ impl Mat {
     ///
     pub fn gaussian_blur(&self, dsize: Size2i, sigma_x: f64, sigma_y: f64, border_type: BorderType) -> Mat {
         unsafe {
-            let m = native::cv_mat_new();
-            native::cv_gaussian_blur(self.inner, m, dsize.into(), sigma_x, sigma_y, border_type as i32);
+            let m = native::cvsys_mat_new();
+            native::cvsys_gaussian_blur(self.inner, m, dsize.into(), sigma_x, sigma_y, border_type as i32);
             Mat::from_raw(m)
         }
     }
@@ -372,8 +372,8 @@ impl Mat {
     /// size.
     pub fn resize_to(&self, dsize: Size2i, interpolation: InterpolationFlag) -> Mat {
         unsafe {
-            let m = native::cv_mat_new();
-            native::cv_nat_resize(self.inner, m, dsize.into(), 0.0, 0.0, interpolation as i32);
+            let m = native::cvsys_mat_new();
+            native::cvsys_nat_resize(self.inner, m, dsize.into(), 0.0, 0.0, interpolation as i32);
             Mat::from_raw(m)
         }
     }
@@ -384,8 +384,8 @@ impl Mat {
     /// size.
     pub fn resize_by(&self, fx: f64, fy: f64, interpolation: InterpolationFlag) -> Mat {
         unsafe {
-            let m = native::cv_mat_new();
-            native::cv_nat_resize(self.inner, m, Size2i::default().into(), fx, fy, interpolation as i32);
+            let m = native::cvsys_mat_new();
+            native::cvsys_nat_resize(self.inner, m, Size2i::default().into(), fx, fy, interpolation as i32);
             Mat::from_raw(m)
         }
     }
@@ -399,11 +399,11 @@ impl Mat {
         ranges: M,
     ) -> Mat {
         unsafe {
-            let m = native::cv_mat_new();
+            let m = native::cvsys_mat_new();
             let channels = channels.as_ref();
             let hist_size = hist_size.as_ref();
             let ranges = Self::matrix_to_vec(ranges);
-            native::cv_calc_hist(
+            native::cvsys_calc_hist(
                 self.inner,
                 1,
                 channels.as_ptr(),
@@ -426,9 +426,9 @@ impl Mat {
         ranges: M,
     ) -> Mat {
         unsafe {
-            let m = native::cv_mat_new();
+            let m = native::cvsys_mat_new();
             let ranges = Self::matrix_to_vec(ranges);
-            native::cv_calc_back_project(
+            native::cvsys_calc_back_project(
                 self.inner,
                 1,
                 channels.as_ref().as_ptr(),
@@ -451,7 +451,7 @@ impl Mat {
     /// consider using the cv::EMD function.
     pub fn compare_hist(&self, other: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
         let mut r: native::Result<f64> = unsafe { std::mem::zeroed() };
-        unsafe { native::cv_compare_hist(self.inner, other.inner, method as i32, &mut r) }
+        unsafe { native::cvsys_compare_hist(self.inner, other.inner, method as i32, &mut r) }
         r.into()
     }
 
@@ -465,7 +465,7 @@ impl Mat {
     ) -> Result<Mat, String> {
         let edges = Mat::new();
         let result = unsafe {
-            native::cv_canny(
+            native::cvsys_canny(
                 self.inner,
                 edges.inner,
                 threshold1,
