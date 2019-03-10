@@ -72,12 +72,21 @@ fn main() {
     let dst = config.build();
 
     // Link cvsys.
-    println!("cargo:rustc-link-search=native={}", dst.join("build").join("Debug").display());
+    println!(
+        "cargo:rustc-link-search=native={}",
+        dst.join("build").join("Debug").display()
+    );
     println!("cargo:rustc-link-lib=static=cvsys");
 
-    let bindings = Builder::default().rustfmt_bindings(true).whitelist_function("cvsys::.*").whitelist_type("cvsys::.*")
-        .opaque_type("cv::.*").opaque_type("std::.*")
-        .blacklist_function("cv::.*").blacklist_function("std::.*");
+    let bindings = Builder::default()
+        .rustfmt_bindings(true)
+        .whitelist_recursively(false)
+        .whitelist_function("cvsys::.*")
+        .whitelist_type("cvsys::.*")
+        .opaque_type("cv::.*")
+        .opaque_type("std::.*")
+        .whitelist_type("cv::MouseCallback")
+        .whitelist_type("cv::text::classifier_type");
     let bindings = bindings.clang_args(core_modules.iter().map(|lib| {
         format!(
             "-I{}",
