@@ -5,7 +5,6 @@
 #include <opencv2/core.hpp>
 #include <opencv2/text/ocr.hpp>
 
-extern "C" {
 void cv_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
                 cv::Mat& image,
                 CString* output_text,
@@ -26,6 +25,5 @@ void cv_hmm_new(const char* classifier_filename,
 void cv_hmm_drop(cv::Ptr<cv::text::OCRHMMDecoder>* ocr);
 void cv_holistic_new(const char* archive_file, const char* weights_file, const char* words_file, Result<void*>* result);
 void cv_holistic_drop(cv::Ptr<cv::text::OCRHolisticWordRecognizer>* ocr);
-}
 
 #endif  // CV_RS_TEXT_H

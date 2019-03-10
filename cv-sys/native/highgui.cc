@@ -1,7 +1,5 @@
 #include "highgui.hpp"
 
-extern "C" {
-
 void cv_nat_named_window(const char* const winname, int flags) {
     cv::namedWindow(winname, flags);
 }
@@ -22,5 +20,4 @@ void cv_nat_imshow(const char* const winname, cv::Mat* mat) {
 
 int cv_nat_wait_key(int delay) {
     return cv::waitKey(delay);
-}
 }

@@ -4,8 +4,6 @@
 #include "common.hpp"
 #include <opencv2/objdetect.hpp>
 
-extern "C" {
-
 cv::CascadeClassifier* cv_cascade_classifier_new();
 cv::CascadeClassifier* cv_cascade_classifier_from_path(const char* const path);
 bool cv_cascade_classifier_load(cv::CascadeClassifier* cc, const char* const path);
@@ -34,6 +32,5 @@ void cv_hog_detect(cv::HOGDescriptor*,
                    double scale,
                    double final_threshold,
                    bool use_means_shift);
-}
 
 #endif  // CV_RS_OBJDETECT_H

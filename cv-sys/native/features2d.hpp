@@ -5,8 +5,6 @@
 #include <opencv2/core.hpp>
 #include <opencv2/features2d.hpp>
 
-extern "C" {
-
 // =============================================================================
 //   MSER
 // =============================================================================
@@ -56,6 +54,5 @@ cv::BOWKMeansTrainer* cv_bow_trainer_new(int clusterCount, const cv::TermCriteri
 void cv_bow_trainer_drop(cv::BOWKMeansTrainer* trainer);
 void cv_bow_trainer_add(cv::BOWKMeansTrainer& trainer, cv::Mat& descriptors);
 cv::Mat* cv_bow_trainer_cluster(cv::BOWKMeansTrainer& trainer);
-}
 
 #endif  // CV_RS_FEATURES2D_H

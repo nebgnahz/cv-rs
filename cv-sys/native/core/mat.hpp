@@ -6,8 +6,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-extern "C" {
-
 cv::Mat* cv_mat_from_file_storage(const char* path, const char* section);
 cv::Mat* cv_mat_new();
 cv::Mat* cv_mat_new_with_size(int rows, int cols, int type);
@@ -46,6 +44,5 @@ void cv_mat_copy_make_border(const cv::Mat* const src1,
                              int right,
                              int borderType,
                              Scalar value);
-}
 
 #endif  // CV_RS_MAT_H

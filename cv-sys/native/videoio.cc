@@ -1,7 +1,5 @@
 #include "videoio.hpp"
 
-extern "C" {
-
 cv::VideoCapture* cv_videocapture_new(int index) {
     return new cv::VideoCapture(index);
 }
@@ -70,5 +68,4 @@ bool cv_videowriter_set(cv::VideoWriter* writer, int property, double value) {
 
 double cv_videowriter_get(cv::VideoWriter* writer, int property) {
     return writer->get(property);
-}
 }

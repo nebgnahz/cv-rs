@@ -3,8 +3,6 @@
 #include "cudaobjdetect.hpp"
 #include "utils.hpp"
 
-extern "C" {
-
 // =============================================================================
 //   Basic
 // =============================================================================
@@ -226,5 +224,4 @@ Size2i cv_cuda_cascade_get_min_object_size(cv::Ptr<cv::cuda::CascadeClassifier>*
 
 double cv_cuda_cascade_get_scale_factor(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
     return (*cascade)->getScaleFactor();
-}
 }

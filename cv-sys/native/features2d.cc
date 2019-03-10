@@ -1,8 +1,6 @@
 #include "features2d.hpp"
 #include "utils.hpp"
 
-extern "C" {
-
 cv::Ptr<cv::MSER>* cv_mser_new(int delta,
                                int min_area,
                                int max_area,
@@ -122,5 +120,4 @@ cv::Mat* cv_bow_trainer_cluster(cv::BOWKMeansTrainer& trainer) {
     cv::Mat* mat = new cv::Mat();
     *mat = trainer.cluster();
     return (mat);
-}
 }

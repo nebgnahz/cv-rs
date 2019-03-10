@@ -1,7 +1,5 @@
 #include "imgcodecs.hpp"
 
-extern "C" {
-
 cv::Mat* cv_nat_imread(const char* const filename, int flags) {
     cv::Mat* image = new cv::Mat();
     *image = cv::imread(filename, flags);
@@ -30,5 +28,4 @@ void cv_nat_imencode(const char* const ext,
     } else {
         *result = COption<CVec<uint8_t>>{false, CVec<uint8_t>()};
     }
-}
 }

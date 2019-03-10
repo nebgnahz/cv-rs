@@ -1,7 +1,5 @@
 #include "video.hpp"
 
-extern "C" {
-
 cv::TermCriteria* cv_term_criteria_new(int type, int count, double epsilon) {
     return new cv::TermCriteria(type, count, epsilon);
 }
@@ -21,5 +19,4 @@ RotatedRect cv_camshift(cv::Mat* bp_image, Rect crect, cv::TermCriteria* criteri
     c_rr.size.height = rr.size.height;
     c_rr.angle = rr.angle;
     return c_rr;
-}
 }

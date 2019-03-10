@@ -5,8 +5,6 @@
 #include <opencv2/cudaobjdetect.hpp>
 #include <stddef.h>
 
-extern "C" {
-
 // =============================================================================
 //   Basic
 // =============================================================================
@@ -65,6 +63,5 @@ int cv_cuda_cascade_get_min_neighbors(cv::Ptr<cv::cuda::CascadeClassifier>*);
 Size2i cv_cuda_cascade_get_max_object_size(cv::Ptr<cv::cuda::CascadeClassifier>*);
 Size2i cv_cuda_cascade_get_min_object_size(cv::Ptr<cv::cuda::CascadeClassifier>*);
 double cv_cuda_cascade_get_scale_factor(cv::Ptr<cv::cuda::CascadeClassifier>*);
-}
 
 #endif  // OPENCV_GPU_H_

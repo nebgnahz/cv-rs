@@ -1,8 +1,6 @@
 #include "objdetect.hpp"
 #include "utils.hpp"
 
-extern "C" {
-
 cv::CascadeClassifier* cv_cascade_classifier_new() {
     return new cv::CascadeClassifier();
 }
@@ -94,5 +92,4 @@ void cv_hog_detect(cv::HOGDescriptor* hog,
     // Prepare the results
     cv_to_ffi(objects, vec_rect);
     cv_to_ffi(weights, vec_weight);
-}
 }

@@ -1,8 +1,6 @@
 #include <opencv2/core.hpp>
 #include <opencv2/img_hash.hpp>
 
-extern "C" {
-
 void cv_hash_compute(cv::Ptr<cv::img_hash::PHash>* hash, cv::Mat& mat, cv::Mat& result) {
     hash->get()->compute(mat, result);
 }
@@ -68,5 +66,4 @@ cv::Ptr<cv::img_hash::RadialVarianceHash>* cv_radial_variance_hash_new() {
 void cv_radial_variance_hash_drop(cv::Ptr<cv::img_hash::RadialVarianceHash>* hash) {
     delete hash;
     hash = nullptr;
-}
 }

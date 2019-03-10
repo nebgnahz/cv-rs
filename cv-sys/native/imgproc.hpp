@@ -5,8 +5,6 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 
-extern "C" {
-
 void cv_nat_line(cv::Mat* mat, Point2i pt1, Point2i pt2, Scalar color, int thickness, int linetype, int shift);
 void cv_nat_rectangle(cv::Mat* mat, Rect crect, Scalar color, int thickness, int linetype);
 void cv_nat_ellipse(cv::Mat* mat,
@@ -46,6 +44,6 @@ void cv_calc_back_project(const cv::Mat* images,
 void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result);
 EmptyResult
 cv_canny(cv::Mat* image, cv::Mat* edges, double threshold1, double threshold2, int aperture_size, bool l2_gradient);
-}
+
 
 #endif  // CV_RS_IMGPROC_H

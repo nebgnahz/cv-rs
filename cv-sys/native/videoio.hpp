@@ -4,8 +4,6 @@
 #include "common.hpp"
 #include <opencv2/videoio.hpp>
 
-extern "C" {
-
 cv::VideoCapture* cv_videocapture_new(int index);
 cv::VideoCapture* cv_videocapture_from_file(const char* const filename);
 cv::VideoCapture* cv_videocapture_from_gst_pipeline(const char* const pipeline);
@@ -24,5 +22,5 @@ bool cv_videowriter_is_opened(cv::VideoWriter* writer);
 void cv_videowriter_write(cv::VideoWriter* writer, cv::Mat* mat);
 bool cv_videowriter_set(cv::VideoWriter* writer, int property, double value);
 double cv_videowriter_get(cv::VideoWriter* writer, int property);
-}
+
 #endif  // CV_RS_VIDEOIO_H

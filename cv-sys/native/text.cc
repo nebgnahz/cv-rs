@@ -1,7 +1,6 @@
 #include "text.hpp"
 #include "utils.hpp"
 
-extern "C" {
 void cv_ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
                 cv::Mat& image,
                 CString* output_text,
@@ -75,5 +74,4 @@ void cv_holistic_new(const char* archive_file,
 void cv_holistic_drop(cv::Ptr<cv::text::OCRHolisticWordRecognizer>* ocr) {
     delete ocr;
     ocr = nullptr;
-}
 }

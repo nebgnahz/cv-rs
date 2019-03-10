@@ -1,7 +1,5 @@
 #include "imgproc.hpp"
 
-extern "C" {
-
 void cv_nat_line(cv::Mat* mat, Point2i pt1, Point2i pt2, Scalar color, int thickness, int linetype, int shift) {
     cv::Point point1(pt1.x, pt1.y);
     cv::Point point2(pt2.x, pt2.y);
@@ -98,5 +96,4 @@ cv_canny(cv::Mat* image, cv::Mat* edges, double threshold1, double threshold2, i
     return EmptyResult::FromFunction([image, edges, threshold1, threshold2, aperture_size, l2_gradient]() {
         cv::Canny(*image, *edges, threshold1, threshold2, aperture_size, l2_gradient);
     });
-}
 }

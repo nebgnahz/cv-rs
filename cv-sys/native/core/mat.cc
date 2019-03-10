@@ -1,7 +1,5 @@
 #include "mat.hpp"
 
-extern "C" {
-
 cv::Mat* cv_mat_from_file_storage(const char* path, const char* section) {
     auto result = new cv::Mat();
     cv::FileStorage fs(path, cv::FileStorage::READ);
@@ -157,5 +155,4 @@ void cv_mat_copy_make_border(
     const cv::Mat* const src, cv::Mat* const d, int t, int b, int l, int r, int type, Scalar color) {
     cv::Scalar c(color.v0, color.v1, color.v2, color.v3);
     copyMakeBorder(*src, *d, t, b, l, r, type, c);
-}
 }

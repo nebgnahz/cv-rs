@@ -5,8 +5,6 @@
 #include <opencv2/core.hpp>
 #include <opencv2/xfeatures2d.hpp>
 
-extern "C" {
-
 // =============================================================================
 //   SURF
 // =============================================================================
@@ -34,6 +32,5 @@ void cv_sift_detect_and_compute(cv::Ptr<cv::xfeatures2d::SIFT>* detector,
                                 CVec<KeyPoint>* keypoints,
                                 cv::Mat* descriptors,
                                 bool useProvidedKeypoints);
-}
 
 #endif  // CV_RS_XFEATURES2D_H

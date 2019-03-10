@@ -1,7 +1,5 @@
 #include "common-rust.hpp"
 
-extern "C" {
-
 void cv_vec_drop(CVec<void>* vec, unsigned int depth) {
     if (vec->array != nullptr) {
         if (depth > 1) {
@@ -19,5 +17,4 @@ void cv_vec_drop(CVec<void>* vec, unsigned int depth) {
 void c_drop(void* value) {
     free(value);
     value = nullptr;
-}
 }
