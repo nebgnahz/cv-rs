@@ -4,25 +4,29 @@
 #include <opencv2/core.hpp>
 #include <opencv2/img_hash.hpp>
 
-void cvsys_hash_compute(cv::Ptr<cv::img_hash::ImgHashBase>* phash, cv::Mat& mat, cv::Mat& result);
-double cvsys_hash_compare(cv::Ptr<cv::img_hash::ImgHashBase>* phash, cv::Mat& lhs, cv::Mat& rhs);
+namespace cvsys {
 
-cv::Ptr<cv::img_hash::AverageHash>* cvsys_average_hash_new();
-void cvsys_average_hash_drop(cv::Ptr<cv::img_hash::AverageHash>* phash);
+void hash_compute(cv::Ptr<cv::img_hash::ImgHashBase>* phash, cv::Mat& mat, cv::Mat& result);
+double hash_compare(cv::Ptr<cv::img_hash::ImgHashBase>* phash, cv::Mat& lhs, cv::Mat& rhs);
 
-cv::Ptr<cv::img_hash::BlockMeanHash>* cvsys_block_mean_hash_new();
-void cvsys_block_mean_hash_drop(cv::Ptr<cv::img_hash::BlockMeanHash>* phash);
+cv::Ptr<cv::img_hash::AverageHash>* average_hash_new();
+void average_hash_drop(cv::Ptr<cv::img_hash::AverageHash>* phash);
 
-cv::Ptr<cv::img_hash::ColorMomentHash>* cvsys_color_moment_hash_new();
-void cvsys_color_moment_hash_drop(cv::Ptr<cv::img_hash::ColorMomentHash>* phash);
+cv::Ptr<cv::img_hash::BlockMeanHash>* block_mean_hash_new();
+void block_mean_hash_drop(cv::Ptr<cv::img_hash::BlockMeanHash>* phash);
 
-cv::Ptr<cv::img_hash::MarrHildrethHash>* cvsys_marr_hildreth_hash_new();
-void cvsys_marr_hildreth_hash_drop(cv::Ptr<cv::img_hash::MarrHildrethHash>* phash);
+cv::Ptr<cv::img_hash::ColorMomentHash>* color_moment_hash_new();
+void color_moment_hash_drop(cv::Ptr<cv::img_hash::ColorMomentHash>* phash);
 
-cv::Ptr<cv::img_hash::PHash>* cvsys_phash_new();
-void cvsys_phash_drop(cv::Ptr<cv::img_hash::PHash>* phash);
+cv::Ptr<cv::img_hash::MarrHildrethHash>* marr_hildreth_hash_new();
+void marr_hildreth_hash_drop(cv::Ptr<cv::img_hash::MarrHildrethHash>* phash);
 
-cv::Ptr<cv::img_hash::RadialVarianceHash>* cvsys_radial_variance_hash_new();
-void cvsys_radial_variance_hash_drop(cv::Ptr<cv::img_hash::RadialVarianceHash>* phash);
+cv::Ptr<cv::img_hash::PHash>* phash_new();
+void phash_drop(cv::Ptr<cv::img_hash::PHash>* phash);
+
+cv::Ptr<cv::img_hash::RadialVarianceHash>* radial_variance_hash_new();
+void radial_variance_hash_drop(cv::Ptr<cv::img_hash::RadialVarianceHash>* phash);
+
+}  // namespace cvsys
 
 #endif

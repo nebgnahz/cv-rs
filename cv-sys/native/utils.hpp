@@ -6,14 +6,16 @@
 
 #include "common.hpp"
 
-void cvsys_to_ffi(const cv::Rect& source, Rect* dest);
-void cvsys_to_ffi(const cv::Point& source, Point2i* dest);
-void cvsys_to_ffi(const cv::KeyPoint& source, KeyPoint* dest);
-void cvsys_to_ffi(const cv::DMatch& source, DMatch* dest);
-void cvsys_to_ffi(const std::string& source, CString* dest);
+namespace cvsys {
+
+void to_ffi(const cv::Rect& source, Rect* dest);
+void to_ffi(const cv::Point& source, Point2i* dest);
+void to_ffi(const cv::KeyPoint& source, KeyPoint* dest);
+void to_ffi(const cv::DMatch& source, DMatch* dest);
+void to_ffi(const std::string& source, CString* dest);
 
 template <typename T>
-void cvsys_to_ffi(const std::vector<T>& source, CVec<T>* dest) {
+void to_ffi(const std::vector<T>& source, CVec<T>* dest) {
     size_t num = source.size();
     dest->size = num;
     dest->array = (T*) malloc(num * sizeof(T));
@@ -21,12 +23,12 @@ void cvsys_to_ffi(const std::vector<T>& source, CVec<T>* dest) {
 }
 
 template <typename T, typename U>
-void cvsys_to_ffi(const std::vector<T>& source, CVec<U>* dest) {
+void to_ffi(const std::vector<T>& source, CVec<U>* dest) {
     size_t num = source.size();
     dest->size = num;
     dest->array = (U*) malloc(num * sizeof(U));
     for (size_t i = 0; i < num; i++) {
-        cvsys_to_ffi(source[i], &dest->array[i]);
+        to_ffi(source[i], &dest->array[i]);
     }
 }
 
@@ -41,4 +43,7 @@ void ffi_to_cv(const CVec<U*>& source, std::vector<T>* dest) {
         dest->push_back(*cell);
     }
 }
+
+}  // namespace cvsys
+
 #endif  // UTILS_H_

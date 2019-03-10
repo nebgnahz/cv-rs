@@ -1,5 +1,7 @@
 #include "common.hpp"
 
+namespace cvsys {
+
 bool CString::is_str() const {
     return value != nullptr;
 }
@@ -7,3 +9,5 @@ bool CString::is_str() const {
 const char* CString::get_str() const {
     return value;
 }
+
+}  // namespace cvsys

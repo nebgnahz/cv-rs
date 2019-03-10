@@ -3,7 +3,11 @@
 
 #include "common.hpp"
 
-void cvsys_vec_drop(CVec<void>* vec, unsigned int depth);
+namespace cvsys {
+
+void vec_drop(CVec<void>* vec, unsigned int depth);
 void c_drop(void* value);
+
+}  // namespace cvsys
 
 #endif  // CV_RS_COMMON_RUST_H

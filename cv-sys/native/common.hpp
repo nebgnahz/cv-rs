@@ -5,6 +5,8 @@
 #include <functional>
 #include <opencv2/core.hpp>
 
+namespace cvsys {
+
 typedef struct {
     int x;
     int y;
@@ -130,4 +132,7 @@ struct COption {
     bool hasValue;
     T value;
 };
+
+}  // namespace cvsys
+
 #endif  // CV_RS_COMMON_H
