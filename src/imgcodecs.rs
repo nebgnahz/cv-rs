@@ -139,6 +139,6 @@ impl Mat {
         let path = path_to_cstring(path)?;
         let path = path.as_ptr();
         let result = unsafe { native::cvsys_nat_imread(path, flags as i32) };
-        Ok(unsafe { Mat::from_raw(result) } )
+        Ok(unsafe { Mat::from_raw(result) })
     }
 }

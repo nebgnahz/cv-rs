@@ -9,6 +9,11 @@ use std::ffi::OsString;
 use itertools::Itertools;
 
 fn main() {
+    let (configuration, lib_postfix) = match env!("PROFILE") {
+        "debug" => ("Debug", "d"),
+        "release" => ("Release", ""),
+    };
+
     let mut core_modules = vec![
         "core",
         "features2d",
@@ -22,7 +27,7 @@ fn main() {
     ];
 
     // Add associated CUDA files if the `cuda` feature is enabled.
-    if env::var("CARGO_FEATURE_CUDA").is_ok() {
+    if option_env!("CARGO_FEATURE_CUDA").is_some() {
         core_modules.push("cudaobjdetect");
     }
 
@@ -57,7 +62,7 @@ fn main() {
         .define("BUILD_opencv_js", "OFF")
         .define("BUILD_opencv_python_bindings_generator", "OFF")
         .define("BUILD_SHARED_LIBS", "OFF")
-        .define("CMAKE_BUILD_TYPE", "RELEASE")
+        .define("CMAKE_BUILD_TYPE", configuration.to_ascii_uppercase())
         .define("INSTALL_PYTHON_EXAMPLES", "OFF")
         .define("INSTALL_C_EXAMPLES", "OFF")
         .define("OPENCV_ENABLE_NONFREE", "ON")
@@ -103,7 +108,7 @@ fn main() {
     // This is generated in the CMakeLists.txt.
     let libs_list: Vec<PathBuf> = std::fs::read_to_string(dst.join("build").join("link_libs_list.txt"))
         .expect("CMakeLists.txt didn't produce libs list")
-        .replace("$(Configuration)", "Debug")
+        .replace("$(Configuration)", configuration)
         .split(';').map(Into::into).collect();
     
     // This contains the raw lib names.
@@ -121,7 +126,7 @@ fn main() {
     // Link cvsys.
     println!(
         "cargo:rustc-link-search={}",
-        dst.join("build").join("Debug").display()
+        dst.join("build").join(configuration).display()
     );
     println!("cargo:rustc-link-lib=static=cvsys");
 
@@ -134,7 +139,7 @@ fn main() {
     }
 
     for libname in deduped_lib_names {
-        println!("cargo:rustc-link-lib=static={}d", libname.to_str().expect("OpenCV lib names must be valid UTF-8"));
+        println!("cargo:rustc-link-lib=static={}{}", libname.to_str().expect("OpenCV lib names must be valid UTF-8"), lib_postfix);
     }
 
     let bindings = Builder::default()

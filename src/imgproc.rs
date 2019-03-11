@@ -292,7 +292,7 @@ impl Mat {
     /// Blurs an image and downsamples it. This function performs the
     /// downsampling step of the Gaussian pyramid construction.
     pub fn pyr_down(&self) -> Mat {
-        unsafe { 
+        unsafe {
             let m = native::cvsys_mat_new();
             native::cvsys_pyr_down(self.inner, m);
             Mat::from_raw(m)
