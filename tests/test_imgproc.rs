@@ -71,6 +71,7 @@ fn get_image_histogram(path: &'static str) -> Mat {
 }
 
 #[test]
+#[ignore]
 fn canny_edge_detection() {
     let lenna = utils::load_lenna();
     let edges = lenna.canny(70.0, 140.0, 3, false);
