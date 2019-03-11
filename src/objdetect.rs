@@ -20,7 +20,7 @@ pub trait ObjectDetect {
 /// Cascade classifier class for object detection.
 #[derive(Debug)]
 pub struct CascadeClassifier {
-    inner: *mut native::cvsys_CascadeClassifier,
+    inner: *mut native::cv_CascadeClassifier,
 }
 
 impl ObjectDetect for CascadeClassifier {
@@ -85,7 +85,7 @@ impl CascadeClassifier {
         min_size: Size2i,
         max_size: Size2i,
     ) -> Vec<Rect> {
-        let mut c_result: native::CVec<native::Rect> = unsafe { std::mem::zeroed() };
+        let mut c_result: native::cvsys_CVec<native::cvsys_Rect> = unsafe { std::mem::zeroed() };
         unsafe {
             native::cvsys_cascade_classifier_detect(
                 self.inner,
@@ -122,7 +122,7 @@ impl Drop for CascadeClassifier {
 #[derive(Debug)]
 pub struct SvmDetector {
     /// Pointer to the inner data structure
-    pub(crate) inner: *mut native::std_vector,
+    pub(crate) inner: *mut [u64; 3],
 }
 
 impl SvmDetector {
@@ -264,7 +264,7 @@ impl Default for HogParams {
 /// `HogDescriptor` implements Histogram of Oriented Gradients.
 #[derive(Debug)]
 pub struct HogDescriptor {
-    inner: *mut native::cvsys_HOGDescriptor,
+    inner: *mut native::cv_HOGDescriptor,
 
     /// Hog parameters.
     pub params: HogParams,
@@ -281,8 +281,8 @@ impl Default for HogDescriptor {
 
 impl ObjectDetect for HogDescriptor {
     fn detect(&self, image: &Mat) -> Vec<(Rect, f64)> {
-        let mut detected: native::CVec<native::Rect> = unsafe { std::mem::zeroed() };
-        let mut weights: native::CVec<c_double> = unsafe { std::mem::zeroed() };
+        let mut detected: native::cvsys_CVec<native::cvsys_Rect> = unsafe { std::mem::zeroed() };
+        let mut weights: native::cvsys_CVec<c_double> = unsafe { std::mem::zeroed() };
         unsafe {
             native::cvsys_hog_detect(
                 self.inner,

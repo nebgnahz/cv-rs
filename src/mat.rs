@@ -16,7 +16,7 @@ use *;
 #[derive(Debug)]
 pub struct Mat {
     /// Pointer to the actual C/C++ data structure
-    pub(crate) inner: *mut native::cvsys_Mat,
+    pub(crate) inner: *mut native::cv_Mat,
 
     /// Number of columns
     pub cols: c_int,
@@ -40,13 +40,13 @@ impl Mat {
         let path = path.as_ptr();
         let section = section.as_ptr();
         let result = unsafe { native::cvsys_mat_from_file_storage(path, section) };
-        Ok(unsafe { Mat::from_raw(result) } )
+        Ok(unsafe { Mat::from_raw(result) })
     }
 
     #[inline]
     /// Creates a `Mat` object from raw `CMat` pointer. This will read the rows
     /// and cols of the image.
-    pub(crate) unsafe fn from_raw(raw: *mut native::cvsys_Mat) -> Mat {
+    pub(crate) unsafe fn from_raw(raw: *mut native::cv_Mat) -> Mat {
         Mat {
             inner: raw,
             rows: native::cvsys_mat_rows(raw),

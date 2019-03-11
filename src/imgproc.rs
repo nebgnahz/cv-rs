@@ -450,7 +450,7 @@ impl Mat {
     /// To compare such histograms or more general sparse configurations of weighted points,
     /// consider using the cv::EMD function.
     pub fn compare_hist(&self, other: &Mat, method: HistogramComparisionMethod) -> Result<f64, String> {
-        let mut r: native::Result<f64> = unsafe { std::mem::zeroed() };
+        let mut r: native::cvsys_Result<f64> = unsafe { std::mem::zeroed() };
         unsafe { native::cvsys_compare_hist(self.inner, other.inner, method as i32, &mut r) }
         r.into()
     }

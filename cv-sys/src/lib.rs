@@ -3,7 +3,6 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(clippy::all)]
-#![allow(all)]
 
 use std::ffi::CStr;
 use std::iter::FromIterator;
@@ -24,6 +23,53 @@ pub enum cv_KeyPoint {}
 pub enum cv_Point {}
 pub enum cv_Rect {}
 pub enum std_string {}
+
+impl Clone for cvsys_Point2i {
+    fn clone(&self) -> Self {
+        Self { x: self.x, y: self.y }
+    }
+}
+
+impl Clone for cvsys_Point2f {
+    fn clone(&self) -> Self {
+        Self { x: self.x, y: self.y }
+    }
+}
+
+impl Clone for cvsys_Rect {
+    fn clone(&self) -> Self {
+        Self {
+            x: self.x,
+            y: self.y,
+            width: self.width,
+            height: self.height,
+        }
+    }
+}
+
+impl Clone for cvsys_DMatch {
+    fn clone(&self) -> Self {
+        Self {
+            distance: self.distance,
+            imgIdx: self.imgIdx,
+            queryIdx: self.queryIdx,
+            trainIdx: self.trainIdx,
+        }
+    }
+}
+
+impl Clone for cvsys_KeyPoint {
+    fn clone(&self) -> Self {
+        Self {
+            pt: self.pt.clone(),
+            size: self.size,
+            angle: self.angle,
+            response: self.response,
+            octave: self.octave,
+            class_id: self.class_id,
+        }
+    }
+}
 
 impl From<cvsys_EmptyResult> for Result<(), String> {
     fn from(e: cvsys_EmptyResult) -> Self {

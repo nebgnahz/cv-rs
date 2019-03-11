@@ -7,7 +7,7 @@ use *;
 /// Speeded up robust features extractor.
 #[derive(Debug)]
 pub struct SURF {
-    value: *mut native::cvsys_Ptr<native::cvsys_xfeatures2d_SURF>,
+    value: *mut u8,
 }
 
 impl SURF {
@@ -83,9 +83,16 @@ impl Into<SURF> for SURFBuilder {
 impl Feature2D for SURF {
     fn detect_and_compute(&self, image: &Mat, mask: &Mat) -> (Vec<KeyPoint>, Mat) {
         unsafe {
-            let mut keypoints: native::CVec<native::KeyPoint> = std::mem::zeroed();
+            let mut keypoints: native::cvsys_CVec<native::cvsys_KeyPoint> = std::mem::zeroed();
             let descriptors = native::cvsys_mat_new();
-            native::cvsys_surf_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
+            native::cvsys_surf_detect_and_compute(
+                self.value,
+                image.inner,
+                mask.inner,
+                &mut keypoints,
+                descriptors,
+                false,
+            );
             (keypoints.into(), Mat::from_raw(descriptors))
         }
     }

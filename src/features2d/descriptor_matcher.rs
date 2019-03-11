@@ -13,8 +13,8 @@ pub struct DMatch {
     train_idx: i32,
 }
 
-impl From<native::DMatch> for DMatch {
-    fn from(n: native::DMatch) -> Self {
+impl From<native::cvsys_DMatch> for DMatch {
+    fn from(n: native::cvsys_DMatch) -> Self {
         Self {
             distance: n.distance,
             img_idx: n.imgIdx,
@@ -50,7 +50,7 @@ impl DescriptorMatcherType {
 /// Type for matching keypoint descriptors
 #[derive(Debug)]
 pub struct DescriptorMatcher<'a> {
-    value: *mut native::cvsys_Ptr<native::cvsys_DescriptorMatcher>,
+    value: *mut [u64; 2],
     phantom: PhantomData<&'a ()>,
 }
 
@@ -93,7 +93,7 @@ impl<'a> DescriptorMatcher<'a> {
 
     /// Finds the best match for each descriptor from a query set
     pub fn match_(&self, query_descriptors: &Mat) -> Vec<DMatch> {
-        let mut matches: native::CVec<native::DMatch> = unsafe { std::mem::zeroed() };
+        let mut matches: native::cvsys_CVec<native::cvsys_DMatch> = unsafe { std::mem::zeroed() };
         unsafe {
             native::cvsys_matcher_match(self.value, query_descriptors.inner, &mut matches);
         }
@@ -103,7 +103,7 @@ impl<'a> DescriptorMatcher<'a> {
     /// Finds the best match for each descriptor from a query set.
     /// Unlike `match_`, train descriptors collection are passed directly
     pub fn match_two(&self, query_descriptors: &Mat, train_descriptors: &Mat) -> Vec<DMatch> {
-        let mut matches: native::CVec<native::DMatch> = unsafe { std::mem::zeroed() };
+        let mut matches: native::cvsys_CVec<native::cvsys_DMatch> = unsafe { std::mem::zeroed() };
         unsafe {
             native::cvsys_matcher_match_two(
                 self.value,
@@ -117,11 +117,16 @@ impl<'a> DescriptorMatcher<'a> {
 
     /// Finds the k best matches for each descriptor from a query set.
     pub fn knn_match(&self, query_descriptors: &Mat, k: usize) -> Vec<Vec<DMatch>> {
-        let mut matches: native::CVec<native::CVec<native::DMatch>> = unsafe { std::mem::zeroed() };
+        let mut matches: native::cvsys_CVec<native::cvsys_CVec<native::cvsys_DMatch>> = unsafe { std::mem::zeroed() };
         unsafe {
             native::cvsys_matcher_knn_match(self.value, query_descriptors.inner, k as c_int, &mut matches);
         }
-        let matches: Vec<native::CVec<native::DMatch>> = matches.into();
-        matches.into_iter().map(Into::into).collect()
+        let match_conv = |matches: native::cvsys_CVec<native::cvsys_CVec<native::cvsys_DMatch>>| {
+            matches
+                .iter()
+                .map(|inner| inner.iter().cloned().map(Into::into).collect())
+                .collect()
+        };
+        match_conv(matches)
     }
 }

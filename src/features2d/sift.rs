@@ -7,7 +7,7 @@ use *;
 /// Speeded up robust features extractor.
 #[derive(Debug)]
 pub struct SIFT {
-    value: *mut native::cvsys_Ptr<native::cvsys_xfeatures2d_SIFT>,
+    value: *mut u8,
 }
 
 impl SIFT {
@@ -19,7 +19,8 @@ impl SIFT {
         edge_threshold: f64,
         sigma: f64,
     ) -> Self {
-        let sift = unsafe { native::cvsys_sift_new(features, octave_layers, contrast_threshold, edge_threshold, sigma) };
+        let sift =
+            unsafe { native::cvsys_sift_new(features, octave_layers, contrast_threshold, edge_threshold, sigma) };
         SIFT { value: sift }
     }
 }
@@ -89,9 +90,16 @@ impl Into<SIFT> for SIFTBuilder {
 impl Feature2D for SIFT {
     fn detect_and_compute(&self, image: &Mat, mask: &Mat) -> (Vec<KeyPoint>, Mat) {
         unsafe {
-            let mut keypoints: native::CVec<native::KeyPoint> = std::mem::zeroed();
+            let mut keypoints: native::cvsys_CVec<native::cvsys_KeyPoint> = std::mem::zeroed();
             let descriptors = native::cvsys_mat_new();
-            native::cvsys_sift_detect_and_compute(self.value, image.inner, mask.inner, &mut keypoints, descriptors, false);
+            native::cvsys_sift_detect_and_compute(
+                self.value,
+                image.inner,
+                mask.inner,
+                &mut keypoints,
+                descriptors,
+                false,
+            );
             (keypoints.into(), Mat::from_raw(descriptors))
         }
     }

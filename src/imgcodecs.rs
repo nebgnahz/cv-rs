@@ -122,12 +122,12 @@ impl Mat {
     pub fn image_encode(&self, ext: &str, flags: Vec<ImageWriteMode>) -> Result<Vec<u8>, Error> {
         let ext = CString::new(ext)?;
         unsafe {
-            let mut result: native::COption<native::CVec<u8>> = mem::zeroed();
+            let mut result: native::cvsys_COption<native::cvsys_CVec<u8>> = mem::zeroed();
             // This happens to be fine because `ImageWriteMode` is `repr(C)`
             // and LLVM defines a C enum to be the same size as an int.
             let c_flags = flags.as_ptr() as *const i32;
             native::cvsys_nat_imencode(ext.into_raw(), self.inner, c_flags, flags.len(), &mut result);
-            let result: Option<native::CVec<u8>> = result.into();
+            let result: Option<native::cvsys_CVec<u8>> = result.into();
             result
                 .map(Into::into)
                 .ok_or_else(|| CvError::UnknownError("Unable to convert this image to bytes".to_owned()).into())

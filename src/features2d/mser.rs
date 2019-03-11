@@ -6,18 +6,21 @@ use *;
 /// Maximally stable extremal region extractor.
 #[derive(Debug)]
 pub struct Mser {
-    value: *mut native::cvsys_Ptr<native::cvsys_MSER>,
+    value: *mut u8,
 }
 
 impl Mser {
     /// Detect MSER regions.
     pub fn detect_regions(&self, image: &Mat) -> (Vec<Vec<Point2i>>, Vec<Rect>) {
-        let mut msers: native::CVec<native::CVec<native::Point2i>> = unsafe {std::mem::zeroed()};
-        let mut bboxes: native::CVec<native::Rect> = unsafe {std::mem::zeroed()};
+        let mut msers: native::cvsys_CVec<native::cvsys_CVec<native::cvsys_Point2i>> = unsafe { std::mem::zeroed() };
+        let mut bboxes: native::cvsys_CVec<native::cvsys_Rect> = unsafe { std::mem::zeroed() };
         unsafe {
             native::cvsys_mser_detect_regions(self.value, image.inner, &mut msers, &mut bboxes);
         }
-        let msers = msers.iter().map(|inner| inner.iter().cloned().map(Into::into).collect()).collect();
+        let msers = msers
+            .iter()
+            .map(|inner| inner.iter().cloned().map(Into::into).collect())
+            .collect();
         let bboxes = bboxes.iter().cloned().map(Into::into).collect();
         (msers, bboxes)
     }

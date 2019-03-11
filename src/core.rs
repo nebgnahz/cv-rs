@@ -23,8 +23,8 @@ pub struct KeyPoint {
     pub class_id: c_int,
 }
 
-impl From<native::KeyPoint> for KeyPoint {
-    fn from(n: native::KeyPoint) -> Self {
+impl From<native::cvsys_KeyPoint> for KeyPoint {
+    fn from(n: native::cvsys_KeyPoint) -> Self {
         Self {
             point: n.pt.into(),
             size: n.size,
@@ -36,7 +36,7 @@ impl From<native::KeyPoint> for KeyPoint {
     }
 }
 
-impl From<KeyPoint> for native::KeyPoint {
+impl From<KeyPoint> for native::cvsys_KeyPoint {
     fn from(n: KeyPoint) -> Self {
         Self {
             pt: n.point.into(),
@@ -81,8 +81,8 @@ impl Scalar {
     }
 }
 
-impl From<native::Scalar> for Scalar {
-    fn from(n: native::Scalar) -> Self {
+impl From<native::cvsys_Scalar> for Scalar {
+    fn from(n: native::cvsys_Scalar) -> Self {
         Self {
             v0: n.v0,
             v1: n.v1,
@@ -92,7 +92,7 @@ impl From<native::Scalar> for Scalar {
     }
 }
 
-impl From<Scalar> for native::Scalar {
+impl From<Scalar> for native::cvsys_Scalar {
     fn from(n: Scalar) -> Self {
         Self {
             v0: n.v0,
@@ -121,21 +121,15 @@ impl Point2i {
     }
 }
 
-impl From<Point2i> for native::Point2i {
+impl From<Point2i> for native::cvsys_Point2i {
     fn from(n: Point2i) -> Self {
-        Self {
-            x: n.x,
-            y: n.y,
-        }
+        Self { x: n.x, y: n.y }
     }
 }
 
-impl From<native::Point2i> for Point2i {
-    fn from(n: native::Point2i) -> Self {
-        Self {
-            x: n.x,
-            y: n.y,
-        }
+impl From<native::cvsys_Point2i> for Point2i {
+    fn from(n: native::cvsys_Point2i) -> Self {
+        Self { x: n.x, y: n.y }
     }
 }
 
@@ -157,21 +151,15 @@ impl Point2f {
     }
 }
 
-impl From<Point2f> for native::Point2f {
+impl From<Point2f> for native::cvsys_Point2f {
     fn from(n: Point2f) -> Self {
-        Self {
-            x: n.x,
-            y: n.y,
-        }
+        Self { x: n.x, y: n.y }
     }
 }
 
-impl From<native::Point2f> for Point2f {
-    fn from(n: native::Point2f) -> Self {
-        Self {
-            x: n.x,
-            y: n.y,
-        }
+impl From<native::cvsys_Point2f> for Point2f {
+    fn from(n: native::cvsys_Point2f) -> Self {
+        Self { x: n.x, y: n.y }
     }
 }
 
@@ -196,7 +184,7 @@ impl Size2i {
     }
 }
 
-impl From<Size2i> for native::Size2i {
+impl From<Size2i> for native::cvsys_Size2i {
     fn from(n: Size2i) -> Self {
         Self {
             width: n.width,
@@ -216,7 +204,7 @@ pub struct Size2f {
     pub height: f32,
 }
 
-impl From<Size2f> for native::Size2f {
+impl From<Size2f> for native::cvsys_Size2f {
     fn from(n: Size2f) -> Self {
         Self {
             width: n.width,
@@ -225,8 +213,8 @@ impl From<Size2f> for native::Size2f {
     }
 }
 
-impl From<native::Size2f> for Size2f {
-    fn from(n: native::Size2f) -> Self {
+impl From<native::cvsys_Size2f> for Size2f {
+    fn from(n: native::cvsys_Size2f) -> Self {
         Self {
             width: n.width,
             height: n.height,
@@ -285,7 +273,7 @@ impl Rect {
     }
 }
 
-impl From<Rect> for native::Rect {
+impl From<Rect> for native::cvsys_Rect {
     fn from(n: Rect) -> Self {
         Self {
             x: n.x,
@@ -296,8 +284,8 @@ impl From<Rect> for native::Rect {
     }
 }
 
-impl From<native::Rect> for Rect {
-    fn from(n: native::Rect) -> Self {
+impl From<native::cvsys_Rect> for Rect {
+    fn from(n: native::cvsys_Rect) -> Self {
         Self {
             x: n.x,
             y: n.y,
@@ -564,7 +552,7 @@ impl RotatedRect {
     }
 }
 
-impl From<RotatedRect> for native::RotatedRect {
+impl From<RotatedRect> for native::cvsys_RotatedRect {
     fn from(n: RotatedRect) -> Self {
         Self {
             center: n.center.into(),
@@ -574,8 +562,8 @@ impl From<RotatedRect> for native::RotatedRect {
     }
 }
 
-impl From<native::RotatedRect> for RotatedRect {
-    fn from(n: native::RotatedRect) -> Self {
+impl From<native::cvsys_RotatedRect> for RotatedRect {
+    fn from(n: native::cvsys_RotatedRect) -> Self {
         Self {
             center: n.center.into(),
             size: n.size.into(),
@@ -622,7 +610,7 @@ pub enum TermType {
 /// Termination criteria for iterative algorithms.
 #[derive(Debug)]
 pub struct TermCriteria {
-    pub(crate) c_criteria: *mut native::cvsys_TermCriteria,
+    pub(crate) c_criteria: *mut native::cv_TermCriteria,
 }
 
 impl TermCriteria {

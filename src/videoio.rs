@@ -10,7 +10,7 @@ use std::os::raw::c_int;
 /// Video capturing from video files, image sequences or cameras.
 #[derive(Debug)]
 pub struct VideoCapture {
-    inner: *mut native::cvsys_VideoCapture,
+    inner: *mut native::cv_VideoCapture,
 }
 
 unsafe impl Send for VideoCapture {}
@@ -182,7 +182,7 @@ impl Drop for VideoCapture {
 /// -On MacOSX QTKit is used.
 #[derive(Debug)]
 pub struct VideoWriter {
-    inner: *mut native::cvsys_VideoWriter,
+    inner: *mut native::cv_VideoWriter,
 }
 
 impl VideoWriter {
