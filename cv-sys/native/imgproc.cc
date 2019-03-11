@@ -90,6 +90,10 @@ void calc_back_project(const cv::Mat* images,
 }
 
 void compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result) {
+    if (first_image->size != second_image->size) {
+        *result = Result<double>{0.0, CString("compare_hist requires matrices that are the same size")};
+        return;
+    }
     *result = Result<double>::FromFunction(
         [first_image, second_image, method]() { return cv::compareHist(*first_image, *second_image, method); });
 }
