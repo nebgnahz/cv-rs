@@ -181,7 +181,7 @@ impl Mat {
 
     /// Returns the images type. For supported types, please see
     /// [CvType](enum.CvType).
-    pub fn cvsys_type(&self) -> CvType {
+    pub fn cv_type(&self) -> CvType {
         unsafe { native::cvsys_mat_type(self.inner).into() }
     }
 
@@ -445,7 +445,7 @@ impl Not for Mat {
 
 impl Clone for Mat {
     fn clone(&self) -> Self {
-        unsafe { Mat::from_buffer(self.rows, self.cols, self.cvsys_type(), self.data()) }
+        unsafe { Mat::from_buffer(self.rows, self.cols, self.cv_type(), self.data()) }
     }
 }
 

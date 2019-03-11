@@ -13,6 +13,7 @@ use native::cvsys_phash_drop;
 use native::cvsys_phash_new;
 use native::cvsys_radial_variance_hash_drop;
 use native::cvsys_radial_variance_hash_new;
+use std::ffi::c_void;
 
 use *;
 
@@ -40,7 +41,7 @@ impl<T: HashImplInterface> Hash for T {
         unsafe {
             let result = native::cvsys_mat_new();
             let value = self.get_value();
-            native::cvsys_hash_compute(value, mat.inner, result);
+            native::cvsys_hash_any_compute(value as *mut c_void, mat.inner, result);
             Mat::from_raw(result)
         }
     }
@@ -49,7 +50,7 @@ impl<T: HashImplInterface> Hash for T {
     fn compare(&self, lhs: &Mat, rhs: &Mat) -> f64 {
         unsafe {
             let value = self.get_value();
-            native::cvsys_hash_compare(value, lhs.inner, rhs.inner)
+            native::cvsys_hash_any_compare(value as *mut c_void, lhs.inner, rhs.inner)
         }
     }
 }

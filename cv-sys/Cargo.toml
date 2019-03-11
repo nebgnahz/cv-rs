@@ -15,3 +15,4 @@ cuda = []
 [build-dependencies]
 bindgen = "0.48.1"
 cmake = "0.1.35"
+itertools = "0.8.0"

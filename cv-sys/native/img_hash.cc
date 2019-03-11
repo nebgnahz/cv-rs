@@ -3,12 +3,14 @@
 
 namespace cvsys {
 
-void hash_compute(cv::Ptr<cv::img_hash::PHash>* hash, cv::Mat& mat, cv::Mat& result) {
-    hash->get()->compute(mat, result);
+void hash_any_compute(void* hash, cv::Mat& mat, cv::Mat& result) {
+    cv::Ptr<cv::img_hash::PHash>* base = static_cast<cv::Ptr<cv::img_hash::PHash>*>(hash);
+    base->get()->compute(mat, result);
 }
 
-double hash_compare(cv::Ptr<cv::img_hash::PHash>* hash, cv::Mat& lhs, cv::Mat& rhs) {
-    return hash->get()->compare(lhs, rhs);
+double hash_any_compare(void* hash, cv::Mat& lhs, cv::Mat& rhs) {
+    cv::Ptr<cv::img_hash::PHash>* base = static_cast<cv::Ptr<cv::img_hash::PHash>*>(hash);
+    return base->get()->compare(lhs, rhs);
 }
 
 cv::Ptr<cv::img_hash::AverageHash>* average_hash_new() {

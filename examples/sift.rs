@@ -61,7 +61,7 @@ fn main() {
     )
     .flat_map(|(b, g, r)| once(b).chain(once(g)).chain(once(r)))
     .collect::<Vec<u8>>();
-    let draw_mat = Mat::from_buffer(blue.rows, blue.cols, mat.cv_type(), &complete_buffer);
+    let draw_mat = unsafe { Mat::from_buffer(blue.rows, blue.cols, mat.cv_type(), &complete_buffer) };
 
     draw_mat.show("SIFT Points", 0).unwrap();
 }

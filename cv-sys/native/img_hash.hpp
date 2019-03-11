@@ -6,8 +6,8 @@
 
 namespace cvsys {
 
-void hash_compute(cv::Ptr<cv::img_hash::ImgHashBase>* phash, cv::Mat& mat, cv::Mat& result);
-double hash_compare(cv::Ptr<cv::img_hash::ImgHashBase>* phash, cv::Mat& lhs, cv::Mat& rhs);
+void hash_any_compute(void* phash, cv::Mat& mat, cv::Mat& result);
+double hash_any_compare(void* phash, cv::Mat& lhs, cv::Mat& rhs);
 
 cv::Ptr<cv::img_hash::AverageHash>* average_hash_new();
 void average_hash_drop(cv::Ptr<cv::img_hash::AverageHash>* phash);

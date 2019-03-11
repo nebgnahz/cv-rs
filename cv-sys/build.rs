@@ -5,6 +5,8 @@ use bindgen::Builder;
 use cmake::Config;
 use std::env;
 use std::path::PathBuf;
+use std::ffi::OsString;
+use itertools::Itertools;
 
 fn main() {
     let mut core_modules = vec![
@@ -34,6 +36,26 @@ fn main() {
     // Global configuration for OpenCV build.
     let mut config = Config::new(".");
     config
+        .static_crt(true)
+        .define("CMAKE_C_FLAGS", "/MT")
+        .define("CMAKE_C_FLAGS_DEBUG", "/MT")
+        .define("CMAKE_C_FLAGS_RELEASE", "/MT")
+        .define("CMAKE_C_FLAGS_MINSIZEREL", "/MT")
+        .define("CMAKE_C_FLAGS_RELWITHDEBINFO", "/MT")
+        .define("CMAKE_CXX_FLAGS", "/MT")
+        .define("CMAKE_CXX_FLAGS_DEBUG", "/MT")
+        .define("CMAKE_CXX_FLAGS_RELEASE", "/MT")
+        .define("CMAKE_CXX_FLAGS_MINSIZEREL", "/MT")
+        .define("CMAKE_CXX_FLAGS_RELWITHDEBINFO", "/MT")
+        .define("BUILD_WITH_STATIC_CRT", "ON")
+        // This creates some really annoying build issues on Windows.
+        // Eventually we need to fix it.
+        .define("WITH_IPP", "OFF")
+        .define("BUILD_IPP_IW", "OFF")
+        .define("BUILD_opencv_apps", "OFF")
+        .define("BUILD_opencv_java_bindings_generator", "OFF")
+        .define("BUILD_opencv_js", "OFF")
+        .define("BUILD_opencv_python_bindings_generator", "OFF")
         .define("BUILD_SHARED_LIBS", "OFF")
         .define("CMAKE_BUILD_TYPE", "RELEASE")
         .define("INSTALL_PYTHON_EXAMPLES", "OFF")
@@ -65,18 +87,55 @@ fn main() {
             println!("cargo:rustc-link-lib=gomp");
             println!("cargo:rustc-link-lib=stdc++");
         }
+        Ok("windows") => {
+            println!("cargo:rustc-link-lib=comdlg32");
+            println!("cargo:rustc-link-lib=Vfw32");
+            println!("cargo:rustc-link-lib=Ole32");
+            println!("cargo:rustc-link-lib=OleAut32");
+        }
         _ => {}
     }
 
     // Build OpenCV and add it to cargo.
     let dst = config.build();
 
+    // Load link_libs_list.txt to get list of all static libs to link to.
+    // This is generated in the CMakeLists.txt.
+    let libs_list: Vec<PathBuf> = std::fs::read_to_string(dst.join("build").join("link_libs_list.txt"))
+        .expect("CMakeLists.txt didn't produce libs list")
+        .replace("$(Configuration)", "Debug")
+        .split(';').map(Into::into).collect();
+    
+    // This contains the raw lib names.
+    let deduped_lib_names: Vec<OsString> =
+        libs_list.iter()
+            .map(|p| p.file_stem().expect("expected only files in libs list").to_os_string())
+            .unique().collect();
+
+    // This contains the lib search paths.
+    let deduped_lib_search_paths: Vec<PathBuf> =
+        libs_list.iter()
+            .map(|p| p.parent().expect("expected libs to be in a directory").to_path_buf())
+            .unique().collect();
+
     // Link cvsys.
     println!(
-        "cargo:rustc-link-search=native={}",
+        "cargo:rustc-link-search={}",
         dst.join("build").join("Debug").display()
     );
     println!("cargo:rustc-link-lib=static=cvsys");
+
+    // Link all cvsys dependencies.
+    for libpath in deduped_lib_search_paths {
+        println!(
+            "cargo:rustc-link-search={}",
+            libpath.display()
+        );
+    }
+
+    for libname in deduped_lib_names {
+        println!("cargo:rustc-link-lib=static={}d", libname.to_str().expect("OpenCV lib names must be valid UTF-8"));
+    }
 
     let bindings = Builder::default()
         .rustfmt_bindings(true)
@@ -118,9 +177,6 @@ fn main() {
     let bindings = all_modules
         .map(|lib| format!("native/{}.hpp", lib))
         .fold(bindings, Builder::header);
-    for p in bindings.command_line_flags() {
-        eprintln!("{}", p);
-    }
     let bindings = bindings.generate().expect("Unable to generate bindings");
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     bindings
