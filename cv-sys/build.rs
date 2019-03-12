@@ -9,9 +9,10 @@ use std::ffi::OsString;
 use itertools::Itertools;
 
 fn main() {
-    let (configuration, lib_postfix) = match env!("PROFILE") {
+    let (configuration, lib_postfix) = match env::var("PROFILE").unwrap().as_str() {
         "debug" => ("Debug", "d"),
         "release" => ("Release", ""),
+        _ => panic!("unknown PROFILE env var from Cargo"),
     };
 
     let mut core_modules = vec![
@@ -27,7 +28,7 @@ fn main() {
     ];
 
     // Add associated CUDA files if the `cuda` feature is enabled.
-    if option_env!("CARGO_FEATURE_CUDA").is_some() {
+    if env::var("CARGO_FEATURE_CUDA").is_ok() {
         core_modules.push("cudaobjdetect");
     }
 
