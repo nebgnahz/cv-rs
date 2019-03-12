@@ -93,7 +93,8 @@ void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Re
         [first_image, second_image, method]() { return cv::compareHist(*first_image, *second_image, method); });
 }
 
-void cv_sobel(cv::Mat* src, cv::Mat* dst, int ddepth, int dx, int dy, int k_size, double scale, double delta, int borderType) {
+void cv_sobel(
+    cv::Mat* src, cv::Mat* dst, int ddepth, int dx, int dy, int k_size, double scale, double delta, int borderType) {
     cv::Sobel(*src, *dst, ddepth, dx, dy, k_size, scale, delta, borderType);
 }
 
