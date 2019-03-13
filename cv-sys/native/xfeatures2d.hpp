@@ -11,10 +11,9 @@ namespace cvsys {
 //   SURF
 // =============================================================================
 
-cv::Ptr<cv::xfeatures2d::SURF>*
-surf_new(double hessianThreshold, int nOctaves, int nOctaveLayers, bool extended, bool upright);
-void surf_drop(cv::Ptr<cv::xfeatures2d::SURF>* detector);
-void surf_detect_and_compute(cv::Ptr<cv::xfeatures2d::SURF>* detector,
+void* surf_new(double hessianThreshold, int nOctaves, int nOctaveLayers, bool extended, bool upright);
+void surf_drop(void* detector);
+void surf_detect_and_compute(void* detector,
                              cv::Mat* image,
                              cv::Mat* mask,
                              CVec<KeyPoint>* keypoints,
@@ -25,10 +24,9 @@ void surf_detect_and_compute(cv::Ptr<cv::xfeatures2d::SURF>* detector,
 //   SIFT
 // =============================================================================
 
-cv::Ptr<cv::xfeatures2d::SIFT>*
-sift_new(int nfeatures, int nOctaveLayers, double contrastThreshold, double edgeThreshold, double sigma);
-void sift_drop(cv::Ptr<cv::xfeatures2d::SIFT>* detector);
-void sift_detect_and_compute(cv::Ptr<cv::xfeatures2d::SIFT>* detector,
+void* sift_new(int nfeatures, int nOctaveLayers, double contrastThreshold, double edgeThreshold, double sigma);
+void sift_drop(void* detector);
+void sift_detect_and_compute(void* detector,
                              cv::Mat* image,
                              cv::Mat* mask,
                              CVec<KeyPoint>* keypoints,

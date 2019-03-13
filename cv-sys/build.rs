@@ -6,7 +6,6 @@ use cmake::Config;
 use itertools::Itertools;
 use std::env;
 use std::ffi::OsString;
-use std::fs;
 use std::path::PathBuf;
 
 fn main() -> Result<(), std::io::Error> {
@@ -16,39 +15,6 @@ fn main() -> Result<(), std::io::Error> {
         "release" => ("Release", ""),
         _ => panic!("unknown PROFILE env var from Cargo"),
     };
-
-    // Look up the full list of core modules.
-    let module_dir_entries = fs::read_dir("opencv/modules")?.collect::<Result<Vec<_>, _>>()?;
-    let all_core_modules: Vec<OsString> = module_dir_entries
-        .into_iter()
-        .filter_map(|entry| {
-            entry
-                .file_type()
-                .ok()
-                .filter(|ft| ft.is_dir())
-                .map(|_| entry.file_name())
-        })
-        .collect();
-
-    // Look up the full list of core modules.
-    let contrib_module_dir_entries = fs::read_dir("opencv_contrib/modules")?.collect::<Result<Vec<_>, _>>()?;
-    let all_contrib_modules: Vec<OsString> = contrib_module_dir_entries
-        .into_iter()
-        .filter_map(|entry| {
-            entry
-                .file_type()
-                .ok()
-                .filter(|ft| ft.is_dir())
-                .map(|_| entry.file_name())
-        })
-        .collect();
-
-    // All the opencv modules (core and contrib).
-    let all_opencv_modules: Vec<String> = all_core_modules
-        .iter()
-        .chain(all_contrib_modules.iter())
-        .map(|s| s.to_str().unwrap().to_owned())
-        .collect();
 
     let mut used_core_modules = vec![
         "core",
@@ -68,10 +34,10 @@ fn main() -> Result<(), std::io::Error> {
     }
 
     // All the contrib modules used (core and contrib).
-    let contrib_modules = vec!["xfeatures2d", "img_hash", "text"];
+    let used_contrib_modules = vec!["xfeatures2d", "img_hash", "text"];
 
     // Collect all the modules used.
-    let all_used_modules: Vec<_> = used_core_modules.iter().chain(contrib_modules.iter()).collect();
+    let all_used_modules: Vec<_> = used_core_modules.iter().chain(used_contrib_modules.iter()).collect();
 
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
     // Path to contrib modules.
@@ -101,6 +67,7 @@ fn main() -> Result<(), std::io::Error> {
         .define("BUILD_opencv_java_bindings_generator", "OFF")
         .define("BUILD_opencv_js", "OFF")
         .define("BUILD_opencv_python_bindings_generator", "OFF")
+        .define("BUILD_opencv_world", "OFF")
         .define("BUILD_SHARED_LIBS", "OFF")
         .define("CMAKE_BUILD_TYPE", configuration.to_ascii_uppercase())
         .define("INSTALL_PYTHON_EXAMPLES", "OFF")
@@ -123,16 +90,11 @@ fn main() -> Result<(), std::io::Error> {
         .define("BUILD_DOCS", "OFF")
         .define("BUILD_EXAMPLES", "OFF")
         .define("CV_CORE_MODULES", used_core_modules.join(";"))
-        .define("CV_CONTRIB_MODULES", contrib_modules.join(";"));
+        .define("CV_CONTRIB_MODULES", used_contrib_modules.join(";"));
 
     // Set which modules we want to build.
-    for (var, val) in all_opencv_modules.iter().map(|module| {
-        (
-            format!("BUILD_opencv_{}", module),
-            if all_used_modules.iter().any(|usedm| *usedm == module) { "ON" } else { "OFF" },
-        )
-    }) {
-        config.define(var, val);
+    for module in &all_used_modules {
+        config.define(format!("BUILD_opencv_{}", module), "ON");
     }
 
     // Handle OS-specific requirements.
@@ -230,7 +192,7 @@ fn main() -> Result<(), std::io::Error> {
     }));
 
     // Add contrib module includes.
-    let bindings = bindings.clang_args(contrib_modules.iter().map(|lib| {
+    let bindings = bindings.clang_args(used_contrib_modules.iter().map(|lib| {
         format!(
             "-I{}",
             manifest_dir
