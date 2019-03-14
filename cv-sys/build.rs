@@ -9,9 +9,11 @@ use std::ffi::OsString;
 use std::path::PathBuf;
 
 fn main() -> Result<(), std::io::Error> {
+    let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
+
     // Get profile variables.
     let (configuration, lib_postfix) = match env::var("PROFILE").unwrap().as_str() {
-        "debug" => ("Debug", "d"),
+        "debug" => ("Debug", if target_os == "windows" {"d"} else {""}),
         "release" => ("Release", ""),
         _ => panic!("unknown PROFILE env var from Cargo"),
     };
@@ -47,18 +49,6 @@ fn main() -> Result<(), std::io::Error> {
 
     // Set various cmake definitions.
     config
-        .static_crt(true)
-        .define("CMAKE_C_FLAGS", "/MT")
-        .define("CMAKE_C_FLAGS_DEBUG", "/MT")
-        .define("CMAKE_C_FLAGS_RELEASE", "/MT")
-        .define("CMAKE_C_FLAGS_MINSIZEREL", "/MT")
-        .define("CMAKE_C_FLAGS_RELWITHDEBINFO", "/MT")
-        .define("CMAKE_CXX_FLAGS", "/MT")
-        .define("CMAKE_CXX_FLAGS_DEBUG", "/MT")
-        .define("CMAKE_CXX_FLAGS_RELEASE", "/MT")
-        .define("CMAKE_CXX_FLAGS_MINSIZEREL", "/MT")
-        .define("CMAKE_CXX_FLAGS_RELWITHDEBINFO", "/MT")
-        .define("BUILD_WITH_STATIC_CRT", "ON")
         // TODO: IPP creates some really annoying build issues on Windows.
         // Eventually we need to fix it.
         .define("WITH_IPP", "OFF")
@@ -98,17 +88,31 @@ fn main() -> Result<(), std::io::Error> {
     }
 
     // Handle OS-specific requirements.
-    let target_os = env::var("CARGO_CFG_TARGET_OS");
-    match target_os.as_ref().map(|x| &**x) {
-        Ok("linux") => {
+    match target_os.as_str() {
+        "linux" => {
             println!("cargo:rustc-link-lib=gomp");
             println!("cargo:rustc-link-lib=stdc++");
+
+            config.define("ENABLE_PRECOMPILED_HEADERS", "OFF");
         }
-        Ok("windows") => {
+        "windows" => {
             println!("cargo:rustc-link-lib=comdlg32");
             println!("cargo:rustc-link-lib=Vfw32");
             println!("cargo:rustc-link-lib=Ole32");
             println!("cargo:rustc-link-lib=OleAut32");
+
+            config.static_crt(true)
+                .define("CMAKE_C_FLAGS", "/MT")
+                .define("CMAKE_C_FLAGS_DEBUG", "/MT")
+                .define("CMAKE_C_FLAGS_RELEASE", "/MT")
+                .define("CMAKE_C_FLAGS_MINSIZEREL", "/MT")
+                .define("CMAKE_C_FLAGS_RELWITHDEBINFO", "/MT")
+                .define("CMAKE_CXX_FLAGS", "/MT")
+                .define("CMAKE_CXX_FLAGS_DEBUG", "/MT")
+                .define("CMAKE_CXX_FLAGS_RELEASE", "/MT")
+                .define("CMAKE_CXX_FLAGS_MINSIZEREL", "/MT")
+                .define("CMAKE_CXX_FLAGS_RELWITHDEBINFO", "/MT")
+                .define("BUILD_WITH_STATIC_CRT", "ON");
         }
         _ => {}
     }
@@ -177,6 +181,14 @@ fn main() -> Result<(), std::io::Error> {
         .opaque_type("std::.*")
         .whitelist_type("cv::MouseCallback")
         .whitelist_type("cv::text::classifier_type");
+    
+    // Change bindgen settings based on OS.
+    let bindings = match target_os.as_str() {
+        "linux" => {
+            bindings.clang_arg("-stdlib=libc++")
+        }
+        _ => bindings,
+    };
 
     // Add core module includes.
     let bindings = bindings.clang_args(used_core_modules.iter().map(|lib| {
