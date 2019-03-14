@@ -5,7 +5,6 @@ use bindgen::Builder;
 use cmake::Config;
 use itertools::Itertools;
 use std::env;
-use std::ffi::OsString;
 use std::path::PathBuf;
 
 fn main() -> Result<(), std::io::Error> {
@@ -130,9 +129,9 @@ fn main() -> Result<(), std::io::Error> {
         .collect();
 
     // This contains the raw lib names.
-    let deduped_lib_names: Vec<OsString> = libs_list
+    let deduped_lib_names: Vec<String> = libs_list
         .iter()
-        .map(|p| p.file_stem().expect("expected only files in libs list").to_os_string())
+        .map(|p| p.file_stem().expect("expected only files in libs list").to_str().expect("OpenCV lib names must be valid UTF-8").to_owned())
         .unique()
         .collect();
 
@@ -143,26 +142,51 @@ fn main() -> Result<(), std::io::Error> {
         .unique()
         .collect();
 
+    dbg!(&deduped_lib_names);
+
+    // Change linker paths based on OS.
+    match target_os.as_str() {
+        "windows" => {
+            // Add cvsys path.
+            println!(
+                "cargo:rustc-link-search={}",
+                dst.join("build").join(configuration).display()
+            );
+
+            // Add all the static libs that need to be linked to Cargo, adding
+            // postfixes as necessary (on Windows a 'd' is appended to libs in debug mode).
+            for libname in deduped_lib_names {
+                println!(
+                    "cargo:rustc-link-lib=static={}{}",
+                    libname,
+                    lib_postfix
+                );
+            }
+        }
+        _ => {
+            // Add cvsys path.
+            println!(
+                "cargo:rustc-link-search={}",
+                dst.join("build").display()
+            );
+
+            // Add all the static libs that need to be linked to Cargo, adding
+            // postfixes as necessary (on Windows a 'd' is appended to libs in debug mode).
+            for libname in deduped_lib_names {
+                println!(
+                    "cargo:rustc-link-lib=static={}",
+                    &libname[3..]
+                );
+            }
+        },
+    };
+
     // Link cvsys.
-    println!(
-        "cargo:rustc-link-search={}",
-        dst.join("build").join(configuration).display()
-    );
     println!("cargo:rustc-link-lib=static=cvsys");
 
-    // Link all cvsys dependencies.
+    // Add all cvsys dependencies' paths.
     for libpath in deduped_lib_search_paths {
         println!("cargo:rustc-link-search={}", libpath.display());
-    }
-
-    // Add all the static libs that need to be linked to Cargo, adding
-    // postfixes as necessary (on Windows a 'd' is appended to libs in debug mode).
-    for libname in deduped_lib_names {
-        println!(
-            "cargo:rustc-link-lib=static={}{}",
-            libname.to_str().expect("OpenCV lib names must be valid UTF-8"),
-            lib_postfix
-        );
     }
 
     // Set up bindgen to generate bindings from our C++ wrapper.
@@ -185,7 +209,7 @@ fn main() -> Result<(), std::io::Error> {
     // Change bindgen settings based on OS.
     let bindings = match target_os.as_str() {
         "linux" => {
-            bindings.clang_arg("-stdlib=libc++")
+            bindings.clang_args(&["-x", "c++", "-std=c++14", "-stdlib=libc++"])
         }
         _ => bindings,
     };

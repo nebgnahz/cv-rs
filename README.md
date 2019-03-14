@@ -37,6 +37,24 @@ successful (I probably haven't tried hard enough). There is another
 port [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
 bindings using a Python script (more automated).
 
+## Static Build (default behavior)
+
+`cv-sys` generated bindings are ran through `rustfmt` to ensure they are readable.
+This requires the developer to have `rustfmt` installed as a component in `rustup`,
+otherwise it wont format the bindings.
+
+```bash
+rustup component add rustfmt
+```
+
+### Debian
+
+You must have `clang`, `libc++-dev`, and `cmake` installed.
+
+### Windows
+
+You must have `cmake` installed.
+
 ## Install
 
 Before anything, make sure you have OpenCV 3 installed. If you are using windows, follow [this instruction](#windows), otherwise read this
