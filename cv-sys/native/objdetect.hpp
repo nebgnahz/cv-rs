@@ -21,10 +21,10 @@ void cascade_classifier_detect(cv::CascadeClassifier* cascade,
 
 cv::HOGDescriptor* hog_new();
 void hog_drop(cv::HOGDescriptor*);
-std::vector<float>* hog_default_people_detector();
-std::vector<float>* hog_daimler_people_detector();
-void hog_detector_drop(std::vector<float>*);
-void hog_set_svm_detector(cv::HOGDescriptor*, std::vector<float>*);
+void* hog_default_people_detector();
+void* hog_daimler_people_detector();
+void hog_detector_drop(void*);
+void hog_set_svm_detector(cv::HOGDescriptor*, void*);
 void hog_detect(cv::HOGDescriptor*,
                 cv::Mat*,
                 CVec<Rect>* vec_detected,
