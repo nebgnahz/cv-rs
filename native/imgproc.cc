@@ -93,6 +93,15 @@ void cv_compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Re
         [first_image, second_image, method]() { return cv::compareHist(*first_image, *second_image, method); });
 }
 
+void cv_sobel(
+    cv::Mat* src, cv::Mat* dst, int ddepth, int dx, int dy, int k_size, double scale, double delta, int borderType) {
+    cv::Sobel(*src, *dst, ddepth, dx, dy, k_size, scale, delta, borderType);
+}
+
+void cv_scharr(cv::Mat* src, cv::Mat* dst, int ddepth, int dx, int dy, double scale, double delta, int borderType) {
+    cv::Scharr(*src, *dst, ddepth, dx, dy, scale, delta, borderType);
+}
+
 EmptyResult
 cv_canny(cv::Mat* image, cv::Mat* edges, double threshold1, double threshold2, int aperture_size, bool l2_gradient) {
     return EmptyResult::FromFunction([image, edges, threshold1, threshold2, aperture_size, l2_gradient]() {
