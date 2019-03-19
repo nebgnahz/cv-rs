@@ -51,6 +51,8 @@ rustup component add rustfmt
 
 You must have `clang`, `libc++-dev`, and `cmake` installed.
 
+`libgtk2.0-dev` is required for certian functionality.
+
 ### Windows
 
 You must have `cmake` installed.
