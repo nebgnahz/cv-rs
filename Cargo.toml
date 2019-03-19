@@ -19,11 +19,9 @@ getopts = "0.2"
 float-cmp = "0.4"
 itertools = "0.8.0"
 
-[build-dependencies]
-cc = { version = "1.0", features = ["parallel"] }
-
 [features]
 cuda = []
 text = []
 tesseract = []
+system = ["native/system"]
 

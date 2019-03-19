@@ -11,6 +11,7 @@ documentation = "https://docs.rs/cv-sys/"
 
 [features]
 cuda = []
+system = []
 
 [build-dependencies]
 bindgen = "0.48.1"

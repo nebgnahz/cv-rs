@@ -5,7 +5,7 @@ use super::core::*;
 use super::errors::*;
 use super::*;
 use failure::Error;
-use std::ffi::{CString, c_void};
+use std::ffi::{c_void, CString};
 use std::os::raw::{c_double, c_int};
 use std::path::Path;
 use std::vec::Vec;

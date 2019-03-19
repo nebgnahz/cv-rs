@@ -1,8 +1,6 @@
 cmake_minimum_required (VERSION 2.8.12.2)
 project(CVSYS)
 
-add_subdirectory(opencv)
-
 # Found from https://stackoverflow.com/a/39127212.
 # This is needed to recursively resolve the LINK_LIBRARIES that Cargo needs.
 function(get_link_libraries OUTPUT_LIST TARGET)
@@ -49,17 +47,30 @@ set(SRC
 
 add_library(cvsys ${SRC})
 
-string(REGEX REPLACE "([^;]+)" "opencv/modules/\\1/include" core_module_includes "${CV_CORE_MODULES}")
-string(REGEX REPLACE "([^;]+)" "opencv_contrib/modules/\\1/include" contrib_module_includes "${CV_CONTRIB_MODULES}")
+# If we will use the prebuilt OpenCV on the system.
+if(CVSYS_SYSTEM_CV)
 
-target_include_directories(cvsys PUBLIC ${core_module_includes} ${contrib_module_includes})
-target_include_directories(cvsys PUBLIC ${CMAKE_BINARY_DIR})
+    # Add prebuilt OpenCV include directory (there is only one).
+    target_include_directories(cvsys PUBLIC "${CVSYS_INCLUDE_DIR}")
+    link_directories("${CVSYS_LIB_DIR}")
 
-string(REGEX REPLACE "([^;]+)" "opencv_\\1" module_targets "${MODULES}")
+else(CVSYS_SYSTEM_CV)
 
-target_link_libraries(cvsys
-    ${module_targets}
-)
+    # Bring in opencv build.
+    add_subdirectory(opencv)
 
-get_link_libraries(link_libs_list cvsys)
-file(WRITE "${CMAKE_BINARY_DIR}/link_libs_list.txt" "${link_libs_list}")
+    string(REGEX REPLACE "([^;]+)" "opencv/modules/\\1/include" core_module_includes "${CV_CORE_MODULES}")
+    string(REGEX REPLACE "([^;]+)" "opencv_contrib/modules/\\1/include" contrib_module_includes "${CV_CONTRIB_MODULES}")
+
+    target_include_directories(cvsys PUBLIC ${core_module_includes} ${contrib_module_includes})
+    target_include_directories(cvsys PUBLIC ${CMAKE_BINARY_DIR})
+
+    get_link_libraries(link_libs_list cvsys)
+    file(WRITE "${CMAKE_BINARY_DIR}/link_libs_list.txt" "${link_libs_list}")
+
+endif(CVSYS_SYSTEM_CV)
+
+install(TARGETS cvsys
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
