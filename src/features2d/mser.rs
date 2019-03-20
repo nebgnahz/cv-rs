@@ -4,6 +4,8 @@ use std::os::raw::*;
 use *;
 
 /// Maximally stable extremal region extractor.
+/// 
+/// See [MserBuilder](struct.MserBuilder.html).
 #[derive(Debug)]
 pub struct Mser {
     value: *mut u8,
@@ -34,7 +36,24 @@ impl Drop for Mser {
     }
 }
 
-/// Builder that provides defaults for MSER
+impl Default for Mser {
+    fn default() -> Self {
+        MserBuilder::default().into()
+    }
+}
+
+/// Builder that provides defaults for [Mser](struct.Mser.html).
+/// 
+/// ## Defaults
+/// - delta: 5,
+/// - min_area: 60,
+/// - max_area: 14400,
+/// - max_variation: 0.25,
+/// - min_diversity: 0.2,
+/// - max_evolution: 200,
+/// - area_threshold: 1.01,
+/// - min_margin: 0.003,
+/// - edge_blur_size: 5,
 #[derive(Debug, Copy, Clone)]
 pub struct MserBuilder {
     delta: c_int,
