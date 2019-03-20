@@ -455,6 +455,33 @@ impl Mat {
         r.into()
     }
 
+    /// Calculates the first x- or y- image derivative using Sobel operator.
+    pub fn sobel(
+        &self,
+        ddepth: i32,
+        dx: i32,
+        dy: i32,
+        k_size: i32,
+        scale: f64,
+        delta: f64,
+        border_type: BorderType,
+    ) -> Mat {
+        unsafe {
+            let m = native::cvsys_mat_new();
+            native::cvsys_sobel(self.inner, m, ddepth, dx, dy, k_size, scale, delta, border_type as i32);
+            Mat::from_raw(m)
+        }
+    }
+
+    /// Calculates the first x- or y- image derivative using Scharr operator.
+    pub fn scharr(&self, ddepth: i32, dx: i32, dy: i32, scale: f64, delta: f64, border_type: BorderType) -> Mat {
+        unsafe {
+            let m = native::cvsys_mat_new();
+            native::cvsys_scharr(self.inner, m, ddepth, dx, dy, scale, delta, border_type as i32);
+            Mat::from_raw(m)
+        }
+    }
+
     /// Performs canny edge detection
     pub fn canny(
         &self,
@@ -474,9 +501,7 @@ impl Mat {
                 l2_gradient,
             )
         };
-
         let result: Result<(), String> = result.into();
-
         result.map(|_| edges)
     }
 

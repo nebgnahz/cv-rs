@@ -44,6 +44,9 @@ void calc_back_project(const cv::Mat* images,
                        cv::Mat* back_project,
                        const float* const* ranges);
 void compare_hist(cv::Mat* first_image, cv::Mat* second_image, int method, Result<double>* result);
+void sobel(
+    cv::Mat* src, cv::Mat* dst, int ddepth, int dx, int dy, int k_size, double scale, double delta, int borderType);
+void scharr(cv::Mat* src, cv::Mat* dst, int ddepth, int dx, int dy, double scale, double delta, int borderType);
 EmptyResult
 canny(cv::Mat* image, cv::Mat* edges, double threshold1, double threshold2, int aperture_size, bool l2_gradient);
 
