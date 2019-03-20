@@ -91,7 +91,7 @@ impl CascadeClassifier {
                 self.inner,
                 mat.inner,
                 &mut c_result,
-                c_double::from(scale_factor),
+                scale_factor.into(),
                 min_neighbors,
                 0,
                 min_size.into(),

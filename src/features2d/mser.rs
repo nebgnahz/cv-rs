@@ -4,7 +4,7 @@ use std::os::raw::*;
 use *;
 
 /// Maximally stable extremal region extractor.
-/// 
+///
 /// See [MserBuilder](struct.MserBuilder.html).
 #[derive(Debug)]
 pub struct Mser {
@@ -43,7 +43,7 @@ impl Default for Mser {
 }
 
 /// Builder that provides defaults for [Mser](struct.Mser.html).
-/// 
+///
 /// ## Defaults
 /// - delta: 5,
 /// - min_area: 60,

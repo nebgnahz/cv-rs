@@ -45,12 +45,12 @@ fn main() {
             c1.ellipse(
                 Point2i::new(x, y),
                 Size2i::new((kp.size * 1.0).ceil() as i32, (kp.size * 0.5).ceil() as i32),
-                CircleParams::new().angle(f64::from(kp.angle)),
+                CircleParams::new().angle(kp.angle.into()),
             );
             c2.ellipse(
                 Point2i::new(x, y),
                 Size2i::new((kp.size * 1.0).ceil() as i32, (kp.size * 0.5).ceil() as i32),
-                CircleParams::new().angle(f64::from(kp.angle)),
+                CircleParams::new().angle(kp.angle.into()),
             );
         }
     }
