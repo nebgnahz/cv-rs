@@ -57,7 +57,7 @@ pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data
     let s = CString::new(name)?;
     #[allow(clippy::fn_to_numeric_cast)]
     unsafe {
-        native::cvsys_nat_set_mouse_callback(s.as_ptr(), _mouse_callback as u64, box_wrapper_raw);
+        native::cvsys_nat_set_mouse_callback(s.as_ptr(), Some(_mouse_callback), box_wrapper_raw);
     }
     Ok(())
 }

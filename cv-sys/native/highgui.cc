@@ -10,7 +10,9 @@ void nat_destroy_window(const char* const winname) {
     cv::destroyWindow(winname);
 }
 
-void nat_set_mouse_callback(const char* const winname, cv::MouseCallback on_mouse, void* userdata) {
+void nat_set_mouse_callback(const char* const winname,
+                            void (*on_mouse)(int event, int x, int y, int flags, void* userdata),
+                            void* userdata) {
     cv::setMouseCallback(winname, on_mouse, userdata);
 }
 
