@@ -20,7 +20,7 @@ float-cmp = "0.4"
 itertools = "0.8.0"
 
 [features]
-cuda = []
+cuda = ["native/cuda"]
 text = []
 tesseract = []
 system = ["native/system"]
