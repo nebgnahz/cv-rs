@@ -22,8 +22,10 @@ set(SRC
 
 add_library(cvsys ${SRC})
 
-# Add prebuilt OpenCV include directory (there is only one).
-target_include_directories(cvsys PUBLIC "${CVSYS_INCLUDE_DIR}")
+# Add prebuilt OpenCV include directories.
+foreach(ocv_include_dir IN LISTS CVSYS_INCLUDE_DIRS)
+    target_include_directories(cvsys PUBLIC "${ocv_include_dir}")
+endforeach()
 
 install(TARGETS cvsys
         RUNTIME DESTINATION bin

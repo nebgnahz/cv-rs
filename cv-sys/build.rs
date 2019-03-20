@@ -4,9 +4,9 @@ extern crate cmake;
 use bindgen::Builder;
 use cmake::Config;
 use std::env;
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
-fn link_package(name: &str) {
+fn link_package(name: &str) -> pkg_config::Library {
     let package = pkg_config::probe_library(name).expect(&format!("must install {}", name));
     for libpath in &package.link_paths {
         println!("cargo:rustc-link-search={}", libpath.display());
@@ -14,6 +14,7 @@ fn link_package(name: &str) {
     for lib in &package.libs {
         println!("cargo:rustc-link-lib={}", lib);
     }
+    package
 }
 
 fn cmake_bool(flag: bool) -> &'static str {
@@ -46,6 +47,24 @@ fn cmake_common(config: &mut Config, target_os: &str) {
         }
         _ => {}
     }
+}
+
+fn link_all_libs(location: &Path, target_os: &str) -> Result<(), std::io::Error> {
+    for entry in location.read_dir()? {
+        let entry = entry?;
+        if entry.path().extension().map(|os| os == "lib" || os == "a" || os == "so").unwrap_or(false) {
+            let libname = entry
+                .path()
+                .file_stem()
+                .unwrap()
+                .to_str()
+                .expect("OpenCV lib names must be unicode")
+                .to_owned();
+            // This is not foolproof, but usually works.
+            println!("cargo:rustc-link-lib=static={}", if target_os == "windows" { &libname } else { &libname[3..] });
+        }
+    }
+    Ok(())
 }
 
 fn main() -> Result<(), std::io::Error> {
@@ -82,12 +101,29 @@ fn main() -> Result<(), std::io::Error> {
     // Path to contrib modules.
     let contrib_modules_path = manifest_dir.join("opencv_contrib").join("modules");
 
-    let (opencv_include_dir, opencv_lib_dir) = if feature_system {
-        let opencv_dir = env::var("OPENCV_DIR")
-            .unwrap_or_else(|_| panic!("OPENCV_DIR not set (set it to the directory the include folder is in)"));
-        let opencv_lib_dir = env::var("OPENCV_LIB")
-            .unwrap_or_else(|_| panic!("OPENCV_LIB not set (set it to where the OpenCV libs are)"));
-        (PathBuf::from(opencv_dir).join("include"), PathBuf::from(opencv_lib_dir))
+    // Link cvsys.
+    println!("cargo:rustc-link-lib=static=cvsys");
+
+    let opencv_include_dirs = if feature_system {
+        match target_os.as_str() {
+            "windows" => {
+                let opencv_dir = env::var("OPENCV_DIR")
+                    .unwrap_or_else(|_| panic!("OPENCV_DIR not set (set it to the directory the include folder is in)"));
+                let opencv_lib_dir = env::var("OPENCV_LIB")
+                    .unwrap_or_else(|_| panic!("OPENCV_LIB not set (set it to where the OpenCV libs are)"));
+                // Add search path for OpenCV libs.
+                println!("cargo:rustc-link-search={}", opencv_lib_dir);
+                // Link all dependencies.
+                link_all_libs(&PathBuf::from(opencv_lib_dir), &target_os)?;
+                vec![PathBuf::from(opencv_dir).join("include")]
+            }
+            "linux" => {
+                println!("cargo:rustc-link-lib=stdc++");
+                // Use pkgconfig to get everything.
+                link_package("opencv").include_paths
+            }
+            p => panic!("unsupported platform {}, please file an issue", p),
+        }
     } else {
         // Global configuration for OpenCV build.
         let mut opencv_config = Config::new("opencv");
@@ -144,7 +180,26 @@ fn main() -> Result<(), std::io::Error> {
 
         println!("cargo:rustc-link-lib=static=cvsys");
 
-        (dst.join("include"), dst.join("lib"))
+        match target_os.as_str() {
+            "windows" => {
+                println!("cargo:rustc-link-lib=comdlg32");
+                println!("cargo:rustc-link-lib=Vfw32");
+                println!("cargo:rustc-link-lib=Ole32");
+                println!("cargo:rustc-link-lib=OleAut32");
+                link_all_libs(&dst.join("lib"), &target_os)?;
+                // Everything ends up in include on windows.
+                vec![dst.join("include")]
+            }
+            "linux" => {
+                println!("cargo:rustc-link-lib=stdc++");
+                // Link all dependencies.
+                link_all_libs(&dst.join("lib"), &target_os)?;
+                link_package("libpng");
+                link_package("libtiff-4");
+                vec![dst.join("include")]
+            }
+            p => panic!("unsupported platform {}, please file an issue", p),
+        }
     };
 
     // Global configuration for our native wrapper called cvsys.
@@ -157,60 +212,13 @@ fn main() -> Result<(), std::io::Error> {
     cvsys_config
         .define("CV_CORE_MODULES", used_core_modules.join(";"))
         .define("CV_CONTRIB_MODULES", used_contrib_modules.join(";"))
-        .define("CVSYS_INCLUDE_DIR", &opencv_include_dir);
+        .define("CVSYS_INCLUDE_DIRS", opencv_include_dirs.iter().map(|path| path.to_str().expect("paths must be unicode").to_owned()).collect::<Vec<String>>().join(";"));
 
     // Build cvsys.
     let dst = cvsys_config.build();
 
-    // Link cvsys.
-    println!("cargo:rustc-link-lib=static=cvsys");
-
-    // Add search path for cvsys.
+    // Add search path for OpenCV libs (on Windows non-system) and cvsys (on all platforms).
     println!("cargo:rustc-link-search={}", dst.join("lib").display());
-
-    // Link all dependencies.
-    for entry in opencv_lib_dir.read_dir()? {
-        let entry = entry?;
-        if entry.path().extension().map(|os| os == "cmake").unwrap_or(false) || entry.path().is_dir() {
-            continue;
-        }
-        let libname = entry
-            .path()
-            .file_stem()
-            .unwrap()
-            .to_str()
-            .expect("OpenCV lib names must be unicode")
-            .to_owned();
-        println!(
-            "cargo:rustc-link-lib=static={}",
-            if target_os == "windows" {
-                &libname
-            } else {
-                &libname[3..]
-            }
-        );
-    }
-
-    // Add search path for OpenCV libs.
-    println!("cargo:rustc-link-search={}", opencv_lib_dir.display());
-
-    // Handle OS-specific linker requirements.
-    match target_os.as_str() {
-        "linux" => {
-            link_package("gtk+-3.0");
-            link_package("libpng");
-            link_package("zlib");
-            println!("cargo:rustc-link-lib=stdc++");
-        }
-        "windows" => {
-            println!("cargo:rustc-link-lib=comdlg32");
-            println!("cargo:rustc-link-lib=Vfw32");
-            println!("cargo:rustc-link-lib=Ole32");
-            println!("cargo:rustc-link-lib=OleAut32");
-        }
-        // Please send in a PR for your favorite platform!
-        _ => {}
-    }
 
     if feature_gen_bindings {
         // Set up bindgen to generate bindings from our C++ wrapper.
@@ -233,8 +241,8 @@ fn main() -> Result<(), std::io::Error> {
         // Add some common flags.
         let bindings = bindings.clang_args(&["-x", "c++", "-std=c++14"]);
 
-        // Add OpenCV include directory.
-        let bindings = bindings.clang_arg(format!("-I{}", opencv_include_dir.display()));
+        // Add OpenCV include directories.
+        let bindings = opencv_include_dirs.iter().fold(bindings, |bindings, dir| bindings.clang_arg(format!("-I{}", dir.display())));
 
         // Add all wrapper headers.
         let bindings = all_used_modules

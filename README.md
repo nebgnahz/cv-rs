@@ -57,7 +57,8 @@ You must have:
 - `cmake`
 - `libgtk-3-dev`
 - `libpng-dev`
-- `zlibg1-dev`
+- `libtiff-dev`
+- `pkg-config`
 
 Please create an issue if there are any other unlisted dependencies.
 
