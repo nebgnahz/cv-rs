@@ -54,13 +54,14 @@ fn main() {
             );
         }
     }
-    let complete_buffer = izip!(
+    let rgb_pixels = izip!(
         blue.data().iter().cloned(),
         green.data().iter().cloned(),
         red.data().iter().cloned()
-    )
-    .flat_map(|(b, g, r)| once(b).chain(once(g)).chain(once(r)))
-    .collect::<Vec<u8>>();
+    );
+    let complete_buffer = rgb_pixels
+        .flat_map(|(b, g, r)| once(b).chain(once(g)).chain(once(r)))
+        .collect::<Vec<u8>>();
     let draw_mat = unsafe { Mat::from_buffer(blue.rows, blue.cols, mat.cv_type(), &complete_buffer) };
 
     draw_mat.show("SIFT Points", 0).unwrap();
