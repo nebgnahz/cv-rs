@@ -42,7 +42,7 @@ before_install:
   - clang-format --version
 
 script:
-  - cargo build --no-default-features
+  - cargo build --no-default-features -vv
   - cargo test -v --no-default-features
   - cargo build --features cuda
   - cargo build --features text,tesseract

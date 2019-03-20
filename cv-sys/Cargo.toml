@@ -17,3 +17,4 @@ gen-bindings = []
 [build-dependencies]
 bindgen = "0.48.1"
 cmake = "0.1.35"
+pkg-config = "0.3.14"

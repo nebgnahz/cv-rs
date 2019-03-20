@@ -21,108 +21,49 @@ This library primarily provides idiomatic bindings and APIs for OpenCV 3.x.
 OpenCV (Open Source Computer Vision Library: http://opencv.org) is an
 open-source BSD-licensed library that includes several hundreds of computer
 vision algorithms. It's mainly developed in C++. This library provides Rust
-bindings to access OpenCV functionalities. First, C bindings are created
-(in [native](native) folder); then [Rust APIs](src/lib.rs) are constructed
-atop. Although this manual process seems an inefficient process, it has served
-me well as a learning experience to both OpenCV and Rust. In terms of OpenCV API
-coverage, modules and functions are implemented as needed.
+bindings to access OpenCV functionalities. First, C++ bindings are created
+(in [cv-sys/native](cv-sys/native) folder), then [Rust APIs](src/lib.rs) are constructed
+atop. In terms of OpenCV API coverage, modules and functions are implemented as needed.
+
+To add new APIs, install `clang` on your system and add your APIs in
+[cv-sys/native](cv-sys/native) to the appropriate module's `hpp` and `cc` files.
+Then use the `gen-bindings` feature at the command line:
+`cargo test -vv --features gen-bindings` (the `vv` lets you see
+C++ compiler output). This will generate new bindings instead
+of using the prebuilt ones. At this point you can now access the generated Rust
+bindings (use `cargo doc -p cv-sys --features gen-bindings` to generate docs).
+Use these bindings to implement native Rust bindings in [src](src). See the
+existing bindings for examples.
+
+To add new modules, please see [the build script](cv-sys/build.rs).
 
 Please check out the [documentation](https://nebgnahz.github.io/cv-rs/cv/) to
 see what has been ported. If you have demand for porting specific features,
 please open an issue, or better create a PR.
 
-Attempts to use [rust-bindgen](https://github.com/servo/rust-bindgen)
-or [cpp_to_rust](https://github.com/rust-qt/cpp_to_rust) haven't been very
-successful (I probably haven't tried hard enough). There is another
-port [opencv-rust](https://github.com/kali/opencv-rust/) which generates OpenCV
-bindings using a Python script (more automated).
+There is another port [opencv-rust](https://github.com/kali/opencv-rust/) which
+generates OpenCV bindings using a Python script (more automated). This binds
+to OpenCV 2, so if you are looking for OpenCV 2, this could be more suitable for
+your needs.
 
 ## Static Build (default behavior)
 
-`cv-sys` generated bindings are ran through `rustfmt` to ensure they are readable.
-This requires the developer to have `rustfmt` installed as a component in `rustup`,
-otherwise it wont format the bindings.
-
-```bash
-rustup component add rustfmt
-```
-
 ### Debian
 
-You must have `clang`, `libc++-dev`, and `cmake` installed.
+You must have:
 
-`libgtk2.0-dev` is required for certian functionality.
+- `clang`
+- `libc++-dev`
+- `cmake`
+- `libgtk-3-dev`
+- `libpng-dev`
+- `zlibg1-dev`
+
+Please create an issue if there are any other unlisted dependencies.
 
 ### Windows
 
 You must have `cmake` installed.
-
-## Install
-
-Before anything, make sure you have OpenCV 3 installed. If you are using windows, follow [this instruction](#windows), otherwise read this
-[Introduction to OpenCV][opencv-intro] to get started.
-
-Then in any Rust project, add this to your `Cargo.toml`:
-
-```
-[dependencies]
-cv = { git = "https://github.com/nebgnahz/cv-rs.git" }
-```
-
-And add this to your crate:
-
-```
-extern crate cv;
-use cv::*;
-```
-
-And then, enjoy the power of OpenCV.
-
-If you'd like to use OpenCV GPU functions, it's inside `cv::cuda`. Enable it
-with the following code in `Cargo.toml`:
-
-```
-[dependencies.cv]
-git = "https://github.com/nebgnahz/cv-rs"
-features = [ "cuda" ]
-```
-
-All possible features are listed below:
-- `cuda` - for CUDA support, requires installed CUDA
-- `text` - for text recognition support. Requires building from sources, is not included in most package managers by default, e.g. in brew
-- `tesseract` - for Tesseract OCR support, requires installed Tesseract and enabled `text` feature
-
-### Windows
-
-#### If you are using MSVC toolchain (mandatory if you want to use CUDA)
-##### Prerequisites
-- Installed git.
-- Installed CMake x64 ([download link](https://cmake.org/download/)).
-- Installed Visual Studio 2015 ([download link](https://go.microsoft.com/fwlink/?LinkId=532606&clcid=0x409)), VS2017 is not supported by nVidia at this moment, don't even try, it won't compile.
-
-##### Installation steps
-- Create directory `C:\opencv`.
-- Copy `.git` and `.windows` folders there (you can run them from the `cv-rs` directory itself, but you may encounter an error that paths are too long)
-- Run powershell console as administrator in `c:\opencv`.
-- (***Optional, skip these steps if you don't need CUDA***)
-    1. Download CUDA from [official site](https://developer.nvidia.com/cuda-downloads?target_os=Windows&target_arch=x86_64&target_version=10). Choose `local` package.
-    1. Run `PowerShell -NoExit -File .\.windows\msvc_1_install_CUDA.ps1 -FileName path_to_installer` (for example, `C:\Users\UserName\Downloads\cuda_9.1.85_win10.exe`).
-- Run `PowerShell -NoExit -File (.\.windows\msvc_2_build_OCV.ps1 -EnableCuda $False -Compiler vc15)` (note braces). `1` stays for compilation with CUDA, `0` for compilation without it. Possible compiler values: `vc14` for VS2015/`vc15` for VS2017. **Caution: CUDA is compatible with VS2015 only**
-- Wait until installation finishes. Now you have properly configured OpenCV.
-
-#### If you are using GNU toolchain
-
-##### Prerequisites
-- Installed git.
-- Installed CMake x64 ([download link](https://cmake.org/download/)).
-- Installed MinGW ([download link](https://sourceforge.net/projects/mingw-w64/files/latest/download)). Choose architecture `x86_64` during installation.
-
-##### Installation steps
-- Create directory `C:\opencv`.
-- Copy `.git` and `.windows` folders there (you can run them from the `cv-rs` directory itself, but you may encounter an error that paths are too long)
-- Run powershell console as administrator in `c:\opencv`.
-- Run `PowerShell -NoExit -File .\.windows\mingw_build_OCV.ps1 -MinGWPath "C:\Program Files\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin"` (your path may be different).
-- Wait until installation finishes. Now you have properly configured OpenCV.
 
 ## Usage
 

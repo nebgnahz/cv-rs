@@ -11,7 +11,11 @@ use std::iter::FromIterator;
 #[cfg(feature = "gen-bindings")]
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 #[cfg(not(feature = "gen-bindings"))]
-include!("bindings.rs");
+#[cfg(target_os = "linux")]
+include!("bindings-linux.rs");
+#[cfg(not(feature = "gen-bindings"))]
+#[cfg(target_os = "windows")]
+include!("bindings-windows.rs");
 
 // Create opaque types.
 pub enum cv_BOWKMeansTrainer {}

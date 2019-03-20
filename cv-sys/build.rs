@@ -6,6 +6,16 @@ use cmake::Config;
 use std::env;
 use std::path::PathBuf;
 
+fn link_package(name: &str) {
+    let package = pkg_config::probe_library(name).expect(&format!("must install {}", name));
+    for libpath in &package.link_paths {
+        println!("cargo:rustc-link-search={}", libpath.display());
+    }
+    for lib in &package.libs {
+        println!("cargo:rustc-link-lib={}", lib);
+    }
+}
+
 fn cmake_bool(flag: bool) -> &'static str {
     if flag {
         "ON"
@@ -161,7 +171,7 @@ fn main() -> Result<(), std::io::Error> {
     // Link all dependencies.
     for entry in opencv_lib_dir.read_dir()? {
         let entry = entry?;
-        if entry.path().extension().map(|os| os == "cmake").unwrap_or(false) {
+        if entry.path().extension().map(|os| os == "cmake").unwrap_or(false) || entry.path().is_dir() {
             continue;
         }
         let libname = entry
@@ -171,7 +181,14 @@ fn main() -> Result<(), std::io::Error> {
             .to_str()
             .expect("OpenCV lib names must be unicode")
             .to_owned();
-        println!("cargo:rustc-link-lib=static={}", libname);
+        println!(
+            "cargo:rustc-link-lib=static={}",
+            if target_os == "windows" {
+                &libname
+            } else {
+                &libname[3..]
+            }
+        );
     }
 
     // Add search path for OpenCV libs.
@@ -180,7 +197,9 @@ fn main() -> Result<(), std::io::Error> {
     // Handle OS-specific linker requirements.
     match target_os.as_str() {
         "linux" => {
-            println!("cargo:rustc-link-lib=gomp");
+            link_package("gtk+-3.0");
+            link_package("libpng");
+            link_package("zlib");
             println!("cargo:rustc-link-lib=stdc++");
         }
         "windows" => {
