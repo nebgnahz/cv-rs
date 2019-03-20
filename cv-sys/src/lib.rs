@@ -8,7 +8,10 @@ use std::ffi::CStr;
 use std::iter::FromIterator;
 
 // Include bindings.
+#[cfg(feature = "gen-bindings")]
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+#[cfg(not(feature = "gen-bindings"))]
+include!("bindings.rs");
 
 // Create opaque types.
 pub enum cv_BOWKMeansTrainer {}
