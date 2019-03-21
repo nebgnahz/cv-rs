@@ -196,6 +196,7 @@ fn main() -> Result<(), std::io::Error> {
                 link_all_libs(&dst.join("lib"), &target_os)?;
                 link_package("libpng");
                 link_package("libtiff-4");
+                link_package("libjpeg");
                 vec![dst.join("include")]
             }
             p => panic!("unsupported platform {}, please file an issue", p),

@@ -58,6 +58,7 @@ You must have:
 - `libgtk-3-dev`
 - `libpng-dev`
 - `libtiff-dev`
+- `libjpeg-dev`
 - `pkg-config`
 
 Please create an issue if there are any other unlisted dependencies.
