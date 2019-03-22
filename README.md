@@ -60,7 +60,6 @@ You must have:
 - `libtiff-dev`
 - `libjpeg-dev`
 - `pkg-config`
-- `libgtk-3-dev`
 
 Please create an issue if there are any other unlisted dependencies.
 
