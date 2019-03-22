@@ -8,8 +8,9 @@ void* surf_new(double hessianThreshold, int nOctaves, int nOctaveLayers, bool ex
     return new cv::Ptr<cv::xfeatures2d::SURF>(result);
 }
 void surf_drop(void* detector) {
-    delete detector;
-    detector = nullptr;
+    cv::Ptr<cv::xfeatures2d::SURF>* nat_detector = static_cast<cv::Ptr<cv::xfeatures2d::SURF>*>(detector);
+    delete nat_detector;
+    nat_detector = nullptr;
 }
 
 void surf_detect_and_compute(void* detector,
@@ -29,8 +30,9 @@ void* sift_new(int nfeatures, int nOctaveLayers, double contrastThreshold, doubl
     return new cv::Ptr<cv::xfeatures2d::SIFT>(result);
 }
 void sift_drop(void* detector) {
-    delete detector;
-    detector = nullptr;
+    cv::Ptr<cv::xfeatures2d::SIFT>* nat_detector = static_cast<cv::Ptr<cv::xfeatures2d::SIFT>*>(detector);
+    delete nat_detector;
+    nat_detector = nullptr;
 }
 
 void sift_detect_and_compute(void* detector,
@@ -40,7 +42,7 @@ void sift_detect_and_compute(void* detector,
                              cv::Mat* descriptors,
                              bool useProvidedKeypoints) {
     std::vector<cv::KeyPoint> keypoints_vector;
-    auto nat_detector = static_cast<cv::Ptr<cv::xfeatures2d::SURF>*>(detector);
+    auto nat_detector = static_cast<cv::Ptr<cv::xfeatures2d::SIFT>*>(detector);
     nat_detector->get()->detectAndCompute(*image, *mask, keypoints_vector, *descriptors, useProvidedKeypoints);
     to_ffi(keypoints_vector, keypoints);
 }

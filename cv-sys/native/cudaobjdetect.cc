@@ -12,16 +12,19 @@ void* cuda_gpu_mat_default() {
     return new cv::cuda::GpuMat();
 }
 
-void cuda_gpu_mat_drop(cv::cuda::GpuMat* gpu_image) {
+void cuda_gpu_mat_drop(void* v_gpu_image) {
+    cv::cuda::GpuMat* gpu_image = static_cast<cv::cuda::GpuMat*>(v_gpu_image);
     delete gpu_image;
     gpu_image = nullptr;
 }
 
-void cuda_gpu_mat_upload(cv::cuda::GpuMat* gpu_image, cv::Mat* image) {
+void cuda_gpu_mat_upload(void* v_gpu_image, cv::Mat* image) {
+    cv::cuda::GpuMat* gpu_image = static_cast<cv::cuda::GpuMat*>(v_gpu_image);
     gpu_image->upload(*image);
 }
 
-void* mat_from_gpu_mat(cv::cuda::GpuMat* gpu_image) {
+void* mat_from_gpu_mat(void* v_gpu_image) {
+    cv::cuda::GpuMat* gpu_image = static_cast<cv::cuda::GpuMat*>(v_gpu_image);
     return (new cv::Mat(*gpu_image));
 }
 
@@ -47,25 +50,31 @@ void* cuda_hog_new(Size2i win_size, Size2i block_size, Size2i block_stride, Size
     return new cv::Ptr<cv::cuda::HOG>(hog);
 }
 
-void cuda_hog_drop(cv::Ptr<cv::cuda::HOG>* hog) {
+void cuda_hog_drop(void* v_hog) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     delete hog;
     hog = nullptr;
 }
 
-void cuda_hog_set_detector(cv::Ptr<cv::cuda::HOG>* hog, std::vector<float>* detector) {
+void cuda_hog_set_detector(void* v_hog, std::vector<float>* detector) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     (*hog)->setSVMDetector(*detector);
 }
 
-void cuda_hog_detect(cv::Ptr<cv::cuda::HOG>* hog, cv::cuda::GpuMat* image, CVec<Rect>* found) {
+void cuda_hog_detect(void* v_hog, void* v_image, CVec<Rect>* found) {
+    cv::cuda::GpuMat* image = static_cast<cv::cuda::GpuMat*>(v_image);
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     std::vector<cv::Rect> vec_object;
     (*hog)->detectMultiScale(*image, vec_object);
     to_ffi(vec_object, found);
 }
 
-void cuda_hog_detect_with_conf(cv::Ptr<cv::cuda::HOG>* hog,
-                               cv::cuda::GpuMat* image,
+void cuda_hog_detect_with_conf(void* v_hog,
+                               void* v_image,
                                CVec<Rect>* found,
                                CVec<double>* conf) {
+    cv::cuda::GpuMat* image = static_cast<cv::cuda::GpuMat*>(v_image);
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     std::vector<cv::Rect> vec_object;
     std::vector<double> vec_confidences;
     (*hog)->setGroupThreshold(0);
@@ -74,68 +83,84 @@ void cuda_hog_detect_with_conf(cv::Ptr<cv::cuda::HOG>* hog,
     to_ffi(vec_confidences, conf);
 }
 
-void cuda_hog_set_gamma_correction(cv::Ptr<cv::cuda::HOG>* hog, bool gamma) {
+void cuda_hog_set_gamma_correction(void* v_hog, bool gamma) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     (*hog)->setGammaCorrection(gamma);
 }
 
-void cuda_hog_set_group_threshold(cv::Ptr<cv::cuda::HOG>* hog, int group_threshold) {
+void cuda_hog_set_group_threshold(void* v_hog, int group_threshold) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     (*hog)->setGroupThreshold(group_threshold);
 }
 
-void cuda_hog_set_hit_threshold(cv::Ptr<cv::cuda::HOG>* hog, double hit_threshold) {
+void cuda_hog_set_hit_threshold(void* v_hog, double hit_threshold) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     (*hog)->setHitThreshold(hit_threshold);
 }
 
-void cuda_hog_set_l2hys_threshold(cv::Ptr<cv::cuda::HOG>* hog, double l2hys_threshold) {
+void cuda_hog_set_l2hys_threshold(void* v_hog, double l2hys_threshold) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     (*hog)->setL2HysThreshold(l2hys_threshold);
 }
 
-void cuda_hog_set_num_levels(cv::Ptr<cv::cuda::HOG>* hog, int num_levels) {
+void cuda_hog_set_num_levels(void* v_hog, int num_levels) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     (*hog)->setNumLevels(num_levels);
 }
 
-void cuda_hog_set_scale_factor(cv::Ptr<cv::cuda::HOG>* hog, double scale_factor) {
+void cuda_hog_set_scale_factor(void* v_hog, double scale_factor) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     (*hog)->setScaleFactor(scale_factor);
 }
 
-void cuda_hog_set_win_sigma(cv::Ptr<cv::cuda::HOG>* hog, double win_sigma) {
+void cuda_hog_set_win_sigma(void* v_hog, double win_sigma) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     (*hog)->setWinSigma(win_sigma);
 }
 
-void cuda_hog_set_win_stride(cv::Ptr<cv::cuda::HOG>* hog, Size2i win_stride) {
-    cv::Size win_stride(win_stride.width, win_stride.height);
-    (*hog)->setWinStride(win_stride);
+void cuda_hog_set_win_stride(void* v_hog, Size2i win_stride) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
+    cv::Size nat_win_stride(win_stride.width, win_stride.height);
+    (*hog)->setWinStride(nat_win_stride);
 }
 
-bool cuda_hog_get_gamma_correction(cv::Ptr<cv::cuda::HOG>* hog) {
+bool cuda_hog_get_gamma_correction(void* v_hog) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     return (*hog)->getGammaCorrection();
 }
 
-int cuda_hog_get_group_threshold(cv::Ptr<cv::cuda::HOG>* hog) {
+int cuda_hog_get_group_threshold(void* v_hog) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     return (*hog)->getGroupThreshold();
 }
 
-double cuda_hog_get_hit_threshold(cv::Ptr<cv::cuda::HOG>* hog) {
+double cuda_hog_get_hit_threshold(void* v_hog) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     return (*hog)->getHitThreshold();
 }
 
-double cuda_hog_get_l2hys_threshold(cv::Ptr<cv::cuda::HOG>* hog) {
+double cuda_hog_get_l2hys_threshold(void* v_hog) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     return (*hog)->getL2HysThreshold();
 }
 
-int cuda_hog_get_num_levels(cv::Ptr<cv::cuda::HOG>* hog) {
+int cuda_hog_get_num_levels(void* v_hog) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     return (*hog)->getNumLevels();
 }
 
-double cuda_hog_get_scale_factor(cv::Ptr<cv::cuda::HOG>* hog) {
+double cuda_hog_get_scale_factor(void* v_hog) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     return (*hog)->getScaleFactor();
 }
 
-double cuda_hog_get_win_sigma(cv::Ptr<cv::cuda::HOG>* hog) {
+double cuda_hog_get_win_sigma(void* v_hog) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     return (*hog)->getWinSigma();
 }
 
-Size2i cuda_hog_get_win_stride(cv::Ptr<cv::cuda::HOG>* hog) {
+Size2i cuda_hog_get_win_stride(void* v_hog) {
+    cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     cv::Size size = (*hog)->getWinStride();
     Size2i c_size;
     c_size.width = size.width;
@@ -151,12 +176,15 @@ void* cuda_cascade_new(const char* const filename) {
     return new cv::Ptr<cv::cuda::CascadeClassifier>(cascade);
 }
 
-void cuda_cascade_drop(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+void cuda_cascade_drop(void* v_cascade) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     delete cascade;
     cascade = nullptr;
 }
 
-void cuda_cascade_detect(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, cv::cuda::GpuMat* image, CVec<Rect>* objects) {
+void cuda_cascade_detect(void* v_cascade, void* v_image, CVec<Rect>* objects) {
+    cv::cuda::GpuMat* image = static_cast<cv::cuda::GpuMat*>(v_image);
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     cv::cuda::GpuMat objbuf;
     std::vector<cv::Rect> vec_object;
 
@@ -166,63 +194,76 @@ void cuda_cascade_detect(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, cv::cuda
     to_ffi(vec_object, objects);
 }
 
-void cuda_cascade_set_find_largest_object(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, bool value) {
+void cuda_cascade_set_find_largest_object(void* v_cascade, bool value) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     (*cascade)->setFindLargestObject(value);
 }
 
-void cuda_cascade_set_max_num_objects(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, int num) {
+void cuda_cascade_set_max_num_objects(void* v_cascade, int num) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     (*cascade)->setMaxNumObjects(num);
 }
 
-void cuda_cascade_set_min_neighbors(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, int min) {
+void cuda_cascade_set_min_neighbors(void* v_cascade, int min) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     (*cascade)->setMinNeighbors(min);
 }
 
-void cuda_cascade_set_max_object_size(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, Size2i max_size) {
-    cv::Size max_size(max_size.width, max_size.height);
-    (*cascade)->setMaxObjectSize(max_size);
+void cuda_cascade_set_max_object_size(void* v_cascade, Size2i max_size) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
+    cv::Size nat_max_size(max_size.width, max_size.height);
+    (*cascade)->setMaxObjectSize(nat_max_size);
 }
 
-void cuda_cascade_set_min_object_size(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, Size2i min_size) {
-    cv::Size min_size(min_size.width, min_size.height);
-    (*cascade)->setMinObjectSize(min_size);
+void cuda_cascade_set_min_object_size(void* v_cascade, Size2i min_size) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
+    cv::Size nat_min_size(min_size.width, min_size.height);
+    (*cascade)->setMinObjectSize(nat_min_size);
 }
 
-void cuda_cascade_set_scale_factor(cv::Ptr<cv::cuda::CascadeClassifier>* cascade, double factor) {
+void cuda_cascade_set_scale_factor(void* v_cascade, double factor) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     (*cascade)->setScaleFactor(factor);
 }
 
-Size2i cuda_cascade_get_classifier_size(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+Size2i cuda_cascade_get_classifier_size(void* v_cascade) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     cv::Size2i size = (*cascade)->getClassifierSize();
     Size2i c_size = {size.width, size.height};
     return c_size;
 }
 
-bool cuda_cascade_get_find_largest_object(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+bool cuda_cascade_get_find_largest_object(void* v_cascade) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     return (*cascade)->getFindLargestObject();
 }
 
-int cuda_cascade_get_max_num_objects(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+int cuda_cascade_get_max_num_objects(void* v_cascade) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     return (*cascade)->getMaxNumObjects();
 }
 
-int cuda_cascade_get_min_neighbors(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+int cuda_cascade_get_min_neighbors(void* v_cascade) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     return (*cascade)->getMinNeighbors();
 }
 
-Size2i cuda_cascade_get_max_object_size(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+Size2i cuda_cascade_get_max_object_size(void* v_cascade) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     cv::Size2i size = (*cascade)->getMaxObjectSize();
     Size2i c_size = {.width = size.width, .height = size.height};
     return c_size;
 }
 
-Size2i cuda_cascade_get_min_object_size(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+Size2i cuda_cascade_get_min_object_size(void* v_cascade) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     cv::Size2i size = (*cascade)->getMinObjectSize();
     Size2i c_size = {.width = size.width, .height = size.height};
     return c_size;
 }
 
-double cuda_cascade_get_scale_factor(cv::Ptr<cv::cuda::CascadeClassifier>* cascade) {
+double cuda_cascade_get_scale_factor(void* v_cascade) {
+    cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     return (*cascade)->getScaleFactor();
 }
 
