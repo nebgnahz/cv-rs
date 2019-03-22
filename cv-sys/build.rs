@@ -154,6 +154,7 @@ fn main() -> Result<(), std::io::Error> {
             .define("OPENCV_3P_LIB_INSTALL_PATH", &out_lib_dir)
             .define("OPENCV_BIN_INSTALL_PATH", &out_bin_dir)
             .define("WITH_CUDA", cmake_bool(feature_cuda))
+            .define("BUILD_opencv_cudacodec", "OFF")
             // TODO: IPP creates some really annoying build issues on Windows.
             // Eventually we need to fix it.
             .define("WITH_IPP", "OFF")
