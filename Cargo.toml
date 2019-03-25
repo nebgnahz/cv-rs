@@ -24,5 +24,4 @@ cuda = ["native/cuda"]
 text = []
 tesseract = []
 system = ["native/system"]
-gen-bindings = ["native/gen-bindings"]
 

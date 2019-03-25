@@ -72,7 +72,8 @@ fn main() -> Result<(), std::io::Error> {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let feature_cuda = env::var("CARGO_FEATURE_CUDA").is_ok();
     let feature_system = env::var("CARGO_FEATURE_SYSTEM").is_ok();
-    let feature_gen_bindings = env::var("CARGO_FEATURE_GEN_BINDINGS").is_ok();
+
+    let disabled_modules = vec!["cudaoptflow", "superres", "cudafilters"];
 
     let mut used_core_modules = vec![
         "core",
@@ -136,6 +137,11 @@ fn main() -> Result<(), std::io::Error> {
         // Set which modules we want to build.
         for module in &all_used_modules {
             opencv_config.define(format!("BUILD_opencv_{}", module), "ON");
+        }
+
+        // Set which modules not to build.
+        for module in &disabled_modules {
+            opencv_config.define(format!("BUILD_opencv_{}", module), "OFF");
         }
 
         let out_lib_dir = out_dir
@@ -225,51 +231,49 @@ fn main() -> Result<(), std::io::Error> {
     // Add search path for OpenCV libs (on Windows non-system) and cvsys (on all platforms).
     println!("cargo:rustc-link-search={}", dst.join("lib").display());
 
-    if feature_gen_bindings {
-        // Set up bindgen to generate bindings from our C++ wrapper.
-        // This whitelists exactly the stuff that is needed using regex.
-        let bindings = Builder::default()
-            .rustfmt_bindings(true)
-            .whitelist_recursively(false)
-            .derive_eq(true)
-            .derive_ord(true)
-            .derive_hash(true)
-            .derive_debug(true)
-            .derive_copy(true)
-            .whitelist_function("cvsys::.*")
-            .whitelist_type("cvsys::.*")
-            .opaque_type("cv::.*")
-            .opaque_type("std::.*")
-            .whitelist_type("cv::MouseCallback")
-            .whitelist_type("cv::text::classifier_type");
+    // Set up bindgen to generate bindings from our C++ wrapper.
+    // This whitelists exactly the stuff that is needed using regex.
+    let bindings = Builder::default()
+        .rustfmt_bindings(true)
+        .whitelist_recursively(false)
+        .derive_eq(true)
+        .derive_ord(true)
+        .derive_hash(true)
+        .derive_debug(true)
+        .derive_copy(true)
+        .whitelist_function("cvsys::.*")
+        .whitelist_type("cvsys::.*")
+        .opaque_type("cv::.*")
+        .opaque_type("std::.*")
+        .whitelist_type("cv::MouseCallback")
+        .whitelist_type("cv::text::classifier_type");
 
-        // Add some common flags.
-        let bindings = bindings.clang_args(&["-x", "c++", "-std=c++14"]);
+    // Add some common flags.
+    let bindings = bindings.clang_args(&["-x", "c++", "-std=c++14"]);
 
-        // Add OpenCV include directories.
-        let bindings = opencv_include_dirs.iter().fold(bindings, |bindings, dir| bindings.clang_arg(format!("-I{}", dir.display())));
+    // Add OpenCV include directories.
+    let bindings = opencv_include_dirs.iter().fold(bindings, |bindings, dir| bindings.clang_arg(format!("-I{}", dir.display())));
 
-        // Add all wrapper headers.
-        let bindings = all_used_modules
-            .iter()
-            .map(|lib| format!("native/{}.hpp", lib))
-            .fold(bindings, Builder::header);
+    // Add all wrapper headers.
+    let bindings = all_used_modules
+        .iter()
+        .map(|lib| format!("native/{}.hpp", lib))
+        .fold(bindings, Builder::header);
 
-        // Change bindgen settings based on OS.
-        let bindings = match target_os.as_str() {
-            "linux" => bindings.clang_arg("-stdlib=libc++"),
-            _ => bindings,
-        };
+    // Change bindgen settings based on OS.
+    let bindings = match target_os.as_str() {
+        "linux" => bindings.clang_arg("-stdlib=libc++"),
+        _ => bindings,
+    };
 
-        // Finally generate the bindings.
-        let bindings = bindings.generate().expect("bindgen was unable to generate bindings");
+    // Finally generate the bindings.
+    let bindings = bindings.generate().expect("bindgen was unable to generate bindings");
 
-        // Write the bindings in the build directory.
-        let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
-        bindings
-            .write_to_file(out_path.join("bindings.rs"))
-            .expect("Couldn't write bindings!");
-    }
+    // Write the bindings in the build directory.
+    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    bindings
+        .write_to_file(out_path.join("bindings.rs"))
+        .expect("Couldn't write bindings!");
 
     Ok(())
 }
