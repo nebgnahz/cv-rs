@@ -110,7 +110,9 @@ mod unix {
         println!("cargo:rustc-link-lib=opencv_imgcodecs");
         println!("cargo:rustc-link-lib=opencv_imgproc");
         println!("cargo:rustc-link-lib=opencv_objdetect");
-        println!("cargo:rustc-link-lib=opencv_text");
+        if cfg!(feature = "text") {
+            println!("cargo:rustc-link-lib=opencv_text");
+        }
         println!("cargo:rustc-link-lib=opencv_videoio");
         println!("cargo:rustc-link-lib=opencv_video");
         if cfg!(feature = "cuda") {
@@ -137,6 +139,11 @@ fn main() {
 
     if cfg!(not(target_env = "msvc")) {
         opencv_config.flag("--std=c++11");
+    }
+
+    if cfg!(feature = "text") {
+        let text_files = get_files("native/text");
+        opencv_config.files(text_files);
     }
 
     if cfg!(feature = "cuda") {
