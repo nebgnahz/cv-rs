@@ -107,6 +107,7 @@ fn main() -> Result<(), std::io::Error> {
     if feature_cuda {
         println!("cargo:rustc-link-lib=nvrtc");
         println!("cargo:rustc-link-lib=cudart");
+        println!("cargo:rustc-link-lib=cuda");
     }
 
     let opencv_include_dirs = if feature_system {
@@ -164,6 +165,7 @@ fn main() -> Result<(), std::io::Error> {
             .define("OPENCV_3P_LIB_INSTALL_PATH", &out_lib_dir)
             .define("OPENCV_BIN_INSTALL_PATH", &out_bin_dir)
             .define("WITH_CUDA", cmake_bool(feature_cuda))
+            .define("CUDA_NVCC_FLAGS", "--expt-relaxed-constexpr")
             .define("BUILD_opencv_cudacodec", "OFF")
             // TODO: IPP creates some really annoying build issues on Windows.
             // Eventually we need to fix it.

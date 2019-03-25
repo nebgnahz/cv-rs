@@ -71,9 +71,9 @@ You must install these packages (use `sudo apt install <package>`):
   - You can avoid these steps by uninstalling every `gcc` and `g++` aside from `7`.
   - `sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7`
   - `sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7`
-  - `sudo update-alternatives --configure gcc`
+  - `sudo update-alternatives --config gcc`
     - Choose `gcc-7` manual option.
-  - `sudo update-alternatives --configure g++`
+  - `sudo update-alternatives --config g++`
     - Choose `g++-7` manual option.
   - You may need to install alternatives for other `gcc` and `g++` verisons on your system
     if you wish to switch to another `gcc` version in the future.
