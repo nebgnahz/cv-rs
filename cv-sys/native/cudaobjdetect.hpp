@@ -13,7 +13,7 @@ namespace cvsys {
 void* cuda_gpu_mat_default();
 void cuda_gpu_mat_drop(void*);
 void cuda_gpu_mat_upload(void*, cv::Mat*);
-void* mat_from_gpu_mat(void*);
+cv::Mat* mat_from_gpu_mat(void*);
 void* cuda_gpu_mat_from_mat(cv::Mat*);
 
 // =============================================================================
@@ -22,7 +22,7 @@ void* cuda_gpu_mat_from_mat(cv::Mat*);
 void* cuda_hog_default();
 void* cuda_hog_new(Size2i win_size, Size2i block_size, Size2i block_stride, Size2i cell_size, int nbins);
 void cuda_hog_drop(void*);
-void cuda_hog_set_detector(void*, std::vector<float>*);
+void cuda_hog_set_detector(void*, void*);
 void cuda_hog_detect(void*, void*, CVec<Rect>*);
 void cuda_hog_detect_with_conf(void*, void*, CVec<Rect>*, CVec<double>*);
 

@@ -23,7 +23,7 @@ void cuda_gpu_mat_upload(void* v_gpu_image, cv::Mat* image) {
     gpu_image->upload(*image);
 }
 
-void* mat_from_gpu_mat(void* v_gpu_image) {
+cv::Mat* mat_from_gpu_mat(void* v_gpu_image) {
     cv::cuda::GpuMat* gpu_image = static_cast<cv::cuda::GpuMat*>(v_gpu_image);
     return (new cv::Mat(*gpu_image));
 }
@@ -56,7 +56,8 @@ void cuda_hog_drop(void* v_hog) {
     hog = nullptr;
 }
 
-void cuda_hog_set_detector(void* v_hog, std::vector<float>* detector) {
+void cuda_hog_set_detector(void* v_hog, void* v_detector) {
+    std::vector<float>* detector = static_cast<std::vector<float>*>(v_detector);
     cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     (*hog)->setSVMDetector(*detector);
 }
@@ -69,10 +70,7 @@ void cuda_hog_detect(void* v_hog, void* v_image, CVec<Rect>* found) {
     to_ffi(vec_object, found);
 }
 
-void cuda_hog_detect_with_conf(void* v_hog,
-                               void* v_image,
-                               CVec<Rect>* found,
-                               CVec<double>* conf) {
+void cuda_hog_detect_with_conf(void* v_hog, void* v_image, CVec<Rect>* found, CVec<double>* conf) {
     cv::cuda::GpuMat* image = static_cast<cv::cuda::GpuMat*>(v_image);
     cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     std::vector<cv::Rect> vec_object;

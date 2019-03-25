@@ -3,22 +3,18 @@
 
 use super::core::*;
 use super::errors::*;
-use super::objdetect::{CSvmDetector, HogParams, ObjectDetect, SvmDetector};
+use super::objdetect::{HogParams, ObjectDetect, SvmDetector};
 use failure::Error;
-use std::ffi::CString;
-use std::os::raw::{c_char, c_double, c_int};
+use std::ffi::{CString, c_void};
+use std::os::raw::{c_int, c_double};
 use std::path::Path;
 use *;
-
-/// Opaque data struct for C/C++ cv::cuda::GpuMat bindings
-#[derive(Clone, Copy, Debug)]
-pub enum CGpuMat {}
 
 /// `GpuMat` data structure in rust, bound to an opaque type in C/C++.
 #[derive(Debug)]
 pub struct GpuMat {
     /// The pointer to the opaque C/C++ data structure
-    pub(crate) inner: *mut CGpuMat,
+    pub(crate) inner: *mut c_void,
 
     /// Number of columns
     pub cols: c_int,
@@ -42,7 +38,7 @@ impl GpuMat {
     }
 
     /// Creates a `GpuMat` from raw pointer.
-    pub(crate) fn from_raw(inner: *mut CGpuMat) -> GpuMat {
+    pub(crate) fn from_raw(inner: *mut c_void) -> GpuMat {
         GpuMat {
             inner: inner,
             cols: 0,
@@ -79,14 +75,10 @@ impl From<Mat> for GpuMat {
     }
 }
 
-/// Opaque data struct for C bindings
-#[derive(Clone, Copy, Debug)]
-pub enum CGpuHog {}
-
 #[derive(Debug)]
 /// Data structure that performs Histogram of Gradient (HOG).
 pub struct GpuHog {
-    inner: *mut CGpuHog,
+    inner: *mut c_void,
 
     /// Hog parameters.
     pub params: HogParams,
@@ -105,7 +97,7 @@ impl ObjectDetect for GpuHog {
         if self.return_score {
             self._detect_with_confidence(&gpu_mat)
         } else {
-            self._detect(&gpu_mat)
+            self._detect(&gpu_mat).into_iter().map(|r| (r, 0.0)).collect()
         }
     }
 }
@@ -126,7 +118,7 @@ impl Default for GpuHog {
 impl GpuHog {
     /// Creates a new GpuHog detector.
     pub fn new(win_size: Size2i, block_size: Size2i, block_stride: Size2i, cell_size: Size2i, nbins: c_int) -> GpuHog {
-        let inner = unsafe { native::cvsys_cuda_hog_new(win_size, block_size, block_stride, cell_size, nbins) };
+        let inner = unsafe { native::cvsys_cuda_hog_new(win_size.into(), block_size.into(), block_stride.into(), cell_size.into(), nbins) };
         let mut params = HogParams::default();
         GpuHog::update_params(inner, &mut params);
         GpuHog {
@@ -145,20 +137,20 @@ impl GpuHog {
     pub fn with_params(params: HogParams) -> GpuHog {
         let inner = unsafe {
             native::cvsys_cuda_hog_new(
-                params.win_size,
-                params.block_size,
-                params.block_stride,
-                params.cell_size,
+                params.win_size.into(),
+                params.block_size.into(),
+                params.block_stride.into(),
+                params.cell_size.into(),
                 params.nbins,
             )
         };
         unsafe {
             native::cvsys_cuda_hog_set_gamma_correction(inner, params.gamma_correction);
             native::cvsys_cuda_hog_set_l2hys_threshold(inner, params.l2hys_threshold);
-            native::cvsys_cuda_hog_set_num_levels(inner, params.nlevels);
+            native::cvsys_cuda_hog_set_num_levels(inner, params.nlevels as i32);
             native::cvsys_cuda_hog_set_win_sigma(inner, params.win_sigma);
 
-            native::cvsys_cuda_hog_set_win_stride(inner, params.win_stride);
+            native::cvsys_cuda_hog_set_win_stride(inner, params.win_stride.into());
             native::cvsys_cuda_hog_set_scale_factor(inner, params.scale);
             native::cvsys_cuda_hog_set_hit_threshold(inner, params.hit_threshold);
             native::cvsys_cuda_hog_set_group_threshold(inner, params.group_threshold);
@@ -171,15 +163,15 @@ impl GpuHog {
     }
 
     /// Updates the parameter inside this GpuHog detector.
-    fn update_params(inner: *mut CGpuHog, params: &mut HogParams) {
+    fn update_params(inner: *mut c_void, params: &mut HogParams) {
         params.gamma_correction = unsafe { native::cvsys_cuda_hog_get_gamma_correction(inner) };
         params.group_threshold = unsafe { native::cvsys_cuda_hog_get_group_threshold(inner) };
         params.hit_threshold = unsafe { native::cvsys_cuda_hog_get_hit_threshold(inner) };
         params.l2hys_threshold = unsafe { native::cvsys_cuda_hog_get_l2hys_threshold(inner) };
-        params.nlevels = unsafe { native::cvsys_cuda_hog_get_num_levels(inner) };
+        params.nlevels = unsafe { native::cvsys_cuda_hog_get_num_levels(inner) as usize };
         params.scale = unsafe { native::cvsys_cuda_hog_get_scale_factor(inner) };
         params.win_sigma = unsafe { native::cvsys_cuda_hog_get_win_sigma(inner) };
-        params.win_stride = unsafe { native::cvsys_cuda_hog_get_win_stride(inner) };
+        params.win_stride = unsafe { native::cvsys_cuda_hog_get_win_stride(inner).into() };
     }
 
     /// Sets the SVM detector.
@@ -188,24 +180,24 @@ impl GpuHog {
     }
 
     /// Detects according to the SVM detector specified.
-    fn _detect(&self, mat: &GpuMat) -> Vec<(Rect, f64)> {
-        let mut found = CVec::<Rect>::default();
+    fn _detect(&self, mat: &GpuMat) -> Vec<Rect> {
+        let mut found: native::cvsys_CVec<native::cvsys_Rect> = unsafe { std::mem::zeroed() };
         unsafe {
             native::cvsys_cuda_hog_detect(self.inner, mat.inner, &mut found);
         }
-        found.unpack().into_iter().map(|r| (r, 0f64)).collect::<Vec<_>>()
+        found.into()
     }
 
     /// Detects and returns the results with confidence (scores)
     fn _detect_with_confidence(&self, mat: &GpuMat) -> Vec<(Rect, f64)> {
-        let mut found = CVec::<Rect>::default();
-        let mut conf = CVec::<c_double>::default();
+        let mut found: native::cvsys_CVec<native::cvsys_Rect> = unsafe { std::mem::zeroed() };
+        let mut conf: native::cvsys_CVec<c_double> = unsafe { std::mem::zeroed() };
         unsafe { native::cvsys_cuda_hog_detect_with_conf(self.inner, mat.inner, &mut found, &mut conf) }
 
-        found
-            .unpack()
-            .into_iter()
-            .zip(conf.unpack().into_iter())
+        let rects: Vec<Rect> = found.iter().cloned().map(Into::into).collect();
+        let scores: Vec<f64> = conf.iter().cloned().collect();
+        rects.into_iter()
+            .zip(scores.into_iter())
             .collect::<Vec<_>>()
     }
 }
@@ -216,14 +208,10 @@ impl Drop for GpuHog {
     }
 }
 
-/// Opaque data struct for C bindings
-#[derive(Clone, Copy, Debug)]
-pub enum CGpuCascade {}
-
 #[derive(Debug)]
 /// Data structure that performs object detection with a cascade classifier.
 pub struct GpuCascade {
-    inner: *mut CGpuCascade,
+    inner: *mut c_void,
 }
 
 /// We can safely send a mutable pointer to a different thread
@@ -248,11 +236,11 @@ impl GpuCascade {
 
     /// Detects objects of different sizes in the input image.
     pub fn detect_multiscale(&self, mat: &GpuMat) -> Vec<Rect> {
-        let mut found = CVec::<Rect>::default();
+        let mut found: native::cvsys_CVec<native::cvsys_Rect> = unsafe { std::mem::zeroed() };
         unsafe {
             native::cvsys_cuda_cascade_detect(self.inner, mat.inner, &mut found);
         }
-        found.unpack()
+        found.into()
     }
 
     /// Sets whether or not to find the only largest object.
@@ -279,14 +267,14 @@ impl GpuCascade {
     /// Sets the maximun object size.
     pub fn set_max_object_size(&mut self, max: Size2i) {
         unsafe {
-            native::cvsys_cuda_cascade_set_max_object_size(self.inner, max);
+            native::cvsys_cuda_cascade_set_max_object_size(self.inner, max.into());
         }
     }
 
     /// Sets the minimal object size.
     pub fn set_min_object_size(&mut self, min: Size2i) {
         unsafe {
-            native::cvsys_cuda_cascade_set_min_object_size(self.inner, min);
+            native::cvsys_cuda_cascade_set_min_object_size(self.inner, min.into());
         }
     }
 
@@ -299,7 +287,7 @@ impl GpuCascade {
 
     /// Returns the classifier size.
     pub fn get_classifier_size(&self) -> Size2i {
-        unsafe { native::cvsys_cuda_cascade_get_classifier_size(self.inner) }
+        unsafe { native::cvsys_cuda_cascade_get_classifier_size(self.inner).into() }
     }
 
     /// Returns if the CascadeClassifier will only return the largest object.
@@ -320,12 +308,12 @@ impl GpuCascade {
 
     /// Returns the maximum object size.
     pub fn get_max_object_size(&self) -> Size2i {
-        unsafe { native::cvsys_cuda_cascade_get_max_object_size(self.inner) }
+        unsafe { native::cvsys_cuda_cascade_get_max_object_size(self.inner).into() }
     }
 
     /// Returns the minimal object size.
     pub fn get_min_object_size(&self) -> Size2i {
-        unsafe { native::cvsys_cuda_cascade_get_min_object_size(self.inner) }
+        unsafe { native::cvsys_cuda_cascade_get_min_object_size(self.inner).into() }
     }
 
     /// Returns the scale factor.

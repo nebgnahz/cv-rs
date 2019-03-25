@@ -48,9 +48,9 @@ your needs.
 
 ## Static Build (default behavior)
 
-### Debian
+### Debian & Ubuntu
 
-You must have:
+You must install these packages (use `sudo apt install <package>`):
 
 - `clang`
 - `libc++-dev`
@@ -60,6 +60,24 @@ You must have:
 - `libtiff-dev`
 - `libjpeg-dev`
 - `pkg-config`
+
+#### `cuda` feature
+
+- Install `nvidia-cuda-toolkit`
+  - `sudo apt install nvidia-cuda-toolkit`
+- Install `gcc-7`
+- Install `g++-7`
+- If `gcc-7` and `g++-7` are not the default (run `gcc -v` to check):
+  - You can avoid these steps by uninstalling every `gcc` and `g++` aside from `7`.
+  - `sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 7`
+  - `sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 7`
+  - `sudo update-alternatives --configure gcc`
+    - Choose `gcc-7` manual option.
+  - `sudo update-alternatives --configure g++`
+    - Choose `g++-7` manual option.
+  - You may need to install alternatives for other `gcc` and `g++` verisons on your system
+    if you wish to switch to another `gcc` version in the future.
+
 
 Please create an issue if there are any other unlisted dependencies.
 
