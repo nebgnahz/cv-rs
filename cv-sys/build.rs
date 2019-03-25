@@ -104,8 +104,10 @@ fn main() -> Result<(), std::io::Error> {
 
     // Link cvsys.
     println!("cargo:rustc-link-lib=static=cvsys");
-    println!("cargo:rustc-link-lib=nvrtc");
-    println!("cargo:rustc-link-lib=cudart");
+    if feature_cuda {
+        println!("cargo:rustc-link-lib=nvrtc");
+        println!("cargo:rustc-link-lib=cudart");
+    }
 
     let opencv_include_dirs = if feature_system {
         match target_os.as_str() {
