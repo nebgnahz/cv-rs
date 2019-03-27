@@ -87,7 +87,17 @@ fn main() -> Result<(), std::io::Error> {
     let feature_text = env::var("CARGO_FEATURE_TEXT").is_ok();
     let feature_tesseract = env::var("CARGO_FEATURE_TESSERACT").is_ok();
 
-    let mut disabled_modules = vec!["cudaoptflow", "superres", "cudafilters"];
+    let mut disabled_modules = vec![
+        "cudaoptflow",
+        "superres",
+        "cudafilters",
+        "tracking",
+        "face",
+        "bioinspired",
+        "structured_light",
+        "surface_matching",
+        "saliency",
+    ];
 
     if !feature_text {
         disabled_modules.push("text");
