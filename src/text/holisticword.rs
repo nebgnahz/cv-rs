@@ -27,7 +27,7 @@ impl OcrHolisticWord {
         let c_weights_file = weights_file.as_ptr();
         let c_words_file = words_file.as_ptr();
 
-        let result = unsafe {native::cvsys_holistic_new(c_archive_file, c_weights_file, c_words_file)};
+        let result = unsafe { native::cvsys_holistic_new(c_archive_file, c_weights_file, c_words_file) };
         let result: Result<_, String> = result.into();
         let result = result.map_err(CvError::UnknownError)?;
         Ok(Self { value: result })

@@ -56,9 +56,20 @@ impl<T: OcrImplInterface> Ocr for T {
                 component_level as i32,
             );
             dbg!("before returns");
-            let component_texts = component_texts.iter().map(|s| CStr::from_ptr(s.get_str()).to_str().expect("OpenCV text gave back non-utf8 string").to_owned()).collect();
+            let component_texts = component_texts
+                .iter()
+                .map(|s| {
+                    CStr::from_ptr(s.get_str())
+                        .to_str()
+                        .expect("OpenCV text gave back non-utf8 string")
+                        .to_owned()
+                })
+                .collect();
             (
-                CStr::from_ptr(output_text.get_str()).to_str().expect("OpenCV text gave back non-utf8 string").to_owned(),
+                CStr::from_ptr(output_text.get_str())
+                    .to_str()
+                    .expect("OpenCV text gave back non-utf8 string")
+                    .to_owned(),
                 component_rects.into(),
                 component_texts,
                 component_confidences.into(),

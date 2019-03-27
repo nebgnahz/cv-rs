@@ -4,7 +4,7 @@ extern crate cmake;
 use bindgen::Builder;
 use cmake::Config;
 use std::env;
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 
 fn link_package(name: &str) -> pkg_config::Library {
     let package = pkg_config::probe_library(name).expect(&format!("must install {}", name));
@@ -52,7 +52,12 @@ fn cmake_common(config: &mut Config, target_os: &str) {
 fn link_all_libs(location: &Path, target_os: &str) -> Result<(), std::io::Error> {
     for entry in location.read_dir()? {
         let entry = entry?;
-        if entry.path().extension().map(|os| os == "lib" || os == "a" || os == "so").unwrap_or(false) {
+        if entry
+            .path()
+            .extension()
+            .map(|os| os == "lib" || os == "a" || os == "so")
+            .unwrap_or(false)
+        {
             let libname = entry
                 .path()
                 .file_stem()
@@ -61,7 +66,14 @@ fn link_all_libs(location: &Path, target_os: &str) -> Result<(), std::io::Error>
                 .expect("OpenCV lib names must be unicode")
                 .to_owned();
             // This is not foolproof, but usually works.
-            println!("cargo:rustc-link-lib=static={}", if target_os == "windows" { &libname } else { &libname[3..] });
+            println!(
+                "cargo:rustc-link-lib=static={}",
+                if target_os == "windows" {
+                    &libname
+                } else {
+                    &libname[3..]
+                }
+            );
         }
     }
     Ok(())
@@ -72,8 +84,14 @@ fn main() -> Result<(), std::io::Error> {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let feature_cuda = env::var("CARGO_FEATURE_CUDA").is_ok();
     let feature_system = env::var("CARGO_FEATURE_SYSTEM").is_ok();
+    let feature_text = env::var("CARGO_FEATURE_TEXT").is_ok();
+    let feature_tesseract = env::var("CARGO_FEATURE_TESSERACT").is_ok();
 
-    let disabled_modules = vec!["cudaoptflow", "superres", "cudafilters"];
+    let mut disabled_modules = vec!["cudaoptflow", "superres", "cudafilters"];
+
+    if !feature_text {
+        disabled_modules.push("text");
+    }
 
     let mut used_core_modules = vec![
         "core",
@@ -92,8 +110,12 @@ fn main() -> Result<(), std::io::Error> {
         used_core_modules.push("cudaobjdetect");
     }
 
-    // All the contrib modules used (core and contrib).
-    let used_contrib_modules = vec!["xfeatures2d", "img_hash", "text"];
+    // All the contrib modules used.
+    let mut used_contrib_modules = vec!["xfeatures2d", "img_hash"];
+
+    if feature_text {
+        used_contrib_modules.push("text");
+    }
 
     // Collect all the modules used.
     let all_used_modules: Vec<_> = used_core_modules.iter().chain(used_contrib_modules.iter()).collect();
@@ -113,8 +135,9 @@ fn main() -> Result<(), std::io::Error> {
     let opencv_include_dirs = if feature_system {
         match target_os.as_str() {
             "windows" => {
-                let opencv_dir = env::var("OPENCV_DIR")
-                    .unwrap_or_else(|_| panic!("OPENCV_DIR not set (set it to the directory the include folder is in)"));
+                let opencv_dir = env::var("OPENCV_DIR").unwrap_or_else(|_| {
+                    panic!("OPENCV_DIR not set (set it to the directory the include folder is in)")
+                });
                 let opencv_lib_dir = env::var("OPENCV_LIB")
                     .unwrap_or_else(|_| panic!("OPENCV_LIB not set (set it to where the OpenCV libs are)"));
                 // Add search path for OpenCV libs.
@@ -211,6 +234,9 @@ fn main() -> Result<(), std::io::Error> {
                 println!("cargo:rustc-link-lib=stdc++");
                 // Link all dependencies.
                 link_all_libs(&dst.join("lib"), &target_os)?;
+                if feature_tesseract {
+                    link_package("tesseract");
+                }
                 link_package("libpng");
                 link_package("libtiff-4");
                 link_package("libjpeg");
@@ -231,7 +257,14 @@ fn main() -> Result<(), std::io::Error> {
     cvsys_config
         .define("CV_CORE_MODULES", used_core_modules.join(";"))
         .define("CV_CONTRIB_MODULES", used_contrib_modules.join(";"))
-        .define("CVSYS_INCLUDE_DIRS", opencv_include_dirs.iter().map(|path| path.to_str().expect("paths must be unicode").to_owned()).collect::<Vec<String>>().join(";"));
+        .define(
+            "CVSYS_INCLUDE_DIRS",
+            opencv_include_dirs
+                .iter()
+                .map(|path| path.to_str().expect("paths must be unicode").to_owned())
+                .collect::<Vec<String>>()
+                .join(";"),
+        );
 
     // Build cvsys.
     let dst = cvsys_config.build();
@@ -259,7 +292,9 @@ fn main() -> Result<(), std::io::Error> {
     let bindings = bindings.clang_args(&["-x", "c++", "-std=c++14"]);
 
     // Add OpenCV include directories.
-    let bindings = opencv_include_dirs.iter().fold(bindings, |bindings, dir| bindings.clang_arg(format!("-I{}", dir.display())));
+    let bindings = opencv_include_dirs.iter().fold(bindings, |bindings, dir| {
+        bindings.clang_arg(format!("-I{}", dir.display()))
+    });
 
     // Add all wrapper headers.
     let bindings = all_used_modules

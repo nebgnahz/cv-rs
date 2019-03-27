@@ -30,7 +30,7 @@ tesseract_new(const char* datapath, const char* language, const char* char_white
     });
 }
 
-void tesseract_drop(OCRHMMDecoder* ocr) {
+void tesseract_drop(OCRTesseract* ocr) {
     delete ocr;
 }
 

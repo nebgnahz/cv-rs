@@ -36,7 +36,7 @@ pub enum PageSegmentationMode {
 /// `OcrTesseract` class provides an interface with the tesseract-ocr API
 #[derive(Debug)]
 pub struct OcrTesseract {
-    value: *mut COCR,
+    value: *mut native::cvsys_OCRTesseract,
 }
 
 impl OcrTesseract {
@@ -56,9 +56,9 @@ impl OcrTesseract {
         let c_language = to_nullable_string(&c_language);
         let c_char_whitelist = to_nullable_string(&c_char_whitelist);
 
-        let result = CResult::<*mut COCR>::from_callback(|r| unsafe {
-            native::cvsys_tesseract_new(c_data_path, c_language, c_char_whitelist, oem, psmode, r)
-        });
+        let result = unsafe {
+            native::cvsys_tesseract_new(c_data_path, c_language, c_char_whitelist, oem as i32, psmode as i32)
+        };
         let result: Result<_, String> = result.into();
         let result = result.map_err(CvError::UnknownError)?;
         Ok(Self { value: result })
@@ -74,8 +74,8 @@ impl Drop for OcrTesseract {
 }
 
 impl OcrImpl for OcrTesseract {
-    fn get_value(&self) -> *mut COCR {
-        self.value
+    fn get_value(&self) -> *mut native::cvsys_BaseOCR {
+        self.value as *mut _
     }
 }
 

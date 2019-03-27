@@ -12,6 +12,8 @@ documentation = "https://docs.rs/cv-sys/"
 [features]
 cuda = []
 system = []
+text = []
+tesseract = ["text"]
 
 [build-dependencies]
 bindgen = "0.48.1"

@@ -21,7 +21,7 @@ itertools = "0.8.0"
 
 [features]
 cuda = ["native/cuda"]
-text = []
-tesseract = []
+text = ["native/text"]
+tesseract = ["text", "native/tesseract"]
 system = ["native/system"]
 

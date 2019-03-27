@@ -5,8 +5,8 @@ use super::core::*;
 use super::errors::*;
 use super::objdetect::{HogParams, ObjectDetect, SvmDetector};
 use failure::Error;
-use std::ffi::{CString, c_void};
-use std::os::raw::{c_int, c_double};
+use std::ffi::{c_void, CString};
+use std::os::raw::{c_double, c_int};
 use std::path::Path;
 use *;
 
@@ -118,7 +118,15 @@ impl Default for GpuHog {
 impl GpuHog {
     /// Creates a new GpuHog detector.
     pub fn new(win_size: Size2i, block_size: Size2i, block_stride: Size2i, cell_size: Size2i, nbins: c_int) -> GpuHog {
-        let inner = unsafe { native::cvsys_cuda_hog_new(win_size.into(), block_size.into(), block_stride.into(), cell_size.into(), nbins) };
+        let inner = unsafe {
+            native::cvsys_cuda_hog_new(
+                win_size.into(),
+                block_size.into(),
+                block_stride.into(),
+                cell_size.into(),
+                nbins,
+            )
+        };
         let mut params = HogParams::default();
         GpuHog::update_params(inner, &mut params);
         GpuHog {
@@ -196,9 +204,7 @@ impl GpuHog {
 
         let rects: Vec<Rect> = found.iter().cloned().map(Into::into).collect();
         let scores: Vec<f64> = conf.iter().cloned().collect();
-        rects.into_iter()
-            .zip(scores.into_iter())
-            .collect::<Vec<_>>()
+        rects.into_iter().zip(scores.into_iter()).collect::<Vec<_>>()
     }
 }
 
