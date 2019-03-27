@@ -54,6 +54,7 @@ mod tesseract {
 }
 
 #[test]
+#[ignore]
 fn ocr_hmm_test() {
     let image_path = get_asset_path("Ubuntu.png");
     let classifier_name = get_asset_path("OCRHMM_knn_model_data.xml.gz");

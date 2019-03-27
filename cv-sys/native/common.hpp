@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <opencv2/core.hpp>
 
 namespace cvsys {
@@ -66,24 +67,14 @@ typedef struct {
 struct CString {
     char* value;
 
-    CString(const char* s) {
-        if (s) {
-            auto len = std::strlen(s);
-            value = new char[len + 1];
-            std::strcpy(value, s);
-        } else {
-            value = nullptr;
-        }
-    }
-    ~CString() {
-        if (value) {
-            delete value;
-        }
-    }
+    CString();
+    CString(const char* s);
 
     bool is_str() const;
 
     const char* get_str() const;
+
+    void drop_cpp();
 };
 
 // Caller is responsible for disposing `error` field
@@ -92,15 +83,16 @@ struct Result {
     T value;
     CString error;
 
-    static Result<T> FromFunction(std::function<T()> function) {
-        T value;
-        CString error(nullptr);
+    Result(std::function<T()> function) {
         try {
             value = function();
         } catch (cv::Exception& e) {
             error = CString(e.what());
         }
-        return Result<T>{value, error};
+    }
+
+    /// Create an error directly.
+    Result(CString error) : error(error) {
     }
 };
 

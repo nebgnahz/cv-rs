@@ -189,7 +189,11 @@ fn main() -> Result<(), std::io::Error> {
             .define("BUILD_DOCS", "OFF")
             .define("BUILD_EXAMPLES", "OFF");
 
-        let dst = opencv_config.build();
+        let dst = if env::var("CVSYS_STOP_CV_REBUILD").is_ok() {
+            PathBuf::from(env::var("OUT_DIR").unwrap())
+        } else {
+            opencv_config.build()
+        };
 
         println!("cargo:rustc-link-lib=static=cvsys");
 
@@ -244,7 +248,7 @@ fn main() -> Result<(), std::io::Error> {
         .derive_ord(true)
         .derive_hash(true)
         .derive_debug(true)
-        .derive_copy(true)
+        .derive_copy(false)
         .whitelist_function("cvsys::.*")
         .whitelist_type("cvsys::.*")
         .opaque_type("cv::.*")

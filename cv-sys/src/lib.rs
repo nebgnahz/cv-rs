@@ -85,12 +85,17 @@ impl From<cvsys_EmptyResult> for Result<(), String> {
 }
 
 impl<T> Into<std::result::Result<T, String>> for cvsys_Result<T> {
-    fn into(self) -> Result<T, String> {
+    fn into(mut self) -> Result<T, String> {
         if unsafe { self.error.is_str() } {
-            Err(unsafe { CStr::from_ptr(self.error.get_str()) }
+            let ret = Err(unsafe { CStr::from_ptr(self.error.get_str()) }
                 .to_str()
                 .expect("got non-UTF8 error string from OpenCV")
-                .to_owned())
+                .to_owned());
+            unsafe {
+                self.error.drop_cpp();
+                std::mem::forget(self);
+            }
+            ret
         } else {
             Ok(self.value)
         }
@@ -124,5 +129,11 @@ where
 impl<T> cvsys_CVec<T> {
     pub fn iter(&self) -> impl Iterator<Item = &T> {
         unsafe { std::slice::from_raw_parts(self.array, self.size).iter() }
+    }
+}
+
+impl Drop for cvsys_CString {
+    fn drop(&mut self) {
+        unsafe { self.drop_cpp() }
     }
 }
