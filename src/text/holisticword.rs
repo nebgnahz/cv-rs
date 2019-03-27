@@ -9,7 +9,7 @@ use *;
 /// `OcrHolisticWord` class provides an interface with the tesseract-ocr API
 #[derive(Debug)]
 pub struct OcrHolisticWord {
-    value: *mut COCR,
+    value: *mut native::cvsys_OCRHolisticWordRecognizer,
 }
 
 impl OcrHolisticWord {
@@ -27,9 +27,7 @@ impl OcrHolisticWord {
         let c_weights_file = weights_file.as_ptr();
         let c_words_file = words_file.as_ptr();
 
-        let result = CResult::<*mut COCR>::from_callback(|r| unsafe {
-            native::cvsys_holistic_new(c_archive_file, c_weights_file, c_words_file, r)
-        });
+        let result = unsafe {native::cvsys_holistic_new(c_archive_file, c_weights_file, c_words_file)};
         let result: Result<_, String> = result.into();
         let result = result.map_err(CvError::UnknownError)?;
         Ok(Self { value: result })
@@ -45,8 +43,8 @@ impl Drop for OcrHolisticWord {
 }
 
 impl OcrImpl for OcrHolisticWord {
-    fn get_value(&self) -> *mut COCR {
-        self.value
+    fn get_value(&self) -> *mut native::cvsys_BaseOCR {
+        self.value as *mut _
     }
 }
 

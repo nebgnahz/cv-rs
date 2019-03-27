@@ -2,7 +2,6 @@
 use super::private::*;
 use super::*;
 use errors::*;
-use mat::CMat;
 use std::os::raw::c_char;
 use std::path::Path;
 use *;
@@ -18,7 +17,7 @@ pub enum ClassifierType {
 /// `OcrHmmDecoder` class provides an interface with the HmmDecoder-ocr API
 #[derive(Debug)]
 pub struct OcrHmmDecoder {
-    value: *mut COCR,
+    value: *mut native::cvsys_OCRHMMDecoder,
 }
 
 impl OcrHmmDecoder {
@@ -40,16 +39,15 @@ impl OcrHmmDecoder {
         let classifier_filename = CString::new(classifier_filename)?;
         let vocabulary = CString::new(vocabulary)?;
 
-        let result = CResult::<*mut COCR>::from_callback(|r| unsafe {
+        let result = unsafe {
             native::cvsys_hmm_new(
                 classifier_filename.as_ptr(),
                 vocabulary.as_ptr(),
                 transition_probabilities_table.inner,
                 emission_probabilities_table.inner,
-                classifier_type,
-                r,
+                classifier_type as u32,
             )
-        });
+        };
         let result: Result<_, String> = result.into();
         let result = result.map_err(CvError::UnknownError)?;
         Ok(Self { value: result })
@@ -65,8 +63,8 @@ impl Drop for OcrHmmDecoder {
 }
 
 impl OcrImpl for OcrHmmDecoder {
-    fn get_value(&self) -> *mut COCR {
-        self.value
+    fn get_value(&self) -> *mut native::cvsys_BaseOCR {
+        self.value as *mut _
     }
 }
 

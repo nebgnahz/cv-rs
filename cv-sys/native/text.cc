@@ -3,7 +3,7 @@
 
 namespace cvsys {
 
-void ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
+void ocr_run(BaseOCR& ocr,
              cv::Mat& image,
              CString* output_text,
              CVec<Rect>* component_rects,
@@ -22,57 +22,50 @@ void ocr_run(cv::Ptr<cv::text::BaseOCR>& ocr,
     to_ffi(confidences, component_confidences);
 }
 
-void tesseract_new(const char* datapath,
-                   const char* language,
-                   const char* char_whitelist,
-                   int oem,
-                   int psmode,
-                   Result<void*>* result) {
-    *result = Result<void*>::FromFunction([datapath, language, char_whitelist, oem, psmode]() {
+Result<OCRTesseract*>
+tesseract_new(const char* datapath, const char* language, const char* char_whitelist, int oem, int psmode) {
+    return Result<OCRTesseract*>::FromFunction([datapath, language, char_whitelist, oem, psmode]() {
         auto result = cv::text::OCRTesseract::create(datapath, language, char_whitelist, oem, psmode);
-        return new cv::Ptr<cv::text::OCRTesseract>(result);
+        return new OCRTesseract(result);
     });
 }
 
-void tesseract_drop(cv::Ptr<cv::text::OCRTesseract>* ocr) {
+void tesseract_drop(OCRHMMDecoder* ocr) {
     delete ocr;
-    ocr = nullptr;
 }
 
-void hmm_new(const char* classifier_filename,
-             const char* vocabulary,
-             cv::Mat& transition_probabilities_table,
-             cv::Mat& emission_probabilities_table,
-             cv::text::classifier_type classifier_type,
-             Result<void*>* result) {
-    *result = Result<void*>::FromFunction([classifier_filename,
-                                           vocabulary,
-                                           transition_probabilities_table,
-                                           emission_probabilities_table,
-                                           classifier_type]() {
+Result<OCRHMMDecoder*> hmm_new(const char* classifier_filename,
+                               const char* vocabulary,
+                               cv::Mat& transition_probabilities_table,
+                               cv::Mat& emission_probabilities_table,
+                               cv::text::classifier_type classifier_type) {
+    return Result<OCRHMMDecoder*>::FromFunction([classifier_filename,
+                                                 vocabulary,
+                                                 transition_probabilities_table,
+                                                 emission_probabilities_table,
+                                                 classifier_type] {
         std::string voc(vocabulary);
         auto classifier = cv::text::loadOCRHMMClassifier(classifier_filename, classifier_type);
         auto result = cv::text::OCRHMMDecoder::create(
             classifier, voc, transition_probabilities_table, emission_probabilities_table);
-        return new cv::Ptr<cv::text::OCRHMMDecoder>(result);
+        return new OCRHMMDecoder(result);
     });
 }
 
-void hmm_drop(cv::Ptr<cv::text::OCRHMMDecoder>* ocr) {
+void hmm_drop(OCRHMMDecoder* ocr) {
     delete ocr;
-    ocr = nullptr;
 }
 
-void holistic_new(const char* archive_file, const char* weights_file, const char* words_file, Result<void*>* result) {
-    *result = Result<void*>::FromFunction([archive_file, weights_file, words_file]() {
+Result<OCRHolisticWordRecognizer*>
+holistic_new(const char* archive_file, const char* weights_file, const char* words_file) {
+    return Result<OCRHolisticWordRecognizer*>::FromFunction([archive_file, weights_file, words_file] {
         auto result = cv::text::OCRHolisticWordRecognizer::create(archive_file, weights_file, words_file);
-        return new cv::Ptr<cv::text::OCRHolisticWordRecognizer>(result);
+        return new OCRHolisticWordRecognizer(result);
     });
 }
 
-void holistic_drop(cv::Ptr<cv::text::OCRHolisticWordRecognizer>* ocr) {
+void holistic_drop(OCRHolisticWordRecognizer* ocr) {
     delete ocr;
-    ocr = nullptr;
 }
 
 }  // namespace cvsys

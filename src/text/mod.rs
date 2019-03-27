@@ -11,15 +11,12 @@ pub use self::holisticword::*;
 pub use self::tesseract::*;
 
 use failure::Error;
-use mat::CMat;
+use std::ffi::CStr;
 use *;
 
 mod private {
-    #[allow(missing_copy_implementations, missing_debug_implementations)]
-    pub enum COCR {}
-
     pub trait OcrImpl {
-        fn get_value(&self) -> *mut COCR;
+        fn get_value(&self) -> *mut native::cvsys_BaseOCR;
     }
 }
 
@@ -43,11 +40,11 @@ pub trait Ocr {
 impl<T: OcrImplInterface> Ocr for T {
     fn run(&self, image: &Mat, component_level: ComponentLevel) -> (String, Vec<Rect>, Vec<String>, Vec<f32>) {
         let value = self.get_value();
-        let mut output_text = CDisposableString::default();
-        let mut component_rects = CVec::<Rect>::default();
-        let mut component_texts = CVec::<CDisposableString>::default();
-        let mut component_confidences = CVec::<f32>::default();
         unsafe {
+            let mut output_text: native::cvsys_CString = std::mem::zeroed();
+            let mut component_rects: native::cvsys_CVec<native::cvsys_Rect> = std::mem::zeroed();
+            let mut component_texts: native::cvsys_CVec<native::cvsys_CString> = std::mem::zeroed();
+            let mut component_confidences: native::cvsys_CVec<f32> = std::mem::zeroed();
             native::cvsys_ocr_run(
                 value,
                 image.inner,
@@ -55,14 +52,15 @@ impl<T: OcrImplInterface> Ocr for T {
                 &mut component_rects,
                 &mut component_texts,
                 &mut component_confidences,
-                component_level,
+                component_level as i32,
             );
+            let component_texts = component_texts.iter().map(|s| CStr::from_ptr(s.get_str()).to_str().expect("OpenCV text gave back non-utf8 string").to_owned()).collect();
+            (
+                CStr::from_ptr(output_text.get_str()).to_str().expect("OpenCV text gave back non-utf8 string").to_owned(),
+                component_rects.into(),
+                component_texts,
+                component_confidences.into(),
+            )
         }
-        (
-            output_text.unpack(),
-            component_rects.unpack(),
-            component_texts.unpack(),
-            component_confidences.unpack(),
-        )
     }
 }

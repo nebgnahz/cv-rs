@@ -249,7 +249,6 @@ fn main() -> Result<(), std::io::Error> {
         .whitelist_type("cvsys::.*")
         .opaque_type("cv::.*")
         .opaque_type("std::.*")
-        .whitelist_type("cv::MouseCallback")
         .whitelist_type("cv::text::classifier_type");
 
     // Add some common flags.
