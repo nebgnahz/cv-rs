@@ -8,14 +8,14 @@ use *;
 /// Speeded up robust features extractor.
 #[derive(Debug)]
 pub struct SURF {
-    value: *mut c_void,
+    value: *mut native::cvsys_SURF,
 }
 
 impl SURF {
     /// Creates a new maximally stable extremal region extractor criteria.
     pub fn new(hessian_threshold: f64, octaves: c_int, octave_layers: c_int, extended: bool, upright: bool) -> Self {
-        let surf = unsafe { native::cvsys_surf_new(hessian_threshold, octaves, octave_layers, extended, upright) };
-        SURF { value: surf }
+        let value = unsafe { native::cvsys_surf_new(hessian_threshold, octaves, octave_layers, extended, upright) };
+        SURF { value }
     }
 }
 

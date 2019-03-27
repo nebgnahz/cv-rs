@@ -8,7 +8,7 @@ use *;
 /// Speeded up robust features extractor.
 #[derive(Debug)]
 pub struct SIFT {
-    value: *mut c_void,
+    value: *mut native::cvsys_SIFT,
 }
 
 impl SIFT {
@@ -20,9 +20,9 @@ impl SIFT {
         edge_threshold: f64,
         sigma: f64,
     ) -> Self {
-        let sift =
+        let value =
             unsafe { native::cvsys_sift_new(features, octave_layers, contrast_threshold, edge_threshold, sigma) };
-        SIFT { value: sift }
+        SIFT { value }
     }
 }
 
