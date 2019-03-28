@@ -54,24 +54,30 @@ Size2i cuda_hog_get_win_stride(CudaHog*);
 // =============================================================================
 //   CascadeClassifier
 // =============================================================================
-void* cuda_cascade_new(const char* const filename);
-void cuda_cascade_drop(void*);
-void cuda_cascade_detect(void*, cv::cuda::GpuMat* image, CVec<Rect>*);
 
-void cuda_cascade_set_find_largest_object(void*, bool);
-void cuda_cascade_set_max_num_objects(void*, int);
-void cuda_cascade_set_min_neighbors(void*, int);
-void cuda_cascade_set_max_object_size(void*, Size2i);
-void cuda_cascade_set_min_object_size(void*, Size2i);
-void cuda_cascade_set_scale_factor(void*, double);
+struct CudaCascadeClassifier : cv::Ptr<cv::cuda::CascadeClassifier> {
+    CudaCascadeClassifier(cv::Ptr<cv::cuda::CascadeClassifier> p) : cv::Ptr<cv::cuda::CascadeClassifier>(p) {
+    }
+};
 
-Size2i cuda_cascade_get_classifier_size(void*);
-bool cuda_cascade_get_find_largest_object(void*);
-int cuda_cascade_get_max_num_objects(void*);
-int cuda_cascade_get_min_neighbors(void*);
-Size2i cuda_cascade_get_max_object_size(void*);
-Size2i cuda_cascade_get_min_object_size(void*);
-double cuda_cascade_get_scale_factor(void*);
+CudaCascadeClassifier* cuda_cascade_new(const char* const filename);
+void cuda_cascade_drop(CudaCascadeClassifier*);
+void cuda_cascade_detect(CudaCascadeClassifier*, cv::cuda::GpuMat* image, CVec<Rect>*);
+
+void cuda_cascade_set_find_largest_object(CudaCascadeClassifier*, bool);
+void cuda_cascade_set_max_num_objects(CudaCascadeClassifier*, int);
+void cuda_cascade_set_min_neighbors(CudaCascadeClassifier*, int);
+void cuda_cascade_set_max_object_size(CudaCascadeClassifier*, Size2i);
+void cuda_cascade_set_min_object_size(CudaCascadeClassifier*, Size2i);
+void cuda_cascade_set_scale_factor(CudaCascadeClassifier*, double);
+
+Size2i cuda_cascade_get_classifier_size(CudaCascadeClassifier*);
+bool cuda_cascade_get_find_largest_object(CudaCascadeClassifier*);
+int cuda_cascade_get_max_num_objects(CudaCascadeClassifier*);
+int cuda_cascade_get_min_neighbors(CudaCascadeClassifier*);
+Size2i cuda_cascade_get_max_object_size(CudaCascadeClassifier*);
+Size2i cuda_cascade_get_min_object_size(CudaCascadeClassifier*);
+double cuda_cascade_get_scale_factor(CudaCascadeClassifier*);
 
 }  // namespace cvsys
 

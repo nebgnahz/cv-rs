@@ -5,7 +5,7 @@ use super::core::*;
 use super::errors::*;
 use super::objdetect::{HogParams, ObjectDetect, SvmDetector};
 use failure::Error;
-use std::ffi::{c_void, CString};
+use std::ffi::CString;
 use std::os::raw::{c_double, c_int};
 use std::path::Path;
 use *;
@@ -217,7 +217,7 @@ impl Drop for GpuHog {
 #[derive(Debug)]
 /// Data structure that performs object detection with a cascade classifier.
 pub struct GpuCascade {
-    inner: *mut c_void,
+    inner: *mut native::cvsys_CudaCascadeClassifier,
 }
 
 /// We can safely send a mutable pointer to a different thread
