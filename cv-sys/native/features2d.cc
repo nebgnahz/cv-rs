@@ -3,15 +3,15 @@
 
 namespace cvsys {
 
-cv::Ptr<cv::MSER>* mser_new(int delta,
-                            int min_area,
-                            int max_area,
-                            double max_variation,
-                            double min_diversity,
-                            int max_evolution,
-                            double area_threshold,
-                            double min_margin,
-                            int edge_blur_size) {
+MSER* mser_new(int delta,
+               int min_area,
+               int max_area,
+               double max_variation,
+               double min_diversity,
+               int max_evolution,
+               double area_threshold,
+               double min_margin,
+               int edge_blur_size) {
     cv::Ptr<cv::MSER> result = cv::MSER::create(delta,
                                                 min_area,
                                                 max_area,
@@ -21,15 +21,14 @@ cv::Ptr<cv::MSER>* mser_new(int delta,
                                                 area_threshold,
                                                 min_margin,
                                                 edge_blur_size);
-    return new cv::Ptr<cv::MSER>(result);
+    return new MSER(result);
 }
 
-void mser_drop(cv::Ptr<cv::MSER>* detector) {
+void mser_drop(MSER* detector) {
     delete detector;
-    detector = nullptr;
 }
 
-void mser_detect_regions(cv::Ptr<cv::MSER>* detector, cv::Mat* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes) {
+void mser_detect_regions(MSER* detector, cv::Mat* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes) {
     std::vector<std::vector<cv::Point>> msers_vector;
     std::vector<cv::Rect> bboxes_vector;
 
@@ -39,7 +38,7 @@ void mser_detect_regions(cv::Ptr<cv::MSER>* detector, cv::Mat* image, CVec<CVec<
     to_ffi(bboxes_vector, bboxes);
 }
 
-void mser_detect_and_compute(cv::Ptr<cv::MSER>* detector,
+void mser_detect_and_compute(MSER* detector,
                              cv::Mat* image,
                              cv::Mat* mask,
                              CVec<KeyPoint>* keypoints,
@@ -50,17 +49,16 @@ void mser_detect_and_compute(cv::Ptr<cv::MSER>* detector,
     to_ffi(keypoints_vector, keypoints);
 }
 
-cv::Ptr<cv::DescriptorMatcher>* matcher_new(const char* descriptorMatcherType) {
+DescriptorMatcher* matcher_new(const char* descriptorMatcherType) {
     auto result = cv::DescriptorMatcher::create(descriptorMatcherType);
-    return new cv::Ptr<cv::DescriptorMatcher>(result);
+    return new DescriptorMatcher(result);
 }
 
-void matcher_drop(cv::Ptr<cv::DescriptorMatcher>* descriptorMatcher) {
+void matcher_drop(DescriptorMatcher* descriptorMatcher) {
     delete descriptorMatcher;
-    descriptorMatcher = nullptr;
 }
 
-void matcher_add(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher, cv::Mat* const* descriptors, size_t len) {
+void matcher_add(DescriptorMatcher& descriptorMatcher, cv::Mat* const* descriptors, size_t len) {
     std::vector<cv::Mat> descriptors_vector;
     for (size_t i = 0; i < len; i++) {
         descriptors_vector.emplace_back(*descriptors[i]);
@@ -68,23 +66,21 @@ void matcher_add(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher, cv::Mat* con
     descriptorMatcher.get()->add(descriptors_vector);
 }
 
-void matcher_train(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher) {
+void matcher_train(DescriptorMatcher& descriptorMatcher) {
     descriptorMatcher.get()->train();
 }
 
-bool matcher_is_empty(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher) {
+bool matcher_is_empty(DescriptorMatcher& descriptorMatcher) {
     return descriptorMatcher.get()->empty();
 }
 
-void matcher_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
-                   cv::Mat& queryDescriptors,
-                   CVec<DMatch>* matches) {
+void matcher_match(DescriptorMatcher& descriptorMatcher, cv::Mat& queryDescriptors, CVec<DMatch>* matches) {
     std::vector<cv::DMatch> matches_vector;
     descriptorMatcher.get()->match(queryDescriptors, matches_vector);
     to_ffi(matches_vector, matches);
 }
 
-void matcher_match_two(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
+void matcher_match_two(DescriptorMatcher& descriptorMatcher,
                        cv::Mat& queryDescriptors,
                        cv::Mat& trainDescriptors,
                        CVec<DMatch>* matches) {
@@ -93,7 +89,7 @@ void matcher_match_two(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
     to_ffi(matches_vector, matches);
 }
 
-void matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
+void matcher_knn_match(DescriptorMatcher& descriptorMatcher,
                        cv::Mat& queryDescriptors,
                        int k,
                        CVec<CVec<DMatch>>* matches) {

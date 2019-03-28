@@ -50,7 +50,7 @@ impl DescriptorMatcherType {
 /// Type for matching keypoint descriptors
 #[derive(Debug)]
 pub struct DescriptorMatcher<'a> {
-    value: *mut [u64; 2],
+    value: *mut native::cvsys_DescriptorMatcher,
     phantom: PhantomData<&'a ()>,
 }
 

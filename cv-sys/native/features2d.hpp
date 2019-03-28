@@ -10,18 +10,24 @@ namespace cvsys {
 // =============================================================================
 //   MSER
 // =============================================================================
-cv::Ptr<cv::MSER>* mser_new(int delta,
-                            int min_area,
-                            int max_area,
-                            double max_variation,
-                            double min_diversity,
-                            int max_evolution,
-                            double area_threshold,
-                            double min_margin,
-                            int edge_blur_size);
-void mser_drop(cv::Ptr<cv::MSER>* detector);
-void mser_detect_regions(cv::Ptr<cv::MSER>* detector, cv::Mat* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes);
-void mser_detect_and_compute(cv::Ptr<cv::MSER>* detector,
+
+struct MSER : cv::Ptr<cv::MSER> {
+    MSER(cv::Ptr<cv::MSER> p) : cv::Ptr<cv::MSER>(p) {
+    }
+};
+
+MSER* mser_new(int delta,
+               int min_area,
+               int max_area,
+               double max_variation,
+               double min_diversity,
+               int max_evolution,
+               double area_threshold,
+               double min_margin,
+               int edge_blur_size);
+void mser_drop(MSER* detector);
+void mser_detect_regions(MSER* detector, cv::Mat* image, CVec<CVec<Point2i>>* msers, CVec<Rect>* bboxes);
+void mser_detect_and_compute(MSER* detector,
                              cv::Mat* image,
                              cv::Mat* mask,
                              CVec<KeyPoint>* keypoints,
@@ -32,20 +38,29 @@ void mser_detect_and_compute(cv::Ptr<cv::MSER>* detector,
 //   DESCRIPTOR MATCHER
 // =============================================================================
 
-cv::Ptr<cv::DescriptorMatcher>* matcher_new(const char* descriptorMatcherType);
-void matcher_drop(cv::Ptr<cv::DescriptorMatcher>* descriptorMatcher);
-void matcher_add(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher, cv::Mat* const* descriptors, size_t len);
-void matcher_train(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher);
-bool matcher_is_empty(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher);
-void matcher_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher, cv::Mat& queryDescriptors, CVec<DMatch>* matches);
-void matcher_match_two(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
+struct DescriptorMatcher : cv::Ptr<cv::DescriptorMatcher> {
+    DescriptorMatcher(cv::Ptr<cv::DescriptorMatcher> p) : cv::Ptr<cv::DescriptorMatcher>(p) {
+    }
+};
+
+DescriptorMatcher* matcher_new(const char* descriptorMatcherType);
+void matcher_drop(DescriptorMatcher* descriptorMatcher);
+void matcher_add(DescriptorMatcher& descriptorMatcher, cv::Mat* const* descriptors, size_t len);
+void matcher_train(DescriptorMatcher& descriptorMatcher);
+bool matcher_is_empty(DescriptorMatcher& descriptorMatcher);
+void matcher_match(DescriptorMatcher& descriptorMatcher, cv::Mat& queryDescriptors, CVec<DMatch>* matches);
+void matcher_match_two(DescriptorMatcher& descriptorMatcher,
                        cv::Mat& queryDescriptors,
                        cv::Mat& trainDescriptors,
                        CVec<DMatch>* matches);
-void matcher_knn_match(cv::Ptr<cv::DescriptorMatcher>& descriptorMatcher,
+void matcher_knn_match(DescriptorMatcher& descriptorMatcher,
                        cv::Mat& queryDescriptors,
                        int k,
                        CVec<CVec<DMatch>>* matches);
+
+// =============================================================================
+//   BoW
+// =============================================================================
 
 cv::BOWKMeansTrainer* bow_trainer_new(int clusterCount, const cv::TermCriteria& termcrit, int attempts, int flags);
 void bow_trainer_drop(cv::BOWKMeansTrainer* trainer);

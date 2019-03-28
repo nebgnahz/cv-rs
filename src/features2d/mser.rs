@@ -8,7 +8,7 @@ use *;
 /// See [MserBuilder](struct.MserBuilder.html).
 #[derive(Debug)]
 pub struct Mser {
-    value: *mut u8,
+    value: *mut native::cvsys_MSER,
 }
 
 impl Mser {
