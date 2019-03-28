@@ -13,13 +13,18 @@ use native::cvsys_phash_drop;
 use native::cvsys_phash_new;
 use native::cvsys_radial_variance_hash_drop;
 use native::cvsys_radial_variance_hash_new;
-use std::ffi::c_void;
+use native::cvsys_AverageHash;
+use native::cvsys_BlockMeanHash;
+use native::cvsys_ColorMomentHash;
+use native::cvsys_MarrHildrethHash;
+use native::cvsys_PHash;
+use native::cvsys_RadialVarianceHash;
 
 use *;
 
 mod private {
     pub trait HashImpl {
-        fn get_value(&self) -> *mut u8;
+        fn get_value(&self) -> *mut super::cvsys_PHash;
     }
 }
 
@@ -40,8 +45,7 @@ impl<T: HashImplInterface> Hash for T {
     fn compute(&self, mat: &Mat) -> Mat {
         unsafe {
             let result = native::cvsys_mat_new();
-            let value = self.get_value();
-            native::cvsys_hash_any_compute(value as *mut c_void, mat.inner, result);
+            native::cvsys_hash_any_compute(self.get_value(), mat.inner, result);
             Mat::from_raw(result)
         }
     }
@@ -49,18 +53,17 @@ impl<T: HashImplInterface> Hash for T {
     /// Compares two image hashes
     fn compare(&self, lhs: &Mat, rhs: &Mat) -> f64 {
         unsafe {
-            let value = self.get_value();
-            native::cvsys_hash_any_compare(value as *mut c_void, lhs.inner, rhs.inner)
+            native::cvsys_hash_any_compare(self.get_value(), lhs.inner, rhs.inner)
         }
     }
 }
 
 macro_rules! impl_hash {
-    ($x:ident, $ctor:ident, $drop:ident, $description:expr) => {
+    ($x:ident, $nat:ident, $ctor:ident, $drop:ident, $description:expr) => {
         #[doc=$description]
         #[derive(Debug)]
         pub struct $x {
-            value: *mut u8,
+            value: *mut $nat,
         }
 
         impl $x {
@@ -86,8 +89,8 @@ macro_rules! impl_hash {
         }
 
         impl HashImpl for $x {
-            fn get_value(&self) -> *mut u8 {
-                self.value
+            fn get_value(&self) -> *mut cvsys_PHash {
+                self.value as *mut _
             }
         }
 
@@ -104,36 +107,42 @@ macro_rules! impl_hash {
 
 impl_hash!(
     AverageHash,
+    cvsys_AverageHash,
     cvsys_average_hash_new,
     cvsys_average_hash_drop,
     "Computes average hash value of the input image"
 );
 impl_hash!(
     BlockMeanHash,
+    cvsys_BlockMeanHash,
     cvsys_block_mean_hash_new,
     cvsys_block_mean_hash_drop,
     "Image hash based on block mean"
 );
 impl_hash!(
     ColorMomentHash,
+    cvsys_ColorMomentHash,
     cvsys_color_moment_hash_new,
     cvsys_color_moment_hash_drop,
     "Image hash based on color moments"
 );
 impl_hash!(
     MarrHildrethHash,
+    cvsys_MarrHildrethHash,
     cvsys_marr_hildreth_hash_new,
     cvsys_marr_hildreth_hash_drop,
     "Marr-Hildreth Operator Based Hash, slowest but more discriminative."
 );
 impl_hash!(
     PHash,
+    cvsys_PHash,
     cvsys_phash_new,
     cvsys_phash_drop,
     "Slower than AverageHash, but tolerant of minor modifications"
 );
 impl_hash!(
     RadialVarianceHash,
+    cvsys_RadialVarianceHash,
     cvsys_radial_variance_hash_new,
     cvsys_radial_variance_hash_drop,
     "Image hash based on Radon transform"

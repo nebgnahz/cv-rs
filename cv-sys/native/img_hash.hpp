@@ -6,26 +6,56 @@
 
 namespace cvsys {
 
-void hash_any_compute(void* phash, cv::Mat& mat, cv::Mat& result);
-double hash_any_compare(void* phash, cv::Mat& lhs, cv::Mat& rhs);
+struct AverageHash : cv::Ptr<cv::img_hash::AverageHash> {
+    AverageHash(cv::Ptr<cv::img_hash::AverageHash> p) : cv::Ptr<cv::img_hash::AverageHash>(p) {
+    }
+};
 
-cv::Ptr<cv::img_hash::AverageHash>* average_hash_new();
-void average_hash_drop(cv::Ptr<cv::img_hash::AverageHash>* phash);
+struct BlockMeanHash : cv::Ptr<cv::img_hash::BlockMeanHash> {
+    BlockMeanHash(cv::Ptr<cv::img_hash::BlockMeanHash> p) : cv::Ptr<cv::img_hash::BlockMeanHash>(p) {
+    }
+};
 
-cv::Ptr<cv::img_hash::BlockMeanHash>* block_mean_hash_new();
-void block_mean_hash_drop(cv::Ptr<cv::img_hash::BlockMeanHash>* phash);
+struct ColorMomentHash : cv::Ptr<cv::img_hash::ColorMomentHash> {
+    ColorMomentHash(cv::Ptr<cv::img_hash::ColorMomentHash> p) : cv::Ptr<cv::img_hash::ColorMomentHash>(p) {
+    }
+};
 
-cv::Ptr<cv::img_hash::ColorMomentHash>* color_moment_hash_new();
-void color_moment_hash_drop(cv::Ptr<cv::img_hash::ColorMomentHash>* phash);
+struct MarrHildrethHash : cv::Ptr<cv::img_hash::MarrHildrethHash> {
+    MarrHildrethHash(cv::Ptr<cv::img_hash::MarrHildrethHash> p) : cv::Ptr<cv::img_hash::MarrHildrethHash>(p) {
+    }
+};
 
-cv::Ptr<cv::img_hash::MarrHildrethHash>* marr_hildreth_hash_new();
-void marr_hildreth_hash_drop(cv::Ptr<cv::img_hash::MarrHildrethHash>* phash);
+struct PHash : cv::Ptr<cv::img_hash::PHash> {
+    PHash(cv::Ptr<cv::img_hash::PHash> p) : cv::Ptr<cv::img_hash::PHash>(p) {
+    }
+};
 
-cv::Ptr<cv::img_hash::PHash>* phash_new();
-void phash_drop(cv::Ptr<cv::img_hash::PHash>* phash);
+struct RadialVarianceHash : cv::Ptr<cv::img_hash::RadialVarianceHash> {
+    RadialVarianceHash(cv::Ptr<cv::img_hash::RadialVarianceHash> p) : cv::Ptr<cv::img_hash::RadialVarianceHash>(p) {
+    }
+};
 
-cv::Ptr<cv::img_hash::RadialVarianceHash>* radial_variance_hash_new();
-void radial_variance_hash_drop(cv::Ptr<cv::img_hash::RadialVarianceHash>* phash);
+void hash_any_compute(PHash* phash, cv::Mat& mat, cv::Mat& result);
+double hash_any_compare(PHash* phash, cv::Mat& lhs, cv::Mat& rhs);
+
+AverageHash* average_hash_new();
+void average_hash_drop(AverageHash* phash);
+
+BlockMeanHash* block_mean_hash_new();
+void block_mean_hash_drop(BlockMeanHash* phash);
+
+ColorMomentHash* color_moment_hash_new();
+void color_moment_hash_drop(ColorMomentHash* phash);
+
+MarrHildrethHash* marr_hildreth_hash_new();
+void marr_hildreth_hash_drop(MarrHildrethHash* phash);
+
+PHash* phash_new();
+void phash_drop(PHash* phash);
+
+RadialVarianceHash* radial_variance_hash_new();
+void radial_variance_hash_drop(RadialVarianceHash* phash);
 
 }  // namespace cvsys
 
