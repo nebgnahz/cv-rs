@@ -5,7 +5,7 @@ use super::core::*;
 use super::errors::*;
 use super::*;
 use failure::Error;
-use std::ffi::{c_void, CString};
+use std::ffi::CString;
 use std::os::raw::{c_double, c_int};
 use std::path::Path;
 use std::vec::Vec;
@@ -122,7 +122,7 @@ impl Drop for CascadeClassifier {
 #[derive(Debug)]
 pub struct SvmDetector {
     /// Pointer to the inner data structure
-    pub(crate) inner: *mut c_void,
+    pub(crate) inner: *mut native::cvsys_SvmDetector,
 }
 
 impl SvmDetector {

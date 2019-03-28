@@ -2,9 +2,7 @@
 use failure::Error;
 use mat::*;
 use std::ffi::CString;
-use std::mem;
 use std::os::raw::{c_int, c_void};
-use std::ptr;
 use *;
 
 use std::fmt;

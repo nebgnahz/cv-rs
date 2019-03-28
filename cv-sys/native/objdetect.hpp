@@ -6,6 +6,11 @@
 
 namespace cvsys {
 
+struct SvmDetector : std::vector<float> {
+    SvmDetector(std::vector<float>&& v) : std::vector<float>(v) {
+    }
+};
+
 cv::CascadeClassifier* cascade_classifier_new();
 cv::CascadeClassifier* cascade_classifier_from_path(const char* const path);
 bool cascade_classifier_load(cv::CascadeClassifier* cc, const char* const path);
@@ -21,10 +26,10 @@ void cascade_classifier_detect(cv::CascadeClassifier* cascade,
 
 cv::HOGDescriptor* hog_new();
 void hog_drop(cv::HOGDescriptor*);
-void* hog_default_people_detector();
-void* hog_daimler_people_detector();
-void hog_detector_drop(void*);
-void hog_set_svm_detector(cv::HOGDescriptor*, void*);
+SvmDetector* hog_default_people_detector();
+SvmDetector* hog_daimler_people_detector();
+void hog_detector_drop(SvmDetector*);
+void hog_set_svm_detector(cv::HOGDescriptor*, SvmDetector*);
 void hog_detect(cv::HOGDescriptor*,
                 cv::Mat*,
                 CVec<Rect>* vec_detected,

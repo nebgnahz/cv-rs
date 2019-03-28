@@ -54,23 +54,20 @@ void hog_drop(cv::HOGDescriptor* hog) {
     hog = nullptr;
 }
 
-void* hog_default_people_detector() {
-    return new std::vector<float>(cv::HOGDescriptor::getDefaultPeopleDetector());
+SvmDetector* hog_default_people_detector() {
+    return new SvmDetector(cv::HOGDescriptor::getDefaultPeopleDetector());
 }
 
-void* hog_daimler_people_detector() {
-    return new std::vector<float>(cv::HOGDescriptor::getDaimlerPeopleDetector());
+SvmDetector* hog_daimler_people_detector() {
+    return new SvmDetector(cv::HOGDescriptor::getDaimlerPeopleDetector());
 }
 
-void hog_detector_drop(void* detector) {
-    auto nat_detector = static_cast<std::vector<float>*>(detector);
-    delete nat_detector;
-    nat_detector = nullptr;
+void hog_detector_drop(SvmDetector* detector) {
+    delete detector;
 }
 
-void hog_set_svm_detector(cv::HOGDescriptor* hog, void* detector) {
-    auto nat_detector = static_cast<std::vector<float>*>(detector);
-    hog->setSVMDetector(*nat_detector);
+void hog_set_svm_detector(cv::HOGDescriptor* hog, SvmDetector* detector) {
+    hog->setSVMDetector(*detector);
 }
 
 void hog_detect(cv::HOGDescriptor* hog,
