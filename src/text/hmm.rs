@@ -2,7 +2,6 @@
 use super::private::*;
 use super::*;
 use errors::*;
-use std::os::raw::c_char;
 use std::path::Path;
 use *;
 

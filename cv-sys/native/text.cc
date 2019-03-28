@@ -38,7 +38,7 @@ Result<OCRHMMDecoder*> hmm_new(const char* classifier_filename,
                                const char* vocabulary,
                                cv::Mat& transition_probabilities_table,
                                cv::Mat& emission_probabilities_table,
-                               cv::text::classifier_type classifier_type) {
+                               uint32_t classifier_type) {
     return Result<OCRHMMDecoder*>([classifier_filename,
                                    vocabulary,
                                    transition_probabilities_table,

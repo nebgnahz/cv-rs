@@ -40,7 +40,7 @@ Result<OCRHMMDecoder*> hmm_new(const char* classifier_filename,
                                const char* vocabulary,
                                cv::Mat& transition_probabilities_table,
                                cv::Mat& emission_probabilities_table,
-                               cv::text::classifier_type classifier_type);
+                               uint32_t classifier_type);
 void hmm_drop(OCRHMMDecoder* ocr);
 Result<OCRHolisticWordRecognizer*>
 holistic_new(const char* archive_file, const char* weights_file, const char* words_file);
