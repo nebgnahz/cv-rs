@@ -21,25 +21,27 @@ fn main() {
     assert!(cap.is_open());
 
     let mut window = Window::new("Window", WindowFlag::Autosize).unwrap();
-    window.set_mouse_callback(|data| {
-        let MouseCallbackData { event, point, .. } = data;
-        let mut ss = ss.borrow_mut();
-        match event {
-            MouseEventType::LButtonDown => {
-                ss.selection.x = point.x;
-                ss.selection.y = point.y;
-            }
-            MouseEventType::LButtonUp => {
-                ss.selection.width = point.x - ss.selection.x;
-                ss.selection.height = point.y - ss.selection.y;
-
-                if ss.selection.width > 0 && ss.selection.height > 0 {
-                    ss.status = true;
+    window
+        .set_mouse_callback(|data| {
+            let MouseCallbackData { event, point, .. } = data;
+            let mut ss = ss.borrow_mut();
+            match event {
+                MouseEventType::LButtonDown => {
+                    ss.selection.x = point.x;
+                    ss.selection.y = point.y;
                 }
+                MouseEventType::LButtonUp => {
+                    ss.selection.width = point.x - ss.selection.x;
+                    ss.selection.height = point.y - ss.selection.y;
+
+                    if ss.selection.width > 0 && ss.selection.height > 0 {
+                        ss.status = true;
+                    }
+                }
+                _ => {}
             }
-            _ => {}
-        }
-    }).unwrap();
+        })
+        .unwrap();
 
     let mut is_tracking = false;
 

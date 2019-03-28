@@ -1,6 +1,12 @@
 //! The module brings implementations of different image hashing algorithms.
 use self::private::*;
 
+use native::cvsys_AverageHash;
+use native::cvsys_BlockMeanHash;
+use native::cvsys_ColorMomentHash;
+use native::cvsys_MarrHildrethHash;
+use native::cvsys_PHash;
+use native::cvsys_RadialVarianceHash;
 use native::cvsys_average_hash_drop;
 use native::cvsys_average_hash_new;
 use native::cvsys_block_mean_hash_drop;
@@ -13,12 +19,6 @@ use native::cvsys_phash_drop;
 use native::cvsys_phash_new;
 use native::cvsys_radial_variance_hash_drop;
 use native::cvsys_radial_variance_hash_new;
-use native::cvsys_AverageHash;
-use native::cvsys_BlockMeanHash;
-use native::cvsys_ColorMomentHash;
-use native::cvsys_MarrHildrethHash;
-use native::cvsys_PHash;
-use native::cvsys_RadialVarianceHash;
 
 use *;
 
@@ -52,9 +52,7 @@ impl<T: HashImplInterface> Hash for T {
 
     /// Compares two image hashes
     fn compare(&self, lhs: &Mat, rhs: &Mat) -> f64 {
-        unsafe {
-            native::cvsys_hash_any_compare(self.get_value(), lhs.inner, rhs.inner)
-        }
+        unsafe { native::cvsys_hash_any_compare(self.get_value(), lhs.inner, rhs.inner) }
     }
 }
 

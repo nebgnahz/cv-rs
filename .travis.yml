@@ -42,11 +42,11 @@ before_install:
   - clang-format --version
 
 script:
-  - cargo build --no-default-features -vv
+  - cargo build -vv --no-default-features
   - cargo test -v --no-default-features
-  - cargo build --features cuda
-  - cargo build --features text,tesseract
-  - cargo test -v --features tesseract
+  - cargo build -vv --features cuda
+  - cargo build -vv --features text,tesseract
+  - cargo test -v --features text,tesseract
   - cargo doc --features cuda --no-deps
   - cargo fmt -- --check
   - diff -u <(cat native/*) <(clang-format native/*)

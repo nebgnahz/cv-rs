@@ -32,7 +32,7 @@ impl Window {
         unsafe {
             native::cvsys_nat_named_window(s.as_ptr(), flags as i32);
         }
-        Ok(Window{
+        Ok(Window {
             name: name.to_owned(),
             callback: None,
         })
@@ -50,15 +50,15 @@ impl Window {
     pub fn set_mouse_callback<'a, F: FnMut(MouseCallbackData) + 'a>(&'a mut self, on_mouse: F) -> Result<(), Error> {
         extern "C" fn _mouse_callback(e: c_int, x: c_int, y: c_int, flags: c_int, ud: *mut c_void) {
             let cb_wrapper = unsafe { &mut *(ud as *mut CallbackWrapper) };
-            (cb_wrapper.callback)(MouseCallbackData{
+            (cb_wrapper.callback)(MouseCallbackData {
                 event: e.into(),
-                point: Point2i { x, y, },
+                point: Point2i { x, y },
                 flags: flags as u32,
             });
         }
 
         self.callback = Some(Box::new(CallbackWrapper {
-            callback: unsafe { std::mem::transmute(Box::<F>::new( on_mouse ) as Box<dyn FnMut(MouseCallbackData) + 'a>) },
+            callback: unsafe { std::mem::transmute(Box::<F>::new(on_mouse) as Box<dyn FnMut(MouseCallbackData) + 'a>) },
         }));
 
         let callback_box: &mut Box<CallbackWrapper> = self.callback.as_mut().unwrap();
@@ -173,11 +173,7 @@ impl Show for Mat {
         unsafe {
             native::cvsys_nat_imshow((&s).as_ptr(), self.inner);
             let key = native::cvsys_nat_wait_key(delay.unwrap_or(0) as c_int) as i32;
-            Ok(if key == -1 {
-                None
-            } else {
-                Some(key as u32)
-            })
+            Ok(if key == -1 { None } else { Some(key as u32) })
         }
     }
 }
