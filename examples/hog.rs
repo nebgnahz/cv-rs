@@ -48,10 +48,6 @@ fn run() -> Result<()> {
 
     let dir = matches.opt_str("d").expect("You need to provide the directory");
 
-    if show {
-        highgui_named_window("window", WindowFlag::Autosize).unwrap();
-    }
-
     let mut param = HogParams::default();
     param.group_threshold = 0;
     let mut hog = Hog::with_params(param);
@@ -84,7 +80,8 @@ fn run_detect_for_image<P: AsRef<Path>, OD: ObjectDetect>(detector: &mut OD, pat
 
     if show {
         results.iter().map(|&(r, _w)| mat.rectangle(r.scale(0.6))).count();
-        mat.show("window", 0).unwrap();
+        let window = Window::new("window", WindowFlag::Autosize).unwrap();
+        window.show(&mat, None).unwrap();
     }
 }
 

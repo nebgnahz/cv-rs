@@ -60,6 +60,5 @@ fn main() {
     }
 
     // Show the histogram
-    highgui_named_window("Display window", WindowFlag::Normal).unwrap();
-    hist_image.show("Histogram", 0).unwrap();
+    hist_image.show("Histogram", None).unwrap();
 }

@@ -5,61 +5,94 @@ use std::ffi::CString;
 use std::mem;
 use std::os::raw::{c_int, c_void};
 use std::ptr;
+use *;
 
-/// Create a window that can be used as a placeholder for images and
-/// trackbars. All created windows are referred to by their names. If a window
-/// with the same name already exists, the function does nothing.
-pub fn highgui_named_window(name: &str, flags: WindowFlag) -> Result<(), Error> {
-    let s = CString::new(name)?;
-    unsafe {
-        native::cvsys_nat_named_window(s.as_ptr(), flags as i32);
-    }
-    Ok(())
+use std::fmt;
+
+/// Create a window that you can show data in and allow the user to manipulate it.
+pub struct Window {
+    name: String,
+    callback: Option<Box<CallbackWrapper>>,
 }
 
-/// Destroy the specified window with the given name.
-pub fn highgui_destroy_window(name: &str) {
-    let s = CString::new(name).unwrap();
-    unsafe {
-        native::cvsys_nat_destroy_window((&s).as_ptr());
+impl fmt::Debug for Window {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Window {{ name: {} }}", self.name)
     }
 }
 
-/// Pointer referring to the data used in MouseCallback
-pub type MouseCallbackData = *mut c_void;
+struct CallbackWrapper {
+    callback: Box<dyn FnMut(MouseCallbackData)>,
+}
 
-/// Callback function for mouse events, primarily used in
-/// [highgui_set_mouse_callback](fn.highgui_set_mouse_callback.html)
-pub type MouseCallback = fn(MouseEventType, c_int, c_int, c_int, MouseCallbackData);
-
-/// Set mouse handler for the specified window (identified by name). A callback
-/// handler should be provided and optional user_data can be passed around.
-pub fn highgui_set_mouse_callback(name: &str, on_mouse: MouseCallback, user_data: *mut c_void) -> Result<(), Error> {
-    struct CallbackWrapper {
-        cb: Box<MouseCallback>,
-        data: *mut c_void,
+impl Window {
+    /// Create a window that can be used as a placeholder for images and
+    /// trackbars. All created windows are referred to by their names. If a window
+    /// with the same name already exists, the function does nothing.
+    pub fn new(name: &str, flags: WindowFlag) -> Result<Window, Error> {
+        let s = CString::new(name)?;
+        unsafe {
+            native::cvsys_nat_named_window(s.as_ptr(), flags as i32);
+        }
+        Ok(Window{
+            name: name.to_owned(),
+            callback: None,
+        })
     }
 
-    extern "C" fn _mouse_callback(e: c_int, x: c_int, y: c_int, f: c_int, ud: *mut c_void) {
-        let e: MouseEventType = e.into();
-        let cb_wrapper = unsafe { ptr::read(ud as *mut CallbackWrapper) };
-        let true_callback = *(cb_wrapper.cb);
-        true_callback(e, x, y, f, cb_wrapper.data);
-        mem::forget(cb_wrapper.cb);
+    /// Shows the data in the window until a key is pressed.
+    /// If delay is `None` the window will stay open indefinitely.
+    /// Returns the key that was pressed, if a key was pressed.
+    pub fn show<S: Show>(&self, s: &S, delay: Option<u32>) -> Result<Option<u32>, Error> {
+        s.show(&self.name, delay)
     }
 
-    let box_wrapper: Box<CallbackWrapper> = Box::new(CallbackWrapper {
-        cb: Box::new(on_mouse),
-        data: user_data,
-    });
-    let box_wrapper_raw = Box::into_raw(box_wrapper) as *mut c_void;
+    /// Set mouse handler for the specified window (identified by name). A callback
+    /// handler should be provided and optional user_data can be passed around.
+    pub fn set_mouse_callback<'a, F: FnMut(MouseCallbackData) + 'a>(&'a mut self, on_mouse: F) -> Result<(), Error> {
+        extern "C" fn _mouse_callback(e: c_int, x: c_int, y: c_int, flags: c_int, ud: *mut c_void) {
+            let cb_wrapper = unsafe { &mut *(ud as *mut CallbackWrapper) };
+            (cb_wrapper.callback)(MouseCallbackData{
+                event: e.into(),
+                point: Point2i { x, y, },
+                flags: flags as u32,
+            });
+        }
 
-    let s = CString::new(name)?;
-    #[allow(clippy::fn_to_numeric_cast)]
-    unsafe {
-        native::cvsys_nat_set_mouse_callback(s.as_ptr(), Some(_mouse_callback), box_wrapper_raw);
+        self.callback = Some(Box::new(CallbackWrapper {
+            callback: unsafe { std::mem::transmute(Box::<F>::new( on_mouse ) as Box<dyn FnMut(MouseCallbackData) + 'a>) },
+        }));
+
+        let callback_box: &mut Box<CallbackWrapper> = self.callback.as_mut().unwrap();
+        let callback_ref: &mut CallbackWrapper = &mut **callback_box;
+        let callback_pointer = callback_ref as *mut CallbackWrapper as *mut c_void;
+
+        let s = CString::new(self.name.as_str())?;
+        unsafe {
+            native::cvsys_nat_set_mouse_callback(s.as_ptr(), Some(_mouse_callback), callback_pointer);
+        }
+        Ok(())
     }
-    Ok(())
+}
+
+impl Drop for Window {
+    fn drop(&mut self) {
+        let s = CString::new(self.name.as_str()).unwrap();
+        unsafe {
+            native::cvsys_nat_destroy_window((&s).as_ptr());
+        }
+    }
+}
+
+/// See [the OpenCV documentation](https://docs.opencv.org/3.4.1/d7/dfc/group__highgui.html).
+#[derive(Copy, Clone, Debug)]
+pub struct MouseCallbackData {
+    /// https://docs.opencv.org/3.4.1/d7/dfc/group__highgui.html
+    pub event: MouseEventType,
+    /// The mouse position.
+    pub point: Point2i,
+    /// https://docs.opencv.org/3.4.1/d7/dfc/group__highgui.html#gaab4dc057947f70058c80626c9f1c25ce
+    pub flags: u32,
 }
 
 /// Flags for [highgui_named_window](fn.highgui_named_window.html). This only
@@ -132,16 +165,21 @@ impl From<c_int> for MouseEventType {
 /// Provides some highgui functionallity
 pub trait Show {
     /// Calls out to highgui to show the image, the duration is specified by `delay`.
-    fn show(&self, name: &str, delay: c_int) -> Result<(), Error>;
+    /// Returns the key that was pressed, if a key was pressed.
+    fn show(&self, name: &str, delay: Option<u32>) -> Result<Option<u32>, Error>;
 }
 
 impl Show for Mat {
-    fn show(&self, name: &str, delay: c_int) -> Result<(), Error> {
+    fn show(&self, name: &str, delay: Option<u32>) -> Result<Option<u32>, Error> {
         let s = CString::new(name)?;
         unsafe {
             native::cvsys_nat_imshow((&s).as_ptr(), self.inner);
-            native::cvsys_nat_wait_key(delay);
+            let key = native::cvsys_nat_wait_key(delay.unwrap_or(0) as c_int) as i32;
+            Ok(if key == -1 {
+                None
+            } else {
+                Some(key as u32)
+            })
         }
-        Ok(())
     }
 }

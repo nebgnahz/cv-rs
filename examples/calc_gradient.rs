@@ -8,7 +8,7 @@ fn main() {
     match image_mat {
         Ok(mat) => {
             let scharr_x = mat.scharr(mat.depth, 0, 1, 1.0, 0.0, cv::BorderType::Default);
-            scharr_x.show("Display", 0).unwrap()
+            scharr_x.show("Display", None).unwrap();
         }
         Err(e) => println!("error loading image header: {:?}", e),
     }

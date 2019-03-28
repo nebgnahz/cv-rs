@@ -68,6 +68,6 @@ fn main() {
         }
     }
 
-    highgui_named_window("Display window", WindowFlag::Normal).unwrap();
-    hist_image.show("Histogram", 0).unwrap();
+    let window = Window::new("Display window", WindowFlag::Normal).unwrap();
+    window.show(&hist_image, None).unwrap();
 }

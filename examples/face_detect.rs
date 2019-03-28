@@ -20,8 +20,6 @@ fn main() {
     d.push("assets/haarcascade_frontalface_default.xml");
     let cascade = CascadeClassifier::from_path(d).unwrap();
 
-    highgui_named_window("window", WindowFlag::Normal).unwrap();
-
     // result is a vector of rectangles
     let result = cascade.detect_with_params(&mat, 1.1, 15, Size2i::new(80, 80), Size2i::default());
 
@@ -31,5 +29,5 @@ fn main() {
         .iter()
         .map(|&r| mat.rectangle_custom(r.scale(1.2), Scalar::new(255, 255, 0, 255), 10, LineType::Line8))
         .count();
-    mat.show("window", 0).unwrap();
+    mat.show("window", None).unwrap();
 }

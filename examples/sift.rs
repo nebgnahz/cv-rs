@@ -64,5 +64,5 @@ fn main() {
         .collect::<Vec<u8>>();
     let draw_mat = unsafe { Mat::from_buffer(blue.rows, blue.cols, mat.cv_type(), &complete_buffer) };
 
-    draw_mat.show("SIFT Points", 0).unwrap();
+    draw_mat.show("SIFT Points", None).unwrap();
 }
