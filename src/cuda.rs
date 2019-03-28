@@ -78,7 +78,7 @@ impl From<Mat> for GpuMat {
 #[derive(Debug)]
 /// Data structure that performs Histogram of Gradient (HOG).
 pub struct GpuHog {
-    inner: *mut c_void,
+    inner: *mut native::cvsys_CudaHog,
 
     /// Hog parameters.
     pub params: HogParams,
@@ -171,7 +171,7 @@ impl GpuHog {
     }
 
     /// Updates the parameter inside this GpuHog detector.
-    fn update_params(inner: *mut c_void, params: &mut HogParams) {
+    fn update_params(inner: *mut native::cvsys_CudaHog, params: &mut HogParams) {
         params.gamma_correction = unsafe { native::cvsys_cuda_hog_get_gamma_correction(inner) };
         params.group_threshold = unsafe { native::cvsys_cuda_hog_get_group_threshold(inner) };
         params.hit_threshold = unsafe { native::cvsys_cuda_hog_get_hit_threshold(inner) };
