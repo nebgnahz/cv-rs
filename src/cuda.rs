@@ -14,7 +14,7 @@ use *;
 #[derive(Debug)]
 pub struct GpuMat {
     /// The pointer to the opaque C/C++ data structure
-    pub(crate) inner: *mut c_void,
+    pub(crate) inner: *mut native::cv_cuda_GpuMat,
 
     /// Number of columns
     pub cols: c_int,
@@ -38,9 +38,9 @@ impl GpuMat {
     }
 
     /// Creates a `GpuMat` from raw pointer.
-    pub(crate) fn from_raw(inner: *mut c_void) -> GpuMat {
+    pub(crate) unsafe fn from_raw(inner: *mut native::cv_cuda_GpuMat) -> GpuMat {
         GpuMat {
-            inner: inner,
+            inner,
             cols: 0,
             rows: 0,
             depth: 0,

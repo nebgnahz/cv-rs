@@ -2,6 +2,7 @@
 #define OPENCV_CUDA_H_
 
 #include "common.hpp"
+#include "objdetect.hpp"
 #include <opencv2/cudaobjdetect.hpp>
 #include <stddef.h>
 
@@ -10,11 +11,11 @@ namespace cvsys {
 // =============================================================================
 //   Basic
 // =============================================================================
-void* cuda_gpu_mat_default();
-void cuda_gpu_mat_drop(void*);
-void cuda_gpu_mat_upload(void*, cv::Mat*);
-cv::Mat* mat_from_gpu_mat(void*);
-void* cuda_gpu_mat_from_mat(cv::Mat*);
+cv::cuda::GpuMat* cuda_gpu_mat_default();
+void cuda_gpu_mat_drop(cv::cuda::GpuMat* gpu_image);
+void cuda_gpu_mat_upload(cv::cuda::GpuMat*, cv::Mat*);
+cv::Mat* mat_from_gpu_mat(cv::cuda::GpuMat*);
+cv::cuda::GpuMat* cuda_gpu_mat_from_mat(cv::Mat*);
 
 // =============================================================================
 //   Hog
@@ -22,9 +23,9 @@ void* cuda_gpu_mat_from_mat(cv::Mat*);
 void* cuda_hog_default();
 void* cuda_hog_new(Size2i win_size, Size2i block_size, Size2i block_stride, Size2i cell_size, int nbins);
 void cuda_hog_drop(void*);
-void cuda_hog_set_detector(void*, void*);
-void cuda_hog_detect(void*, void*, CVec<Rect>*);
-void cuda_hog_detect_with_conf(void*, void*, CVec<Rect>*, CVec<double>*);
+void cuda_hog_set_detector(void*, SvmDetector* detector);
+void cuda_hog_detect(void*, cv::cuda::GpuMat* image, CVec<Rect>*);
+void cuda_hog_detect_with_conf(void*, cv::cuda::GpuMat* image, CVec<Rect>*, CVec<double>*);
 
 void cuda_hog_set_gamma_correction(void*, bool gamma);
 void cuda_hog_set_group_threshold(void*, int group_threshold);
@@ -49,7 +50,7 @@ Size2i cuda_hog_get_win_stride(void*);
 // =============================================================================
 void* cuda_cascade_new(const char* const filename);
 void cuda_cascade_drop(void*);
-void cuda_cascade_detect(void*, void*, CVec<Rect>*);
+void cuda_cascade_detect(void*, cv::cuda::GpuMat* image, CVec<Rect>*);
 
 void cuda_cascade_set_find_largest_object(void*, bool);
 void cuda_cascade_set_max_num_objects(void*, int);

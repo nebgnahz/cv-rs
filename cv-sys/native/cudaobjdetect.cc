@@ -8,27 +8,24 @@ namespace cvsys {
 // =============================================================================
 //   Basic
 // =============================================================================
-void* cuda_gpu_mat_default() {
+cv::cuda::GpuMat* cuda_gpu_mat_default() {
     return new cv::cuda::GpuMat();
 }
 
-void cuda_gpu_mat_drop(void* v_gpu_image) {
-    cv::cuda::GpuMat* gpu_image = static_cast<cv::cuda::GpuMat*>(v_gpu_image);
+void cuda_gpu_mat_drop(cv::cuda::GpuMat* gpu_image) {
     delete gpu_image;
     gpu_image = nullptr;
 }
 
-void cuda_gpu_mat_upload(void* v_gpu_image, cv::Mat* image) {
-    cv::cuda::GpuMat* gpu_image = static_cast<cv::cuda::GpuMat*>(v_gpu_image);
+void cuda_gpu_mat_upload(cv::cuda::GpuMat* gpu_image, cv::Mat* image) {
     gpu_image->upload(*image);
 }
 
-cv::Mat* mat_from_gpu_mat(void* v_gpu_image) {
-    cv::cuda::GpuMat* gpu_image = static_cast<cv::cuda::GpuMat*>(v_gpu_image);
-    return (new cv::Mat(*gpu_image));
+cv::Mat* mat_from_gpu_mat(cv::cuda::GpuMat* gpu_image) {
+    return new cv::Mat(*gpu_image);
 }
 
-void* cuda_gpu_mat_from_mat(cv::Mat* image) {
+cv::cuda::GpuMat* cuda_gpu_mat_from_mat(cv::Mat* image) {
     return new cv::cuda::GpuMat(*image);
 }
 
@@ -56,22 +53,19 @@ void cuda_hog_drop(void* v_hog) {
     hog = nullptr;
 }
 
-void cuda_hog_set_detector(void* v_hog, void* v_detector) {
-    std::vector<float>* detector = static_cast<std::vector<float>*>(v_detector);
+void cuda_hog_set_detector(void* v_hog, SvmDetector* detector) {
     cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     (*hog)->setSVMDetector(*detector);
 }
 
-void cuda_hog_detect(void* v_hog, void* v_image, CVec<Rect>* found) {
-    cv::cuda::GpuMat* image = static_cast<cv::cuda::GpuMat*>(v_image);
+void cuda_hog_detect(void* v_hog, cv::cuda::GpuMat* image, CVec<Rect>* found) {
     cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     std::vector<cv::Rect> vec_object;
     (*hog)->detectMultiScale(*image, vec_object);
     to_ffi(vec_object, found);
 }
 
-void cuda_hog_detect_with_conf(void* v_hog, void* v_image, CVec<Rect>* found, CVec<double>* conf) {
-    cv::cuda::GpuMat* image = static_cast<cv::cuda::GpuMat*>(v_image);
+void cuda_hog_detect_with_conf(void* v_hog, cv::cuda::GpuMat* image, CVec<Rect>* found, CVec<double>* conf) {
     cv::Ptr<cv::cuda::HOG>* hog = static_cast<cv::Ptr<cv::cuda::HOG>*>(v_hog);
     std::vector<cv::Rect> vec_object;
     std::vector<double> vec_confidences;
@@ -180,8 +174,7 @@ void cuda_cascade_drop(void* v_cascade) {
     cascade = nullptr;
 }
 
-void cuda_cascade_detect(void* v_cascade, void* v_image, CVec<Rect>* objects) {
-    cv::cuda::GpuMat* image = static_cast<cv::cuda::GpuMat*>(v_image);
+void cuda_cascade_detect(void* v_cascade, cv::cuda::GpuMat* image, CVec<Rect>* objects) {
     cv::Ptr<cv::cuda::CascadeClassifier>* cascade = static_cast<cv::Ptr<cv::cuda::CascadeClassifier>*>(v_cascade);
     cv::cuda::GpuMat objbuf;
     std::vector<cv::Rect> vec_object;

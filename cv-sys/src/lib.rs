@@ -15,6 +15,7 @@ pub enum cv_BOWKMeansTrainer {}
 pub enum cv_CascadeClassifier {}
 pub enum cv_HOGDescriptor {}
 pub enum cv_Mat {}
+pub enum cv_cuda_GpuMat {}
 pub enum cv_TermCriteria {}
 pub enum cv_VideoCapture {}
 pub enum cv_VideoWriter {}
