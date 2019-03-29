@@ -1,7 +1,3 @@
-env:
-  global:
-    - MAKEFLAGS="-j 4"
-sudo: required
 dist: trusty
 
 language: rust
@@ -31,11 +27,10 @@ addons:
     - pkg-config
     - tesseract-ocr
     - xvfb
+    - nvidia-cuda-toolkit
 
 before_install:
   - export PATH="$PATH:$HOME/.cargo/bin"
-  - sudo -E ./.ci/install_cuda.sh
-  - sudo -E ./.ci/travis_build_opencv.sh
   - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib:/usr/local/lib/x86_64-linux-gnu
   - rustup component add rustfmt-preview
   - cargo fmt --version
@@ -49,7 +44,7 @@ script:
   - cargo test -v --features tesseract
   - cargo doc --features cuda --no-deps
   - cargo fmt -- --check
-  - diff -u <(cat native/*) <(clang-format native/*)
+  - diff -u <(cat cv-sys/native/*) <(clang-format cv-sys/native/*)
 
 notifications:
   email:
