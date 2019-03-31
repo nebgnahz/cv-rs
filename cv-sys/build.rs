@@ -265,6 +265,7 @@ fn main() -> Result<(), std::io::Error> {
                 link_package("libtiff-4");
                 link_package("libjpeg");
                 link_package("gtk+-3.0");
+                link_package("zlib");
                 vec![dst.join("include")]
             }
             p => panic!("unsupported platform {}, please file an issue", p),
