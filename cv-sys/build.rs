@@ -80,6 +80,7 @@ fn link_all_libs(location: &Path, target_os: &str) -> Result<(), std::io::Error>
 }
 
 fn main() -> Result<(), std::io::Error> {
+    let target_tripple = env::var("TARGET").unwrap();
     let target_os = env::var("CARGO_CFG_TARGET_OS").unwrap();
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let feature_cuda = env::var("CARGO_FEATURE_CUDA").is_ok();
@@ -236,6 +237,15 @@ fn main() -> Result<(), std::io::Error> {
 
         match target_os.as_str() {
             "windows" => {
+                if feature_cuda {
+                    let cuda_path = PathBuf::from(env::var("CUDA_PATH").expect("CUDA_PATH must be set"));
+                    let lib_subfolder = if target_tripple.contains("x86_64") {
+                        "x64"
+                    } else {
+                        "Win32"
+                    };
+                    println!("cargo:rustc-link-search={}", cuda_path.join("lib").join(lib_subfolder).display());
+                }
                 println!("cargo:rustc-link-lib=comdlg32");
                 println!("cargo:rustc-link-lib=Vfw32");
                 println!("cargo:rustc-link-lib=Ole32");
