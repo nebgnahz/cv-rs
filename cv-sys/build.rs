@@ -205,6 +205,9 @@ fn main() -> Result<(), std::io::Error> {
             // Eventually we need to fix it.
             .define("WITH_IPP", "OFF")
             .define("BUILD_IPP_IW", "OFF")
+            // This causes third-party libraries to be build and statically
+            // linked, even on Linux.
+            .define("OPENCV_FORCE_3RDPARTY_BUILD", "ON")
             .define("BUILD_opencv_apps", "OFF")
             .define("BUILD_opencv_java_bindings_generator", "OFF")
             .define("BUILD_opencv_js", "OFF")
@@ -261,11 +264,7 @@ fn main() -> Result<(), std::io::Error> {
                 if feature_tesseract {
                     link_package("tesseract");
                 }
-                link_package("libpng");
-                link_package("libtiff-4");
-                link_package("libjpeg");
                 link_package("gtk+-3.0");
-                link_package("zlib");
                 vec![dst.join("include")]
             }
             p => panic!("unsupported platform {}, please file an issue", p),
