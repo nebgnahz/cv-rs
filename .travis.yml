@@ -17,7 +17,6 @@ addons:
     - libavformat-dev
     - libdc1394-22-dev
     - libgmp-dev
-    - libgtk2.0-dev
     - libjasper-dev
     - libjpeg-dev
     - libleptonica-dev
@@ -30,6 +29,7 @@ addons:
     - pkg-config
     - tesseract-ocr
     - xvfb
+    - libgtk-3-dev
     - nvidia-profiler
     - nvidia-cuda-dev
     - nvidia-cuda-toolkit
