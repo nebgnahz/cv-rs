@@ -1,3 +1,6 @@
+env:
+  global:
+    - CVSYS_CUDA_ARCH_BIN="5.2"
 dist: xenial
 
 language: rust

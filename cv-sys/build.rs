@@ -221,6 +221,10 @@ fn main() -> Result<(), std::io::Error> {
             .define("BUILD_PERF_TESTS", "OFF")
             .define("BUILD_DOCS", "OFF")
             .define("BUILD_EXAMPLES", "OFF");
+        
+        if let Ok(s) = env::var("CVSYS_CUDA_ARCH_BIN") {
+            opencv_config.define("CUDA_ARCH_BIN", s);
+        }
 
         let dst = if env::var("CVSYS_STOP_CV_REBUILD").is_ok() {
             PathBuf::from(env::var("OUT_DIR").unwrap())
