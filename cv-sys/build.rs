@@ -279,6 +279,8 @@ fn main() -> Result<(), std::io::Error> {
 
     // Set modules used and opencv include dir for cvsys.
     cvsys_config
+        .uses_cxx11()
+        .cxxflag("-std=c++14")
         .define("CV_CORE_MODULES", used_core_modules.join(";"))
         .define("CV_CONTRIB_MODULES", used_contrib_modules.join(";"))
         .define(
