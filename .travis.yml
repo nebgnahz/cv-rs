@@ -47,7 +47,7 @@ script:
   - cargo build -vv --features cuda
   - cargo build -vv --features tesseract
   - cargo test -v --features tesseract
-  - cargo doc --features cuda --no-deps
+  - cargo doc -vv --features cuda --no-deps
   - cargo fmt -- --check
   - diff -u <(cat cv-sys/native/*) <(clang-format cv-sys/native/*)
 
