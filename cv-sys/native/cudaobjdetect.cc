@@ -207,13 +207,17 @@ int cuda_cascade_get_min_neighbors(CudaCascadeClassifier* cascade) {
 
 Size2i cuda_cascade_get_max_object_size(CudaCascadeClassifier* cascade) {
     cv::Size2i size = (*cascade)->getMaxObjectSize();
-    Size2i c_size = {.width = size.width, .height = size.height};
+    Size2i c_size;
+    c_size.width = size.width;
+    c_size.height = size.height;
     return c_size;
 }
 
 Size2i cuda_cascade_get_min_object_size(CudaCascadeClassifier* cascade) {
     cv::Size2i size = (*cascade)->getMinObjectSize();
-    Size2i c_size = {.width = size.width, .height = size.height};
+    Size2i c_size;
+    c_size.width = size.width;
+    c_size.height = size.height;
     return c_size;
 }
 
