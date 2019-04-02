@@ -271,10 +271,13 @@ fn main() -> Result<(), std::io::Error> {
                 println!("cargo:rustc-link-lib=stdc++");
                 // Linking all libs twice may solve dependency ordering issues.
                 link_all_libs(&dst.join("lib"), &target_os)?;
+                // TODO: These various pkgconfig interactions might need to be conditional based
+                // on if the packge is installed or not because OpenCV also checks for installation.
                 if feature_tesseract {
                     link_package("tesseract");
                 }
                 link_package("gtk+-3.0");
+                link_package("libdc1394-2");
                 vec![dst.join("include")]
             }
             p => panic!("unsupported platform {}, please file an issue", p),
