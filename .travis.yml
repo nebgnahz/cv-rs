@@ -18,7 +18,6 @@ addons:
     - libleptonica-dev
     - libswscale-dev
     - libtesseract-dev
-    - libpng-dev
     - pkg-config
     - tesseract-ocr
     - xvfb

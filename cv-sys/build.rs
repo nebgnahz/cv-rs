@@ -208,6 +208,16 @@ fn main() -> Result<(), std::io::Error> {
             // This causes third-party libraries to be build and statically
             // linked, even on Linux.
             .define("OPENCV_FORCE_3RDPARTY_BUILD", "ON")
+            .define("BUILD_ZLIB", "ON")
+            .define("BUILD_TIFF", "ON")
+            .define("BUILD_JASPER", "ON")
+            .define("BUILD_JPEG", "ON")
+            .define("BUILD_PNG", "ON")
+            .define("BUILD_OPENEXR", "ON")
+            .define("BUILD_WEBP", "ON")
+            .define("BUILD_TBB", "ON")
+            .define("BUILD_IPP_IW", "ON")
+            .define("BUILD_ITT", "ON")
             .define("BUILD_opencv_apps", "OFF")
             .define("BUILD_opencv_java_bindings_generator", "OFF")
             .define("BUILD_opencv_js", "OFF")
@@ -264,7 +274,6 @@ fn main() -> Result<(), std::io::Error> {
                 if feature_tesseract {
                     link_package("tesseract");
                 }
-                link_package("libpng");
                 link_package("gtk+-3.0");
                 vec![dst.join("include")]
             }
