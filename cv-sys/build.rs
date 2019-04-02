@@ -261,10 +261,10 @@ fn main() -> Result<(), std::io::Error> {
                 println!("cargo:rustc-link-lib=stdc++");
                 // Linking all libs twice may solve dependency ordering issues.
                 link_all_libs(&dst.join("lib"), &target_os)?;
-                link_all_libs(&dst.join("lib"), &target_os)?;
                 if feature_tesseract {
                     link_package("tesseract");
                 }
+                link_package("libpng");
                 link_package("gtk+-3.0");
                 vec![dst.join("include")]
             }
