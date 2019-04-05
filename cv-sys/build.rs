@@ -213,7 +213,7 @@ fn main() -> Result<(), std::io::Error> {
             .define("BUILD_JASPER", "ON")
             .define("BUILD_JPEG", "ON")
             .define("BUILD_PNG", "ON")
-            .define("BUILD_OPENEXR", "ON")
+            .define("BUILD_OPENEXR", if target_os == "Windows" { "ON" } else { "OFF" })
             .define("BUILD_WEBP", "ON")
             .define("BUILD_TBB", "ON")
             .define("BUILD_IPP_IW", "ON")
@@ -235,7 +235,7 @@ fn main() -> Result<(), std::io::Error> {
             .define("BUILD_PERF_TESTS", "OFF")
             .define("BUILD_DOCS", "OFF")
             .define("BUILD_EXAMPLES", "OFF");
-        
+
         if let Ok(s) = env::var("CVSYS_CUDA_ARCH_BIN") {
             opencv_config.define("CUDA_ARCH_BIN", s);
         }
@@ -257,7 +257,10 @@ fn main() -> Result<(), std::io::Error> {
                     } else {
                         "Win32"
                     };
-                    println!("cargo:rustc-link-search={}", cuda_path.join("lib").join(lib_subfolder).display());
+                    println!(
+                        "cargo:rustc-link-search={}",
+                        cuda_path.join("lib").join(lib_subfolder).display()
+                    );
                 }
                 println!("cargo:rustc-link-lib=comdlg32");
                 println!("cargo:rustc-link-lib=Vfw32");
@@ -278,6 +281,7 @@ fn main() -> Result<(), std::io::Error> {
                 }
                 link_package("gtk+-3.0");
                 link_package("libdc1394-2");
+                link_package("OpenEXR");
                 vec![dst.join("include")]
             }
             p => panic!("unsupported platform {}, please file an issue", p),

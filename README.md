@@ -60,6 +60,7 @@ You must install these packages (use `sudo apt install <package>`):
 - `libtiff-dev`
 - `libjpeg-dev`
 - `pkg-config`
+- `libopenexr-dev`
 
 #### `cuda` feature
 

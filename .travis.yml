@@ -25,6 +25,7 @@ addons:
     - nvidia-profiler
     - nvidia-cuda-dev
     - nvidia-cuda-toolkit
+    - libopenexr-dev
 
 before_install:
   - export PATH="$PATH:$HOME/.cargo/bin"
