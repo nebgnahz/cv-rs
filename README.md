@@ -56,11 +56,9 @@ You must install these packages (use `sudo apt install <package>`):
 - `libc++-dev`
 - `cmake`
 - `libgtk-3-dev`
-- `libpng-dev`
-- `libtiff-dev`
-- `libjpeg-dev`
 - `pkg-config`
 - `libopenexr-dev`
+- `libdc1394-22-dev`
 
 #### `cuda` feature
 
@@ -80,11 +78,24 @@ You must install these packages (use `sudo apt install <package>`):
     if you wish to switch to another `gcc` version in the future.
 
 
+#### `tesseract` feature
+
+The `text` feature works fine without any system dependencies. To use the `tesseract` feature,
+you must install:
+
+- `tesseract-ocr`
+
+You may also want to install some tesseract language support from your distribution as well.
+They have packages for text in each language.
+
 Please create an issue if there are any other unlisted dependencies.
 
 ### Windows
 
-You must have `cmake` installed.
+You must have `cmake` installed and it otherwise just works. It will build
+OpenCV and statically link it to your Rust binary. You only need to build OpenCV
+once, but be careful not to run `cargo clean` without considering the about half an hour
+OpenCV may take to rebuild.
 
 ## Usage
 

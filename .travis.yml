@@ -22,8 +22,6 @@ addons:
     - tesseract-ocr
     - xvfb
     - libgtk-3-dev
-    - nvidia-profiler
-    - nvidia-cuda-dev
     - nvidia-cuda-toolkit
     - libopenexr-dev
 
