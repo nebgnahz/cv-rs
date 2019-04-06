@@ -88,6 +88,16 @@ fn main() -> Result<(), std::io::Error> {
     let feature_text = env::var("CARGO_FEATURE_TEXT").is_ok();
     let feature_tesseract = env::var("CARGO_FEATURE_TESSERACT").is_ok();
 
+    // Ask for pkg-config to be resolved up-front to avoid needless compilation.
+    if !feature_system && target_os == "linux" {
+        if feature_tesseract {
+            link_package("tesseract");
+        }
+        link_package("gtk+-3.0");
+        link_package("libdc1394-2");
+        link_package("OpenEXR");
+    }
+
     let mut disabled_modules = vec![
         "cudaoptflow",
         "superres",
@@ -274,14 +284,6 @@ fn main() -> Result<(), std::io::Error> {
                 println!("cargo:rustc-link-lib=stdc++");
                 // Linking all libs twice may solve dependency ordering issues.
                 link_all_libs(&dst.join("lib"), &target_os)?;
-                // TODO: These various pkgconfig interactions might need to be conditional based
-                // on if the packge is installed or not because OpenCV also checks for installation.
-                if feature_tesseract {
-                    link_package("tesseract");
-                }
-                link_package("gtk+-3.0");
-                link_package("libdc1394-2");
-                link_package("OpenEXR");
                 vec![dst.join("include")]
             }
             p => panic!("unsupported platform {}, please file an issue", p),
