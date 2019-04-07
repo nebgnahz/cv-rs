@@ -128,7 +128,7 @@ mod unix {
     }
 
     pub fn opencv_link() {
-        let cargo_rustc_link_search = env::var("OPENCV_LIB").unwrap_or("/use/local/lib".into());
+        let cargo_rustc_link_search = env::var("OPENCV_LIB").unwrap_or("/usr/local/lib".into());
 
         println!("cargo:rustc-link-search=native={}", cargo_rustc_link_search);
         println!("cargo:rustc-link-lib=opencv_core");
@@ -139,7 +139,9 @@ mod unix {
         println!("cargo:rustc-link-lib=opencv_imgcodecs");
         println!("cargo:rustc-link-lib=opencv_imgproc");
         println!("cargo:rustc-link-lib=opencv_objdetect");
-        println!("cargo:rustc-link-lib=opencv_text");
+        if cfg!(feature = "text") {
+            println!("cargo:rustc-link-lib=opencv_text");
+        }
         println!("cargo:rustc-link-lib=opencv_videoio");
         println!("cargo:rustc-link-lib=opencv_video");
         if cfg!(feature = "cuda") {
@@ -166,6 +168,11 @@ fn main() {
 
     if cfg!(not(target_env = "msvc")) {
         opencv_config.flag("--std=c++11");
+    }
+
+    if cfg!(feature = "text") {
+        let text_files = get_files("native/text");
+        opencv_config.files(text_files);
     }
 
     if cfg!(feature = "cuda") {
