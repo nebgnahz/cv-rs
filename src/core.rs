@@ -74,7 +74,7 @@ pub struct Point2i {
 }
 
 impl Point2i {
-    /// Creats a new `Point2i`.
+    /// Creates a new `Point2i`.
     pub fn new(x: c_int, y: c_int) -> Self {
         Point2i { x: x, y: y }
     }
@@ -92,7 +92,7 @@ pub struct Point2f {
 }
 
 impl Point2f {
-    /// Creats a new `Point2f`.
+    /// Creates a new `Point2f`.
     pub fn new(x: f32, y: f32) -> Self {
         Point2f { x: x, y: y }
     }
