@@ -10,6 +10,7 @@ pub(crate) enum CTermCriteria {}
 extern "C" {
     fn cv_term_criteria_new(t: TermType, count: c_int, epsilon: f64) -> *mut CTermCriteria;
     fn cv_term_criteria_drop(criteria: *mut CTermCriteria);
+    fn cv_get_optimal_dft_size(vecsize: c_int) -> c_int;
 }
 
 /// Data structure for salient point detectors
@@ -467,4 +468,10 @@ impl Drop for TermCriteria {
             cv_term_criteria_drop(self.c_criteria);
         }
     }
+}
+
+/// Returns the optimal DFT size for a given vector size.
+/// https://docs.opencv.org/3.1.0/d2/de8/group__core__array.html#ga6577a2e59968936ae02eb2edde5de299
+pub fn get_optimal_dft_size(vecsize: c_int) -> c_int {
+    unsafe { cv_get_optimal_dft_size(vecsize) }
 }

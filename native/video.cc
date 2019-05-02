@@ -11,6 +11,10 @@ void cv_term_criteria_drop(cv::TermCriteria* criteria) {
     criteria = nullptr;
 }
 
+int cv_get_optimal_dft_size(int vecsize) {
+    return cv::getOptimalDFTSize(vecsize);
+}
+
 RotatedRect cv_camshift(cv::Mat* bp_image, Rect crect, cv::TermCriteria* criteria) {
     cv::Rect rect(crect.x, crect.y, crect.width, crect.height);
     cv::RotatedRect rr = cv::CamShift(*bp_image, rect, *criteria);
