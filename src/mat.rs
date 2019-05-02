@@ -74,6 +74,7 @@ extern "C" {
         border_type: c_int,
         color: Scalar,
     ) -> c_int;
+    fn cv_mat_convert_to(src: *const CMat, cv_type: CvType, alpha: c_double, beta: c_double) -> *mut CMat;
 }
 
 /// The class `Mat` represents an n-dimensional dense numerical single-channel or multi-channel array.
@@ -391,6 +392,12 @@ impl Mat {
         unsafe {
             cv_mat_copy_make_border(self.inner, m, top, bottom, left, right, type_ as i32, color);
         }
+        Mat::from_raw(m)
+    }
+
+    /// Changes mat type
+    pub fn convert_to(&self, cv_type: CvType, alpha: f64, beta: f64) -> Mat {
+        let m = unsafe { cv_mat_convert_to(self.inner, cv_type, alpha, beta) };
         Mat::from_raw(m)
     }
 }

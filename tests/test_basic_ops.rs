@@ -40,3 +40,18 @@ fn test_mat_clone() {
 fn pixel_eq(a: u8, b: u8) -> bool {
     (a - b) <= 1
 }
+
+#[test]
+fn test_mat_convert_to() {
+    let img = utils::load_lenna();
+    for cv_type in vec![
+        CvType::Cv8UC1,
+        CvType::Cv32FC1,
+        CvType::Cv16UC1,
+    ].into_iter() {
+        let img2 = img.convert_to(cv_type, 0.5, 0.5);
+        assert_eq!(img2.cv_type(), cv_type);
+        assert_eq!(img.cols, img2.cols);
+        assert_eq!(img.rows, img2.rows);
+    }
+}

@@ -158,4 +158,11 @@ void cv_mat_copy_make_border(
     cv::Scalar c(color.v0, color.v1, color.v2, color.v3);
     copyMakeBorder(*src, *d, t, b, l, r, type, c);
 }
+
+void* cv_mat_convert_to(
+    const cv::Mat *const src1, int type, double alpha, double beta) {
+    cv::Mat *dst = new cv::Mat();
+    src1->convertTo(*dst, type, alpha, beta);
+    return dst;
+}
 }
