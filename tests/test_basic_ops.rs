@@ -8,6 +8,7 @@ extern crate cv;
 mod utils;
 
 use cv::*;
+use cv::mat::Merge;
 
 #[test]
 fn test_accessing_pixel() {
@@ -39,4 +40,15 @@ fn test_mat_clone() {
 
 fn pixel_eq(a: u8, b: u8) -> bool {
     (a - b) <= 1
+}
+
+#[test]
+fn test_mat_merge() {
+    let size = Size2i::new(100, 200);
+    let img = utils::load_lenna().resize_to(size.clone(), cv::imgproc::InterpolationFlag::InterNearst);
+    let img2 = utils::load_messi_color().resize_to(size.clone(), cv::imgproc::InterpolationFlag::InterNearst);
+    let merged = vec![&img, &img2].merge();
+    assert_eq!(merged.channels, img.channels + img2.channels);
+    assert_eq!(merged.size().width, size.width);
+    assert_eq!(merged.size().height, size.height);
 }

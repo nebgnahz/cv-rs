@@ -153,6 +153,14 @@ int cv_mat_count_non_zero(const cv::Mat* const src) {
     return cv::countNonZero(*src);
 }
 
+void cv_mat_merge(const cv::Mat** const srcs, unsigned long size, cv::Mat* const dst) {
+    std::vector<cv::Mat> matVec;
+    for (unsigned long i = 0; i < size; i++) {
+        matVec.push_back(*srcs[i]);
+    }
+    cv::merge(matVec, *dst);
+}
+
 void cv_mat_copy_make_border(
     const cv::Mat* const src, cv::Mat* const d, int t, int b, int l, int r, int type, Scalar color) {
     cv::Scalar c(color.v0, color.v1, color.v2, color.v3);

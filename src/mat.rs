@@ -5,7 +5,7 @@ use failure::Error;
 use std::ffi::CString;
 use std::mem;
 use std::ops::{BitAnd, BitOr, BitXor, Not};
-use std::os::raw::{c_char, c_double, c_int};
+use std::os::raw::{c_char, c_double, c_int, c_ulong};
 use std::path::Path;
 use std::slice;
 use *;
@@ -63,6 +63,7 @@ extern "C" {
     fn cv_mat_bitwise_not(src: *const CMat, dst: *mut CMat);
     fn cv_mat_bitwise_or(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
     fn cv_mat_bitwise_xor(src1: *const CMat, src2: *const CMat, dst: *mut CMat);
+    fn cv_mat_merge(srcs: *const *mut CMat, srcs_len: c_ulong, dst: *mut CMat);
     fn cv_mat_count_non_zero(src: *const CMat) -> c_int;
     fn cv_mat_copy_make_border(
         src: *const CMat,
@@ -503,5 +504,61 @@ impl<'a> Not for &'a Mat {
         let m = CMat::new();
         unsafe { cv_mat_bitwise_not(self.inner, m) }
         Mat::from_raw(m)
+    }
+}
+
+/// Merge trait to merge mats into a multi-channel array.
+pub trait Merge {
+    /// The functions merge several arrays to make a single multi-channel array.
+    fn merge(&self) -> Mat;
+}
+
+impl Merge for &[Mat] {
+    /// The functions merge several arrays to make a single multi-channel array. That is,
+    /// each element of the output array will be a concatenation of the elements of the input
+    /// arrays, where elements of i-th input array are treated as mv[i].channels()-element vectors.
+    ///
+    /// https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html?highlight=merge#cv2.merge
+    fn merge(&self) -> Mat {
+        let me = self.iter().collect::<Vec<&Mat>>();
+        me.merge()
+    }
+}
+
+impl Merge for Vec<Mat> {
+    /// The functions merge several arrays to make a single multi-channel array. That is,
+    /// each element of the output array will be a concatenation of the elements of the input
+    /// arrays, where elements of i-th input array are treated as mv[i].channels()-element vectors.
+    ///
+    /// https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html?highlight=merge#cv2.merge
+    fn merge(&self) -> Mat {
+        let me = self.iter().collect::<Vec<&Mat>>();
+        me.merge()
+    }
+}
+
+impl Merge for &[&Mat] {
+    /// The functions merge several arrays to make a single multi-channel array. That is,
+    /// each element of the output array will be a concatenation of the elements of the input
+    /// arrays, where elements of i-th input array are treated as mv[i].channels()-element vectors.
+    ///
+    /// https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html?highlight=merge#cv2.merge
+    fn merge(&self) -> Mat {
+        let m = CMat::new();
+        let myinners: Vec<*mut CMat> = self.iter().map(|x| x.inner).collect::<Vec<_>>();
+        unsafe { cv_mat_merge(myinners.as_ptr(), self.len() as c_ulong, m); }
+        Mat::from_raw(m)
+    }
+}
+
+impl Merge for Vec<&Mat> {
+    /// The functions merge several arrays to make a single multi-channel array. That is,
+    /// each element of the output array will be a concatenation of the elements of the input
+    /// arrays, where elements of i-th input array are treated as mv[i].channels()-element vectors.
+    ///
+    /// https://docs.opencv.org/2.4/modules/core/doc/operations_on_arrays.html?highlight=merge#cv2.merge
+    fn merge(&self) -> Mat {
+        let me: &[_] = self;
+        me.merge()
     }
 }
