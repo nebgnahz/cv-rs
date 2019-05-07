@@ -1,5 +1,4 @@
 #include "mat.h"
-
 extern "C" {
 
 void* cv_mat_from_file_storage(const char* path, const char* section) {
@@ -157,5 +156,16 @@ void cv_mat_copy_make_border(
     const cv::Mat* const src, cv::Mat* const d, int t, int b, int l, int r, int type, Scalar color) {
     cv::Scalar c(color.v0, color.v1, color.v2, color.v3);
     copyMakeBorder(*src, *d, t, b, l, r, type, c);
+}
+
+void cv_mat_split(const cv::Mat* const src, cv::Mat** dst) {
+    std::vector<cv::Mat> matVec;
+    for (int i = 0; i < src->channels(); i++) {
+        matVec.push_back(*dst[i]);
+    }
+    cv::split(*src, matVec);
+    for (int i = 0; i < src->channels(); i++) {
+        *dst[i] = matVec[i];
+    }
 }
 }
