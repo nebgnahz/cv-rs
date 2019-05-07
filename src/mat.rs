@@ -74,6 +74,7 @@ extern "C" {
         border_type: c_int,
         color: Scalar,
     ) -> c_int;
+    fn cv_mat_copy_to(src: *const CMat, dst: *mut CMat);
 }
 
 /// The class `Mat` represents an n-dimensional dense numerical single-channel or multi-channel array.
@@ -392,6 +393,11 @@ impl Mat {
             cv_mat_copy_make_border(self.inner, m, top, bottom, left, right, type_ as i32, color);
         }
         Mat::from_raw(m)
+    }
+
+    /// Copies the matrix to another one.
+    pub fn copy_to(&self, dst: &mut Mat) {
+        unsafe { cv_mat_copy_to(self.inner, dst.inner) };
     }
 }
 

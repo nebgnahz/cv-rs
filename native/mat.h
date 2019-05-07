@@ -46,6 +46,7 @@ void cv_mat_copy_make_border(const cv::Mat* const src1,
                              int right,
                              int borderType,
                              Scalar value);
+void cv_mat_copy_to(const cv::Mat *const src, cv::Mat* dst);
 }
 
 #endif  // CV_RS_MAT_H

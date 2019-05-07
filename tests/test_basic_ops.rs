@@ -40,3 +40,11 @@ fn test_mat_clone() {
 fn pixel_eq(a: u8, b: u8) -> bool {
     (a - b) <= 1
 }
+
+#[test]
+fn test_mat_copy_to() {
+    let img = utils::load_lenna();
+    let mut dst = Mat::with_size(1024, 1024, img.cv_type() as i32);
+    img.copy_to(&mut dst);
+    assert_eq!(dst.roi(cv::Rect::new(0, 0, 4, 4)).data(), img.roi(cv::Rect::new(0, 0, 4, 4)).data());
+}
