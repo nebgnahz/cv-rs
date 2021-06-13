@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ColorConversion","Color conversion code used in cvt_color."],["HistogramComparisionMethod","Possible methods for histogram comparision method"],["InterpolationFlag","Interpolation algorithm"],["ThresholdType","ThresholdTypes used in threshold."]]});

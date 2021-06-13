@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["CvError","Custom errors that may happen during calls"]]});
